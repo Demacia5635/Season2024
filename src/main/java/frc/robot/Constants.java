@@ -121,8 +121,8 @@ public final class Constants {
 
       public static final double FORWORD_MOVE_KS = 0.05; // 0.15851/12; //0.0362;
       public static final double FORWORD_MOVE_KV = 0.263; //0.012314/12; //0.0862;
-      public static final double FORWORD_ANGLE_KS = 0.035;//0.52557/12.0; //0.05;
-      public static final double FORWORD_ANGLE_KV = 0.0003;//0.003737/12.0; //0.0962;
+      public static final double FORWORD_ANGLE_KS = 0.062;//0.52557/12.0; //0.05;
+      public static final double FORWORD_ANGLE_KV = 0.0006;//0.003737/12.0; //0.0962;
 
       public static final double BACKWARD_MOVE_KS = 0.05; // 0.15851/12; //0.0362;
       public static final double BACKWARD_MOVE_KV = 0.263; //0.012314/12; //0.0862;
