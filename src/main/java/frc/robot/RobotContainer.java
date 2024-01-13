@@ -18,11 +18,7 @@ public class RobotContainer {
   Chassis chassis;
   DriveCommand drive;
 
-  static TalonFX motor1;
-  static TalonFX motor2;
-  static TalonFX motor3;
-  static TalonFX motor4;
-
+ 
   public RobotContainer() {
 
     commandController = new CommandXboxController(Constants.CONTROLLER_PORT);
@@ -32,11 +28,7 @@ public class RobotContainer {
     chassis.setDefaultCommand(drive);
     
 
-    motor1 = new TalonFX(1);
-    motor2 = new TalonFX(4);
-    motor3 = new TalonFX(5);
-    motor4 = new TalonFX(7);
-
+    
     configureBindings();
   }
 
@@ -55,25 +47,19 @@ public class RobotContainer {
 
         // safty buttons to stop the arm and/or the gripper
     }
-    public static void speen(double speed){
-      motor1.set(ControlMode.PercentOutput, speed);
-      motor2.set(ControlMode.PercentOutput, speed);
-      motor3.set(ControlMode.PercentOutput, speed);
-      motor4.set(ControlMode.PercentOutput, speed);
-    }
-
+   
   /**
-   * Use this to pass the autonomous command to the main {@link Robot} class.
+   * Use this to pass the autonomous command to the main {@link Robot} cass.
    *
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    //return new RunCommand(()-> chassis.setModulesAngleFromSB(90), chassis);
+    return new RunCommand(()-> chassis.setModulesAngleFromSB(90), chassis);
     // return new InstantCommand(() -> chassis.resetWheels(), chassis)
     // .andThen(new RunCommand(() -> chassis.setVelocities(new ChassisSpeeds(-2, 0, 0))).withTimeout(2).andThen(new InstantCommand(() -> chassis.stop())));
     //return new RunCommand(() -> chassis.getModule(2).setAngularVelocity(600));
-    //return new RunCommand(() -> chassis.setModulesPower(0.2));
-    return new RunCommand(()-> speen(0.2), chassis);
+    // return new RunCommand(() -> chassis.setModulesPower(0.05));
+    // return new RunCommand(()-> chassis.setModulesAngularPower(-0.3), chassis);
     //return new RunCommand(()->{chassis.getModule(2).setAngularPower(0.049 + 300*0.0003);},chassis).withTimeout(3)
     //  .andThen(new InstantCommand(()->{SmartDashboard.putNumber("FF TEST",  chassis.getModule(2).getAngularVelocity());
     //chassis.stop();}));

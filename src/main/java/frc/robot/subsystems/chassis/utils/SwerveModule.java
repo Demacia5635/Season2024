@@ -44,25 +44,28 @@ public class SwerveModule implements Sendable {
     public SwerveModule(SwerveModuleConstants constants, boolean FORWORD) {
         moveMotor = new TalonFX(constants.moveMotorId);
         angleMotor = new TalonFX(constants.angleMotorId);
+        moveMotor.configFactoryDefault();
+        angleMotor.configFactoryDefault();
         absoluteEncoder = new CANCoder(constants.absoluteEncoderId);
         this.FORWORD = FORWORD;
-        if (FORWORD  ){
+        if (FORWORD){
             velocityFF = new SimpleMotorFeedforward(FORWORD_ANGLE_KS, FORWORD_MOVE_KV);
             angularFF = new SimpleMotorFeedforward(FORWORD_ANGLE_KS, FORWORD_ANGLE_KV);
             setMovePID(FORWORD_MOVE_KP, FORWORD_MOVE_KI, FORWORD_MOVE_KD);
             setAnglePID(FORWORD_ANGLE_VELOCITY_KP, FORWORD_ANGLE_VELOCITY_KI, FORWORD_ANGLE_VELOCITY_KD);
+            angleMotor.setInverted(false);
+
         }
         else{
             velocityFF = new SimpleMotorFeedforward(BACKWARD_ANGLE_KS, BACKWARD_MOVE_KV);
             angularFF = new SimpleMotorFeedforward(BACKWARD_ANGLE_KS, BACKWARD_ANGLE_KV);
             setMovePID(BACKWARD_MOVE_KP, BACKWARD_MOVE_KI, BACKWARD_MOVE_KD);
             setAnglePID(BACKWARD_ANGLE_VELOCITY_KP, BACKWARD_ANGLE_VELOCITY_KI, BACKWARD_ANGLE_VELOCITY_KD);
+            angleMotor.setInverted(true);
         }
         
         angleTrapezoid = new Trapezoid(MAX_ANGULAR_VELOCITY, ANGULAR_ACCELERATION);
 
-        moveMotor.configFactoryDefault();
-        angleMotor.configFactoryDefault();
 
 
         angleOffset = constants.steerOffset;

@@ -53,22 +53,22 @@ public final class Constants {
     public final static SwerveModuleConstants MODULE_FRONT_LEFT = new SwerveModuleConstants(
       3, 4, 12,
       new Translation2d(0.332, 0.277),
-      79.892578125
+      257.607421875
     );
     public final static SwerveModuleConstants MODULE_FRONT_RIGHT = new SwerveModuleConstants(
       5, 6, 13,
       new Translation2d(0.332, -0.277),
-      112.587890625
+      290.7
     );
     public final static SwerveModuleConstants MODULE_BACK_LEFT = new SwerveModuleConstants(
       2, 1, 11,
       new Translation2d(-0.332, 0.288),
-      96.591796875-41.39
+      230
     );
     public final static SwerveModuleConstants MODULE_BACK_RIGHT = new SwerveModuleConstants(
       8, 7, 14,
       new Translation2d(-0.332, -0.288),
-      96.591796875
+      276.1
     );
     public static final int GYRO_ID = 15;
 
@@ -85,7 +85,7 @@ public final class Constants {
     public static final double ANGULAR_ACCELERATION = 6000;
 
     public static final double FORWORD_PULSES_PER_METER = 52226.56641604010025062656641604;
-    public static final double FORWORD_PULSES_PER_DEGREE = 72.817777777777777777777777777779;
+    public static final double FORWORD_PULSES_PER_DEGREE = (12.8 * 2048)/360;
 
     // public static final double WHEEL_DIAMETER = (4 * 2.54) / 100;
     // public static final double WHEEL_PERIMETER = WHEEL_DIAMETER * Math.PI;
@@ -94,7 +94,7 @@ public final class Constants {
     // public static final double BACKWARD_PULSES_PER_METER = (1 / (WHEEL_PERIMETER))*MOTOR_PULSES_PER_SPIN * MK4I_GEAR_RATIO;
     // public static final double BACKWARD_PULSES_PER_DEGREE = 12.9047619048;
     public static final double BACKWARD_PULSES_PER_METER = 52226.56641604010025062656641604;
-    public static final double BACKWARD_PULSES_PER_DEGREE = 72.817777777777777777777777777779;
+    public static final double BACKWARD_PULSES_PER_DEGREE = ((150/7)*2048)/360;
 
     public static class SwerveModuleConstants {
       public static final double FORWORD_MOVE_KP = 0.05;
@@ -105,16 +105,16 @@ public final class Constants {
       public static final double BACKWARD_MOVE_KI = 0;
       public static final double BACKWARD_MOVE_KD = 0;
 
-      public static final double FORWORD_ANGLE_POSITION_KP = 0.35;
-      public static final double FORWORD_ANGLE_POSITION_KI = 0;
-      public static final double FORWORD_ANGLE_POSITION_KD = 0.029;
+      public static final double FORWORD_ANGLE_POSITION_KP = 0.001;
+      public static final double FORWORD_ANGLE_POSITION_KI = 0.0000003;
+      public static final double FORWORD_ANGLE_POSITION_KD = 0.0;
       public static final double FORWORD_ANGLE_VELOCITY_KP = 0.08;//0.05/*6.7422E-08*/; //0.07
       public static final double FORWORD_ANGLE_VELOCITY_KI = 0.0; //0.004;
       public static final double FORWORD_ANGLE_VELOCITY_KD = 0;
 
-      public static final double BACKWARD_ANGLE_POSITION_KP = 0.35;
-      public static final double BACKWARD_ANGLE_POSITION_KI = 0;
-      public static final double BACKWARD_ANGLE_POSITION_KD = 0.029;
+      public static final double BACKWARD_ANGLE_POSITION_KP = 0.0001;
+      public static final double BACKWARD_ANGLE_POSITION_KI = 0.000001;
+      public static final double BACKWARD_ANGLE_POSITION_KD = 0.0;
       public static final double BACKWARD_ANGLE_VELOCITY_KP = 0.0/*6.7422E-08*/; //0.07
       public static final double BACKWARD_ANGLE_VELOCITY_KI = 0.; //0.004;
       public static final double BACKWARD_ANGLE_VELOCITY_KD = 0;

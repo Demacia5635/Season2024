@@ -228,7 +228,7 @@ public class Chassis extends SubsystemBase {
       poseEstimator.update(getAngle(), getModulePositions());
       updateField();
       for (SwerveModule module : modules) {
-        // module.update();
+        module.update();
       }
 
       SmartDashboard.putNumber("absolute encoder 2", modules[2].getAbsoluteEncoder());
