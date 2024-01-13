@@ -23,8 +23,7 @@ import static frc.robot.Constants.ChassisConstants.*;
 import java.util.Arrays;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.sensors.PigeonIMU;
-import com.ctre.phoenix6.hardware.Pigeon2;
+import com.ctre.phoenix.sensors.Pigeon2;
 
 public class Chassis extends SubsystemBase {
   private final SwerveModule[] modules;
@@ -163,7 +162,7 @@ public class Chassis extends SubsystemBase {
    * Returns the angle of the gyro
    */
   public Rotation2d getAngle() {
-    return Rotation2d.fromDegrees(gyro.getYaw().getValue());
+    return Rotation2d.fromDegrees(gyro.getYaw());
   }
 
   /**
@@ -230,6 +229,10 @@ public class Chassis extends SubsystemBase {
       for (SwerveModule module : modules) {
         module.update();
       }
+
+      SmartDashboard.putNumber("gyro angle", getAngle().getDegrees());
+      SmartDashboard.putNumber("gyro pitch", gyro.getPitch());
+      SmartDashboard.putNumber("gyro roll", gyro.getRoll());
 
       SmartDashboard.putNumber("absolute encoder 2", modules[2].getAbsoluteEncoder());
       SmartDashboard.putNumber("absolute encoder 3", modules[3].getAbsoluteEncoder());
