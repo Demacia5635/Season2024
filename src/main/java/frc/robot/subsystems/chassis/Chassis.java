@@ -165,6 +165,12 @@ public class Chassis extends SubsystemBase {
     return Rotation2d.fromDegrees(gyro.getYaw());
   }
 
+  public void setOdometryToForward(){
+    poseEstimator.resetPosition(getAngle(), getModulePositions(), new Pose2d(new Translation2d(poseEstimator.getEstimatedPosition().getX(), poseEstimator.getEstimatedPosition().getY())
+    , new Rotation2d().fromDegrees(0)));
+    gyro.setYaw(0);
+  }
+
   /**
    * Returns the position of every module
    * @return Position relative to the field
