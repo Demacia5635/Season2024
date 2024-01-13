@@ -19,7 +19,7 @@ public class RobotContainer implements Sendable{
   CommandXboxController commandController;
   Chassis chassis;
   DriveCommand drive;
-  double x = 0.2;
+  double x = 1;
   TalonFX motor;
 
  
@@ -32,7 +32,7 @@ public class RobotContainer implements Sendable{
     chassis.setDefaultCommand(drive);
     SmartDashboard.putData("RC", this);
 
-    motor = new TalonFX(2);
+    motor = new TalonFX(1);
     configureBindings();
   }
 
