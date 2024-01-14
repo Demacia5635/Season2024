@@ -175,15 +175,16 @@ public class SwerveModule implements Sendable {
      */
     public void setAngle(Rotation2d angle) {
         targetAngle = angle.getDegrees();
-    }
-
-    public void update() {
         double dist = Rotation2d.fromDegrees(targetAngle).minus(getAngle()).getDegrees();
         double v = angleTrapezoid.calculate(dist, getAngularVelocity(), 0);
         if (Math.abs(dist) > MAX_STEER_ERROR)
             setAngularVelocity(v);
         else
             setAngularPower(0);
+    }
+
+    public void update() {
+        
     }
 
     /**

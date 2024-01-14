@@ -229,7 +229,6 @@ public class Chassis extends SubsystemBase {
 
   @Override
   public void periodic() {
-    //System.out.println(gyro.getYaw().getValue());
       poseEstimator.update(getAngle(), getModulePositions());
       updateField();
       for (SwerveModule module : modules) {

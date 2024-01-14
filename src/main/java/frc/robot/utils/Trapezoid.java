@@ -30,7 +30,7 @@ public class Trapezoid {
     // Helper function to calculate distance required to change from current velocity to target velocity
     private double distanceToVelocity(double currentVelocity, double targetVelocity, double acceleration) {
         double deltaVelocity = currentVelocity - targetVelocity;
-        return (currentVelocity - deltaVelocity/2)*deltaVelocity/acceleration;
+        return (currentVelocity - deltaVelocity)/2*deltaVelocity/acceleration;
     }
 
     // Function to calculate the next velocity setpoint, based on remaining distance and current and target velocities

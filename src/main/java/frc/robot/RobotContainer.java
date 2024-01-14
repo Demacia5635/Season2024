@@ -20,7 +20,6 @@ public class RobotContainer implements Sendable{
   Chassis chassis;
   DriveCommand drive;
   double x = 0.2;
-  TalonFX motor;
 
  
   public RobotContainer() {
@@ -32,7 +31,6 @@ public class RobotContainer implements Sendable{
     chassis.setDefaultCommand(drive);
     SmartDashboard.putData("RC", this);
 
-    motor = new TalonFX(4);
     configureBindings();
   }
 
@@ -67,7 +65,8 @@ public class RobotContainer implements Sendable{
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    //return new RunCommand(()-> chassis.setModulesAngleFromSB(90), chassis);
+    //return null;
+    return new RunCommand(()-> chassis.setModulesAngularVelocity(50), chassis);
     // return new InstantCommand(() -> chassis.resetWheels(), chassis)
     // .andThen(new RunCommand(() -> chassis.setVelocities(new ChassisSpeeds(-2, 0, 0))).withTimeout(2).andThen(new InstantCommand(() -> chassis.stop())));
     //return new RunCommand(() -> chassis.getModule(2).setAngularVelocity(600));
@@ -76,6 +75,5 @@ public class RobotContainer implements Sendable{
     //return new RunCommand(()->{chassis.getModule(2).setAngularPower(0.049 + 300*0.0003);},chassis).withTimeout(3)
     //  .andThen(new InstantCommand(()->{SmartDashboard.putNumber("FF TEST",  chassis.getModule(2).getAngularVelocity());
     //chassis.stop();}));
-    return new RunCommand(()-> motor.set(ControlMode.PercentOutput, x), chassis);
   }
 }
