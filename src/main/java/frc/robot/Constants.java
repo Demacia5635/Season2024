@@ -108,26 +108,26 @@ public final class Constants {
       public static final double FORWORD_ANGLE_POSITION_KP = 0.001;
       public static final double FORWORD_ANGLE_POSITION_KI = 0.0000003;
       public static final double FORWORD_ANGLE_POSITION_KD = 0.0;
-      public static final double FORWORD_ANGLE_VELOCITY_KP = 0.2;//0.05/*6.7422E-08*/; //0.07
+      public static final double FORWORD_ANGLE_VELOCITY_KP = 0.0;//0.05/*6.7422E-08*/; //0.07
       public static final double FORWORD_ANGLE_VELOCITY_KI = 0.0; //0.004;
       public static final double FORWORD_ANGLE_VELOCITY_KD = 0;
 
       public static final double BACKWARD_ANGLE_POSITION_KP = 0.0001;
       public static final double BACKWARD_ANGLE_POSITION_KI = 0.000001;
       public static final double BACKWARD_ANGLE_POSITION_KD = 0.0;
-      public static final double BACKWARD_ANGLE_VELOCITY_KP = 0.2/*6.7422E-08*/; //0.07
-      public static final double BACKWARD_ANGLE_VELOCITY_KI = 0.; //0.004;
-      public static final double BACKWARD_ANGLE_VELOCITY_KD = 0;
+      public static final double BACKWARD_ANGLE_VELOCITY_KP = 0.00712; /*6.7422E-08*/ //0.07
+      public static final double BACKWARD_ANGLE_VELOCITY_KI = 0; //0.004;
+      public static final double BACKWARD_ANGLE_VELOCITY_KD = 0.052;
 
       public static final double FORWORD_MOVE_KS = 0.05; // 0.15851/12; //0.0362;
       public static final double FORWORD_MOVE_KV = 0.263; //0.012314/12; //0.0862;
-      public static final double FORWORD_ANGLE_KS = 0.05;//0.52557/12.0; //0.05;
-      public static final double FORWORD_ANGLE_KV = 0.0006;//0.003737/12.0; //0.0962;
+      public static final double FORWORD_ANGLE_KS = 0.027;//0.52557/12.0; //0.05;
+      public static final double FORWORD_ANGLE_KV = 0.00051;//0.003737/12.0; //0.0962;
 
       public static final double BACKWARD_MOVE_KS = 0.05; // 0.15851/12; //0.0362;
       public static final double BACKWARD_MOVE_KV = 0.263; //0.012314/12; //0.0862;
-      public static final double BACKWARD_ANGLE_KS = 0.047;//0.52557/12.0; //0.05;
-      public static final double BACKWARD_ANGLE_KV = 0.00056;//0.003737/12.0; //0.0962;
+      public static final double BACKWARD_ANGLE_KS = 0.048; //in50deg/sec 0.032;//0.52557/12.0; //0.05;
+      public static final double BACKWARD_ANGLE_KV = 0.00045; //in50deg/sec 0.000296;//0.003737/12.0; //0.0962;
 
       public static final double MAX_STEER_ERROR = 5;
 
