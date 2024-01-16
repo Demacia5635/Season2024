@@ -5,20 +5,17 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.commands.chassis.utils.ResetWheelCommand;
-import frc.robot.subsystems.chassis.utils.SwerveModule;
+import frc.robot.Sysid.Sysid;
 
-import static frc.robot.Constants.ChassisConstants.*;
+import static frc.robot.subsystems.chassis.Constants.*;
 
 import java.util.Arrays;
 
@@ -34,10 +31,10 @@ public class Chassis extends SubsystemBase {
 
   public Chassis() {
     modules = new SwerveModule[] {
-      new SwerveModule(MODULE_FRONT_LEFT, true),
-      new SwerveModule(MODULE_FRONT_RIGHT, true),
-      new SwerveModule(MODULE_BACK_LEFT, false),
-      new SwerveModule(MODULE_BACK_RIGHT, false),
+      new SwerveModule(FRONT_LEFT, this),
+      new SwerveModule(FRONT_RIGHT, this),
+      new SwerveModule(BACK_LEFT, this),
+      new SwerveModule(BACK_RIGHT, this),
     };
 
     gyro = new Pigeon2(GYRO_ID);
@@ -47,15 +44,9 @@ public class Chassis extends SubsystemBase {
     field = new Field2d();
     SmartDashboard.putData(field);
     SmartDashboard.putData(this);
-    SmartDashboard.putData("left front module", modules[0]);
-    SmartDashboard.putData("right front module", modules[1]);
-    SmartDashboard.putData("left back module", modules[2]);
-    SmartDashboard.putData("right back module", modules[3]);
-
-    modules[0].setInverted(false);
-    modules[1].setInverted(false);
-    modules[2].setInverted(false);
-    modules[3].setInverted(false);
+    for(SwerveModule m : modules) {
+      SmartDashboard.putData(m.name, m);
+    }
     modules[0].debug = true;
 
     SmartDashboard.putData("set coast", new InstantCommand(() -> setNeutralMode(NeutralMode.Coast)).ignoringDisable(true));
@@ -65,6 +56,8 @@ public class Chassis extends SubsystemBase {
       resetWheels();
     }).ignoringDisable(true));
 
+    SmartDashboard.putData("Chassis Move Sysid", (new Sysid(this::setModulesPower, this::getMoveVelocity, 0.1, 0.5, this)).getCommand());
+
   }
 
   public SwerveModule getModule(int i) {
@@ -72,7 +65,7 @@ public class Chassis extends SubsystemBase {
   }
 
   public void resetWheels() {
-    for (SwerveModule module : modules) {
+    for (var module : modules) {
       module.setAngle(new Rotation2d());
     }
   }
@@ -81,36 +74,34 @@ public class Chassis extends SubsystemBase {
    * Stops the entire chassis
    */
   public void stop() {
-    Arrays.stream(modules).forEach(SwerveModule::stop);
+    for(var m : modules) {
+      m.stop();
+    }
   }
 
 
-  public void setModulesAngularPower(double power) {
-    for (int i = 0; i < modules.length; i++) {
-      modules[i].setAngularPower(power);
+  public void setModulesSteerPower(double power) {
+    for(var m : modules) {
+      m.setSteerPower(power);
     }
-
-    // modules[3].setPower(power);
   }
 
   public void setModulesPower(double power) {
-    // for (int i = 0; i < modules.length; i++) {
-    //   modules[i].setPower(power);
-    // }
-
-    modules[3].setPower(power);
+    for(var m : modules) {
+      m.setPower(power);
+    }
   }
 
-  public void setModulesAngularVelocity(double v) {
-    for (int i = 0; i < modules.length; i++) {
-      modules[i].setAngularVelocity(v);
+  public void setModulesSteerVelocity(double v) {
+    for(var m : modules) {
+      m.setSteerVelocity(v, false);
     }
   }
   
   public double[] getAngularVelocities() {
-    double[] angularVelocities = new double[4];
+    double[] angularVelocities = new double[modules.length];
     for (int i = 0; i < modules.length; i++) {
-      angularVelocities[i] = modules[i].getAngularVelocity();
+      angularVelocities[i] = modules[i].getSteerVelocity();
     }
     return angularVelocities;
   }
@@ -118,7 +109,7 @@ public class Chassis extends SubsystemBase {
 
 
   public double[] getVelocities() {
-    double[] angularVelocities = new double[4];
+    double[] angularVelocities = new double[modules.length];
     for (int i = 0; i < modules.length; i++) {
       angularVelocities[i] = modules[i].getVelocity();
     }
@@ -146,6 +137,10 @@ public class Chassis extends SubsystemBase {
     return new Translation2d(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond);
   }
 
+  public double getMoveVelocity() {
+    return getVelocity().getNorm();
+  }
+
   public ChassisSpeeds getChassisSpeeds() {
     return KINEMATICS.toChassisSpeeds(getModuleStates());
   }
@@ -166,9 +161,8 @@ public class Chassis extends SubsystemBase {
   }
 
   public void setOdometryToForward(){
-    poseEstimator.resetPosition(getAngle(), getModulePositions(), new Pose2d(new Translation2d(poseEstimator.getEstimatedPosition().getX(), poseEstimator.getEstimatedPosition().getY())
-    , new Rotation2d().fromDegrees(0)));
-    gyro.setYaw(0);
+    poseEstimator.resetPosition(getAngle(), getModulePositions(), 
+          new Pose2d(poseEstimator.getEstimatedPosition().getTranslation(),Rotation2d.fromDegrees(0)));
   }
 
   /**
@@ -176,7 +170,11 @@ public class Chassis extends SubsystemBase {
    * @return Position relative to the field
    */
   public SwerveModulePosition[] getModulePositions() {
-    return Arrays.stream(modules).map(SwerveModule::getModulePosition).toArray(SwerveModulePosition[]::new);
+    SwerveModulePosition[] res = new SwerveModulePosition[modules.length];
+    for(int i = 0; i < modules.length; i++) {
+      res[i] = modules[i].getModulePosition();
+    }
+    return res;
   }
 
   /**
@@ -184,11 +182,15 @@ public class Chassis extends SubsystemBase {
    * @return Velocity in m/s, angle in Rotation2d
    */
   public SwerveModuleState[] getModuleStates() {
-    return Arrays.stream(modules).map(SwerveModule::getState).toArray(SwerveModuleState[]::new);
+    SwerveModuleState[] res = new SwerveModuleState[modules.length];
+    for(int i = 0; i < modules.length; i++) {
+      res[i] = modules[i].getState();
+    }
+    return res;
   }
 
   public double[] getModulesAngles() {
-    double[] angles = new double[4];
+    double[] angles = new double[modules.length];
     for (int i = 0; i < modules.length; i++) {
       angles[i] = modules[i].getAngle().getDegrees();
     }
@@ -200,7 +202,9 @@ public class Chassis extends SubsystemBase {
    * @param states Velocity in m/s, angle in Rotation2d
    */
   public void setModuleStates(SwerveModuleState[] states) {
-    for (int i = 0; i < 4; i++) modules[i].setState(states[i]);
+    for (int i = 0; i < states.length; i++) {
+      modules[i].setState(states[i]);
+    }
   }
 
   public Pose2d getPose() {
@@ -231,10 +235,6 @@ public class Chassis extends SubsystemBase {
   public void periodic() {
       poseEstimator.update(getAngle(), getModulePositions());
       updateField();
-      for (SwerveModule module : modules) {
-        module.update();
-      }
-
       SmartDashboard.putNumber("gyro angle", getAngle().getDegrees());
       SmartDashboard.putNumber("gyro pitch", gyro.getPitch());
       SmartDashboard.putNumber("gyro roll", gyro.getRoll());

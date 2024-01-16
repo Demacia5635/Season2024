@@ -36,7 +36,7 @@ public class DriveCommand extends Command {
     
     double velX = Math.pow(joyX, 3) * MAX_DRIVE_VELOCITY;
     double velY = Math.pow(joyY, 3) * MAX_DRIVE_VELOCITY;
-    double velRot = Math.pow(rot, 3) * MAX_ANGULAR_VELOCITY;
+    double velRot = Math.pow(rot, 3) * MAX_STEER_VELOCITY;
     
     if (precisionDrive) {
       velX /= 2;
