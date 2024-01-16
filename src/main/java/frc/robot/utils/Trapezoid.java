@@ -28,7 +28,8 @@ public class Trapezoid {
     // Helper function to calculate distance required to change from current velocity to target velocity
     private double distanceToVelocity(double currentVelocity, double targetVelocity, double acceleration) {
         double deltaVelocity = currentVelocity - targetVelocity;
-        return (currentVelocity - deltaVelocity)/2*deltaVelocity/acceleration;
+        double time = Math.abs(deltaVelocity/acceleration);
+        return (currentVelocity + targetVelocity)/2*time; // avg velocity * time
     }
 
     // Function to calculate the next velocity setpoint, based on remaining distance and current and target velocities
@@ -38,23 +39,27 @@ public class Trapezoid {
             return  -calculate(-remainingDistance, -curentVelocity, -targetVelocity);
         }
         double time = Timer.getFPGATimestamp();
-        if(time - lastTime < Constants.CYCLE_DT) {
-            if(lastA > 0 && curentVelocity < lastV) {
-                curentVelocity = lastV;
+        double cv = curentVelocity;
+        // update cv for situation that we are not accelerating or deaccelerating as expected
+        if(time - lastTime < Constants.CYCLE_DT*2) {
+            if(lastA > 0 && curentVelocity < lastV) { // 
+                cv = lastV;
             } else if(lastA < 0 && curentVelocity > lastV) {
-                curentVelocity = lastV;
+                cv = lastV;
             }
         }        // Case for below max velocity, and enough distance to reach targetVelocity at max acceleration
-        if(curentVelocity < maxVelocity && distanceToVelocity(curentVelocity+deltaVelocity, targetVelocity, maxAcceleration) < remainingDistance - cycleDistanceWithAccel(curentVelocity)) {
+        if(cv < maxVelocity && distanceToVelocity(cv+deltaVelocity, targetVelocity, maxAcceleration) < remainingDistance - cycleDistanceWithAccel(cv)) {
             lastV = Math.min(curentVelocity + deltaVelocity, maxVelocity);
         } 
         // Case for enough distance to reach targetVelocity without acceleration
-        else if(distanceToVelocity(curentVelocity, targetVelocity, maxAcceleration) < remainingDistance - cycleDistanceNoAccel(curentVelocity)) {
-            lastV = curentVelocity;
+        else if(distanceToVelocity(cv, targetVelocity, maxAcceleration) < remainingDistance - cycleDistanceNoAccel(cv)) {
+            lastV = cv;
         } 
         // Case for not enough distance to reach targetVelocity, must decelerate
         else {
-            lastV = Math.max(curentVelocity - deltaVelocity,0);
+            // calclate the required acceleration from cv to target v in remaining distance
+            double t = 2 * remainingDistance / (curentVelocity + targetVelocity);
+            lastV = cv - (curentVelocity-targetVelocity)*Constants.CYCLE_DT/t;
         }
         lastA = lastV - curentVelocity;
         lastTime = time;
@@ -63,10 +68,10 @@ public class Trapezoid {
 
     // Helper function to compute the distance travelled in one cycle without acceleration
     private double cycleDistanceNoAccel(double currentVelocity) {
-        return currentVelocity * 0.02;
+        return currentVelocity * Constants.CYCLE_DT;
     }
     // Helper function to compute the distance travelled in one cycle with maximum acceleration
     private double cycleDistanceWithAccel(double currentVelocity) {
-        return currentVelocity * 0.02 + (0.5*maxAcceleration * Math.pow(0.02, 2));
+        return currentVelocity * Constants.CYCLE_DT + (0.5*maxAcceleration * Math.pow(Constants.CYCLE_DT, 2));
     }
 }
