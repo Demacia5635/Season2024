@@ -1,5 +1,9 @@
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 
@@ -107,4 +111,23 @@ public final class Constants {
       }
     }
   }
+  
+  public static final class VisionConstants {
+
+    public static final String Limelight2Name = "Limelight2";
+    public static final String Limelight3Name = "Limelight3";
+
+    public static final Pose2d robotCenterToLimelight2 = new Pose2d(new Translation2d(0.14, -0.22),Rotation2d.fromDegrees(-28));
+    public static final Transform3d robotCenterToLimelight2Transform = new Transform3d(new Pose3d(), new Pose3d(robotCenterToLimelight2));
+
+    public static final Pose2d robotCenterToLimelight3 = new Pose2d(new Translation2d(-0.14, -0.22),Rotation2d.fromDegrees(28));
+    public static final Transform3d robotCenterToLimelight3Transform = new Transform3d(new Pose3d(), new Pose3d(robotCenterToLimelight3));
+
+
+    public static final double maxValidVelcity = 2.0; // m/s - ignoring vision data abve this velocity
+    public static final double maxValidAngleDiff = 10.0; // degrees - ignoring vision data if vision heading is off by more than this value
+    public static final double maxDistanceOfCameraFromAprilTag = 4; // meters - ignoring vision data if apriltag is farther than this value
+  }
+
+
 }

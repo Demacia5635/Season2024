@@ -1,22 +1,20 @@
 package frc.robot.subsystems.chassis;
 
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.commands.chassis.utils.ResetWheelCommand;
 import frc.robot.subsystems.chassis.utils.SwerveModule;
+import frc.robot.subsystems.vision.Vision;
+import frc.robot.subsystems.vision.utils.SwerveDrivePoseEstimator;
 
 import static frc.robot.Constants.ChassisConstants.*;
 
@@ -32,6 +30,8 @@ public class Chassis extends SubsystemBase {
   private final SwerveDrivePoseEstimator poseEstimator;
   private final Field2d field;
 
+  private final Vision vision;
+
   public Chassis() {
     modules = new SwerveModule[] {
       new SwerveModule(MODULE_FRONT_LEFT, true),
@@ -42,8 +42,8 @@ public class Chassis extends SubsystemBase {
 
     gyro = new Pigeon2(GYRO_ID);
     gyro.setYaw(0);
-
     poseEstimator = new SwerveDrivePoseEstimator(KINEMATICS, getAngle(), getModulePositions(), new Pose2d());
+    vision = new Vision(this, poseEstimator);
     field = new Field2d();
     SmartDashboard.putData(field);
     SmartDashboard.putData(this);
@@ -166,8 +166,9 @@ public class Chassis extends SubsystemBase {
   }
 
   public void setOdometryToForward(){
+    new Rotation2d();
     poseEstimator.resetPosition(getAngle(), getModulePositions(), new Pose2d(new Translation2d(poseEstimator.getEstimatedPosition().getX(), poseEstimator.getEstimatedPosition().getY())
-    , new Rotation2d().fromDegrees(0)));
+    , Rotation2d.fromDegrees(0)));
     gyro.setYaw(0);
   }
 

@@ -12,12 +12,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import frc.robot.Constants;
-import frc.robot.Robot;
 import frc.robot.Constants.ChassisConstants.SwerveModuleConstants;
 import frc.robot.utils.Trapezoid;
 
@@ -47,7 +42,7 @@ public class SwerveModule implements Sendable {
         moveMotor.configFactoryDefault();
         angleMotor.configFactoryDefault();
         absoluteEncoder = new CANCoder(constants.absoluteEncoderId);
-        this.FORWORD = FORWORD;
+        SwerveModule.FORWORD = FORWORD;
         if (FORWORD){
             velocityFF = new SimpleMotorFeedforward(FORWORD_ANGLE_KS, FORWORD_MOVE_KV);
             angularFF = new SimpleMotorFeedforward(FORWORD_ANGLE_KS, FORWORD_ANGLE_KV);
