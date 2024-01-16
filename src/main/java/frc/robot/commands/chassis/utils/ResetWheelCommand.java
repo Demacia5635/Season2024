@@ -18,6 +18,6 @@ public class ResetWheelCommand extends Command {
 
   @Override
   public boolean isFinished() {
-    return Math.abs(module.getAngle().getDegrees()) < 0.3;  
+    return Math.abs(module.getAngle().getDegrees()) < 3;  
   }
 }

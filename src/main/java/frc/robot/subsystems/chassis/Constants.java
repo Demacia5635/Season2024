@@ -11,9 +11,11 @@ public final class Constants {
 
   public static final double MAX_DRIVE_VELOCITY = 3;
   public static final double DRIVE_ACCELERATION = 8;
-  public static final double MAX_ANGULAR_VELOCITY = 600;
-  public static final double ANGULAR_ACCELERATION = 6000;
+  public static final double MAX_STEER_VELOCITY = 600;
+  public static final double STEER_ACCELERATION = 6000;
   public static final double MAX_STEER_ERROR = 5;
+  public static final double MAX_OMEGA_VELOCITY = Math.toRadians(180);
+  public static final double MAX_OMEGA_ACCELERATION = Math.toRadians(720);
 
   // Pulse per meter/degrees
   public static final double WHEEL_DIAMETER = 4 * 0.0254; // 4 inch
