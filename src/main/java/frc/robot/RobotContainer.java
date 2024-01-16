@@ -1,21 +1,21 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.shooter.Shooter;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 
 public class RobotContainer  {
-
+  
   public Shooter shooter;
- 
+  
   public RobotContainer() {
     shooter = new Shooter();
-
     configureBindings();
   }
-
+  
 
 
     /**
@@ -40,6 +40,6 @@ public class RobotContainer  {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return null;
+    return new InstantCommand(()-> shooter.falconSetVel(40000), shooter);
   }
 }
