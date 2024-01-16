@@ -107,4 +107,9 @@ public final class Constants {
       }
     }
   }
+
+  public static class ShooterConstants {
+    public static final int NEON_ID = 0;
+    public static final double PULES_PER_ROTATION = 42;
+  }
 }
