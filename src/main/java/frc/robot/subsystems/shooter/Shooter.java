@@ -6,7 +6,6 @@ package frc.robot.subsystems.shooter;
 
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static frc.robot.Constants.ShooterConstants.*;
 
@@ -19,8 +18,6 @@ public class Shooter extends SubsystemBase {
   public CANSparkMax neon;
   public TalonFX motor1;
   public TalonFX motor2;
-  
-  double wantedVel = 0;
   
   /** Creates a new Shooter. */
   public Shooter() {
@@ -84,12 +81,9 @@ public class Shooter extends SubsystemBase {
       super.initSendable(builder);
 
       builder.addDoubleProperty("neon encoder", this::getNeonRev, null);
-      builder.addDoubleProperty("motor 1 speed", ()-> motor1.getSelectedSensorPosition()*10/(FALCON_PULES_PER_REV/360), null);
-      builder.addDoubleProperty("motor 2 speed", ()-> motor2.getSelectedSensorPosition()*10/(FALCON_PULES_PER_REV/360), null);
+      builder.addDoubleProperty("motor 1 speed", ()-> motor1.getSelectedSensorVelocity()*10/(FALCON_PULES_PER_REV/360), null);
+      builder.addDoubleProperty("motor 2 speed", ()-> motor2.getSelectedSensorVelocity()*10/(FALCON_PULES_PER_REV/360), null);
   
-      SmartDashboard.putData("set wanted vel", new InstantCommand(()-> wantedVel = SmartDashboard.getNumber("wanted vel", 10000)));
-      SmartDashboard.putData("RUN", new InstantCommand(()-> falconSetVel(wantedVel)));
-      SmartDashboard.putData("STOP", new InstantCommand(()-> falconStop()));
   }
 
   @Override
