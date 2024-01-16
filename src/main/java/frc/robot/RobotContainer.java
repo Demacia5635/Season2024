@@ -12,13 +12,17 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.chassis.DriveCommand;
+import frc.robot.commands.climb.TestClimbCommand;
 import frc.robot.subsystems.chassis.Chassis;
+import frc.robot.subsystems.climb.ClimbSubsystem;
 
 
 public class RobotContainer implements Sendable{
   CommandXboxController commandController;
   Chassis chassis;
+  ClimbSubsystem climbsubsystem;
   DriveCommand drive;
+  TestClimbCommand TDC;
   double x = 0.2;
 
  
@@ -26,8 +30,9 @@ public class RobotContainer implements Sendable{
 
     commandController = new CommandXboxController(Constants.CONTROLLER_PORT);
     chassis = new Chassis();
+    climbsubsystem = new ClimbSubsystem();
+    TDC = new TestClimbCommand(climbsubsystem);
     drive = new DriveCommand(chassis, commandController);
-
     chassis.setDefaultCommand(drive);
     SmartDashboard.putData("RC", this);
 
@@ -39,6 +44,8 @@ public class RobotContainer implements Sendable{
   public void initSendable(SendableBuilder builder) {
 
     builder.addDoubleProperty("spinspeed", () -> x, null);
+    builder.addDoubleProperty("getLeftVolteg",() -> climbsubsystem.getLeftVolteg() , null);
+    builder.addDoubleProperty("getRoghtVolteg",() -> climbsubsystem.getRoghtVolteg() , null);
 
   }
 
@@ -66,7 +73,8 @@ public class RobotContainer implements Sendable{
    */
   public Command getAutonomousCommand() {
     //return null;
-    return new RunCommand(()-> chassis.setModulesAngularVelocity(50), chassis);
+    //return new RunCommand(()-> chassis.setModulesAngularVelocity(50), chassis);
+    return TDC;
     // return new InstantCommand(() -> chassis.resetWheels(), chassis)
     // .andThen(new RunCommand(() -> chassis.setVelocities(new ChassisSpeeds(-2, 0, 0))).withTimeout(2).andThen(new InstantCommand(() -> chassis.stop())));
     //return new RunCommand(() -> chassis.getModule(2).setAngularVelocity(600));
