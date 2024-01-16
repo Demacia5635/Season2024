@@ -1,46 +1,20 @@
 package frc.robot;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.can.TalonFX;
-
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.commands.chassis.DriveCommand;
-import frc.robot.subsystems.chassis.Chassis;
 
 
-public class RobotContainer implements Sendable{
-  CommandXboxController commandController;
-  Chassis chassis;
-  DriveCommand drive;
-  double x = 0.2;
+public class RobotContainer  {
 
  
   public RobotContainer() {
 
-    commandController = new CommandXboxController(Constants.CONTROLLER_PORT);
-    chassis = new Chassis();
-    drive = new DriveCommand(chassis, commandController);
-
-    chassis.setDefaultCommand(drive);
-    SmartDashboard.putData("RC", this);
 
     configureBindings();
   }
 
 
-  @Override
-  public void initSendable(SendableBuilder builder) {
-
-    builder.addDoubleProperty("spinspeed", () -> x, null);
-
-  }
 
     /**
      * 
@@ -53,7 +27,6 @@ public class RobotContainer implements Sendable{
      * joysticks}.
      */
     private void configureBindings() {
-      commandController.start().onTrue(new InstantCommand(()->{chassis.setOdometryToForward();}));
         // code for controller to controll the gripper and the parallelogram
 
         // safty buttons to stop the arm and/or the gripper
@@ -65,15 +38,6 @@ public class RobotContainer implements Sendable{
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    //return null;
-    return new RunCommand(()-> chassis.setModulesAngularVelocity(50), chassis);
-    // return new InstantCommand(() -> chassis.resetWheels(), chassis)
-    // .andThen(new RunCommand(() -> chassis.setVelocities(new ChassisSpeeds(-2, 0, 0))).withTimeout(2).andThen(new InstantCommand(() -> chassis.stop())));
-    //return new RunCommand(() -> chassis.getModule(2).setAngularVelocity(600));
-    // return new RunCommand(() -> chassis.setModulesPower(0.05));
-    // return new RunCommand(()-> chassis.setModulesAngularPower(-0.3), chassis);
-    //return new RunCommand(()->{chassis.getModule(2).setAngularPower(0.049 + 300*0.0003);},chassis).withTimeout(3)
-    //  .andThen(new InstantCommand(()->{SmartDashboard.putNumber("FF TEST",  chassis.getModule(2).getAngularVelocity());
-    //chassis.stop();}));
+    return null;
   }
 }
