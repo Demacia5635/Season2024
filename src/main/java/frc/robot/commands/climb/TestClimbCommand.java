@@ -28,10 +28,10 @@ public class TestClimbCommand extends Command {
   @Override
   public void execute() {
     if (climb.getLeftVolteg() < MI_WON_DAY_VOLTEG){
-      climb.climbLeft(-0.3);
+      climb.climbLeft(0.6);
     }
     if (climb.getRoghtVolteg() < MI_WON_DAY_VOLTEG){
-      climb.climbRight(-0.3);
+      climb.climbRight(0.6);
     }
   }
 
