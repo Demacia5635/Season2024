@@ -60,7 +60,7 @@ public class RobotContainer implements Sendable{
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return new SetModuleAngle(chassis, 0);
+    return new SetModuleAngle(chassis);
 //    return new RunCommand(()-> chassis.setModulesSteerVelocity(500), chassis);
     // return new InstantCommand(() -> chassis.resetWheels(), chassis)
     // .andThen(new RunCommand(() -> chassis.setVelocities(new ChassisSpeeds(-2, 0, 0))).withTimeout(2).andThen(new InstantCommand(() -> chassis.stop())));

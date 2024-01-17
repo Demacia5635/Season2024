@@ -4,6 +4,8 @@
 
 package frc.robot.utils;
 
+import static frc.robot.subsystems.chassis.Constants.CYCLE_DT;
+
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants;
 
@@ -26,7 +28,7 @@ public class Trapezoid {
     }
 
     // Helper function to calculate distance required to change from current velocity to target velocity
-    private double distanceToVelocity(double currentVelocity, double targetVelocity, double acceleration) {
+    private double  distanceToVelocity(double currentVelocity, double targetVelocity, double acceleration) {
         double deltaVelocity = currentVelocity - targetVelocity;
         double time = Math.abs(deltaVelocity/acceleration);
         return (currentVelocity + targetVelocity)/2*time; // avg velocity * time
@@ -47,14 +49,22 @@ public class Trapezoid {
             } else if(lastA < 0 && curentVelocity > lastV) {
                 cv = lastV;
             }
-        }        // Case for below max velocity, and enough distance to reach targetVelocity at max acceleration
+        }        
+        // Case for below max velocity, and enough distance to reach targetVelocity at max acceleration
         if(cv < maxVelocity && distanceToVelocity(cv+deltaVelocity, targetVelocity, maxAcceleration) < remainingDistance - cycleDistanceWithAccel(cv)) {
             lastV = Math.min(curentVelocity + deltaVelocity, maxVelocity);
         } 
-        // Case for enough distance to reach targetVelocity without acceleration
-        else if(distanceToVelocity(cv, targetVelocity, maxAcceleration) < remainingDistance - cycleDistanceNoAccel(cv)) {
-            lastV = cv;
+        // Case at max velocity and not deacceleration yet
+        else if(cv >= maxVelocity && distanceToVelocity(maxVelocity, targetVelocity, maxAcceleration) < remainingDistance - cycleDistanceNoAccel(cv)) {
+            lastV = maxVelocity;
         } 
+        // case we need to accelerate at a slower rate
+        else if(distanceToVelocity(curentVelocity, targetVelocity, maxAcceleration) < remainingDistance || curentVelocity < targetVelocity) {
+            // need to accelerate at a lower value
+            double d = remainingDistance - distanceToVelocity(curentVelocity, targetVelocity, maxAcceleration);
+            lastV = curentVelocity + d/CYCLE_DT/2;
+
+        }
         // Case for not enough distance to reach targetVelocity, must decelerate
         else {
             // calclate the required acceleration from cv to target v in remaining distance

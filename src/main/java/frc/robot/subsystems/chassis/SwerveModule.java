@@ -18,6 +18,7 @@ import frc.robot.subsystems.chassis.Constants.SwerveModuleConstants;
 import frc.robot.utils.Trapezoid;
 
 import static frc.robot.Constants.ChassisConstants.*;
+import static frc.robot.Constants.ChassisConstants.SwerveModuleConstants.MAX_STEER_ERROR;
 import static frc.robot.subsystems.chassis.Constants.MOTOR_PULSES_PER_ROTATION;
 
 public class SwerveModule implements Sendable {
@@ -204,7 +205,7 @@ public class SwerveModule implements Sendable {
         targetAngle = angle;
         double error = angle.minus(getAngle()).getDegrees();
         double v = 0;
-        if(Math.abs(error) > 1) {
+        if(Math.abs(error) > MAX_STEER_ERROR) {
             double cv = getSteerVelocity();
             v = steerTrapezoid.calculate(error, cv, 0);
             System.out.println(name + " error=" + error + " v=" + v + " cv=" + cv);

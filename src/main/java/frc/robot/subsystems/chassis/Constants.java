@@ -13,7 +13,7 @@ public final class Constants {
   public static final double DRIVE_ACCELERATION = 8;
   public static final double MAX_STEER_VELOCITY = 600;
   public static final double STEER_ACCELERATION = 6000;
-  public static final double MAX_STEER_ERROR = 5;
+  public static final double MAX_STEER_ERROR = 2;
   public static final double MAX_OMEGA_VELOCITY = Math.toRadians(180);
   public static final double MAX_OMEGA_ACCELERATION = Math.toRadians(720);
 
