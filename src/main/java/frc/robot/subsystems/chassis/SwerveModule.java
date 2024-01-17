@@ -27,6 +27,7 @@ public class SwerveModule implements Sendable {
     private final double angleOffset;
     private double pulsePerDegree;
     private double pulsePerMeter;
+    private double steerTalonEncoderOffset;
 
     private FeedForward_SVA moveFF;
     private FeedForward_SVA steerFF;
@@ -62,6 +63,7 @@ public class SwerveModule implements Sendable {
         moveMotor.setNeutralMode(NeutralMode.Brake);
         steerMotor.setNeutralMode(NeutralMode.Brake);
         moveMotor.setInverted(constants.inverted);
+        steerTalonEncoderOffset = steerMotor.getSelectedSensorPosition() - getAngle().getDegrees()*pulsePerDegree;
         SmartDashboard.putData(name + " Steer Sysid", (new Sysid(this::setSteerPower, this::getSteerVelocity, 0.1, 0.5, chassis)).getCommand());
     }
 
@@ -84,6 +86,10 @@ public class SwerveModule implements Sendable {
 
     public double getAbsoluteEncoder() {
         return absoluteEncoder.getAbsolutePosition();
+    }
+
+    public double steerTalonAngle() {
+        return (steerMotor.getSelectedSensorPosition()-steerTalonEncoderOffset)/pulsePerDegree;
     }
 
     /**
@@ -244,6 +250,7 @@ public class SwerveModule implements Sendable {
         builder.addDoubleProperty("Steer velocity", this::getSteerVelocity, null);
         builder.addDoubleProperty("desired angle", () -> targetAngle.getDegrees(), null);
         builder.addDoubleProperty("desired velocity", () -> targetVelocity, null);
+        builder.addDoubleProperty("Steer Talon Angle", this::steerTalonAngle, null);
     }
     
 
