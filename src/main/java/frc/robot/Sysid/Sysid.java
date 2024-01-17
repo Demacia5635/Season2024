@@ -211,6 +211,25 @@ public class Sysid {
         SmartDashboard.putNumber("Sysid/Max Error", max);
         SmartDashboard.putNumber("Sysid/Avg Error Sqr", avg);
         System.out.println("Sysid: max error=" + max + " avg error squared=" + avg);
+        double kp = (valueOf(Gains.KV, gains, result) + valueOf(Gains.KA, gains, result))/5.0;
+        SmartDashboard.putNumber("Sysid/KP (Roborio)", kp);
+        SmartDashboard.putNumber("Sysid/KP (Roborio)", kp);
+    }
+
+    /**
+     * Value of a specific Gain type
+     * @param gain
+     * @param gains
+     * @param values
+     * @return
+     */
+    double valueOf(Gains gain, Gains[] gains, double[] values) {
+        for(int i = 0; i < gains.length; i++) {
+            if(gains[i] ==gain) {
+                return values[i];
+            }
+        }
+        return 0;
     }
 
     /**
