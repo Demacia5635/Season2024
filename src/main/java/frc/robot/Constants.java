@@ -2,6 +2,7 @@ package frc.robot;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import frc.robot.PathFollow.Util.RectanglePos;
 
 public final class Constants {
   
@@ -9,6 +10,13 @@ public final class Constants {
 
     public static final double CYCLE_DT = 0.02;
   public static final int CONTROLLER_PORT = 0;
+
+  //need to work on positions
+  public static RectanglePos rectAMP = new RectanglePos(new Translation2d(-16.549, 0), new Translation2d(-13.239, -0.450));   //need to switch 
+  public static RectanglePos rectSPEAKER = new RectanglePos(new Translation2d(), new Translation2d());    
+  public static RectanglePos rectSOURCE = new RectanglePos(new Translation2d(-16.557, -6.629), new Translation2d(-14.709, -8.217)); //need to switch   
+  public static RectanglePos rectSTAGE = new RectanglePos(new Translation2d(), new Translation2d()); 
+
 
   public static class ChassisConstants {
     public final static SwerveModuleConstants MODULE_FRONT_LEFT = new SwerveModuleConstants(

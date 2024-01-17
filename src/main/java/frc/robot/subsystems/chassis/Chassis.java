@@ -15,12 +15,15 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.PathFollow.Util.pathPoint;
 import frc.robot.commands.chassis.utils.ResetWheelCommand;
 import frc.robot.subsystems.chassis.utils.SwerveModule;
 
 import static frc.robot.Constants.ChassisConstants.*;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.sensors.Pigeon2;
@@ -28,6 +31,8 @@ import com.ctre.phoenix.sensors.Pigeon2;
 public class Chassis extends SubsystemBase {
   private final SwerveModule[] modules;
   private final Pigeon2 gyro;
+
+  public static List<pathPoint> pointsForPathTeleop = new ArrayList<pathPoint>();
 
   private final SwerveDrivePoseEstimator poseEstimator;
   private final Field2d field;
