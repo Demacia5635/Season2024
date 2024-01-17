@@ -29,8 +29,10 @@ public class GetPoinsPathTeleop extends Command {
   public void initialize() {
     points.add(new pathPoint(chassis.getPose().getX(), chassis.getPose().getY(),
      chassis.getAngle(), 1, false));
+     
     
     Zone zone = Zone.getZone(chassis.getPose().getTranslation());
+    System.out.println("ZONE: " + zone);
     switch (zone) {
       case STAGE:
 
@@ -48,15 +50,12 @@ public class GetPoinsPathTeleop extends Command {
     Chassis.pointsForPathTeleop = points;
   }
 
-  // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {}
 
-  // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {}
 
-  // Returns true when the command should end.
   @Override
   public boolean isFinished() {
     return true;
