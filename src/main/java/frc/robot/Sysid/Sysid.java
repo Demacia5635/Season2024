@@ -76,7 +76,7 @@ public class Sysid {
                 null,
                 minPower,
                 maxPower,
-                3,
+                4,
                 defaultDuration,
                 defaultDelay,
                 subsystems);

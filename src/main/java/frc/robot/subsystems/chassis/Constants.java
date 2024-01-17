@@ -27,17 +27,17 @@ public final class Constants {
   public static final double BACK_STEER_RATIO = 150.0 / 7.0;
   public static final double FRONT_STEER_RATIO = 12.8;
 
-  public static final double BACK_PULSES_PER_DEGREE = BACK_STEER_RATIO * MOTOR_PULSES_PER_ROTATION / 360.0;
   public static final double FRONT_PULSES_PER_DEGREE = FRONT_STEER_RATIO * MOTOR_PULSES_PER_ROTATION / 360.0;
-
+  public static final double BACK_PULSES_PER_DEGREE =  BACK_STEER_RATIO * MOTOR_PULSES_PER_ROTATION / 360.0;
+  
   // PID
   public static final PID_Constants MOVE_PID = new PID_Constants(0.05, 0, 0);
-  public static final PID_Constants FRONT_STEER_PID = new PID_Constants(0.2, 0, 0);
-  public static final PID_Constants BACK_STEER_PID = new PID_Constants(0.2, 0, 0);
+  public static final PID_Constants FRONT_STEER_PID = new PID_Constants(0.00018*10*1023/FRONT_PULSES_PER_DEGREE, 0, 0);
+  public static final PID_Constants BACK_STEER_PID = new PID_Constants(0.0003*10*1023/BACK_PULSES_PER_DEGREE, 0, 0);
   // Feed Forward Gains
   public static final FF_Constants MOVE_FF = new FF_Constants(0.05, 0.263, 0.1);
-  public static final FF_Constants FRONT_STEER_FF = new FF_Constants(0.05, 0.0006, 0.01);
-  public static final FF_Constants BACK_STEER_FF = new FF_Constants(0.05, 0.006, 0.01);
+  public static final FF_Constants FRONT_STEER_FF = new FF_Constants(0.0085, 0.00034, 0.0005);
+  public static final FF_Constants BACK_STEER_FF = new FF_Constants(0.0075, 0.00053, 0.0008);
 
   public final static SwerveModuleConstants FRONT_LEFT = new SwerveModuleConstants(
       3, 4, 12,
@@ -72,7 +72,7 @@ public final class Constants {
       BACK_STEER_FF,
       PULSES_PER_METER,
       BACK_PULSES_PER_DEGREE,
-      false);
+      true);
 
   public final static SwerveModuleConstants BACK_RIGHT = new SwerveModuleConstants(
       8, 7, 14,
@@ -84,7 +84,7 @@ public final class Constants {
       BACK_STEER_FF,
       PULSES_PER_METER,
       BACK_PULSES_PER_DEGREE,
-      false);
+      true);
 
   public static final SwerveDriveKinematics KINEMATICS = new SwerveDriveKinematics(
       FRONT_LEFT.moduleTranslationOffset,

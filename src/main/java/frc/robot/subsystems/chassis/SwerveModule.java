@@ -18,6 +18,7 @@ import frc.robot.subsystems.chassis.Constants.SwerveModuleConstants;
 import frc.robot.utils.Trapezoid;
 
 import static frc.robot.Constants.ChassisConstants.*;
+import static frc.robot.subsystems.chassis.Constants.MOTOR_PULSES_PER_ROTATION;
 
 public class SwerveModule implements Sendable {
     private final TalonFX moveMotor;
@@ -27,7 +28,6 @@ public class SwerveModule implements Sendable {
     private final double angleOffset;
     private double pulsePerDegree;
     private double pulsePerMeter;
-    private double steerTalonEncoderOffset;
 
     private FeedForward_SVA moveFF;
     private FeedForward_SVA steerFF;
@@ -48,8 +48,8 @@ public class SwerveModule implements Sendable {
         moveMotor.configFactoryDefault();
         steerMotor.configFactoryDefault();
         absoluteEncoder = new CANCoder(constants.absoluteEncoderId);
-        moveFF = new FeedForward_SVA(constants.moveFF.KS, constants.moveFF.KS, constants.moveFF.KA);
-        steerFF = new FeedForward_SVA(constants.steerFF.KS, constants.steerFF.KS, constants.steerFF.KA);
+        moveFF = new FeedForward_SVA(constants.moveFF.KS, constants.moveFF.KV, constants.moveFF.KA);
+        steerFF = new FeedForward_SVA(constants.steerFF.KS, constants.steerFF.KV, constants.steerFF.KA);
         setMovePID(constants.movePID.KP, constants.movePID.KI, constants.movePID.KD);
         setAnglePID(constants.steerPID.KP, constants.steerPID.KI, constants.steerPID.KD);
         steerMotor.setInverted(false);
@@ -62,9 +62,11 @@ public class SwerveModule implements Sendable {
         
         moveMotor.setNeutralMode(NeutralMode.Brake);
         steerMotor.setNeutralMode(NeutralMode.Brake);
-        moveMotor.setInverted(constants.inverted);
-        steerTalonEncoderOffset = steerMotor.getSelectedSensorPosition() - getAngle().getDegrees()*pulsePerDegree;
-        SmartDashboard.putData(name + " Steer Sysid", (new Sysid(this::setSteerPower, this::getSteerVelocity, 0.1, 0.5, chassis)).getCommand());
+        moveMotor.setInverted(true);
+        steerMotor.setInverted(constants.inverted);
+        moveMotor.setSelectedSensorPosition(0);
+        steerMotor.setSelectedSensorPosition(getAngle().getDegrees()*pulsePerDegree);
+        SmartDashboard.putData(name + " Steer Sysid", (new Sysid(this::setSteerPower, this::getSteerVelocity, 0.15, 0.5, chassis)).getCommand());
     }
 
     public void setMovePID(double kP, double kI, double kD) {
@@ -89,7 +91,10 @@ public class SwerveModule implements Sendable {
     }
 
     public double steerTalonAngle() {
-        return (steerMotor.getSelectedSensorPosition()-steerTalonEncoderOffset)/pulsePerDegree;
+        return steerMotor.getSelectedSensorPosition()/pulsePerDegree;
+    }
+    public double steerTalonRawAngle() {
+        return steerMotor.getSelectedSensorPosition()*360/MOTOR_PULSES_PER_ROTATION;
     }
 
     /**
@@ -196,10 +201,15 @@ public class SwerveModule implements Sendable {
     }
 
     public void setAngle(Rotation2d angle) {
+        targetAngle = angle;
         double error = angle.minus(getAngle()).getDegrees();
-        double cv = getSteerVelocity();
-        double v = steerTrapezoid.calculate(error, cv, 0);
-        setSteerVelocity(v, false);
+        double v = 0;
+        if(Math.abs(error) > 1) {
+            double cv = getSteerVelocity();
+            v = steerTrapezoid.calculate(error, cv, 0);
+            System.out.println(name + " error=" + error + " v=" + v + " cv=" + cv);
+        }
+        setSteerVelocity(v, true);
     }
 
     /**
@@ -243,6 +253,10 @@ public class SwerveModule implements Sendable {
             return speed / pulsePerDegree * 10;
     }
 
+    public double getDistance() {
+        return moveMotor.getSelectedSensorPosition()/pulsePerMeter;
+    }
+
     @Override
     public void initSendable(SendableBuilder builder) {
         builder.addDoubleProperty("angle", () -> getAngle().getDegrees(), null);
@@ -251,6 +265,9 @@ public class SwerveModule implements Sendable {
         builder.addDoubleProperty("desired angle", () -> targetAngle.getDegrees(), null);
         builder.addDoubleProperty("desired velocity", () -> targetVelocity, null);
         builder.addDoubleProperty("Steer Talon Angle", this::steerTalonAngle, null);
+        builder.addDoubleProperty("Steer Talon Raw Angle", this::steerTalonRawAngle, null);
+        builder.addDoubleProperty("distance", this::getDistance, null);
+        builder.addDoubleProperty("Steer Power",()->steerMotor.getMotorOutputPercent(), null);
     }
     
 

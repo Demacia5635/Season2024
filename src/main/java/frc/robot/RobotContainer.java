@@ -6,9 +6,11 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.chassis.DriveCommand;
+import frc.robot.commands.chassis.SetModuleAngle;
 import frc.robot.subsystems.chassis.Chassis;
 
 
@@ -21,11 +23,8 @@ public class RobotContainer implements Sendable{
  
   public RobotContainer() {
 
-    commandController = new CommandXboxController(Constants.CONTROLLER_PORT);
+//    commandController = new CommandXboxController(Constants.CONTROLLER_PORT);
     chassis = new Chassis();
-    drive = new DriveCommand(chassis, commandController);
-
-    chassis.setDefaultCommand(drive);
     SmartDashboard.putData("RC", this);
 
     configureBindings();
@@ -35,7 +34,6 @@ public class RobotContainer implements Sendable{
   @Override
   public void initSendable(SendableBuilder builder) {
 
-    builder.addDoubleProperty("spinspeed", () -> x, null);
 
   }
 
@@ -50,7 +48,7 @@ public class RobotContainer implements Sendable{
      * joysticks}.
      */
     private void configureBindings() {
-      commandController.start().onTrue(new InstantCommand(()->{chassis.setOdometryToForward();}));
+//      commandController.start().onTrue(new InstantCommand(()->{chassis.setOdometryToForward();}));
         // code for controller to controll the gripper and the parallelogram
 
         // safty buttons to stop the arm and/or the gripper
@@ -62,8 +60,8 @@ public class RobotContainer implements Sendable{
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return null;
-    //return new RunCommand(()-> chassis.setModulesAngularVelocity(50), chassis);
+    return new SetModuleAngle(chassis, 0);
+//    return new RunCommand(()-> chassis.setModulesSteerVelocity(500), chassis);
     // return new InstantCommand(() -> chassis.resetWheels(), chassis)
     // .andThen(new RunCommand(() -> chassis.setVelocities(new ChassisSpeeds(-2, 0, 0))).withTimeout(2).andThen(new InstantCommand(() -> chassis.stop())));
     //return new RunCommand(() -> chassis.getModule(2).setAngularVelocity(600));
