@@ -26,7 +26,6 @@ public class Shooter extends SubsystemBase {
     
     motor1 = new TalonFX(MOTOR_1_ID);
     motor2 = new TalonFX(MOTOR_2_ID);
-    motor2.setInverted(true);
     
     motor1.config_kP(0, KP);
     motor1.config_kI(0, KI);
