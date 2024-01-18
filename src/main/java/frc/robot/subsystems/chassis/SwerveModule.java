@@ -1,11 +1,14 @@
 package frc.robot.subsystems.chassis;
 
+import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
+import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.SteerRequestType;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -60,13 +63,24 @@ public class SwerveModule implements Sendable {
         angleOffset = constants.steerOffset;
         name = (constants.moduleTranslationOffset.getX()>0?"Front":"Back") + 
                (constants.moduleTranslationOffset.getY()>0?"Left":"Right");
+        debug = constants.moduleTranslationOffset.getX() < 0 && constants.moduleTranslationOffset.getY() >0;
         
         moveMotor.setNeutralMode(NeutralMode.Brake);
         steerMotor.setNeutralMode(NeutralMode.Brake);
         moveMotor.setInverted(true);
         steerMotor.setInverted(constants.inverted);
         moveMotor.setSelectedSensorPosition(0);
-        steerMotor.setSelectedSensorPosition(getAngle().getDegrees()*pulsePerDegree);
+        System.out.println(" angle degrees = " + getAngleDegrees());
+        steerMotor.setSelectedSensorPosition(getAngleDegrees()*pulsePerDegree);
+        steerMotor.configClosedloopRamp(0.5);
+        steerMotor.configOpenloopRamp(0.5);
+        double kp = 0.1*1023/20/pulsePerDegree; // correct 0.1  power at 20 degrees error
+        double ki = kp/10;
+        System.out.println(" kp = " + kp + " ki = " + ki);
+
+        setAnglePID(kp,ki,0);
+
+        System.out.println(" selected sensor " + steerMotor.getSelectedSensorPosition());
         SmartDashboard.putData(name + " Steer Sysid", (new Sysid(this::setSteerPower, this::getSteerVelocity, 0.15, 0.5, chassis)).getCommand());
     }
 
@@ -91,8 +105,10 @@ public class SwerveModule implements Sendable {
         return absoluteEncoder.getAbsolutePosition();
     }
 
+
+
     public double steerTalonAngle() {
-        return steerMotor.getSelectedSensorPosition()/pulsePerDegree;
+        return MathUtil.inputModulus(steerMotor.getSelectedSensorPosition()/pulsePerDegree,-180,180);
     }
     public double steerTalonRawAngle() {
         return steerMotor.getSelectedSensorPosition()*360/MOTOR_PULSES_PER_ROTATION;
@@ -168,6 +184,10 @@ public class SwerveModule implements Sendable {
     public Rotation2d getAngle() {
         return Rotation2d.fromDegrees(absoluteEncoder.getAbsolutePosition() - angleOffset);
     }
+    public double getAngleDegrees() {
+        double d = getAngle().getDegrees();
+        return MathUtil.inputModulus(d,-180,180);
+    }
 
     /**
      * Sets the rotational power of the module
@@ -182,7 +202,7 @@ public class SwerveModule implements Sendable {
      * @return Velocity in deg/s
      */
     public double getSteerVelocity() {  
-        return encoderToAngularSpeed(steerMotor.getSelectedSensorVelocity());
+        return absoluteEncoder.getVelocity(); // encoderToAngularSpeed(steerMotor.getSelectedSensorVelocity());
     }
 
     /**
@@ -198,19 +218,30 @@ public class SwerveModule implements Sendable {
             tgtV = Math.max(tgtV,currentVelocity - maxVChange);
         }
         double ff = steerFF.calculate(tgtV,currentVelocity);
+        if(debug) System.out.println(" set v to " + tgtV + " ff=" + ff);
         steerMotor.set(ControlMode.Velocity, angularToEncoderSpeed(tgtV), DemandType.ArbitraryFeedForward, ff);
     }
 
     public void setAngle(Rotation2d angle) {
         targetAngle = angle;
-        double error = angle.minus(getAngle()).getDegrees();
+        double diff = MathUtil.inputModulus(angle.minus(getAngle()).getDegrees(),-180,180);
+        if(debug) System.out.println(" set angle - " + angle.getDegrees() + " diff=" + diff + " cur=" + getAngleDegrees());
+        if(debug) System.out.println(" error=" + steerMotor.getClosedLoopError() + " power=" + steerMotor.getMotorOutputPercent());
+        double cpos = steerMotor.getSelectedSensorPosition();
+        double pos = cpos + diff*pulsePerDegree;
+        if(debug) System.out.println(" pos=" + pos + " cpos=" + cpos);
+        steerMotor.set(ControlMode.Position,pos);
+
+        /* 
         double v = 0;
         if(Math.abs(error) > MAX_STEER_ERROR) {
             double cv = getSteerVelocity();
-            v = steerTrapezoid.calculate(error, cv, 0);
-            System.out.println(name + " error=" + error + " v=" + v + " cv=" + cv);
+            v = steerTrapezoid.calculate(error, cv, 0, debug);
+            if(debug) System.out.println(name + " error=" + error + " v=" + v + " cv=" + cv + " angle=" + getAngleDegrees() + "/" + 
+                steerTalonAngle());
         }
         setSteerVelocity(v, true);
+        */
     }
 
     /**
@@ -260,13 +291,14 @@ public class SwerveModule implements Sendable {
 
     @Override
     public void initSendable(SendableBuilder builder) {
-        builder.addDoubleProperty("angle", () -> getAngle().getDegrees(), null);
+        builder.addDoubleProperty("angle", () -> getAngleDegrees(), null);
+        builder.addDoubleProperty("steer error", () -> steerMotor.getClosedLoopError(), null);
         builder.addDoubleProperty("velocity", this::getVelocity, null);
         builder.addDoubleProperty("Steer velocity", this::getSteerVelocity, null);
         builder.addDoubleProperty("desired angle", () -> targetAngle.getDegrees(), null);
         builder.addDoubleProperty("desired velocity", () -> targetVelocity, null);
         builder.addDoubleProperty("Steer Talon Angle", this::steerTalonAngle, null);
-        builder.addDoubleProperty("Steer Talon Raw Angle", this::steerTalonRawAngle, null);
+        builder.addDoubleProperty("Steer power", ()->steerMotor.getMotorOutputPercent(), null);
         builder.addDoubleProperty("distance", this::getDistance, null);
         builder.addDoubleProperty("Steer Power",()->steerMotor.getMotorOutputPercent(), null);
     }

@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.chassis.DriveCommand;
 import frc.robot.commands.chassis.SetModuleAngle;
+import frc.robot.commands.chassis.TestSteerVandA;
 import frc.robot.subsystems.chassis.Chassis;
 
 
@@ -60,7 +61,7 @@ public class RobotContainer implements Sendable{
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return null;
+    return new TestSteerVandA(chassis);
     //    return new RunCommand(()-> chassis.setModulesSteerVelocity(500), chassis);
     // return new InstantCommand(() -> chassis.resetWheels(), chassis)
     // .andThen(new RunCommand(() -> chassis.setVelocities(new ChassisSpeeds(-2, 0, 0))).withTimeout(2).andThen(new InstantCommand(() -> chassis.stop())));

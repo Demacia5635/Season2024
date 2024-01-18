@@ -24,7 +24,7 @@ public final class Constants {
   public static final double MOTOR_PULSES_PER_ROTATION = 2048;
   public static final double PULSES_PER_METER = MOTOR_PULSES_PER_ROTATION * MOVE_GEAR_RATIO / WHEEL_CIRCUMFERENCE;
 
-  public static final double BACK_STEER_RATIO = 150.0 / 7.0;
+  public static final double BACK_STEER_RATIO = 151.0 / 7.0;
   public static final double FRONT_STEER_RATIO = 12.8;
 
   public static final double FRONT_PULSES_PER_DEGREE = FRONT_STEER_RATIO * MOTOR_PULSES_PER_ROTATION / 360.0;
@@ -32,12 +32,12 @@ public final class Constants {
   
   // PID
   public static final PID_Constants MOVE_PID = new PID_Constants(0.05, 0, 0);
-  public static final PID_Constants FRONT_STEER_PID = new PID_Constants(0.00018*10*1023/FRONT_PULSES_PER_DEGREE, 0, 0);
-  public static final PID_Constants BACK_STEER_PID = new PID_Constants(0.0003*10*1023/BACK_PULSES_PER_DEGREE, 0, 0);
+  public static final PID_Constants FRONT_STEER_PID = new PID_Constants(0.000209225899609*10*1023/FRONT_PULSES_PER_DEGREE, 0, 0);
+  public static final PID_Constants BACK_STEER_PID = new PID_Constants(0.000319268341586*10*1023/BACK_PULSES_PER_DEGREE, 0, 0.001071468046139);
   // Feed Forward Gains
   public static final FF_Constants MOVE_FF = new FF_Constants(0.05, 0.263, 0.1);
-  public static final FF_Constants FRONT_STEER_FF = new FF_Constants(0.0085, 0.00034, 0.0005);
-  public static final FF_Constants BACK_STEER_FF = new FF_Constants(0.0075, 0.00053, 0.0008);
+  public static final FF_Constants FRONT_STEER_FF = new FF_Constants(0.069108623637248, 0.00034365326824, 0.000702476229803);
+  public static final FF_Constants BACK_STEER_FF = new FF_Constants(0.058365205650786, 0.000524873661792, 0.001088429441032);
 
   public final static SwerveModuleConstants FRONT_LEFT = new SwerveModuleConstants(
       3, 4, 12,

@@ -4,13 +4,13 @@
 
 package frc.robot.utils;
 
-import static frc.robot.subsystems.chassis.Constants.CYCLE_DT;
 
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants;
 
 /** Add your docs here. */
 public class Trapezoid {
+    private static final double CYCLE_DT=0.06;
     double maxVelocity; // Maximum permissible velocity
     double maxAcceleration; // Maximum permissible acceleration
     private double deltaVelocity; // Velocity increment at each time step
@@ -25,7 +25,7 @@ public class Trapezoid {
         this.maxAcceleration = maxAcceleration;
         this.maxVelocity = maxVelocity;
         // Velocity increment calculated based on max acceleration
-        deltaVelocity = maxAcceleration * 0.02;
+        deltaVelocity = maxAcceleration * CYCLE_DT;
         // deaccelerartion offset - start deacceleration before 
         deacceleratingOffset = maxAcceleration*CYCLE_DT*CYCLE_DT;
     }
@@ -37,37 +37,48 @@ public class Trapezoid {
         return (currentVelocity + targetVelocity)/2*time; // avg velocity * time
     }
 
-    // Function to calculate the next velocity setpoint, based on remaining distance and current and target velocities
     public double calculate(double remainingDistance, double curentVelocity, double targetVelocity) {
+        return calculate(remainingDistance, curentVelocity, targetVelocity, false);
+    }
+    // Function to calculate the next velocity setpoint, based on remaining distance and current and target velocities
+    public double calculate(double remainingDistance, double curentVelocity, double targetVelocity, boolean debug) {
         // Case for negative remaining distance
         if(remainingDistance < 0) {
-            return  -calculate(-remainingDistance, -curentVelocity, -targetVelocity);
+            return  -calculate(-remainingDistance, -curentVelocity, -targetVelocity, debug);
         }
         double time = Timer.getFPGATimestamp();
+        if(time-lastTime < CYCLE_DT) {
+            return lastV;
+        }
         double cv = curentVelocity;
         // update cv for situation that we are not accelerating or deaccelerating as expected
-        if(time - lastTime < Constants.CYCLE_DT*2) {
-            if(lastA > 0 && curentVelocity < lastV) { // 
-                cv = lastV;
-            } else if(lastA < 0 && curentVelocity > lastV) {
-                cv = lastV;
-            }
-        }        
+//        if(time - lastTime < Constants.CYCLE_DT*2) {
+//            if(lastA > 0 && curentVelocity < lastV) { // 
+//                cv = lastV;
+//            } else if(lastA < 0 && curentVelocity > lastV) {
+//                cv = lastV;
+//            }
+//        }        
         // Case for below max velocity, and enough distance to reach targetVelocity at max acceleration
         if(cv < maxVelocity && distanceToVelocity(cv+deltaVelocity, targetVelocity, maxAcceleration) < remainingDistance - cycleDistanceWithAccel(cv)) {
             lastV = Math.min(curentVelocity + deltaVelocity, maxVelocity);
+            if(debug) System.out.println("trapezoid  accel- v=" + lastV + " cv=" + cv + " d=" + remainingDistance);
+
         } 
         // Case at max velocity and not deacceleration yet
         else if(cv >= maxVelocity && distanceToVelocity(maxVelocity, targetVelocity, maxAcceleration) < remainingDistance - cycleDistanceNoAccel(cv)) {
             lastV = maxVelocity;
+            if(debug) System.out.println("trapezoid  same- v=" + lastV + " cv=" + cv + " d=" + remainingDistance);
         } 
         // case we need to accelerate at a slower rate
         else {
             double distanceToDeaccelerarion = remainingDistance - distanceToVelocity(curentVelocity, targetVelocity, maxAcceleration); 
-            if(distanceToDeaccelerarion - deacceleratingOffset > 0  || curentVelocity < targetVelocity) {
+            if(debug) System.out.println(" dtod=" + distanceToDeaccelerarion + " remain=" + remainingDistance + " cv=" + cv);
+            if(distanceToDeaccelerarion + deacceleratingOffset > 0  || curentVelocity < targetVelocity) {
                 // need to accelerate at a lower value
-                distanceToDeaccelerarion -= cycleDistanceNoAccel(curentVelocity);
+                // distanceToDeaccelerarion -= cycleDistanceNoAccel(curentVelocity);
                 lastV = curentVelocity + distanceToDeaccelerarion/CYCLE_DT/2;
+                if(debug) System.out.println("trapezoid - v=" + lastV + " cv=" + cv + " d=" + remainingDistance + " dtod = " + distanceToDeaccelerarion);
 
             } else { // deaccelration
                 // calclate the required deacceleration from cv to target v in remaining distance
@@ -75,6 +86,8 @@ public class Trapezoid {
                 double deaccelerartionTime = remainingDistance / avgVelocity;
                 double deaccelerartion = (cv-targetVelocity)/deaccelerartionTime;
                 lastV = cv - deaccelerartion*Constants.CYCLE_DT;
+                if(debug) System.out.println("trapezoid - deace =" + lastV + " cv=" + cv + " d=" + remainingDistance);
+
             }
         }
         lastA = lastV - curentVelocity;

@@ -1,6 +1,5 @@
 package frc.robot.commands.chassis;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.chassis.Chassis;
 
@@ -10,25 +9,22 @@ public class CheckModulesSteerVelocity extends Command {
     double velocity;
 
 
-    public CheckModulesSteerVelocity(Chassis chassis) {
+    public CheckModulesSteerVelocity(Chassis chassis, double velocity) {
         this.chassis = chassis;
+        this.velocity = velocity;
         addRequirements(chassis);
-        if(SmartDashboard.getNumber("CheckSteerVelocity", 1000) == 1000) {
-            SmartDashboard.putNumber("CheckSteerVelocity", 1);
-            SmartDashboard.getNumber("CheckSteerVelocity", 1000);
-        }
     }
 
     @Override
     public void initialize() {
-        velocity = SmartDashboard.getNumber("CheckSteerVelocity", 1);
-        SmartDashboard.putNumber("CheckSteerVelocity Target", velocity);
     }
+
 
     @Override
     public void execute() {
+        System.out.println("Setting velocity to " + velocity);
         for(int i = 0; i < 4; i++) {
-            chassis.getModule(i).setVelocity(velocity);
+            chassis.getModule(i).setSteerVelocity(velocity, true);
         }
     }
 

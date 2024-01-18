@@ -1,7 +1,6 @@
 package frc.robot.commands.chassis;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.chassis.Chassis;
 import frc.robot.subsystems.chassis.Constants;
@@ -12,20 +11,15 @@ public class SetModuleAngle extends Command {
     Rotation2d angle = null;
     double degrees = 0;
 
-    public SetModuleAngle(Chassis chassis) {
+    public SetModuleAngle(Chassis chassis, double angle) {
         this.chassis = chassis;
+        this.angle = Rotation2d.fromDegrees(angle);
         addRequirements(chassis);
-        if(SmartDashboard.getNumber("SetModuleAngle", 1000) == 1000) {
-            SmartDashboard.putNumber("SetModuleAngle", 0);
-            SmartDashboard.getNumber("SetModuleAngle", 1000);
-        }
+
     }
 
     @Override
     public void initialize() {
-        degrees = SmartDashboard.getNumber("SetModuleAngle", 0);
-        SmartDashboard.putNumber("SetModuleAngle Target", degrees);
-        this.angle = Rotation2d.fromDegrees(degrees);
     }
 
     @Override
@@ -38,6 +32,7 @@ public class SetModuleAngle extends Command {
     @Override
     public boolean isFinished() {
         var angles = chassis.getModulesAngles();
+//        System.out.println(" angles = " + angles[0] + " " + angles[1] + " " + angles[2] + " " + angles[3]);
         for(double a : angles) {
             if(Math.abs(a-degrees) > Constants.MAX_STEER_ERROR) {
                 return false;

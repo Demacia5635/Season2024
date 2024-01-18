@@ -57,8 +57,8 @@ public class Chassis extends SubsystemBase {
     SmartDashboard.putData("reset wheels", new InstantCommand(() -> resetWheels()).ignoringDisable(true));
 
     SmartDashboard.putData("Chassis Move Sysid", (new Sysid(this::setModulesPower, this::getMoveVelocity, 0.1, 0.5, this)).getCommand());
-    SmartDashboard.putData("Test Steer Velocity", (new CheckModulesSteerVelocity(this)));
-    SmartDashboard.putData("Set Modules Angle", (new SetModuleAngle(this)));
+    SmartDashboard.putData("Test Steer Velocity", (new CheckModulesSteerVelocity(this, 200)));
+    SmartDashboard.putData("Set Modules Angle", (new SetModuleAngle(this, 0)));
     new TestVelocity("Chassis", this::setVelocity, this::getMoveVelocity, 0.05, this);
 
   }
@@ -199,7 +199,7 @@ public class Chassis extends SubsystemBase {
   public double[] getModulesAngles() {
     double[] angles = new double[modules.length];
     for (int i = 0; i < modules.length; i++) {
-      angles[i] = modules[i].getAngle().getDegrees();
+      angles[i] = modules[i].getAngleDegrees();
     }
     return angles;
   }
