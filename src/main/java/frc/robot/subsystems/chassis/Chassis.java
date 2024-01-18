@@ -33,6 +33,7 @@ public class Chassis extends SubsystemBase {
   private final Pigeon2 gyro;
 
   public static List<pathPoint> pointsForPathTeleop = new ArrayList<pathPoint>();
+  public static List<pathPoint> pointsForAuto = new ArrayList<pathPoint>();
 
   private final SwerveDrivePoseEstimator poseEstimator;
   private final Field2d field;
