@@ -15,6 +15,7 @@ public class Trapezoid {
     double maxAcceleration; // Maximum permissible acceleration
     private double deltaVelocity; // Velocity increment at each time step
     private double lastTime  = 0;
+    private double deacceleratingOffset;
     private double lastV;
     private double lastA;
 
@@ -25,6 +26,8 @@ public class Trapezoid {
         this.maxVelocity = maxVelocity;
         // Velocity increment calculated based on max acceleration
         deltaVelocity = maxAcceleration * 0.02;
+        // deaccelerartion offset - start deacceleration before 
+        deacceleratingOffset = maxAcceleration*CYCLE_DT*CYCLE_DT;
     }
 
     // Helper function to calculate distance required to change from current velocity to target velocity
@@ -59,17 +62,20 @@ public class Trapezoid {
             lastV = maxVelocity;
         } 
         // case we need to accelerate at a slower rate
-        else if(distanceToVelocity(curentVelocity, targetVelocity, maxAcceleration) < remainingDistance || curentVelocity < targetVelocity) {
-            // need to accelerate at a lower value
-            double d = remainingDistance - distanceToVelocity(curentVelocity, targetVelocity, maxAcceleration);
-            lastV = curentVelocity + d/CYCLE_DT/2;
-
-        }
-        // Case for not enough distance to reach targetVelocity, must decelerate
         else {
-            // calclate the required acceleration from cv to target v in remaining distance
-            double t = 2 * remainingDistance / (curentVelocity + targetVelocity);
-            lastV = cv - (curentVelocity-targetVelocity)*Constants.CYCLE_DT/t;
+            double distanceToDeaccelerarion = remainingDistance - distanceToVelocity(curentVelocity, targetVelocity, maxAcceleration); 
+            if(distanceToDeaccelerarion - deacceleratingOffset > 0  || curentVelocity < targetVelocity) {
+                // need to accelerate at a lower value
+                distanceToDeaccelerarion -= cycleDistanceNoAccel(curentVelocity);
+                lastV = curentVelocity + distanceToDeaccelerarion/CYCLE_DT/2;
+
+            } else {
+                // calclate the required deacceleration from cv to target v in remaining distance
+                double avgVelocity = (cv + targetVelocity) / 2;
+                double deaccelerartionTime = remainingDistance / avgVelocity;
+                double deaccelerartion = (cv-targetVelocity)/deaccelerartionTime;
+                lastV = cv - deaccelerartion*Constants.CYCLE_DT;
+            }
         }
         lastA = lastV - curentVelocity;
         lastTime = time;
