@@ -4,13 +4,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.chassis.Chassis;
 
-public class CheckModulesSterrVelocity extends Command {
+public class CheckModulesSteerVelocity extends Command {
 
     Chassis chassis;
     double velocity;
 
 
-    public CheckModulesSterrVelocity(Chassis chassis) {
+    public CheckModulesSteerVelocity(Chassis chassis) {
         this.chassis = chassis;
         addRequirements(chassis);
         if(SmartDashboard.getNumber("CheckSteerVelocity", 1000) == 1000) {

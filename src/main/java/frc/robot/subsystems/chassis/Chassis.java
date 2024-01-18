@@ -14,6 +14,8 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Sysid.Sysid;
+import frc.robot.commands.chassis.CheckModulesSteerVelocity;
+import frc.robot.commands.chassis.SetModuleAngle;
 import frc.robot.commands.chassis.utils.TestVelocity;
 
 import static frc.robot.subsystems.chassis.Constants.*;
@@ -52,12 +54,11 @@ public class Chassis extends SubsystemBase {
 
     SmartDashboard.putData("set coast", new InstantCommand(() -> setNeutralMode(NeutralMode.Coast)).ignoringDisable(true));
     SmartDashboard.putData("set brake", new InstantCommand(() -> setNeutralMode(NeutralMode.Brake)).ignoringDisable(true));
-
-    SmartDashboard.putData("reset wheels", new InstantCommand(() -> {
-      resetWheels();
-    }).ignoringDisable(true));
+    SmartDashboard.putData("reset wheels", new InstantCommand(() -> resetWheels()).ignoringDisable(true));
 
     SmartDashboard.putData("Chassis Move Sysid", (new Sysid(this::setModulesPower, this::getMoveVelocity, 0.1, 0.5, this)).getCommand());
+    SmartDashboard.putData("Test Steer Velocity", (new CheckModulesSteerVelocity(this)));
+    SmartDashboard.putData("Set Modules Angle", (new SetModuleAngle(this)));
     new TestVelocity("Chassis", this::setVelocity, this::getMoveVelocity, 0.05, this);
 
   }
