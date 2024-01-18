@@ -4,25 +4,25 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.chassis.Chassis;
 
-public class CheckVelocity extends Command {
+public class CheckModulesSterrVelocity extends Command {
 
     Chassis chassis;
     double velocity;
 
 
-    public CheckVelocity(Chassis chassis) {
+    public CheckModulesSterrVelocity(Chassis chassis) {
         this.chassis = chassis;
         addRequirements(chassis);
-        if(SmartDashboard.getNumber("CheckVelocity", 1000) == 1000) {
-            SmartDashboard.putNumber("CheckVelocity", 1);
-            SmartDashboard.getNumber("CheckVelocity", 1000);
+        if(SmartDashboard.getNumber("CheckSteerVelocity", 1000) == 1000) {
+            SmartDashboard.putNumber("CheckSteerVelocity", 1);
+            SmartDashboard.getNumber("CheckSteerVelocity", 1000);
         }
     }
 
     @Override
     public void initialize() {
-        velocity = SmartDashboard.getNumber("CheckVelocity", 1);
-        SmartDashboard.putNumber("CheckVelocity Target", velocity);
+        velocity = SmartDashboard.getNumber("CheckSteerVelocity", 1);
+        SmartDashboard.putNumber("CheckSteerVelocity Target", velocity);
     }
 
     @Override
