@@ -12,7 +12,7 @@ public final class Constants {
   public static final int CONTROLLER_PORT = 0;
 
   /** from blue alliance, in meters */
-  public static RectanglePos rectAMP = new RectanglePos(
+  public static RectanglePos rectAMP = new RectanglePos(   
     new Translation2d(16.534, 0.502),
     new Translation2d(13.229, 0));
   /** from blue alliance, in meters */
@@ -25,8 +25,9 @@ public final class Constants {
     new Translation2d(1.850, 8.156));
   /** from blue alliance, in meters */
   public static RectanglePos rectSTAGE = new RectanglePos(
-    new Translation2d(10.501, 2.35),
-    new Translation2d(13.443, 5.745));
+    new Translation2d(13.443, 5.745),
+    new Translation2d(10.501, 2.35));
+
 
 
   public static class ChassisConstants {
