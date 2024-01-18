@@ -33,6 +33,13 @@ public class ClimbSubsystem extends SubsystemBase {
   public double getRoghtVolteg(){
     return Right_Climb_Motor.getMotorOutputVoltage();
   }
+
+  public void stop() {
+    climbLeft(0);
+    climbRight(0);
+  }
+
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
