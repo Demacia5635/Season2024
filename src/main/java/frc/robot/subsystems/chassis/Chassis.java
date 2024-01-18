@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Sysid.Sysid;
+import frc.robot.commands.chassis.utils.TestVelocity;
 
 import static frc.robot.subsystems.chassis.Constants.*;
 
@@ -57,6 +58,7 @@ public class Chassis extends SubsystemBase {
     }).ignoringDisable(true));
 
     SmartDashboard.putData("Chassis Move Sysid", (new Sysid(this::setModulesPower, this::getMoveVelocity, 0.1, 0.5, this)).getCommand());
+    new TestVelocity("Chassis", this::setVelocity, this::getMoveVelocity, 0.05, this);
 
   }
 
@@ -106,7 +108,11 @@ public class Chassis extends SubsystemBase {
     return angularVelocities;
   }
 
-
+  public void setVelocity(double v) {
+    for(SwerveModule m : modules) {
+      m.setVelocity(v);
+    }
+  }
 
   public double[] getVelocities() {
     double[] angularVelocities = new double[modules.length];

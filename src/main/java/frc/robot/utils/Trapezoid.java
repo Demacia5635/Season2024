@@ -69,7 +69,7 @@ public class Trapezoid {
                 distanceToDeaccelerarion -= cycleDistanceNoAccel(curentVelocity);
                 lastV = curentVelocity + distanceToDeaccelerarion/CYCLE_DT/2;
 
-            } else {
+            } else { // deaccelration
                 // calclate the required deacceleration from cv to target v in remaining distance
                 double avgVelocity = (cv + targetVelocity) / 2;
                 double deaccelerartionTime = remainingDistance / avgVelocity;
