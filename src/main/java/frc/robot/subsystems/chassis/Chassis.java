@@ -58,7 +58,7 @@ public class Chassis extends SubsystemBase {
 
     SmartDashboard.putData("Chassis Move Sysid", (new Sysid(this::setModulesPower, this::getMoveVelocity, 0.1, 0.5, this)).getCommand());
     SmartDashboard.putData("Test Steer Velocity", (new CheckModulesSteerVelocity(this, 200)));
-    SmartDashboard.putData("Set Modules Angle", (new SetModuleAngle(this, 0)));
+    SmartDashboard.putData("Set Modules Angle", (new SetModuleAngle(this)));
     new TestVelocity("Chassis", this::setVelocity, this::getMoveVelocity, 0.05, this);
 
   }

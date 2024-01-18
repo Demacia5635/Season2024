@@ -1,6 +1,9 @@
 package frc.robot.commands.chassis;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.chassis.Chassis;
 import frc.robot.subsystems.chassis.Constants;
@@ -10,16 +13,20 @@ public class SetModuleAngle extends Command {
     Chassis chassis;
     Rotation2d angle = null;
     double degrees = 0;
+    private GenericEntry angleEntry;
 
-    public SetModuleAngle(Chassis chassis, double angle) {
+    public SetModuleAngle(Chassis chassis) {
         this.chassis = chassis;
-        this.angle = Rotation2d.fromDegrees(angle);
         addRequirements(chassis);
+        ShuffleboardTab tab = Shuffleboard.getTab("Module Test");
+        angleEntry = tab.add("Set Module Angle To", 0).getEntry();
+        tab.add("Set Module Entry", this);
 
     }
 
     @Override
     public void initialize() {
+        this.angle = Rotation2d.fromDegrees(angleEntry.getDouble(0));
     }
 
     @Override

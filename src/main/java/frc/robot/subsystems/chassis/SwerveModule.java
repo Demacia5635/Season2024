@@ -4,6 +4,7 @@ import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.StatusFrame;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.SteerRequestType;
@@ -20,9 +21,7 @@ import frc.robot.Sysid.Sysid;
 import frc.robot.subsystems.chassis.Constants.SwerveModuleConstants;
 import frc.robot.utils.Trapezoid;
 
-import static frc.robot.Constants.ChassisConstants.*;
-import static frc.robot.Constants.ChassisConstants.SwerveModuleConstants.MAX_STEER_ERROR;
-import static frc.robot.subsystems.chassis.Constants.MOTOR_PULSES_PER_ROTATION;
+import static frc.robot.subsystems.chassis.Constants.*;
 
 public class SwerveModule implements Sendable {
     private final TalonFX moveMotor;
@@ -55,8 +54,7 @@ public class SwerveModule implements Sendable {
         moveFF = new FeedForward_SVA(constants.moveFF.KS, constants.moveFF.KV, constants.moveFF.KA);
         steerFF = new FeedForward_SVA(constants.steerFF.KS, constants.steerFF.KV, constants.steerFF.KA);
         setMovePID(constants.movePID.KP, constants.movePID.KI, constants.movePID.KD);
-        setAnglePID(constants.steerPID.KP, constants.steerPID.KI, constants.steerPID.KD);
-        steerMotor.setInverted(false);
+//        setAnglePID(constants.steerPID.KP, constants.steerPID.KI, constants.steerPID.KD);
         pulsePerDegree = constants.pulsePerDegree;
         pulsePerMeter = constants.pulsePerMeter;
         steerTrapezoid = new Trapezoid(MAX_STEER_VELOCITY, STEER_ACCELERATION);
@@ -70,15 +68,17 @@ public class SwerveModule implements Sendable {
         moveMotor.setInverted(true);
         steerMotor.setInverted(constants.inverted);
         moveMotor.setSelectedSensorPosition(0);
-        System.out.println(" angle degrees = " + getAngleDegrees());
         steerMotor.setSelectedSensorPosition(getAngleDegrees()*pulsePerDegree);
         steerMotor.configClosedloopRamp(0.5);
         steerMotor.configOpenloopRamp(0.5);
-        double kp = 0.1*1023/20/pulsePerDegree; // correct 0.1  power at 20 degrees error
-        double ki = kp/10;
+        steerMotor.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 10);
+        double kp = 0.01*1023.0/10.0/pulsePerDegree; // correct 0.1  power at 10 degrees error
+        double ki = kp/100;
+        double kd = 0;
         System.out.println(" kp = " + kp + " ki = " + ki);
 
-        setAnglePID(kp,ki,0);
+        setAnglePID(kp,ki, kd);
+        steerMotor.configMaxIntegralAccumulator(0, 360*pulsePerDegree);
 
         System.out.println(" selected sensor " + steerMotor.getSelectedSensorPosition());
         SmartDashboard.putData(name + " Steer Sysid", (new Sysid(this::setSteerPower, this::getSteerVelocity, 0.15, 0.5, chassis)).getCommand());
@@ -219,18 +219,21 @@ public class SwerveModule implements Sendable {
         }
         double ff = steerFF.calculate(tgtV,currentVelocity);
         if(debug) System.out.println(" set v to " + tgtV + " ff=" + ff);
-        steerMotor.set(ControlMode.Velocity, angularToEncoderSpeed(tgtV), DemandType.ArbitraryFeedForward, ff);
+//        steerMotor.set(ControlMode.Velocity, angularToEncoderSpeed(tgtV), DemandType.ArbitraryFeedForward, ff);
     }
 
     public void setAngle(Rotation2d angle) {
-        targetAngle = angle;
-        double diff = MathUtil.inputModulus(angle.minus(getAngle()).getDegrees(),-180,180);
-        if(debug) System.out.println(" set angle - " + angle.getDegrees() + " diff=" + diff + " cur=" + getAngleDegrees());
-        if(debug) System.out.println(" error=" + steerMotor.getClosedLoopError() + " power=" + steerMotor.getMotorOutputPercent());
-        double cpos = steerMotor.getSelectedSensorPosition();
-        double pos = cpos + diff*pulsePerDegree;
-        if(debug) System.out.println(" pos=" + pos + " cpos=" + cpos);
-        steerMotor.set(ControlMode.Position,pos);
+        if(targetAngle.equals(angle)) {
+            if(debug) System.out.println("set angle - same value - no change - " + " error=" + steerMotor.getClosedLoopError() + " power=" + steerMotor.getMotorOutputPercent() );
+        } else {
+            targetAngle = angle;
+            double diff = MathUtil.inputModulus(angle.minus(getAngle()).getDegrees(),-180,180);
+            double cpos = steerMotor.getSelectedSensorPosition();
+            double pos = cpos + diff*pulsePerDegree;
+            if(debug) System.out.println(" set angle - " + angle.getDegrees() + " diff=" + diff + " cur=" + getAngleDegrees() + 
+                    " error=" + steerMotor.getClosedLoopError() + " power=" + steerMotor.getMotorOutputPercent() + " pos=" + pos + " cpos=" + cpos);
+            steerMotor.set(ControlMode.Position,pos);
+        }
 
         /* 
         double v = 0;
