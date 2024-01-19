@@ -1,13 +1,11 @@
 package frc.robot.subsystems.chassis;
 
-import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.StatusFrame;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
-import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.SteerRequestType;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -20,9 +18,13 @@ import frc.robot.Sysid.FeedForward_SVA;
 import frc.robot.Sysid.Sysid;
 import frc.robot.subsystems.chassis.Constants.SwerveModuleConstants;
 import frc.robot.utils.Trapezoid;
+import frc.robot.utils.Utils;
 
 import static frc.robot.subsystems.chassis.Constants.*;
 
+/**
+ * Swerve Module
+ */
 public class SwerveModule implements Sendable {
     private final TalonFX moveMotor;
     private final TalonFX steerMotor;
@@ -43,19 +45,30 @@ public class SwerveModule implements Sendable {
     Rotation2d targetAngle = new Rotation2d();
     public String name;
 
-    private boolean useSteerPositionPID = true;
+    private double maxVelocityChange = MAX_DRIVE_VELOCITY * CYCLE_DT;
+    double maxSteerVelocityChange = STEER_ACCELERATION * CYCLE_DT;
 
+    private boolean useSteerPositionPID = true;
     public boolean debug = false;
 
     Chassis chassis;
 
+    /**
+     * Constructor
+     * @param constants
+     * @param chassis
+     */
     public SwerveModule(SwerveModuleConstants constants, Chassis chassis) {
         this.chassis = chassis;
+        // define motors and encoder
         moveMotor = new TalonFX(constants.moveMotorId);
         steerMotor = new TalonFX(constants.angleMotorId);
         moveMotor.configFactoryDefault();
         steerMotor.configFactoryDefault();
         absoluteEncoder = new CANCoder(constants.absoluteEncoderId);
+        absoluteEncoder.configFactoryDefault();
+
+        // set the controls
         moveFF = new FeedForward_SVA(constants.moveFF.KS, constants.moveFF.KV, constants.moveFF.KA);
         steerFF = new FeedForward_SVA(constants.steerFF.KS, constants.steerFF.KV, constants.steerFF.KA);
         setMovePID(0,constants.movePID.KP, constants.movePID.KI, constants.movePID.KD);
@@ -64,10 +77,12 @@ public class SwerveModule implements Sendable {
         pulsePerMeter = constants.pulsePerMeter;
         steerTrapezoid = new Trapezoid(MAX_STEER_VELOCITY, STEER_ACCELERATION);
         angleOffset = constants.steerOffset;
+        // name
         name = (constants.moduleTranslationOffset.getX()>0?"Front":"Back") + 
                (constants.moduleTranslationOffset.getY()>0?"Left":"Right");
         debug = constants.moduleTranslationOffset.getX() < 0 && constants.moduleTranslationOffset.getY() >0;
-        
+
+        // set motors paramters
         moveMotor.setNeutralMode(NeutralMode.Brake);
         steerMotor.setNeutralMode(NeutralMode.Brake);
         moveMotor.setInverted(true);
@@ -77,16 +92,22 @@ public class SwerveModule implements Sendable {
         steerMotor.configClosedloopRamp(0.5);
         steerMotor.configOpenloopRamp(0.5);
         steerMotor.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 10);
+
         // set position PID at motor
         setSteerPositionPID(constants);
 
         debug(" selected sensor " + steerMotor.getSelectedSensorPosition());
+        // add the sysid for the module
         SmartDashboard.putData(name + " Steer Sysid", (new Sysid(this::setSteerPower, this::getSteerVelocity, 0.15, 0.5, chassis)).getCommand());
     }
 
+    /**
+     * Set the steer position PID and position close loop params
+     * @param constants
+     */
     private void setSteerPositionPID(SwerveModuleConstants constants) {
-        // KP - to provide MAX_VELOCITY at 90 degrees error
-        double kp = steerFF.calculate(MAX_STEER_VELOCITY, MAX_STEER_VELOCITY)*1023.0/angularToEncoderSpeed(90);
+        // KP - to provide MAX_VELOCITY (with no accelration) at 90 degrees error
+        double kp = steerFF.calculate(MAX_STEER_VELOCITY, MAX_STEER_VELOCITY)*1023.0/talonSteerVelocity(90);
         double ki = kp/10;
         double kd = ki/10;
         debug(" steer position PID kp = " + kp + " ki = " + ki + " kd=" + kd);
@@ -100,32 +121,46 @@ public class SwerveModule implements Sendable {
         }
     }
 
+    /**
+     * Set the move motor PID
+     * @param slot
+     * @param kP
+     * @param kI
+     * @param kD
+     */
     public void setMovePID(int slot, double kP, double kI, double kD) {
         moveMotor.config_kP(slot, kP);
         moveMotor.config_kI(slot, kI);
         moveMotor.config_kD(slot, kD);
     }
 
+    /**
+     * Set the Steer velocity PID
+     * @param slot
+     * @param kP
+     * @param kI
+     * @param kD
+     */
     public void setSteerPID(int slot,double kP, double kI, double kD) {
         steerMotor.config_kP(slot, kP);
         steerMotor.config_kI(slot, kI);
         steerMotor.config_kD(slot, kD);
     }
 
-    public void setInverted(boolean invert) {
-        moveMotor.setInverted(invert);
-    }
 
-
-    public double getAbsoluteEncoder() {
-        return absoluteEncoder.getAbsolutePosition();
-    }
-
-
-
+    /**
+     * Get the module angle from Talon encoder 
+     * Use to make sure steer direction and gear ratio/pulse per degree are correct
+     * @return angle based on talon encoder
+     */
     public double steerTalonAngle() {
-        return MathUtil.inputModulus(steerMotor.getSelectedSensorPosition()/pulsePerDegree,-180,180);
+        return Utils.degrees(steerMotor.getSelectedSensorPosition()/pulsePerDegree);
     }
+    /**
+     * Get the talon motor degrees
+     *  Use to make sure steer direction and gear ratio/pulse per degree are correct
+     * @return the motor angle without the gear ratio
+     */
     public double steerTalonRawAngle() {
         return steerMotor.getSelectedSensorPosition()*360/MOTOR_PULSES_PER_ROTATION;
     }
@@ -135,7 +170,7 @@ public class SwerveModule implements Sendable {
      * @return Velocity in m/s
      */
     public double getVelocity() {
-        return encoderToMetricSpeed(moveMotor.getSelectedSensorVelocity());
+        return talonVelocityToVelocity(moveMotor.getSelectedSensorVelocity());
     }
 
     /**
@@ -164,27 +199,21 @@ public class SwerveModule implements Sendable {
 
     public void setVelocity(double v) {
         targetVelocity = v;
-        if(Math.abs(v) < 0.03) {
-            setPower(0);
-            return;
+        if(Math.abs(targetVelocity) < 0.03) {
+            targetVelocity = 0;
         }
-        targetVelocity = v;
         double currentVelocity = getVelocity();
+        /*
         double cv = currentVelocity;
         if(lastMoveA > 0 && currentVelocity < lastMoveV && currentVelocity < v) {
             currentVelocity = lastMoveV;
         } else if(lastMoveA < 0 && currentVelocity > lastMoveV && currentVelocity < v) {
             currentVelocity = lastMoveV;
         }
-        double tgtV = v;
-        double maxAccel = DRIVE_ACCELERATION * Constants.CYCLE_DT;
-        if (v > currentVelocity + maxAccel) {
-            tgtV = currentVelocity + maxAccel;
-        } else if (v < currentVelocity-maxAccel) {
-            tgtV = currentVelocity - maxAccel;
-        }
-        double ff = moveFF.calculate(tgtV, cv);
-        moveMotor.set(ControlMode.Velocity, metricToEncoderSpeed(tgtV), DemandType.ArbitraryFeedForward, ff);
+        */
+        double tgtV = MathUtil.clamp(v, currentVelocity-maxVelocityChange, currentVelocity+maxVelocityChange);
+        double ff = moveFF.calculate(tgtV, currentVelocity);
+        moveMotor.set(ControlMode.Velocity, talonVelocity(tgtV), DemandType.ArbitraryFeedForward, ff);
         lastMoveA = tgtV - currentVelocity;
         lastMoveV = tgtV;
     }
@@ -197,12 +226,19 @@ public class SwerveModule implements Sendable {
         moveMotor.set(ControlMode.PercentOutput, p);
     }
 
+    /**
+     * Get the module angle as Rotation2D
+     * @return
+     */
     public Rotation2d getAngle() {
         return Rotation2d.fromDegrees(absoluteEncoder.getAbsolutePosition() - angleOffset);
     }
+    /**
+     * Get the module angle in degrees in the -180 to 180 range
+     * @return
+     */
     public double getAngleDegrees() {
-        double d = getAngle().getDegrees();
-        return MathUtil.inputModulus(d,-180,180);
+        return Utils.degrees(getAngle());
     }
 
     /**
@@ -218,7 +254,7 @@ public class SwerveModule implements Sendable {
      * @return Velocity in deg/s
      */
     public double getSteerVelocity() {  
-        return encoderToAngularSpeed(steerMotor.getSelectedSensorVelocity());
+        return talonToSteerVelocity(steerMotor.getSelectedSensorVelocity());
     }
 
     /**
@@ -227,45 +263,53 @@ public class SwerveModule implements Sendable {
      */
     public void setSteerVelocity(double v, boolean withAcceleration) {
         steerMotor.selectProfileSlot(SteerVelocitySlot,0);
-        double tgtV = v;
         double currentVelocity = getSteerVelocity();
-        if(withAcceleration) {
-            double maxVChange = STEER_ACCELERATION * Constants.CYCLE_DT;
-            tgtV = Math.min(tgtV,currentVelocity + maxVChange);
-            tgtV = Math.max(tgtV,currentVelocity - maxVChange);
-        }
+        double tgtV = withAcceleration?MathUtil.clamp(v, currentVelocity-maxSteerVelocityChange, currentVelocity+maxSteerVelocityChange):v;
         double ff = steerFF.calculate(tgtV,currentVelocity);
         debug(" set v to " + tgtV + " ff=" + ff);
-        steerMotor.set(ControlMode.Velocity, angularToEncoderSpeed(tgtV), DemandType.ArbitraryFeedForward, ff);
+        steerMotor.set(ControlMode.Velocity, talonSteerVelocity(tgtV), DemandType.ArbitraryFeedForward, ff);
     }
 
-    public void setAngle(Rotation2d angle) {
+    /**
+     * Set the module angle using position PID
+     * @param angle
+     */
+    public void setAngleByPositionPID(Rotation2d angle) {
         steerMotor.selectProfileSlot(SteerPositionSlot,0);
         if(targetAngle.equals(angle)) {
             debug("set angle - same value - no change - " + " error=" + steerMotor.getClosedLoopError() + " power=" + steerMotor.getMotorOutputPercent() );
         } else {
             targetAngle = angle;
-            double diff = MathUtil.inputModulus(angle.minus(getAngle()).getDegrees(),-180,180);
-            double cpos = steerMotor.getSelectedSensorPosition();
-            double pos = cpos + diff*pulsePerDegree;
-            debug(" set angle - " + angle.getDegrees() + " diff=" + diff + " cur=" + getAngleDegrees() + 
-                    " error=" + steerMotor.getClosedLoopError() + " power=" + steerMotor.getMotorOutputPercent() + " pos=" + pos + " cpos=" + cpos);
-            steerMotor.set(ControlMode.Position,pos);
+            Rotation2d currentAngle = getAngle();
+            double diff = Utils.degrees(angle.minus(currentAngle));
+            double currentPos = steerMotor.getSelectedSensorPosition();
+            double targetPos = currentPos + diff*pulsePerDegree;
+            debug(" set angle - " + Utils.degrees(angle) + " diff=" + diff + " cur=" + Utils.degrees(currentAngle) + 
+                    " error=" + steerMotor.getClosedLoopError() + " power=" + steerMotor.getMotorOutputPercent() + " pos=" + targetPos + " cpos=" + currentPos);
+            steerMotor.set(ControlMode.Position,targetPos);
         }
     }
 
+    /**
+     * Set module angle by Trapeziod/Velociyu
+     * @param angle
+     */
     public void setAngleByVelcoity(Rotation2d angle)  {
         targetAngle = angle;
-        double diff = MathUtil.inputModulus(angle.minus(getAngle()).getDegrees(),-180,180);
+        double diff = Utils.degrees(angle.minus(getAngle()));
         double v = 0;
         if(Math.abs(diff) > MAX_STEER_ERROR) {
             double cv = getSteerVelocity();
             v = steerTrapezoid.calculate(diff, cv, 0, debug);
             debug(" diff=" + diff + " v=" + v + " cv=" + cv + " angle=" + getAngleDegrees() + "/" + steerTalonAngle());
         }
-        setSteerVelocity(v, true);
+        setSteerVelocity(v, false);
     }
 
+    /**
+     * Debug message
+     * @param s
+     */
     private void debug(String s) {
         if(debug) 
             System.out.println(name + ": " + s);
@@ -286,7 +330,7 @@ public class SwerveModule implements Sendable {
         SwerveModuleState optimized = SwerveModuleState.optimize(state, getAngle());
         setVelocity(optimized.speedMetersPerSecond);
         if(useSteerPositionPID) {
-            setAngle(optimized.angle);
+            setAngleByPositionPID(optimized.angle);
         } else {
             setAngleByVelcoity(optimized.angle);
         }
@@ -300,19 +344,19 @@ public class SwerveModule implements Sendable {
         return new SwerveModulePosition(moveMotor.getSelectedSensorPosition() / pulsePerMeter, getAngle());
     }
 
-    public double metricToEncoderSpeed(double speed) {
-        return speed * pulsePerMeter / 10;
+    public double talonVelocity(double v) {
+        return v * pulsePerMeter / 10;
     }
 
-    public double encoderToMetricSpeed(double speed) {
-            return speed / pulsePerMeter * 10;
+    public double talonVelocityToVelocity(double v) {
+            return v / pulsePerMeter * 10;
     }
 
-    public double angularToEncoderSpeed(double speed) {
-            return speed * pulsePerDegree / 10;
+    public double talonSteerVelocity(double v) {
+            return v * pulsePerDegree / 10;
     }
     
-    public double encoderToAngularSpeed(double speed) {
+    public double talonToSteerVelocity(double speed) {
             return speed / pulsePerDegree * 10;
     }
 

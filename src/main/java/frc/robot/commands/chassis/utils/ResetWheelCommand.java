@@ -13,7 +13,7 @@ public class ResetWheelCommand extends Command {
 
   @Override
   public void execute() {
-    module.setAngle(new Rotation2d());
+    module.setAngleByPositionPID(new Rotation2d());
   }
 
   @Override

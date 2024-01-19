@@ -47,7 +47,7 @@ public class SetModuleAngle extends Command {
     @Override
     public void execute() {
         for(int i = 0; i < 4; i++) {
-            chassis.getModule(i).setAngle(angle);
+            chassis.getModule(i).setAngleByPositionPID(angle);
             double a = modules[i].getAngleDegrees();
             angleEntry[i].setDouble(a);
             errorEntry[i].setDouble(degrees - a);
