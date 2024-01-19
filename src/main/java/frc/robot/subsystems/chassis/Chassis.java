@@ -63,6 +63,9 @@ public class Chassis extends SubsystemBase {
 
   }
 
+  public SwerveModule[] getModules() {
+    return modules;
+  }
   public SwerveModule getModule(int i) {
     return modules[i];
   }

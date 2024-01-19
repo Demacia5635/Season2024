@@ -36,6 +36,9 @@ public class SwerveModule implements Sendable {
     private FeedForward_SVA steerFF;
     private Trapezoid steerTrapezoid;
 
+    private static final int SteerPositionSlot = 1;
+    private static final int SteerVelocitySlot = 0;
+
     double targetVelocity = 0;
     Rotation2d targetAngle = new Rotation2d();
     public String name;
@@ -56,7 +59,7 @@ public class SwerveModule implements Sendable {
         moveFF = new FeedForward_SVA(constants.moveFF.KS, constants.moveFF.KV, constants.moveFF.KA);
         steerFF = new FeedForward_SVA(constants.steerFF.KS, constants.steerFF.KV, constants.steerFF.KA);
         setMovePID(0,constants.movePID.KP, constants.movePID.KI, constants.movePID.KD);
-        setSteerPID(0,constants.steerPID.KP, constants.steerPID.KI, constants.steerPID.KD);
+        setSteerPID(SteerVelocitySlot,constants.steerPID.KP, constants.steerPID.KI, constants.steerPID.KD);
         pulsePerDegree = constants.pulsePerDegree;
         pulsePerMeter = constants.pulsePerMeter;
         steerTrapezoid = new Trapezoid(MAX_STEER_VELOCITY, STEER_ACCELERATION);
@@ -83,15 +86,18 @@ public class SwerveModule implements Sendable {
 
     private void setSteerPositionPID(SwerveModuleConstants constants) {
         // KP - to provide MAX_VELOCITY at 90 degrees error
-        double kp = steerFF.calculate(90, 90)*1023.0/angularToEncoderSpeed(90);
+        double kp = steerFF.calculate(MAX_STEER_VELOCITY, MAX_STEER_VELOCITY)*1023.0/angularToEncoderSpeed(90);
         double ki = kp/10;
-        double kd = kp/10;
+        double kd = ki/10;
         debug(" steer position PID kp = " + kp + " ki = " + ki + " kd=" + kd);
-        setSteerPID(1,kp,ki, kd);
+        setSteerPID(SteerPositionSlot,kp,ki, kd);
         // set the maximum integral to provide 1.1*KS value
-        steerMotor.configMaxIntegralAccumulator(0, 1.1*constants.steerFF.KS*1023/ki);
+        steerMotor.configMaxIntegralAccumulator(SteerPositionSlot, 1.1*constants.steerFF.KS*1023/ki);
         // set integral zone to 0 when more than 10 degrees error
-        steerMotor.config_IntegralZone(0, 10*pulsePerDegree);
+        steerMotor.config_IntegralZone(SteerPositionSlot, 10*pulsePerDegree);
+        if(useSteerPositionPID) {
+            steerMotor.selectProfileSlot(SteerPositionSlot, 0);
+        }
     }
 
     public void setMovePID(int slot, double kP, double kI, double kD) {
@@ -212,7 +218,7 @@ public class SwerveModule implements Sendable {
      * @return Velocity in deg/s
      */
     public double getSteerVelocity() {  
-        return absoluteEncoder.getVelocity(); // encoderToAngularSpeed(steerMotor.getSelectedSensorVelocity());
+        return encoderToAngularSpeed(steerMotor.getSelectedSensorVelocity());
     }
 
     /**
@@ -220,7 +226,7 @@ public class SwerveModule implements Sendable {
      * @param v Velocity in deg/s
      */
     public void setSteerVelocity(double v, boolean withAcceleration) {
-        steerMotor.selectProfileSlot(0,0);
+        steerMotor.selectProfileSlot(SteerVelocitySlot,0);
         double tgtV = v;
         double currentVelocity = getSteerVelocity();
         if(withAcceleration) {
@@ -234,7 +240,7 @@ public class SwerveModule implements Sendable {
     }
 
     public void setAngle(Rotation2d angle) {
-        steerMotor.selectProfileSlot(1,0);
+        steerMotor.selectProfileSlot(SteerPositionSlot,0);
         if(targetAngle.equals(angle)) {
             debug("set angle - same value - no change - " + " error=" + steerMotor.getClosedLoopError() + " power=" + steerMotor.getMotorOutputPercent() );
         } else {
@@ -325,7 +331,6 @@ public class SwerveModule implements Sendable {
         builder.addDoubleProperty("Steer Talon Angle", this::steerTalonAngle, null);
         builder.addDoubleProperty("Steer power", ()->steerMotor.getMotorOutputPercent(), null);
         builder.addDoubleProperty("distance", this::getDistance, null);
-        builder.addDoubleProperty("Steer Power",()->steerMotor.getMotorOutputPercent(), null);
     }
     
 
