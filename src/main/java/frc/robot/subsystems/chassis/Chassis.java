@@ -66,6 +66,10 @@ public class Chassis extends SubsystemBase {
     SmartDashboard.putData("Set Modules Angle", (new SetModuleAngle(this)));
     new TestVelocity("Chassis", this::setVelocity, this::getMoveVelocity, 0.05, this);
 
+    SmartDashboard.putNumber("ANG", 0);
+    SmartDashboard.putData("go to angle position", new InstantCommand(()->modules[2].setAngleByPositionPID(Rotation2d.fromDegrees(SmartDashboard.getNumber("ANG", 0))), this));
+
+
   }
 
   public SwerveModule[] getModules() {

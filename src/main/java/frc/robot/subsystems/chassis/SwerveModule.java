@@ -14,6 +14,8 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import frc.robot.Sysid.FeedForward_SVA;
 import frc.robot.Sysid.Sysid;
 import frc.robot.subsystems.chassis.Constants.SwerveModuleConstants;
@@ -94,28 +96,47 @@ public class SwerveModule implements Sendable {
         steerMotor.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 10);
 
         // set position PID at motor
+        calculateSteerPositionPID(constants);
         setSteerPositionPID(constants);
+        setSteerPID(SteerPositionSlot,constants.steerPositionPID.KP,constants.steerPositionPID.KI, constants.steerPositionPID.KD);
+
 
         debug(" selected sensor " + steerMotor.getSelectedSensorPosition());
         // add the sysid for the module
-        SmartDashboard.putData(name + " Steer Sysid", (new Sysid(this::setSteerPower, this::getSteerVelocity, 0.15, 0.5, chassis)).getCommand());
+        SmartDashboard.putData(name + " Steer Sysid", (new Sysid(this::setSteerPower, this::getSteerVelocity, 0.1, 0.8, chassis)).getCommand());
+    
+    }
+
+/**
+ * calculate the steer position PID;
+ * @param constants
+ */
+    private void calculateSteerPositionPID(SwerveModuleConstants constants) {
+         double kp = steerFF.calculate(MAX_STEER_VELOCITY, MAX_STEER_VELOCITY)*1023.0/(90*pulsePerDegree);
+        double ki = kp/10;
+        double kd = ki/10;
+        SmartDashboard.putNumber("pid position kp", kp);
+        SmartDashboard.putNumber("pid position kd", kd);
+        SmartDashboard.putNumber("pid position ki", ki);
     }
 
     /**
-     * Set the steer position PID and position close loop params
+     * calculates and sets close loop params
      * @param constants
      */
     private void setSteerPositionPID(SwerveModuleConstants constants) {
         // KP - to provide MAX_VELOCITY (with no accelration) at 90 degrees error
-        double kp = steerFF.calculate(MAX_STEER_VELOCITY, MAX_STEER_VELOCITY)*1023.0/talonSteerVelocity(90);
-        double ki = kp/10;
-        double kd = ki/10;
+        double kp = constants.steerPositionPID.KP;
+        double ki = constants.steerPositionPID.KI;
+        double kd = constants.steerPositionPID.KD;
+
+
+
         debug(" steer position PID kp = " + kp + " ki = " + ki + " kd=" + kd);
-        setSteerPID(SteerPositionSlot,kp,ki, kd);
         // set the maximum integral to provide 1.1*KS value
-        steerMotor.configMaxIntegralAccumulator(SteerPositionSlot, 1.1*constants.steerFF.KS*1023/ki);
+        steerMotor.configMaxIntegralAccumulator(SteerPositionSlot, 0.9*constants.steerFF.KS*1023/ki);
         // set integral zone to 0 when more than 10 degrees error
-        steerMotor.config_IntegralZone(SteerPositionSlot, 10*pulsePerDegree);
+        steerMotor.config_IntegralZone(SteerPositionSlot, 4*pulsePerDegree);
         if(useSteerPositionPID) {
             steerMotor.selectProfileSlot(SteerPositionSlot, 0);
         }
@@ -375,6 +396,7 @@ public class SwerveModule implements Sendable {
         builder.addDoubleProperty("Steer Talon Angle", this::steerTalonAngle, null);
         builder.addDoubleProperty("Steer power", ()->steerMotor.getMotorOutputPercent(), null);
         builder.addDoubleProperty("distance", this::getDistance, null);
+
     }
     
 

@@ -33,11 +33,16 @@ public final class Constants {
   // PID
   public static final PID_Constants MOVE_PID = new PID_Constants(0.05, 0, 0);
   public static final PID_Constants FRONT_STEER_PID = new PID_Constants(0.000209225899609*10*1023/FRONT_PULSES_PER_DEGREE, 0, 0);
-  public static final PID_Constants BACK_STEER_PID = new PID_Constants(0.000319268341586*10*1023/BACK_PULSES_PER_DEGREE, 0, 0.001071468046139);
+  public static final PID_Constants BACK_STEER_PID = new PID_Constants(0.001104748806054*10*1023/BACK_PULSES_PER_DEGREE, 0, 0.001071468046139);
   // Feed Forward Gains
   public static final FF_Constants MOVE_FF = new FF_Constants(0.05, 0.263, 0.1);
   public static final FF_Constants FRONT_STEER_FF = new FF_Constants(0.069108623637248, 0.00034365326824, 0.000702476229803);
-  public static final FF_Constants BACK_STEER_FF = new FF_Constants(0.058365205650786, 0.000524873661792, 0.001088429441032);
+  public static final FF_Constants BACK_STEER_FF = new FF_Constants(0.080821555555163, 0.000529165452406, 0.004994578577863);
+
+
+  // public static final PID_Constants BACK_POSITION_STEER_PID = new PID_Constants(0.036894342949841, 0.003689434294984, 0.000368943429498);
+  public static final PID_Constants FRONT_POSITION_STEER_PID = new PID_Constants(0, 0, 0);
+  public static final PID_Constants BACK_POSITION_STEER_PID = new PID_Constants(0.06, 0.005, 0.000045);
 
   public final static SwerveModuleConstants FRONT_LEFT = new SwerveModuleConstants(
       3, 4, 12,
@@ -45,6 +50,7 @@ public final class Constants {
       257.607421875,
       MOVE_PID,
       FRONT_STEER_PID,
+      FRONT_POSITION_STEER_PID,
       MOVE_FF,
       FRONT_STEER_FF,
       PULSES_PER_METER,
@@ -56,6 +62,7 @@ public final class Constants {
       290.7,
       MOVE_PID,
       FRONT_STEER_PID,
+      FRONT_POSITION_STEER_PID,
       MOVE_FF,
       FRONT_STEER_FF,
       PULSES_PER_METER,
@@ -68,6 +75,7 @@ public final class Constants {
       230,
       MOVE_PID,
       BACK_STEER_PID,
+      BACK_POSITION_STEER_PID,
       MOVE_FF,
       BACK_STEER_FF,
       PULSES_PER_METER,
@@ -80,6 +88,7 @@ public final class Constants {
       276.1,
       MOVE_PID,
       BACK_STEER_PID,
+      BACK_POSITION_STEER_PID,
       MOVE_FF,
       BACK_STEER_FF,
       PULSES_PER_METER,
@@ -120,6 +129,7 @@ public final class Constants {
     public final double steerOffset;
     public final PID_Constants movePID;
     public final PID_Constants steerPID;
+    public final PID_Constants steerPositionPID;
     public final FF_Constants moveFF;
     public final FF_Constants steerFF;
     public final double pulsePerMeter;
@@ -128,7 +138,7 @@ public final class Constants {
 
     public SwerveModuleConstants(int moveMotorId, int angleMotorId, int absoluteEncoderId,
         Translation2d moduleTranslationOffset, double steerOffset,
-        PID_Constants movePID, PID_Constants steerPID, FF_Constants moveFF, FF_Constants steerFF,
+        PID_Constants movePID, PID_Constants steerPID, PID_Constants steerPositionPID, FF_Constants moveFF, FF_Constants steerFF,
         double pulsePerMeter, double pulsePerDegree, boolean inverted) {
       this.moveMotorId = moveMotorId;
       this.angleMotorId = angleMotorId;
@@ -142,6 +152,7 @@ public final class Constants {
       this.pulsePerDegree = pulsePerDegree;
       this.pulsePerMeter = pulsePerMeter;
       this.inverted = inverted;
+      this.steerPositionPID = steerPositionPID;
     }
   }
 }
