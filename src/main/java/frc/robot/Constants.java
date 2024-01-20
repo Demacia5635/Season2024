@@ -109,21 +109,36 @@ public final class Constants {
     }
   }
   public static class AmpConstants{
-    public static class MotorsID{
+    public static class AmpDeviceID{
       public static final int m1 = 0;
       public static final int m2 = 0;
+      public static final int gyro = 0;
+    }
+    public static class ConvertionParams {
+      public static final double m1GearRatio = 0;
+      public static final double m2GearRatio = 0;
+
+      public static final double MOTOR_PULSES_PER_SPIN = 2048;
     }
     public static class Parameters{
       public static final double deadband = 0.2;
 
-      public static final double kp = 0;
-      public static final double ki = 0;
-      public static final double kd = 0;
+      public static final double kp1 = 0;
+      public static final double ki1= 0;
+      public static final double kd1 = 0;
 
-      public static final double ks = 0;
-      public static final double kg = 0;
-      public static final double ka = 0;
-      public static final double kv = 0;
+      public static final double kp2 = 0;
+      public static final double ki2= 0;
+      public static final double kd2 = 0;
+
+      public static final double ks1 = 0;
+      public static final double kg1 = 0;
+      public static final double ka1 = 0;
+      public static final double kv1 = 0;
+
+      public static final double ks2 = 0;
+      public static final double ka2 = 0;
+      public static final double kv2 = 0;
     
   }
     
