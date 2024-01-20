@@ -4,13 +4,9 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 
 public final class Constants {
-  
-    
-  public static class ClimbConstants{
+  public static class ClimbConstants {
     public final static int RIGHT_CLIMB_MOTOR = 1;
     public final static int LEFT_CLIMB_MOTOR = 2;
-    public final static int MI_WON_DAY_VOLTEG = 100000;
-    
   }
   public static final double CYCLE_DT = 0.02;
   public static final int CONTROLLER_PORT = 0;
