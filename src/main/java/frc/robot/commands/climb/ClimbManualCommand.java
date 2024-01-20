@@ -2,7 +2,7 @@ package frc.robot.commands.climb;
 
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.climb.Telescope;
+import frc.robot.subsystems.telescope.Telescope;
 
 public class ClimbManualCommand  extends Command{
     private final Telescope telescope;
