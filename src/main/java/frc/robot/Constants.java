@@ -7,7 +7,7 @@ public final class Constants {
   
     
 
-    public static final double CYCLE_DT = 0.02;
+  public static final double CYCLE_DT = 0.02;
   public static final int CONTROLLER_PORT = 0;
 
   public static class ChassisConstants {
@@ -105,6 +105,27 @@ public final class Constants {
         this.moduleTranslationOffset = moduleTranslationOffset;
         this.steerOffset = steerOffset;
       }
+
     }
   }
+  public static class AmpConstants{
+    public static class MotorsID{
+      public static final int m1 = 0;
+      public static final int m2 = 0;
+    }
+    public static class Parameters{
+      public static final double deadband = 0.2;
+
+      public static final double kp = 0;
+      public static final double ki = 0;
+      public static final double kd = 0;
+
+      public static final double ks = 0;
+      public static final double kg = 0;
+      public static final double ka = 0;
+      public static final double kv = 0;
+    
+  }
+    
+}
 }
