@@ -12,24 +12,30 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.chassis.DriveCommand;
+import frc.robot.commands.chassis.JoyStickAmp;
+import frc.robot.subsystems.chassis.Amp;
 import frc.robot.subsystems.chassis.Chassis;
 
 
 public class RobotContainer implements Sendable{
-  CommandXboxController commandController;
+  public static CommandXboxController commandController;
   Chassis chassis;
-  DriveCommand drive;
-  double x = 0.2;
+  Amp amp;
+  JoyStickAmp moveAmp;
+  //DriveCommand drive;
+  //double x = 0.2;
 
  
   public RobotContainer() {
 
     commandController = new CommandXboxController(Constants.CONTROLLER_PORT);
-    chassis = new Chassis();
-    drive = new DriveCommand(chassis, commandController);
+    //chassis = new Chassis();
+    //drive = new DriveCommand(chassis, commandController);
 
-    chassis.setDefaultCommand(drive);
-    SmartDashboard.putData("RC", this);
+    //chassis.setDefaultCommand(drive);
+    //SmartDashboard.putData("RC", this);
+    moveAmp = new JoyStickAmp(commandController, amp);
+    amp.setDefaultCommand(moveAmp);
 
     configureBindings();
   }
@@ -38,7 +44,7 @@ public class RobotContainer implements Sendable{
   @Override
   public void initSendable(SendableBuilder builder) {
 
-    builder.addDoubleProperty("spinspeed", () -> x, null);
+    //builder.addDoubleProperty("spinspeed", () -> x, null);
 
   }
 
@@ -53,7 +59,7 @@ public class RobotContainer implements Sendable{
      * joysticks}.
      */
     private void configureBindings() {
-      commandController.start().onTrue(new InstantCommand(()->{chassis.setOdometryToForward();}));
+      //commandController.start().onTrue(new InstantCommand(()->{chassis.setOdometryToForward();}));
         // code for controller to controll the gripper and the parallelogram
 
         // safty buttons to stop the arm and/or the gripper

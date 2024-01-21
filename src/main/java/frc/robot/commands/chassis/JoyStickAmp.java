@@ -7,14 +7,15 @@ package frc.robot.commands.chassis;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.chassis.Amp;
 
 public class JoyStickAmp extends Command {
-  private final XboxController xboxController;
+  private final CommandXboxController xboxController;
   private Amp amp;
   private Translation2d translation2d;
   /** Creates a new JoyStickAmpMove. */
-  public JoyStickAmp(XboxController xboxController, Amp amp) {
+  public JoyStickAmp(CommandXboxController xboxController, Amp amp) {
     this.xboxController = xboxController;
     this.amp = amp;
     addRequirements(amp);

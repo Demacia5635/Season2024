@@ -10,12 +10,16 @@ import com.ctre.phoenix.sensors.Pigeon2;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants;
+import frc.robot.RobotContainer;
 import frc.robot.Constants.AmpConstants.*;
+import frc.robot.commands.chassis.JoyStickAmp;
 public class Amp extends SubsystemBase{
     public final Pigeon2 gyro;
     public final TalonFX m1;
@@ -81,19 +85,46 @@ public class Amp extends SubsystemBase{
         return value;
     }
 
-    public static Translation2d getStickLeft(XboxController controller) {
+    public static Translation2d getStickLeft(CommandXboxController controller) {
             return new Translation2d(deadband(controller.getLeftX()), deadband(controller.getLeftY()));
     }
 
-    public static Translation2d getStickRight(XboxController controller) {
+    public static Translation2d getStickRight(CommandXboxController controller) {
         return new Translation2d(deadband(controller.getRightX()), deadband(controller.getRightY()));
     }
 
-    public double poseRad(){
-        return gyro.getPitch();
+    public double fixedDeg(){
+        double fixedDeg = gyro.getPitch();
+        if(fixedDeg>0){
+            while (fixedDeg >=360){
+                fixedDeg -= 360;
+            }
+        }else{
+            while (fixedDeg <0){
+                fixedDeg += 360;
+            }
+        }
+        return fixedDeg;
     }
+    public double getPoseRad(){  
+        return fixedDeg()/360*Math.PI*2;
+    }
+
     public void velFFArm(double posRad, double velRad, double acceleRad) {
-        double velMotor = (velRad*ConvertionParams.m1GearRatio*ConvertionParams.MOTOR_PULSES_PER_SPIN)/100;
+        double velMotor = (velRad/ConvertionParams.m1GearRatio)/100;
         m1.set(ControlMode.Velocity, velMotor, DemandType.ArbitraryFeedForward, ff.calculate(posRad, velRad, acceleRad));
+    }
+
+    public double getVelArm(){
+        return m1.getSelectedSensorVelocity()*100*ConvertionParams.m1GearRatio;
+    }
+
+    @Override
+    public void periodic() {
+        super.periodic();
+        SmartDashboard.putNumber("Motor1 Power", getpower()[0]);
+        SmartDashboard.putNumber("Motor2 Power", getpower()[1]);
+
+        SmartDashboard.putNumber("Motor1 Velocity", getVelArm());
     }
 }

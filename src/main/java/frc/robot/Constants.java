@@ -115,8 +115,8 @@ public final class Constants {
       public static final int gyro = 0;
     }
     public static class ConvertionParams {
-      public static final double m1GearRatio = 0;
-      public static final double m2GearRatio = 0;
+      public static final double m1GearRatio = 0;// (1/number)
+      public static final double m2GearRatio = 0;// (1/number)
 
       public static final double MOTOR_PULSES_PER_SPIN = 2048;
     }
