@@ -22,6 +22,7 @@ import frc.robot.subsystems.chassis.Constants.SwerveModuleConstants;
 import frc.robot.utils.Trapezoid;
 import frc.robot.utils.Utils;
 
+import static frc.robot.Constants.ChassisConstants.SwerveModuleConstants.MAX_STEER_ERROR;
 import static frc.robot.subsystems.chassis.Constants.*;
 
 /**
@@ -49,6 +50,7 @@ public class SwerveModule implements Sendable {
 
     private double maxVelocityChange = MAX_DRIVE_VELOCITY * CYCLE_DT;
     double maxSteerVelocityChange = STEER_ACCELERATION * CYCLE_DT;
+    double MaxSteerClosedLoopError;
 
     private boolean useSteerPositionPID = true;
     public boolean debug = false;
@@ -77,6 +79,7 @@ public class SwerveModule implements Sendable {
         setSteerPID(SteerVelocitySlot,constants.steerPID.KP, constants.steerPID.KI, constants.steerPID.KD);
         pulsePerDegree = constants.pulsePerDegree;
         pulsePerMeter = constants.pulsePerMeter;
+        MaxSteerClosedLoopError = MAX_STEER_ERROR*pulsePerDegree;
         steerTrapezoid = new Trapezoid(MAX_STEER_VELOCITY, STEER_ACCELERATION);
         angleOffset = constants.steerOffset;
         // name
@@ -129,12 +132,10 @@ public class SwerveModule implements Sendable {
         double kp = constants.steerPositionPID.KP;
         double ki = constants.steerPositionPID.KI;
         double kd = constants.steerPositionPID.KD;
-
-
-
         debug(" steer position PID kp = " + kp + " ki = " + ki + " kd=" + kd);
         // set the maximum integral to provide 1.1*KS value
         steerMotor.configMaxIntegralAccumulator(SteerPositionSlot, 0.9*constants.steerFF.KS*1023/ki);
+        steerMotor.configAllowableClosedloopError(SteerPositionSlot, MaxSteerClosedLoopError);
         // set integral zone to 0 when more than 10 degrees error
         steerMotor.config_IntegralZone(SteerPositionSlot, 4*pulsePerDegree);
         if(useSteerPositionPID) {
@@ -306,9 +307,18 @@ public class SwerveModule implements Sendable {
             double currentPos = steerMotor.getSelectedSensorPosition();
             double targetPos = currentPos + diff*pulsePerDegree;
             debug(" set angle - " + Utils.degrees(angle) + " diff=" + diff + " cur=" + Utils.degrees(currentAngle) + 
-                    " error=" + steerMotor.getClosedLoopError() + " power=" + steerMotor.getMotorOutputPercent() + " pos=" + targetPos + " cpos=" + currentPos);
+                    " error=" + steerMotor.getClosedLoopError() + " power=" + steerMotor.getMotorOutputPercent() + " pos=" + targetPos + " cpos=" + currentPos + " " + atSteerAngle());
             steerMotor.set(ControlMode.Position,targetPos);
         }
+    }
+
+    public boolean atSteerAngle() {
+        if(useSteerPositionPID) {
+            return Math.abs(steerMotor.getClosedLoopError()) < MaxSteerClosedLoopError;
+        } else {
+            return Math.abs(Utils.degrees(getAngle().minus(targetAngle))) < MAX_STEER_ERROR;
+        }
+
     }
 
     /**
