@@ -15,14 +15,14 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
 public class Shooter extends SubsystemBase {
-  public CANSparkMax neon;
+  public CANSparkMax neo;
   public TalonFX motor1;
   public TalonFX motor2;
   
   /** Creates a new Shooter. */
   public Shooter() {
-    neon = new CANSparkMax(NEON_ID, MotorType.kBrushless);
-    neon.getEncoder().setPosition(0);
+    neo = new CANSparkMax(NEO_ID, MotorType.kBrushless);
+    neo.getEncoder().setPosition(0);
     
     motor1 = new TalonFX(MOTOR_1_ID);
     motor2 = new TalonFX(MOTOR_2_ID);
@@ -38,27 +38,27 @@ public class Shooter extends SubsystemBase {
   /**
    * @param vel must be from -1 to 1
    */
-  public void neonSetVel(double vel){
-    neon.set(vel);
+  public void neoSetVel(double vel){
+    neo.set(vel);
   }
   
-  public void neonEncoderSet(double postion){
-    neon.getEncoder().setPosition(postion);
+  public void neoEncoderSet(double postion){
+    neo.getEncoder().setPosition(postion);
   }
   
-  public void neonEncoderReset(){
-    neonEncoderSet(0);
+  public void neoEncoderReset(){
+    neoEncoderSet(0);
   }
   
-  public double getNeonRev(){
-    return neon.getEncoder().getPosition()/NEON_PULES_PER_REV;
+  public double getNEORev(){
+    return neo.getEncoder().getPosition()/NEO_PULES_PER_REV;
   }
   
-  public void neonMoveByRev(double vel, double rev){
-    double startPos = getNeonRev();
-    while (Math.abs(getNeonRev()-startPos+rev)==1){
-      neonSetVel(vel);
-      System.out.println("another"+(Math.abs(getNeonRev()-startPos+rev))+"rev");
+  public void neoMoveByRev(double vel, double rev){
+    double startPos = getNEORev();
+    while (Math.abs(getNEORev()-startPos+rev)==1){
+      neoSetVel(vel);
+      System.out.println("another"+(Math.abs(getNEORev()-startPos+rev))+"rev");
     }
   }
   
@@ -79,9 +79,11 @@ public class Shooter extends SubsystemBase {
   public void initSendable(SendableBuilder builder) {
       super.initSendable(builder);
 
-      builder.addDoubleProperty("neon encoder", this::getNeonRev, null);
+      builder.addDoubleProperty("neo encoder", this::getNEORev, null);
       builder.addDoubleProperty("motor 1 speed", ()-> motor1.getSelectedSensorVelocity()*10/(FALCON_PULES_PER_REV/360), null);
       builder.addDoubleProperty("motor 2 speed", ()-> motor2.getSelectedSensorVelocity()*10/(FALCON_PULES_PER_REV/360), null);
+      builder.addDoubleProperty("current amper motor 1", ()-> motor1.getSupplyCurrent(), null);
+      builder.addDoubleProperty("current amper motor 2", ()-> motor2.getSupplyCurrent(), null);
   
   }
 
