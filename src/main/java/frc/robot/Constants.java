@@ -120,7 +120,7 @@ public final class Constants {
 
     public static final double FALCON_PULES_PER_REV = 2048;  
 
-    public static final int NEON_ID = 0;
-    public static final double NEON_PULES_PER_REV = 42;
+    public static final int NEO_ID = 13;
+    public static final double NEO_PULES_PER_REV = 42;
   }
 }
