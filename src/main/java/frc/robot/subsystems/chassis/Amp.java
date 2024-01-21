@@ -20,20 +20,22 @@ import frc.robot.Constants;
 import frc.robot.RobotContainer;
 import frc.robot.Constants.AmpConstants.*;
 import frc.robot.commands.chassis.JoyStickAmp;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkLowLevel.MotorType;
 public class Amp extends SubsystemBase{
     public final Pigeon2 gyro;
     public final TalonFX m1;
-    public final TalonFX m2;
+    public  CANSparkMax neon;
 
     ArmFeedforward ff = new ArmFeedforward(Parameters.ks1, Parameters.kg1, Parameters.kv1, Parameters.ka1);
     SimpleMotorFeedforward ff2 = new SimpleMotorFeedforward(Parameters.ks2, Parameters.kv2, Parameters.ka2);
     public Amp(){
         gyro = new Pigeon2(AmpDeviceID.gyro);
         m1 = new TalonFX(AmpDeviceID.m1);
-        m2 = new TalonFX(AmpDeviceID.m2);
-
+        neon = new CANSparkMax(AmpDeviceID.m2, MotorType.kBrushless);
+        neon.getEncoder().setPosition(0);
         m1.setInverted(false);
-        m2.setInverted(false);
+        //m2.setInverted(false);
 
         SmartDashboard.putData(this);
 
@@ -47,35 +49,49 @@ public class Amp extends SubsystemBase{
         m1.config_kP(0, Parameters.kp1);
         m1.config_kI(0, Parameters.ki1);
         m1.config_kD(0, Parameters.kd1);
-
-        m2.config_kP(0, Parameters.kp2);
-        m2.config_kI(0, Parameters.ki2);
-        m2.config_kD(0, Parameters.kd2);
     }
+
+    public void neonSetVel(double vel){
+        neon.set(vel);
+      }
+      
+      public void neonEncoderSet(double postion){
+        neon.getEncoder().setPosition(postion);
+      }
+      
+      public void neonEncoderReset(){
+        neonEncoderSet(0);
+      }
+      
+      public double getNeonRev(){
+        return neon.getEncoder().getPosition()/ConvertionParams.NEON_PULES_PER_REV;
+      }
+      public void neonMoveByRev(double vel, double rev){
+        double startPos = getNeonRev();
+        while (Math.abs(getNeonRev()-startPos+rev)==1){
+          neonSetVel(vel);
+          System.out.println("another"+(Math.abs(getNeonRev()-startPos+rev))+"rev");
+        }
+      }
     
-    public double[] getpower(){
-        double[] pMotors = new double[2];
-        pMotors[0] = m1.getMotorOutputPercent();
-        pMotors[1] = m2.getMotorOutputPercent();
-        return pMotors;
+    public double getpower(){
+        double pMotor = m1.getMotorOutputPercent();
+        return pMotor;
     }
     public void setPowers(double p1, double p2){
         m1.set(ControlMode.PercentOutput, p1);
-        m2.set(ControlMode.PercentOutput, p2);
+        neonSetVel(p2);
     }
     public void setBrake(){
         System.out.println("brake Diff");
         m1.setNeutralMode(NeutralMode.Brake);
-        m2.setNeutralMode(NeutralMode.Brake);
     }
     public void setCoast(){
         System.out.println("coast Diff");
         m1.setNeutralMode(NeutralMode.Coast);
-        m2.setNeutralMode(NeutralMode.Coast);
     }
     public void stop(){
         m1.set(ControlMode.PercentOutput, 0);
-        m2.set(ControlMode.PercentOutput, 0);
     }
 
     public static double deadband(double value) {
@@ -122,9 +138,9 @@ public class Amp extends SubsystemBase{
     @Override
     public void periodic() {
         super.periodic();
-        SmartDashboard.putNumber("Motor1 Power", getpower()[0]);
-        SmartDashboard.putNumber("Motor2 Power", getpower()[1]);
-
+        SmartDashboard.putNumber("Motor1 Power", getpower());
         SmartDashboard.putNumber("Motor1 Velocity", getVelArm());
+        SmartDashboard.putNumber("Pitch in radiansS", getPoseRad());
+        SmartDashboard.putNumber("neon encoder",getNeonRev());
     }
 }

@@ -119,6 +119,7 @@ public final class Constants {
       public static final double m2GearRatio = 0;// (1/number)
 
       public static final double MOTOR_PULSES_PER_SPIN = 2048;
+      public static final double NEON_PULES_PER_REV = 42;
     }
     public static class Parameters{
       public static final double deadband = 0.2;

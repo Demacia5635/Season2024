@@ -13,7 +13,8 @@ import frc.robot.subsystems.chassis.Amp;
 public class JoyStickAmp extends Command {
   private final CommandXboxController xboxController;
   private Amp amp;
-  private Translation2d translation2d;
+  private Translation2d translation2d1;
+  private Translation2d translation2d2;
   /** Creates a new JoyStickAmpMove. */
   public JoyStickAmp(CommandXboxController xboxController, Amp amp) {
     this.xboxController = xboxController;
@@ -27,8 +28,9 @@ public class JoyStickAmp extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    translation2d = Amp.getStickRight(xboxController);
-    amp.setPowers(translation2d.getY(), 0);
+    translation2d1 = Amp.getStickRight(xboxController);
+    translation2d2 = Amp.getStickLeft(xboxController);
+    amp.setPowers(translation2d1.getY(), translation2d2.getY());
   }
 
   @Override
