@@ -101,7 +101,6 @@ public class SwerveModule implements Sendable {
         setSteerPID(SteerPositionSlot,constants.steerPositionPID.KP,constants.steerPositionPID.KI, constants.steerPositionPID.KD);
 
 
-        debug(" selected sensor " + steerMotor.getSelectedSensorPosition());
         // add the sysid for the module
         SmartDashboard.putData(name + " Steer Sysid", (new Sysid(this::setSteerPower, this::getSteerVelocity, 0.1, 0.8, chassis)).getCommand());
     
@@ -112,7 +111,7 @@ public class SwerveModule implements Sendable {
  * @param constants
  */
     private void calculateSteerPositionPID(SwerveModuleConstants constants) {
-         double kp = steerFF.calculate(MAX_STEER_VELOCITY, MAX_STEER_VELOCITY)*1023.0/(90*pulsePerDegree);
+        double kp = steerFF.calculate(MAX_STEER_VELOCITY, MAX_STEER_VELOCITY)*1023.0/(90*pulsePerDegree);
         double ki = kp/10;
         double kd = ki/10;
         SmartDashboard.putNumber("pid position kp", kp);
@@ -132,11 +131,11 @@ public class SwerveModule implements Sendable {
 
 
 
-        debug(" steer position PID kp = " + kp + " ki = " + ki + " kd=" + kd);
         // set the maximum integral to provide 1.1*KS value
         steerMotor.configMaxIntegralAccumulator(SteerPositionSlot, 0.9*constants.steerFF.KS*1023/ki);
         // set integral zone to 0 when more than 10 degrees error
-        steerMotor.config_IntegralZone(SteerPositionSlot, 4*pulsePerDegree);
+        steerMotor.config_IntegralZone(SteerPositionSlot, constants.INTEGRAL_ZONE*pulsePerDegree);
+        steerMotor.configAllowableClosedloopError(SteerPositionSlot, MAX_STEER_ERROR*pulsePerDegree);
         if(useSteerPositionPID) {
             steerMotor.selectProfileSlot(SteerPositionSlot, 0);
         }
@@ -234,6 +233,7 @@ public class SwerveModule implements Sendable {
         */
         double tgtV = MathUtil.clamp(v, currentVelocity-maxVelocityChange, currentVelocity+maxVelocityChange);
         double ff = moveFF.calculate(tgtV, currentVelocity);
+        debug(" tgtV=" + tgtV + " cur V=" + currentVelocity + " ff=" + ff);
         moveMotor.set(ControlMode.Velocity, talonVelocity(tgtV), DemandType.ArbitraryFeedForward, ff);
         lastMoveA = tgtV - currentVelocity;
         lastMoveV = tgtV;
@@ -297,18 +297,16 @@ public class SwerveModule implements Sendable {
      */
     public void setAngleByPositionPID(Rotation2d angle) {
         steerMotor.selectProfileSlot(SteerPositionSlot,0);
-        if(targetAngle.equals(angle)) {
-            debug("set angle - same value - no change - " + " error=" + steerMotor.getClosedLoopError() + " power=" + steerMotor.getMotorOutputPercent() );
-        } else {
+//        if(targetAngle.equals(angle)) {
+//            debug("set angle - same value - no change - " + " error=" + steerMotor.getClosedLoopError() + " power=" + steerMotor.getMotorOutputPercent() );
+//        } else {
             targetAngle = angle;
             Rotation2d currentAngle = getAngle();
             double diff = Utils.degrees(angle.minus(currentAngle));
             double currentPos = steerMotor.getSelectedSensorPosition();
             double targetPos = currentPos + diff*pulsePerDegree;
-            debug(" set angle - " + Utils.degrees(angle) + " diff=" + diff + " cur=" + Utils.degrees(currentAngle) + 
-                    " error=" + steerMotor.getClosedLoopError() + " power=" + steerMotor.getMotorOutputPercent() + " pos=" + targetPos + " cpos=" + currentPos);
             steerMotor.set(ControlMode.Position,targetPos);
-        }
+//        }
     }
 
     /**
@@ -322,7 +320,6 @@ public class SwerveModule implements Sendable {
         if(Math.abs(diff) > MAX_STEER_ERROR) {
             double cv = getSteerVelocity();
             v = steerTrapezoid.calculate(diff, cv, 0, debug);
-            debug(" diff=" + diff + " v=" + v + " cv=" + cv + " angle=" + getAngleDegrees() + "/" + steerTalonAngle());
         }
         setSteerVelocity(v, false);
     }
@@ -396,6 +393,9 @@ public class SwerveModule implements Sendable {
         builder.addDoubleProperty("Steer Talon Angle", this::steerTalonAngle, null);
         builder.addDoubleProperty("Steer power", ()->steerMotor.getMotorOutputPercent(), null);
         builder.addDoubleProperty("distance", this::getDistance, null);
+        builder.addDoubleProperty("Steer Error", ()->steerMotor.getClosedLoopError()/pulsePerDegree, null);
+        builder.addDoubleProperty("Steer Acum", ()->steerMotor.getIntegralAccumulator()/pulsePerDegree, null);
+
 
     }
     
