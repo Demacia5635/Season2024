@@ -173,10 +173,8 @@ public class Sysid {
         Command cmd = new WaitCommand(powerCycleDelay);
         for (int c = 0; c < nPowerCycles; c++) {
             double power = minPower + c * deltaPower;
-            System.out.println(" adding " + power);
             cmd = cmd.andThen(getPowerCommand(power, resetDataCollector));
             resetDataCollector = false;
-            System.out.println(" adding " + (-power));
             cmd = cmd.andThen(getPowerCommand(-power, resetDataCollector));
         }
         return cmd.andThen(new InstantCommand(() -> analyze()));

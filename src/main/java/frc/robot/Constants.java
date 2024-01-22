@@ -98,7 +98,7 @@ public final class Constants {
       public static final double BACKWARD_ANGLE_KV = 0.00056;//0.003737/12.0; //0.0962;
       public static final double BACKWARD_ANGLE_KA = 0.001;//0.003737/12.0; //0.0962;
 
-      public static final double MAX_STEER_ERROR = 5;
+      public static final double MAX_STEER_ERROR = 1;
 
       public final int moveMotorId;
       public final int angleMotorId;
