@@ -22,9 +22,8 @@ import frc.robot.Sysid.Sysid;
 import frc.robot.subsystems.chassis.ChassisConstants.SwerveModuleConstants;
 import frc.robot.utils.Trapezoid;
 import frc.robot.utils.Utils;
+import static frc.robot.subsystems.chassis.ChassisConstants.*;
 
-import static frc.robot.Constants.ChassisConstants.DRIVE_ACCELERATION;
-import static frc.robot.Constants.ChassisConstants.SwerveModuleConstants.*;
 
 /**
  * Swerve Module

@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.chassis.Chassis;
 
-import static frc.robot.Constants.ChassisConstants.*;
+import static frc.robot.subsystems.chassis.ChassisConstants.*;
 import static frc.robot.subsystems.chassis.ChassisConstants.MAX_OMEGA_VELOCITY;
 
 public class DriveCommand extends Command {

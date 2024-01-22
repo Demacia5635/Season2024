@@ -3,7 +3,7 @@ package frc.robot.PathFollow.Util;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import static frc.robot.Constants.*;
+import static frc.robot.subsystems.chassis.ChassisConstants.*;
 public class CurrentPosOnField {
     
     public static enum Zone{

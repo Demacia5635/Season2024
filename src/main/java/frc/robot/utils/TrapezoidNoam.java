@@ -7,7 +7,7 @@ package frc.robot.utils;
 import java.lang.invoke.ConstantBootstraps;
 
 import edu.wpi.first.wpilibj.Timer;
-import frc.robot.Constants;
+import static frc.robot.subsystems.chassis.ChassisConstants.*;
 
 /** Add your docs here. */
 public class TrapezoidNoam {
@@ -48,7 +48,7 @@ public class TrapezoidNoam {
         }
 
         double time = Timer.getFPGATimestamp();
-        if(time - lastTime <= Constants.CYCLE_DT) {
+        if(time - lastTime <= CYCLE_DT) {
             if(lastA > 0 && curentVelocity < lastV) {
                 curentVelocity = lastV;
             } else if(lastA < 0 && curentVelocity > lastV) {

@@ -6,7 +6,7 @@ package frc.robot.utils;
 
 
 import edu.wpi.first.wpilibj.Timer;
-import frc.robot.Constants;
+import static frc.robot.subsystems.chassis.ChassisConstants.*;
 
 /** Add your docs here. */
 public class Trapezoid {
@@ -85,7 +85,7 @@ public class Trapezoid {
                 double avgVelocity = (cv + targetVelocity) / 2;
                 double deaccelerartionTime = remainingDistance / avgVelocity;
                 double deaccelerartion = (cv-targetVelocity)/deaccelerartionTime;
-                lastV = cv - deaccelerartion*Constants.CYCLE_DT;
+                lastV = cv - deaccelerartion*CYCLE_DT;
                 if(debug) System.out.println("trapezoid - deace =" + lastV + " cv=" + cv + " d=" + remainingDistance);
 
             }
@@ -97,10 +97,10 @@ public class Trapezoid {
 
     // Helper function to compute the distance travelled in one cycle without acceleration
     private double cycleDistanceNoAccel(double currentVelocity) {
-        return currentVelocity * Constants.CYCLE_DT;
+        return currentVelocity * CYCLE_DT;
     }
     // Helper function to compute the distance travelled in one cycle with maximum acceleration
     private double cycleDistanceWithAccel(double currentVelocity) {
-        return currentVelocity * Constants.CYCLE_DT + (0.5*maxAcceleration * Math.pow(Constants.CYCLE_DT, 2));
+        return currentVelocity * CYCLE_DT + (0.5*maxAcceleration * Math.pow(CYCLE_DT, 2));
     }
 }
