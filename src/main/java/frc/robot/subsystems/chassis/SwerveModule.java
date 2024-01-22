@@ -19,12 +19,12 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import frc.robot.Sysid.FeedForward_SVA;
 import frc.robot.Sysid.FeedForward_SVA_V2_VSQRT;
 import frc.robot.Sysid.Sysid;
-import frc.robot.subsystems.chassis.Constants.SwerveModuleConstants;
+import frc.robot.subsystems.chassis.ChassisConstants.SwerveModuleConstants;
 import frc.robot.utils.Trapezoid;
 import frc.robot.utils.Utils;
 
-import static frc.robot.Constants.ChassisConstants.SwerveModuleConstants.MAX_STEER_ERROR;
-import static frc.robot.subsystems.chassis.Constants.*;
+import static frc.robot.Constants.ChassisConstants.DRIVE_ACCELERATION;
+import static frc.robot.Constants.ChassisConstants.SwerveModuleConstants.*;
 
 /**
  * Swerve Module

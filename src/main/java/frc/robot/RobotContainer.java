@@ -20,6 +20,7 @@ import frc.robot.subsystems.chassis.Chassis;
 public class RobotContainer implements Sendable{
   CommandXboxController commandController = new CommandXboxController(0);
   Chassis chassis = new Chassis();
+
   DriveCommand drive = new DriveCommand(chassis, commandController);
   Command test = new RunCommand(() -> {chassis.setVelocities(new ChassisSpeeds(-0.5, 0, 0));}, chassis).andThen(new WaitCommand(2),
   new RunCommand(() -> {chassis.setVelocities(new ChassisSpeeds(-0.4  , 0, 0));}, chassis).andThen(new WaitCommand(2)),
@@ -67,7 +68,7 @@ public class RobotContainer implements Sendable{
    */
   public Command getAutonomousCommand() {
     //return null;
-    return new RunCommand(()-> chassis.setModulesAngularVelocity(50), chassis);
+    return null;
     // return new InstantCommand(() -> chassis.resetWheels(), chassis)
     // .andThen(new RunCommand(() -> chassis.setVelocities(new ChassisSpeeds(-2, 0, 0))).withTimeout(2).andThen(new InstantCommand(() -> chassis.stop())));
     //return new RunCommand(() -> chassis.getModule(2).setAngularVelocity(600));
