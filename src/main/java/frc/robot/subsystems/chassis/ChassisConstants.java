@@ -1,5 +1,7 @@
 package frc.robot.subsystems.chassis;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import frc.robot.PathFollow.Util.RectanglePos;
@@ -26,6 +28,18 @@ public final class ChassisConstants {
   public static final int GYRO_ID = 15;
 
   public static final double CYCLE_DT = 0.02;
+
+
+  /* need to change positions of april tags */
+  static Pose2d aprilTag1 = new Pose2d(0,0, Rotation2d.fromDegrees(0));
+  static Pose2d aprilTag2 = new Pose2d(0,0, Rotation2d.fromDegrees(0));
+  static Pose2d aprilTag3 = new Pose2d(0,0, Rotation2d.fromDegrees(0));
+  static Pose2d aprilTag4 = new Pose2d(0,0, Rotation2d.fromDegrees(0));
+  static Pose2d aprilTag5 = new Pose2d(0,0, Rotation2d.fromDegrees(0));
+  static Pose2d aprilTag6 = new Pose2d(0,0, Rotation2d.fromDegrees(0));
+  static Pose2d aprilTag7 = new Pose2d(0,0, Rotation2d.fromDegrees(0));
+  static Pose2d aprilTag8 = new Pose2d(0,0, Rotation2d.fromDegrees(0));
+  public final static Pose2d[] aprilTagsPositions = {aprilTag1, aprilTag2, aprilTag3, aprilTag4, aprilTag5, aprilTag6, aprilTag7, aprilTag8};
 
   public static final double MAX_DRIVE_VELOCITY = 4;
   public static final double DRIVE_ACCELERATION = 30;
