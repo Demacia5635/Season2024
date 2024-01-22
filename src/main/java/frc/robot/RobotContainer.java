@@ -50,7 +50,7 @@ public class RobotContainer implements Sendable{
      * joysticks}.
      */
     private void configureBindings() {
-      commandController.start().onTrue(new InstantCommand(()->{chassis.setOdometryToForward();}));
+      commandController.a().onTrue(new InstantCommand(()->{chassis.setOdometryToForward();}));
         // code for controller to controll the gripper and the parallelogram
 
         // safty buttons to stop the arm and/or the gripper
