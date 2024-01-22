@@ -11,22 +11,7 @@ public final class Constants {
     public static final double CYCLE_DT = 0.02;
   public static final int CONTROLLER_PORT = 0;
 
-  /** from blue alliance, in meters */
-  public static RectanglePos rectAMP = new RectanglePos(   
-    new Translation2d(16.534, 0.502),
-    new Translation2d(13.229, 0));
-  /** from blue alliance, in meters */
-  public static RectanglePos rectSPEAKER = new RectanglePos(
-    new Translation2d(14.596, 0.395),
-    new Translation2d(16.515, 4.076));
-  /** from blue alliance, in meters */
-  public static RectanglePos rectSOURCE = new RectanglePos(
-    new Translation2d(0.027, 6.515),
-    new Translation2d(1.850, 8.156));
-  /** from blue alliance, in meters */
-  public static RectanglePos rectSTAGE = new RectanglePos(
-    new Translation2d(13.443, 5.745),
-    new Translation2d(10.501, 2.35));
+ 
 
 
 
@@ -34,22 +19,26 @@ public final class Constants {
     public final static SwerveModuleConstants MODULE_FRONT_LEFT = new SwerveModuleConstants(
       3, 4, 12,
       new Translation2d(0.332, 0.277),
-      257.607421875
+      257.607421875,
+      true
     );
     public final static SwerveModuleConstants MODULE_FRONT_RIGHT = new SwerveModuleConstants(
       5, 6, 13,
       new Translation2d(0.332, -0.277),
-      290.7
+      290.7,
+      true
     );
     public final static SwerveModuleConstants MODULE_BACK_LEFT = new SwerveModuleConstants(
       2, 1, 11,
       new Translation2d(-0.332, 0.288),
-      230
+      230,
+      false
     );
     public final static SwerveModuleConstants MODULE_BACK_RIGHT = new SwerveModuleConstants(
       8, 7, 14,
       new Translation2d(-0.332, -0.288),
-      276.1
+      276.1,
+      false
     );
     public static final int GYRO_ID = 15;
 
@@ -60,10 +49,10 @@ public final class Constants {
       MODULE_BACK_RIGHT.moduleTranslationOffset
     );
 
-    public static final double MAX_DRIVE_VELOCITY = 3;
-    public static final double DRIVE_ACCELERATION = 8;
-    public static final double MAX_ANGULAR_VELOCITY = 600;
-    public static final double ANGULAR_ACCELERATION = 6000;
+    public static final double MAX_DRIVE_VELOCITY = 4;
+    public static final double DRIVE_ACCELERATION = 12;
+    public static final double MAX_STEER_VELOCITY = 600;
+    public static final double STEER_ACCELERATION = 6000;
 
     public static final double FORWORD_PULSES_PER_METER = 52226.56641604010025062656641604;
     public static final double FORWORD_PULSES_PER_DEGREE = (12.8 * 2048)/360;
@@ -100,25 +89,35 @@ public final class Constants {
       public static final double BACKWARD_ANGLE_VELOCITY_KI = 0; //0.004;
       public static final double BACKWARD_ANGLE_VELOCITY_KD = 0.052;
 
-      public static final double FORWORD_MOVE_KS = 0.05; // 0.15851/12; //0.0362;
-      public static final double FORWORD_MOVE_KV = 0.263; //0.012314/12; //0.0862;
-      public static final double FORWORD_ANGLE_KS = 0.027;//0.52557/12.0; //0.05;
-      public static final double FORWORD_ANGLE_KV = 0.00051;//0.003737/12.0; //0.0962;
+      public static final double FORWORD_MOVE_KS = 0.02; // 0.15851/12; //0.0362;
 
-      public static final double BACKWARD_MOVE_KS = 0.05; // 0.15851/12; //0.0362;
-      public static final double BACKWARD_MOVE_KV = 0.263; //0.012314/12; //0.0862;
-      public static final double BACKWARD_ANGLE_KS = 0.048; //in50deg/sec 0.032;//0.52557/12.0; //0.05;
-      public static final double BACKWARD_ANGLE_KV = 0.00045; //in50deg/sec 0.000296;//0.003737/12.0; //0.0962;
+      public static final double FORWORD_MOVE_KV = 0.1; //0.012314/12; //0.0862;
 
-      public static final double MAX_STEER_ERROR = 5;
+      public static final double FORWORD_MOVE_KA = 0.1; //0.012314/12; //0.0862;
+      public static final double FORWORD_ANGLE_KS = 0.05;//0.52557/12.0; //0.05;
+      public static final double FORWORD_ANGLE_KV = 0.0006;//0.003737/12.0; //0.0962;
+      public static final double FORWORD_ANGLE_KA = 0.001;//0.003737/12.0; //0.0962;
+
+      public static final double BACKWARD_MOVE_KS = 0.02; // 0.15851/12; //0.0362;
+
+      public static final double BACKWARD_MOVE_KV = 0.1; //0.012314/12; //0.0862;
+
+      public static final double BACKWARD_MOVE_KA = 0.1; //0.012314/12; //0.0862;
+      public static final double BACKWARD_ANGLE_KS = 0.047;//0.52557/12.0; //0.05;
+      public static final double BACKWARD_ANGLE_KV = 0.00056;//0.003737/12.0; //0.0962;
+      public static final double BACKWARD_ANGLE_KA = 0.001;//0.003737/12.0; //0.0962;
+
+      public static final double MAX_STEER_ERROR = 1;
 
       public final int moveMotorId;
       public final int angleMotorId;
       public final int absoluteEncoderId;
       public final Translation2d moduleTranslationOffset;
       public final double steerOffset;
+      public final boolean front;
 
-      public SwerveModuleConstants(int moveMotorId, int angleMotorId, int absoluteEncoderId, Translation2d moduleTranslationOffset, double steerOffset) {
+      public SwerveModuleConstants(int moveMotorId, int angleMotorId, int absoluteEncoderId, Translation2d moduleTranslationOffset, double steerOffset, boolean front) {
+        this.front = front;
         this.moveMotorId = moveMotorId;
         this.angleMotorId = angleMotorId;
         this.absoluteEncoderId = absoluteEncoderId;
