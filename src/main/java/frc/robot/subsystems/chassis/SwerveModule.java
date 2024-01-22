@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import frc.robot.Sysid.FeedForward_SVA;
+import frc.robot.Sysid.FeedForward_SVA_V2_VSQRT;
 import frc.robot.Sysid.Sysid;
 import frc.robot.subsystems.chassis.Constants.SwerveModuleConstants;
 import frc.robot.utils.Trapezoid;
@@ -48,7 +49,7 @@ public class SwerveModule implements Sendable {
     Rotation2d targetAngle = new Rotation2d();
     public String name;
 
-    private double maxVelocityChange = MAX_DRIVE_VELOCITY * CYCLE_DT;
+    private double maxVelocityChange = DRIVE_ACCELERATION * CYCLE_DT;
     double maxSteerVelocityChange = STEER_ACCELERATION * CYCLE_DT;
     double MaxSteerClosedLoopError;
 
@@ -73,6 +74,8 @@ public class SwerveModule implements Sendable {
         absoluteEncoder.configFactoryDefault();
 
         // set the controls
+        // moveFF = new FeedForward_SVA_V2_VSQRT(constants.moveFF.KS, constants.moveFF.KV, constants.moveFF.KA,
+        //     MOVE_KV2, MOVE_KVSQRT);
         moveFF = new FeedForward_SVA(constants.moveFF.KS, constants.moveFF.KV, constants.moveFF.KA);
         steerFF = new FeedForward_SVA(constants.steerFF.KS, constants.steerFF.KV, constants.steerFF.KA);
         setMovePID(0,constants.movePID.KP, constants.movePID.KI, constants.movePID.KD);

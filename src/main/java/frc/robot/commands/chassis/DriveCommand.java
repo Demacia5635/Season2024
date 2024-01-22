@@ -21,7 +21,7 @@ public class DriveCommand extends Command {
 
     addRequirements(chassis);
 
-    controller.pov(0).onTrue(new InstantCommand(() -> precisionDrive = !precisionDrive));
+    controller.b().onTrue(new InstantCommand(() -> precisionDrive = !precisionDrive));
   }
 
   @Override
@@ -30,21 +30,24 @@ public class DriveCommand extends Command {
 
   @Override
   public void execute() {
-    double joyX = deadband(controller.getLeftX(), 0.1);
-    double joyY = -deadband(controller.getLeftY(), 0.1);
+    double joyX = deadband(controller.getLeftY(), 0.1);
+    double joyY = deadband(controller.getLeftX(), 0.1);
     double rot = -(deadband(controller.getRightTriggerAxis(), 0.1) - deadband(controller.getLeftTriggerAxis(), 0.1));
     
-    double velX = Math.pow(joyX, 3) * MAX_DRIVE_VELOCITY;
+    double velX = Math.pow(joyX, 3)* MAX_DRIVE_VELOCITY;
     double velY = Math.pow(joyY, 3) * MAX_DRIVE_VELOCITY;
     double velRot = Math.pow(rot, 3) * MAX_OMEGA_VELOCITY;
     
     if (precisionDrive) {
-      velX /= 2;
-      velY /= 2;
-      velRot /= 2;
+      velX /= 4;
+      velY /= 4;
+      velRot /= 4;
     }
 
-    ChassisSpeeds speeds = new ChassisSpeeds(velY, velX, Math.toRadians(velRot));
+    System.out.println("target velocity= " + velRot);
+
+
+    ChassisSpeeds speeds = new ChassisSpeeds(velX, velY, velRot);
     chassis.setVelocities(speeds);
   }
 

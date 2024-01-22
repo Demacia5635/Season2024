@@ -98,7 +98,7 @@ public class DataCollector {
             case KV2:
                 return v*v;
             case KVsqrt:
-                return Math.sqrt(v);
+                return Math.sqrt(Math.abs(v));
             default:
                 return 0;
         }

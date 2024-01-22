@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Sysid.Sysid;
+import frc.robot.Sysid.Sysid.Gains;
 import frc.robot.commands.chassis.CheckModulesSteerVelocity;
 import frc.robot.commands.chassis.SetModuleAngle;
 import frc.robot.commands.chassis.utils.TestVelocity;
@@ -59,9 +60,22 @@ public class Chassis extends SubsystemBase {
     SmartDashboard.putData("set brake",
         new InstantCommand(() -> setNeutralMode(NeutralMode.Brake)).ignoringDisable(true));
     SmartDashboard.putData("reset wheels", new InstantCommand(() -> resetWheels()).ignoringDisable(true));
+        SmartDashboard.putData("reset pose", new InstantCommand(() -> setOdometryToForward()).ignoringDisable(true));
 
     SmartDashboard.putData("Chassis Move Sysid",
         (new Sysid(this::setModulesPower, this::getMoveVelocity, 0.2, 0.6, this)).getCommand());
+    SmartDashboard.putData("Chassis Move Sysid2",
+        (new Sysid(new Gains[] { Gains.KS, Gains.KV, Gains.KA, Gains.KV2, Gains.KVsqrt},
+        this::setModulesPower,
+        this::getMoveVelocity,
+        null,
+        null,
+        0.1,
+        0.6,
+        3,
+        1,
+        1,
+        this)).getCommand());
     SmartDashboard.putData("Test Steer Velocity", (new CheckModulesSteerVelocity(this, 200)));
     SmartDashboard.putData("Set Modules Angle", (new SetModuleAngle(this)));
     new TestVelocity("Chassis", this::setVelocity, this::getMoveVelocity, 0.05, this);
@@ -181,8 +195,8 @@ public class Chassis extends SubsystemBase {
   }
 
   public void setOdometryToForward() {
-    poseEstimator.resetPosition(getAngle(), getModulePositions(),
-        new Pose2d(poseEstimator.getEstimatedPosition().getTranslation(), Rotation2d.fromDegrees(0)));
+    poseEstimator.resetPosition(Rotation2d.fromDegrees(0), getModulePositions(),
+        new Pose2d(poseEstimator.getEstimatedPosition().getTranslation(), getAngle()));
   }
 
   /**
