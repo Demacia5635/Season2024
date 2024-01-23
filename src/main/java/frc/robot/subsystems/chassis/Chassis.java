@@ -203,6 +203,7 @@ public class Chassis extends SubsystemBase {
   public void setOdometryToForward() {
     poseEstimator.resetPosition(Rotation2d.fromDegrees(0), getModulePositions(),
         new Pose2d(poseEstimator.getEstimatedPosition().getTranslation(), getAngle()));
+        gyro.setYaw(0);
   }
 
   /**

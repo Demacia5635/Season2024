@@ -18,8 +18,8 @@ public class DriveWithAnglePID extends Command {
 
   private boolean precisionDrive = false;
   //need to work on pid
-  PIDController pid = new PIDController(0.5, 0, 0);
-  public DriveWithAnglePID(Chassis chassis, double vX, double vY, CommandXboxController controller) {
+  PIDController pid = new PIDController(0.0001, 0.0002,0.000002);
+  public DriveWithAnglePID(Chassis chassis, CommandXboxController controller) {
     this.controller = controller;
     this.chassis = chassis;
     controller.b().onTrue(new InstantCommand(() -> precisionDrive = !precisionDrive));
@@ -33,14 +33,15 @@ public class DriveWithAnglePID extends Command {
     double joyX = deadband(controller.getLeftY(), 0.1);
     double joyY = deadband(controller.getLeftX(), 0.1);
     double rot = -(deadband(controller.getRightTriggerAxis(), 0.1) - deadband(controller.getLeftTriggerAxis(), 0.1));
-    Rotation2d angle = getAngleOfJoystick();
+    double angle = getAngleOfJoystick().getDegrees();
     
     double velX = Math.pow(joyX, 3)* MAX_DRIVE_VELOCITY;
     double velY = Math.pow(joyY, 3) * MAX_DRIVE_VELOCITY;
     double velRot;
 
-    if(angle == null) velRot = Math.pow(rot, 3) * MAX_OMEGA_VELOCITY;
-    else velRot = angle.getDegrees() * MAX_OMEGA_VELOCITY;
+    if(angle >= -3 && angle <= 3) velRot = Math.pow(rot, 3) * MAX_OMEGA_VELOCITY;
+    else velRot = pid.calculate(chassis.getAngle().getDegrees(), angle) * MAX_OMEGA_VELOCITY;
+    System.out.println("angle: " + angle);
     
     
     
@@ -56,9 +57,8 @@ public class DriveWithAnglePID extends Command {
   }
 
   private Rotation2d getAngleOfJoystick(){
-    double angle = deadband(new Rotation2d(controller.getLeftX(), controller.getLeftY()).getDegrees(), 5);
-    if(angle == 0) return null;
-    else return Rotation2d.fromDegrees(angle);
+    double angle = new Rotation2d(controller.getRightX(), controller.getRightY()).getDegrees();
+    return new Rotation2d(angle);
   }
   private double deadband(double x, double threshold) {
     return (Math.abs(x) < threshold)?0:x;
