@@ -3,13 +3,14 @@ package frc.robot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.commands.shooter.TurnAngle;
 import frc.robot.subsystems.shooter.Shooter;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 
 public class RobotContainer  {
   
-  public Shooter shooter;
+  Shooter shooter;
   
   public RobotContainer() {
     shooter = new Shooter();
@@ -17,8 +18,8 @@ public class RobotContainer  {
   }
   
 
-
-    /**
+  
+  /**
      * 
      * Use this method to define your trigger->command mappings. Triggers can be created via the
      * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with an arbitrary
@@ -29,17 +30,16 @@ public class RobotContainer  {
      * joysticks}.
      */
     private void configureBindings() {
-        // code for controller to controll the gripper and the parallelogram
-
-        // safty buttons to stop the arm and/or the gripper
+      
     }
-   
+    
   /**
    * Use this to pass the autonomous command to the main {@link Robot} cass.
    *
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return new InstantCommand(()-> shooter.falconSetVel(40000), shooter);
+    // return new InstantCommand(()-> shooter.setVel(40000), shooter);y
+    return new TurnAngle(shooter, 1, 0.01);
   }
 }
