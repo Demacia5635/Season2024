@@ -118,9 +118,9 @@ public final class Constants {
     public static final double KV = 0.25/12000.0;
     public static final double KS = 0.15 - KV * 4000;
 
-    public static final double FALCON_PULES_PER_REV = 2048;  
+    public static final double PULES_PER_REV = 2048;  
 
-    public static final int NEO_ID = 13;
-    public static final double NEO_PULES_PER_REV = 42;
+    public static final int MOTOR_ANGLE_ID = 3;
+
   }
 }
