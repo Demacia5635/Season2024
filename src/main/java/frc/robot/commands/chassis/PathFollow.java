@@ -1,4 +1,5 @@
 package frc.robot.commands.chassis;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -40,6 +41,8 @@ public class PathFollow extends CommandBase {
   double rotationVelocity = 0;
 
   double distancePassed = 0;
+  pathPoint[] points;
+  PIDController rotationPidController = new PIDController(0.01, 0.002,0.000002);
 
   /** Creates a new path follower using the given points.
    * @param chassis 
@@ -50,9 +53,9 @@ public class PathFollow extends CommandBase {
    */
   public PathFollow(Chassis chassis,pathPoint[] points, double maxVel, double maxAcc) {
     
+    this.points = points;
     //gets the wanted angle for the robot to finish the path in
     wantedAngle = points[points.length - 1].getRotation();
-
     //creates new coreners array of the "arc points" in the path
     corners = new RoundedPoint[points.length - 2];
     for(int i = 0; i < points.length - 2; i++)
@@ -145,6 +148,8 @@ public class PathFollow extends CommandBase {
 
   @Override
   public void execute() {
+    System.out.println("wanted angle: " + wantedAngle.getDegrees());
+    
     chassisPose = chassis.getPose();
     
     //current velocity vector
@@ -160,16 +165,15 @@ public class PathFollow extends CommandBase {
     driveVelocity = driveTrapezoid.calculate(totalLeft - segments[segmentIndex].distancePassed(chassisPose.getTranslation()),
      currentVelocity.getNorm(), 0);
 
-    if(!segments[segmentIndex].isAprilTagMode()) rotationVelocity = rotationTrapezoid.calculate(
+/*  if(segments[segmentIndex].isAprilTagMode()) rotationVelocity = rotationTrapezoid.calculate(
       (wantedAngle.minus(chassis.getAngle())).getDegrees(),
       Rotation2d.fromRadians( chassis.getChassisSpeeds().omegaRadiansPerSecond).getDegrees(), 0);
 
-    else
-      rotationVelocity = rotationTrapezoid.calculate(getClosestAprilTag().getRotation().minus(chassis.getAngle()).getRadians(),
-       chassis.getChassisSpeeds().omegaRadiansPerSecond, 0);
+    else*/
+    rotationVelocity = rotationPidController.calculate(chassis.getAngle().getRadians(), wantedAngle.getRadians()) * MAX_OMEGA_VELOCITY;
 
     Translation2d velVector = segments[segmentIndex].calc(chassisPose.getTranslation(), driveVelocity);
-    System.out.println(" vel vector=" + velVector + " v=" + velVector.getNorm());
+    System.out.println("ROTATION VELOCITY: " + Math.toDegrees( rotationVelocity));
     ChassisSpeeds speed = new ChassisSpeeds(velVector.getX(), velVector.getY(), rotationVelocity);
     chassis.setVelocities(speed);
   }
@@ -184,7 +188,7 @@ public class PathFollow extends CommandBase {
 
   @Override
   public boolean isFinished() {
-    return totalLeft <= 0.01;
+    return totalLeft <= 0.01 ;
   }
 
   @Override
@@ -193,7 +197,7 @@ public class PathFollow extends CommandBase {
       builder.addDoubleProperty("Distance Passed",() -> {return distancePassed;}, null);
       builder.addDoubleProperty("Total Left",() -> {return totalLeft;}, null);
       builder.addDoubleProperty("Velocity", () -> {return driveVelocity;}, null);
-      builder.addDoubleProperty("Rotation Velocity", () -> {return rotationVelocity;}, null);
+      builder.addDoubleProperty("Rotation Velocity", () -> {return Math.toDegrees(rotationVelocity);}, null);
       builder.addDoubleProperty("Angle", () -> {return chassisPose.getRotation().getDegrees();}, null);
       builder.addDoubleProperty("Pose X", ()-> chassis.getPose().getX(), null);
       builder.addDoubleProperty("Pose Y", ()-> chassis.getPose().getY(), null);

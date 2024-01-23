@@ -1,5 +1,6 @@
 package frc.robot.subsystems.chassis;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -42,6 +43,8 @@ public final class ChassisConstants {
   static Pose2d aprilTag7 = new Pose2d(0,0, Rotation2d.fromDegrees(0));
   static Pose2d aprilTag8 = new Pose2d(0,0, Rotation2d.fromDegrees(0));
   public final static Pose2d[] aprilTagsPositions = {aprilTag1, aprilTag2, aprilTag3, aprilTag4, aprilTag5, aprilTag6, aprilTag7, aprilTag8};
+
+  public static PIDController rotationPid = new PIDController(0.0001, 0.0002,0.000002);
 
   public static final double MAX_DRIVE_VELOCITY = 4;
   public static final double DRIVE_ACCELERATION = 30;

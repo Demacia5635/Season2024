@@ -24,14 +24,10 @@ public class RobotContainer implements Sendable{
   CommandXboxController commandController = new CommandXboxController(0);
   Chassis chassis = new Chassis();
   pathPoint[] points = {
-    new pathPoint(0, 0, new Rotation2d(0), 0.2, false),
+    new pathPoint(0, 0, new Rotation2d(0), 0.5, false),
     
-    new pathPoint(1, 1, new Rotation2d(0), 0.35, false),
-    
-    new pathPoint(0, 2, new Rotation2d(0), 0.2, false),
-    
-    new pathPoint(1, 3, Rotation2d.fromDegrees(0), 0.2, false)
-  };
+    new pathPoint(-2, -2, Rotation2d.fromDegrees(90), 0.5, false),
+   };
   PathFollow path = new PathFollow(chassis, points, 2, 4);
   DriveCommand drive = new DriveCommand(chassis, commandController);
   Command test = new RunCommand(() -> {chassis.setVelocities(new ChassisSpeeds(-0.5, 0, 0));}, chassis).andThen(new WaitCommand(2),

@@ -17,8 +17,7 @@ public class DriveWithAnglePID extends Command {
   private final CommandXboxController controller;
 
   private boolean precisionDrive = false;
-  //need to work on pid
-  PIDController pid = new PIDController(0.0001, 0.0002,0.000002);
+ 
   public DriveWithAnglePID(Chassis chassis, CommandXboxController controller) {
     this.controller = controller;
     this.chassis = chassis;
@@ -40,7 +39,7 @@ public class DriveWithAnglePID extends Command {
     double velRot;
 
     if(angle >= -3 && angle <= 3) velRot = Math.pow(rot, 3) * MAX_OMEGA_VELOCITY;
-    else velRot = pid.calculate(chassis.getAngle().getDegrees(), angle) * MAX_OMEGA_VELOCITY;
+    else velRot = rotationPid.calculate(chassis.getAngle().getDegrees(), angle) * MAX_OMEGA_VELOCITY;
     System.out.println("angle: " + angle);
     
     
