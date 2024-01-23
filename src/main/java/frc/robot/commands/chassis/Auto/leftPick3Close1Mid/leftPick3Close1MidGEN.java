@@ -12,8 +12,10 @@ import frc.robot.subsystems.chassis.Chassis;
 public class leftPick3Close1MidGEN extends Command {
   Chassis chassis;
   List<pathPoint> points = new ArrayList<pathPoint>();
-  public leftPick3Close1MidGEN(Chassis chassis) {
+  bool wantToDefendTop;
+  public leftPick3Close1MidGEN(Chassis chassis, bool wantToDefendTop) {
     this.chassis = chassis;
+    this.wantToDefendTop = wantToDefendTop;
     addRequirements(chassis);
   }
 
@@ -30,11 +32,15 @@ public class leftPick3Close1MidGEN extends Command {
      */
     points.add(new pathPoint(chassis.getPose().getX(),chassis.getPose().getY(), chassis.getAngle(),
      0.1, false));
-    points.add(new pathPoint(13.516, 1.261, null, 0.1, false));
-    points.add(new pathPoint(14.018, 4.587, null, 0.5, false));
-    points.add(new pathPoint(13.516, 4.946, new Rotation2d(0), 0.1, false));
-    points.add(new pathPoint(14.206, 5.961, null, 0.5, false));
-    points.add(new pathPoint(13.516, 6.281, null, 0.1, false));
+    points.add(new pathPoint(13.838, 1.508, null, 0.1, false));
+    points.add(new pathPoint(14.572, 2.27, null, 0.5, false));
+    points.add(new pathPoint(13.895, 2.963, null, 0.1, false));
+    points.add(new pathPoint(14.623, 3.785, null, 0.5, false));
+    points.add(new pathPoint(13.907, 4.4, null, 0.1, false));
+
+    if(wantToDefendTop){
+      points.add(new pathPoint(12.974, 6.736, null, 0.1, false));
+    }
 
   }
 
