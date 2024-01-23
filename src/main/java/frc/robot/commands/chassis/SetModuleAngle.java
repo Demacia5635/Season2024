@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.chassis.Chassis;
-import frc.robot.subsystems.chassis.Constants;
+import frc.robot.subsystems.chassis.ChassisConstants;
 import frc.robot.subsystems.chassis.SwerveModule;
 
 public class SetModuleAngle extends Command {
@@ -59,7 +59,7 @@ public class SetModuleAngle extends Command {
         var angles = chassis.getModulesAngles();
 //        System.out.println(" angles = " + angles[0] + " " + angles[1] + " " + angles[2] + " " + angles[3]);
         for(double a : angles) {
-            if(Math.abs(a-degrees) > Constants.MAX_STEER_ERROR) {
+            if(Math.abs(a-degrees) > ChassisConstants.MAX_STEER_ERROR) {
                 return false;
             }
         }

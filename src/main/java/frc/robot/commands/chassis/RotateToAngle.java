@@ -8,7 +8,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.chassis.Chassis;
-import frc.robot.subsystems.chassis.Constants;
+import frc.robot.subsystems.chassis.ChassisConstants;
 import frc.robot.utils.Trapezoid;
 
 public class RotateToAngle extends Command {
@@ -22,7 +22,7 @@ public class RotateToAngle extends Command {
   public RotateToAngle(double angle, Chassis chassis) {
     this.angle = Rotation2d.fromDegrees(angle);
     this.chassis = chassis;
-    trapezoid = new Trapezoid(Constants.MAX_OMEGA_VELOCITY, Constants.MAX_OMEGA_ACCELERATION);
+    trapezoid = new Trapezoid(ChassisConstants.MAX_OMEGA_VELOCITY, ChassisConstants.MAX_OMEGA_ACCELERATION);
     addRequirements(chassis);
   }
 

@@ -21,7 +21,7 @@ import frc.robot.commands.chassis.SetModuleAngle;
 import frc.robot.commands.chassis.utils.TestVelocity;
 import frc.robot.utils.Utils;
 
-import static frc.robot.subsystems.chassis.Constants.*;
+import static frc.robot.subsystems.chassis.ChassisConstants.*;
 
 import java.util.Arrays;
 
@@ -88,6 +88,10 @@ public class Chassis extends SubsystemBase {
 
   public SwerveModule[] getModules() {
     return modules;
+  }
+
+  public void setGyroAngle(double angle){
+    gyro.setYaw(angle);
   }
 
   public SwerveModule getModule(int i) {

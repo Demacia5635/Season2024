@@ -3,7 +3,7 @@ package frc.robot.subsystems.chassis;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 
-public final class Constants {
+public final class ChassisConstants {
 
   public static final int GYRO_ID = 15;
 

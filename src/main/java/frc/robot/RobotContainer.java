@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.chassis.DriveCommand;
+import frc.robot.commands.chassis.RotateToAngleShooter;
 import frc.robot.commands.chassis.SetModuleAngle;
 import frc.robot.commands.chassis.TestSteerVandA;
 import frc.robot.subsystems.chassis.Chassis;
@@ -24,9 +25,10 @@ public class RobotContainer implements Sendable{
   Command test = new RunCommand(() -> {chassis.setVelocities(new ChassisSpeeds(-0.5, 0, 0));}, chassis).andThen(new WaitCommand(2),
   new RunCommand(() -> {chassis.setVelocities(new ChassisSpeeds(-0.4  , 0, 0));}, chassis).andThen(new WaitCommand(2)),
   new RunCommand(() -> {chassis.setVelocities(new ChassisSpeeds(0, 0, 0));}, chassis).andThen(new WaitCommand(2)));
-  double x = 0.2;
+  double x = 5;
 
- 
+
+
   public RobotContainer() {
     chassis.setDefaultCommand(drive);
 
@@ -38,6 +40,8 @@ public class RobotContainer implements Sendable{
 
   @Override
   public void initSendable(SendableBuilder builder) {
+
+    builder.addDoubleProperty("chassis angle",() -> chassis.getAngle().getDegrees(), null);
 
 
   }
@@ -57,15 +61,8 @@ public class RobotContainer implements Sendable{
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return new RunCommand(()-> chassis.setVelocities(new ChassisSpeeds(0.5, 0, 0)), chassis);
-    //    return new RunCommand(()-> chassis.setModulesSteerVelocity(500), chassis);
-    // return new InstantCommand(() -> chassis.resetWheels(), chassis)
-    // .andThen(new RunCommand(() -> chassis.setVelocities(new ChassisSpeeds(-2, 0, 0))).withTimeout(2).andThen(new InstantCommand(() -> chassis.stop())));
-    //return new RunCommand(() -> chassis.getModule(2).setAngularVelocity(600));
-    // return new RunCommand(() -> chassis.setModulesPower(0.05));
-    // return new RunCommand(()-> chassis.setModulesAngularPower(-0.3), chassis);
-    //return new RunCommand(()->{chassis.getModule(2).setAngularPower(0.049 + 300*0.0003);},chassis).withTimeout(3)
-    //  .andThen(new InstantCommand(()->{SmartDashboard.putNumber("FF TEST",  chassis.getModule(2).getAngularVelocity());
-    //chassis.stop();}));
+    return new RotateToAngleShooter(chassis);
+    //return new RunCommand(()-> chassis.setVelocities(new ChassisSpeeds(0.5, 0, 0)), chassis);
+
   }
 }
