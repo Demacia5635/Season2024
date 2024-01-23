@@ -40,7 +40,10 @@ public class leftPick3Close1MidGEN extends Command {
 
     if(wantToDefendTop){
       points.add(new pathPoint(12.974, 6.736, null, 0.1, false));
+      points.add(new pathPoint(7.04, 7.223, null, 0.1, false));
     }
+    else{
+      points
 
   }
 
