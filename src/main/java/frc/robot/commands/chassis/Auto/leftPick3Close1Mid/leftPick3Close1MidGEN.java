@@ -13,9 +13,11 @@ public class leftPick3Close1MidGEN extends Command {
   Chassis chassis;
   List<pathPoint> points = new ArrayList<pathPoint>();
   bool wantToDefendTop;
-  public leftPick3Close1MidGEN(Chassis chassis, bool wantToDefendTop) {
+  bool pickTop;
+  public leftPick3Close1MidGEN(Chassis chassis, bool wantToDefendTop, bool pickTop) {
     this.chassis = chassis;
     this.wantToDefendTop = wantToDefendTop;
+    this.pickTop = pickTop;
     addRequirements(chassis);
   }
 
@@ -40,10 +42,19 @@ public class leftPick3Close1MidGEN extends Command {
 
     if(wantToDefendTop){
       points.add(new pathPoint(12.974, 6.736, null, 0.1, false));
-      points.add(new pathPoint(7.04, 7.223, null, 0.1, false));
+      points.add(new pathPoint(7.217, 6.746340, null, 0.1, false));
     }
     else{
-      points
+
+      if(picktop){
+        points.add(new pathPoint(12.974, 6.736, null, 0.1, false));
+        points.add(new pathPoint(8.775, 7.866, null, 0.4, false));
+      }
+        
+      else{
+        points.add(new pathPoint(13.790, 5.776, null, 0.6, false));
+        points.add(new pathPoint(11.014, 4.272, null, 0.6, false));
+        points.add(new pathPoint(8.159, 6.181, null, 0.6, false));
 
   }
 
