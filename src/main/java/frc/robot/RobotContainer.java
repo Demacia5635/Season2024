@@ -26,7 +26,8 @@ public class RobotContainer implements Sendable{
   pathPoint[] points = {
     new pathPoint(0, 0, new Rotation2d(0), 0.5, false),
     
-    new pathPoint(-2, -2, Rotation2d.fromDegrees(90), 0.5, false),
+    new pathPoint(-2, -2, Rotation2d.fromDegrees(90), 0.7, false),
+    new pathPoint(0, -4, Rotation2d.fromDegrees(90), 0.5, false)
    };
   PathFollow path = new PathFollow(chassis, points, 2, 4);
   DriveCommand drive = new DriveCommand(chassis, commandController);

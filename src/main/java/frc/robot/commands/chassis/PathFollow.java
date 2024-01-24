@@ -42,7 +42,7 @@ public class PathFollow extends CommandBase {
 
   double distancePassed = 0;
   pathPoint[] points;
-  PIDController rotationPidController = new PIDController(0.01, 0.002,0.000002);
+  PIDController rotationPidController = new PIDController(0.12, 0.06,0.0000005);
 
   /** Creates a new path follower using the given points.
    * @param chassis 
@@ -188,8 +188,9 @@ public class PathFollow extends CommandBase {
 
   @Override
   public boolean isFinished() {
-    return totalLeft <= 0.01 ;
+    return totalLeft <= 0.01 && Math.abs(chassis.getAngle().getDegrees() - wantedAngle.getDegrees()) <= 2;
   }
+
 
   @Override
   public void initSendable(SendableBuilder builder) {
