@@ -4,6 +4,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.units.Velocity;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -42,7 +43,7 @@ public class PathFollow extends CommandBase {
 
   double distancePassed = 0;
   pathPoint[] points;
-  PIDController rotationPidController = new PIDController(0.12, 0.06,0.0000005);
+  PIDController rotationPidController = new PIDController(0.31, 0.006,0.0000025);
 
   /** Creates a new path follower using the given points.
    * @param chassis 
@@ -55,7 +56,7 @@ public class PathFollow extends CommandBase {
     
     this.points = points;
     //gets the wanted angle for the robot to finish the path in
-    wantedAngle = points[points.length - 1].getRotation();
+   
     //creates new coreners array of the "arc points" in the path
     corners = new RoundedPoint[points.length - 2];
     for(int i = 0; i < points.length - 2; i++)
@@ -75,7 +76,8 @@ public class PathFollow extends CommandBase {
 
     //case for 1 segment, need to create only 1 leg
     if(points.length < 3) {
-      segments[0] = new Leg(points[0].getTranslation(), points[1].getTranslation(), false);
+      
+      segments[0] = new Leg(points[0].getTranslation(), points[1].getTranslation(), points[1].isAprilTag());
       System.out.println("------LESS THAN 3------");
     }
     //case for more then 1 segment
@@ -89,7 +91,7 @@ public class PathFollow extends CommandBase {
       for(int i = 0; i < corners.length - 1; i +=1)
       {
         segments[segmentIndexCreator] = corners[i].getArc(); 
-        segments[segmentIndexCreator+1] = new Leg(corners[i].getCurveEnd(), corners[i+1].getCurveStart(), false);
+        segments[segmentIndexCreator+1] = new Leg(corners[i].getCurveEnd(), corners[i+1].getCurveStart(), points[segmentIndexCreator].isAprilTag());
         segmentIndexCreator+=2;
       }
       //creates the last arc and leg
@@ -148,7 +150,7 @@ public class PathFollow extends CommandBase {
 
   @Override
   public void execute() {
-    System.out.println("wanted angle: " + wantedAngle.getDegrees());
+
     
     chassisPose = chassis.getPose();
     
@@ -161,19 +163,30 @@ public class PathFollow extends CommandBase {
       if(segmentIndex != segments.length - 1 || segments[segmentIndex].getLength() <= 0.15)
         segmentIndex++;  
     }
+    wantedAngle = points[segmentIndex].getRotation();
+    Translation2d velVector = segments[segmentIndex].calc(chassisPose.getTranslation(), driveVelocity);
 
     driveVelocity = driveTrapezoid.calculate(totalLeft - segments[segmentIndex].distancePassed(chassisPose.getTranslation()),
      currentVelocity.getNorm(), 0);
+  
+    if(segments[segmentIndex].isAprilTagMode())
+    {
+      velVector = new Translation2d(velVector.getX() / 10, velVector.getY() / 10);
+      wantedAngle = Rotation2d.fromDegrees(180   /*getClosestAprilTag().getRotation().getDegrees()*/);
 
-/*  if(segments[segmentIndex].isAprilTagMode()) rotationVelocity = rotationTrapezoid.calculate(
-      (wantedAngle.minus(chassis.getAngle())).getDegrees(),
-      Rotation2d.fromRadians( chassis.getChassisSpeeds().omegaRadiansPerSecond).getDegrees(), 0);
+    }
 
-    else*/
-    rotationVelocity = rotationPidController.calculate(chassis.getAngle().getRadians(), wantedAngle.getRadians()) * MAX_OMEGA_VELOCITY;
+    else{
+      wantedAngle = points[segmentIndex].getRotation();
+    }
 
-    Translation2d velVector = segments[segmentIndex].calc(chassisPose.getTranslation(), driveVelocity);
+    rotationVelocity = rotationPidController.calculate(
+      chassis.getAngle().getRadians(), wantedAngle.getRadians()) * MAX_OMEGA_VELOCITY;
+      
+
+
     System.out.println("ROTATION VELOCITY: " + Math.toDegrees( rotationVelocity));
+    if(totalLeft <= 0.01) velVector = new Translation2d(0, 0);
     ChassisSpeeds speed = new ChassisSpeeds(velVector.getX(), velVector.getY(), rotationVelocity);
     chassis.setVelocities(speed);
   }
@@ -188,7 +201,7 @@ public class PathFollow extends CommandBase {
 
   @Override
   public boolean isFinished() {
-    return totalLeft <= 0.01 && Math.abs(chassis.getAngle().getDegrees() - wantedAngle.getDegrees()) <= 2;
+    return totalLeft <= 0.01 && Math.abs(chassis.getAngle().getDegrees() - wantedAngle.getDegrees()) <= 3;
   }
 
 

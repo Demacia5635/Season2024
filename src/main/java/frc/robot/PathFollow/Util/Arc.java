@@ -38,10 +38,6 @@ public class Arc extends Segment{
     @Override
     public Translation2d calc(Translation2d pos,double velocity)
     {
-        if(Math.abs(velocity) > 1 && isAprilTagMode())
-        {
-          velocity = 1;
-        }
 
 
           

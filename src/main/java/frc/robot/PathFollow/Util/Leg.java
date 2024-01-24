@@ -28,10 +28,6 @@ public class Leg extends Segment{
     @Override
     public Translation2d calc(Translation2d position, double velocity)
     {
-        if(Math.abs(velocity) > 1 && isAprilTagMode())
-        {
-          velocity = 1;
-        }
 
         Translation2d relativePos = position.minus(p2);
 
