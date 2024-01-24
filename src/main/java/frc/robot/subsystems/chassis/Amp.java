@@ -25,7 +25,8 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 public class Amp extends SubsystemBase{
     public final Pigeon2 gyro;
     public final TalonFX m1;
-    public  CANSparkMax neon;
+    public CANSparkMax neon;
+    public double startDeg;
 
     ArmFeedforward ff = new ArmFeedforward(Parameters.ks1, Parameters.kg1, Parameters.kv1, Parameters.ka1);
     SimpleMotorFeedforward ff2 = new SimpleMotorFeedforward(Parameters.ks2, Parameters.kv2, Parameters.ka2);
@@ -51,6 +52,9 @@ public class Amp extends SubsystemBase{
         m1.config_kD(0, Parameters.kd1);
     }
 
+    public void startDeg(double startDeg){
+        this.startDeg = startDeg;
+    }
     public void neonSetVel(double vel){
         neon.set(vel);
       }
@@ -109,8 +113,8 @@ public class Amp extends SubsystemBase{
         return new Translation2d(deadband(controller.getRightX()), deadband(controller.getRightY()));
     }
 
-    public double fixedDeg(){
-        double fixedDeg = gyro.getPitch();
+    public double deg(){
+        double fixedDeg = gyro.getYaw();
         if(fixedDeg>0){
             while (fixedDeg >=360){
                 fixedDeg -= 360;
@@ -121,6 +125,9 @@ public class Amp extends SubsystemBase{
             }
         }
         return fixedDeg;
+    }
+    public double fixedDeg(){
+        return startDeg - deg();
     }
     public double getPoseRad(){  
         return fixedDeg()/360*Math.PI*2;
@@ -140,7 +147,8 @@ public class Amp extends SubsystemBase{
         super.periodic();
         SmartDashboard.putNumber("Motor1 Power", getpower());
         SmartDashboard.putNumber("Motor1 Velocity", getVelArm());
-        SmartDashboard.putNumber("Pitch in radiansS", getPoseRad());
+        SmartDashboard.putNumber("Pitch in radiansS", fixedDeg());
         SmartDashboard.putNumber("neon encoder",getNeonRev());
+        SmartDashboard.putNumber("start angle", startDeg);
     }
 }

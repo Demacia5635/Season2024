@@ -110,9 +110,9 @@ public final class Constants {
   }
   public static class AmpConstants{
     public static class AmpDeviceID{
-      public static final int m1 = 0;
-      public static final int m2 = 0;
-      public static final int gyro = 0;
+      public static final int m1 = 1;
+      public static final int m2 = 2;
+      public static final int gyro = 14;
     }
     public static class ConvertionParams {
       public static final double m1GearRatio = 0;// (1/number)

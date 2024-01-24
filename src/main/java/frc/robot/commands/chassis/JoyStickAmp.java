@@ -22,6 +22,10 @@ public class JoyStickAmp extends Command {
     addRequirements(amp);
     // Use addRequirements() here to declare subsystem dependencies.
   }
+  @Override
+  public void initialize() {
+    amp.startDeg(amp.deg());
+  }
 
   // Called when the command is initially scheduled.
 

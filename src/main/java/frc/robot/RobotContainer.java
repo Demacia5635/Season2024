@@ -29,6 +29,7 @@ public class RobotContainer implements Sendable{
   public RobotContainer() {
 
     commandController = new CommandXboxController(Constants.CONTROLLER_PORT);
+    amp = new Amp();
     //chassis = new Chassis();
     //drive = new DriveCommand(chassis, commandController);
 
