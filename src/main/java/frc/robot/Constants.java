@@ -108,19 +108,20 @@ public final class Constants {
     }
   }
 
-  public static class ShooterConstants {
-    public static final int MOTOR_1_ID = 1;
-    public static final int MOTOR_2_ID = 2;
-    
-    public static final double KP = 0.3;
-    public static final double KI = 0;
+    public static class ShooterConstants {
+        public static final int MOTOR_1_ID = 1;
+        public static final int MOTOR_2_ID = 2;
+        
+        public static final double KP = 0.3;
+        public static final double KI = 0;
 
-    public static final double KV = 0.25/12000.0;
-    public static final double KS = 0.15 - KV * 4000;
+        public static final double KV = 0.25/12000.0;
+        public static final double KS = 0.15 - KV * 4000;
 
-    public static final double PULES_PER_REV = 2048;  
+        public static final double PULES_PER_REV = 2048;  
 
-    public static final int MOTOR_ANGLE_ID = 3;
+        /* need to change based on the id of the falcon */
+        public static final int MOTOR_ANGLE_ID = 3;
 
-  }
+    }
 }
