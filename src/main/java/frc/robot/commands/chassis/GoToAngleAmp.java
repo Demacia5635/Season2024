@@ -7,24 +7,24 @@ package frc.robot.commands.chassis;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.chassis.Amp;
-import frc.robot.utils.Trapezoid;
+import frc.robot.utils.TrapezoidCalc;
 
 public class GoToAngleAmp extends Command {
   CommandXboxController xboxController;
   Amp amp;
   double angleRad;
-  double velRad;
+  double maxVelRad;
   double acceleRad;
-  Trapezoid trap;
+  TrapezoidCalc trap;
 
   /** Creates a new GoToAngleAmp. */
-  public GoToAngleAmp(CommandXboxController xboxController, Amp amp, double angleRad, double velRad, double acceleRad) {
+  public GoToAngleAmp(CommandXboxController xboxController, Amp amp, double angleRad, double maxVelRad, double acceleRad) {
     this.xboxController = xboxController;
     this.amp = amp;
     this.angleRad = angleRad;
-    this.velRad = velRad;
+    this.maxVelRad = maxVelRad;
     this.acceleRad = acceleRad;
-    this.trap = new Trapezoid(velRad, acceleRad);
+    this.trap = new TrapezoidCalc();
     addRequirements(amp);
     // Use addRequirements() here to declare subsystem dependencies.
   }
@@ -38,6 +38,7 @@ public class GoToAngleAmp extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    double velRad = trap.trapezoid(amp.getVelArm(), maxVelRad, 0, Math.abs(acceleRad), angleRad);
     amp.velFFArm(amp.getPoseRad(), velRad, acceleRad);
   }
 
@@ -50,7 +51,7 @@ public class GoToAngleAmp extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    if(amp.getPoseRad()>=angleRad){
+    if((amp.getPoseRad()>=angleRad-1/360*2*Math.PI)&&(amp.getPoseRad()<=angleRad+1/360*2*Math.PI)){
       return true;
     }
     return false;
