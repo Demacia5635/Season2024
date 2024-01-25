@@ -28,8 +28,8 @@ public class Amp extends SubsystemBase{
     public CANSparkMax neon;
     public double startDeg;
 
-    ArmFeedforward ff = new ArmFeedforward(Parameters.ks1, Parameters.kg1, Parameters.kv1, Parameters.ka1);
-    SimpleMotorFeedforward ff2 = new SimpleMotorFeedforward(Parameters.ks2, Parameters.kv2, Parameters.ka2);
+    //ArmFeedforward ff = new ArmFeedforward(Parameters.ks1, Parameters.kg1, Parameters.kv1, Parameters.ka1);
+    //SimpleMotorFeedforward ff2 = new SimpleMotorFeedforward(Parameters.ks2, Parameters.kv2, Parameters.ka2);
     public Amp(){
         gyro = new Pigeon2(AmpDeviceID.gyro);
         m1 = new TalonFX(AmpDeviceID.m1);
@@ -134,8 +134,9 @@ public class Amp extends SubsystemBase{
     }
 
     public void velFFArm(double posRad, double velRad, double acceleRad) {
+        double ff = acceleRad*Parameters.ka1 + velRad*Parameters.kv1 + Parameters.kg1*Math.sin(posRad) + Math.signum(velRad)*Parameters.ks1;
         double velMotor = (velRad/ConvertionParams.m1GearRatio)/100;
-        m1.set(ControlMode.Velocity, velMotor, DemandType.ArbitraryFeedForward, ff.calculate(posRad, velRad, acceleRad));
+        m1.set(ControlMode.Velocity, velMotor, DemandType.ArbitraryFeedForward, ff);
     }
 
     public double getVelArm(){
