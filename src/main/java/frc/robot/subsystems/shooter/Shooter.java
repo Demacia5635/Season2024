@@ -14,68 +14,70 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 
 public class Shooter extends SubsystemBase {
-  public final TalonFX motorAngle;
-  public final TalonFX motor1;
-  public final TalonFX motor2;
+    public final TalonFX motorAngle;
+    public final TalonFX motor1;
+    public final TalonFX motor2;
 
-  public double basePos = 0;
-  
-  /** Creates a new Shooter. */
-  public Shooter() {
-
-    motor1 = new TalonFX(MOTOR_1_ID);
-    motor2 = new TalonFX(MOTOR_2_ID);
+    public double basePos = 0;
     
-    motor1.config_kP(0, KP);
-    motor1.config_kI(0, KI);
-    motor2.config_kP(0, KP);
-    motor2.config_kI(0, KI);
+    /** Creates a new Shooter. */
+    public Shooter() {
 
-    motorAngle = new TalonFX(MOTOR_ANGLE_ID);
+        motor1 = new TalonFX(MOTOR_1_ID);
+        motor2 = new TalonFX(MOTOR_2_ID);
+        
+        motor1.config_kP(0, KP);
+        motor1.config_kI(0, KI);
+        motor2.config_kP(0, KP);
+        motor2.config_kI(0, KI);
 
-    basePos = motorAngle.getSelectedSensorPosition()/ PULES_PER_REV; 
+        motorAngle = new TalonFX(MOTOR_ANGLE_ID);
+
+        basePos = motorAngle.getSelectedSensorPosition()/ PULES_PER_REV; 
+        
+        SmartDashboard.putData(this);
+    }
+
+    public void setAngleVel(double vel){
+        motorAngle.set(ControlMode.Velocity, vel);
+    }
+
+    public void setVel(double vel){
+        double pow = KS + KV * vel;
+        System.out.println("power = "+ pow);
+        motor1.set(ControlMode.PercentOutput, pow);
+        motor2.set(ControlMode.PercentOutput, pow);
+    }
+
+    public void stop(){
+        motor1.set(ControlMode.PercentOutput, 0);
+        motor2.set(ControlMode.PercentOutput, 0);
+    }
     
-    SmartDashboard.putData(this);
-  }
+    public void stopAngle() {
+        motorAngle.set(ControlMode.PercentOutput, 0);
+    }
+    
+    public double getAngleEncoder(){
+        return motorAngle.getSelectedSensorPosition()/ PULES_PER_REV - basePos;
+    }
 
-  public void setAngleVel(double vel){
-    motorAngle.set(ControlMode.Velocity, vel);
-  }
-  public void setVel(double vel){
-    double velWithFF = KS + KV * vel;
-    System.out.println("Vel = "+ vel);
-    motor1.set(ControlMode.Velocity, velWithFF);
-    motor2.set(ControlMode.Velocity, velWithFF);
-  }
+    @Override
+    public void initSendable(SendableBuilder builder) {
+        super.initSendable(builder);
 
-  public void stop(){
-    motor1.set(ControlMode.PercentOutput, 0);
-    motor2.set(ControlMode.PercentOutput, 0);
-  }
-  
-  public void stopAngle() {
-    motorAngle.set(ControlMode.PercentOutput, 0);
-  }
-  
-  public double getAngleEncoder(){
-    return motorAngle.getSelectedSensorPosition()/ PULES_PER_REV - basePos;
-  }
+        builder.addDoubleProperty("motor 1 speed", ()-> motor1.getSelectedSensorVelocity()*10/(PULES_PER_REV/360), null);
+        builder.addDoubleProperty("motor 2 speed", ()-> motor2.getSelectedSensorVelocity()*10/(PULES_PER_REV/360), null);
+        builder.addDoubleProperty("current amper motor 1", ()-> motor1.getSupplyCurrent(), null);
+        builder.addDoubleProperty("current amper motor 2", ()-> motor2.getSupplyCurrent(), null);
+        builder.addDoubleProperty("motor angle", this::getAngleEncoder, null);
+        builder.addDoubleProperty("motor angle speed", ()->motorAngle.getSelectedSensorVelocity(), null);
+    
+        SmartDashboard.putData("reset base position", new InstantCommand(()-> basePos = motorAngle.getSelectedSensorPosition()/PULES_PER_REV).ignoringDisable(true));
+    }
 
-  @Override
-  public void initSendable(SendableBuilder builder) {
-      super.initSendable(builder);
-
-      builder.addDoubleProperty("motor 1 speed", ()-> motor1.getSelectedSensorVelocity()*10/(PULES_PER_REV/360), null);
-      builder.addDoubleProperty("motor 2 speed", ()-> motor2.getSelectedSensorVelocity()*10/(PULES_PER_REV/360), null);
-      builder.addDoubleProperty("current amper motor 1", ()-> motor1.getSupplyCurrent(), null);
-      builder.addDoubleProperty("current amper motor 2", ()-> motor2.getSupplyCurrent(), null);
-      builder.addDoubleProperty("motor angle", this::getAngleEncoder, null);
-  
-      SmartDashboard.putData("reset base position", new InstantCommand(()-> basePos = motorAngle.getSelectedSensorPosition()/PULES_PER_REV).ignoringDisable(true));
-  }
-
-  @Override
-  public void periodic() {
-    // This method will be called once per scheduler run
-  }
+    @Override
+    public void periodic() {
+        // This method will be called once per scheduler run
+    }
 }
