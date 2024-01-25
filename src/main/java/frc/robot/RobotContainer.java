@@ -22,7 +22,7 @@ import frc.robot.subsystems.chassis.Chassis;
 public class RobotContainer implements Sendable{
 //  CommandXboxController commandController = new CommandXboxController(0);
   PS4Controller controller = new PS4Controller(0);  
-Chassis chassis = new Chassis();
+  Chassis chassis = new Chassis();
   pathPoint[] points = {
     new pathPoint(0, 0, Rotation2d.fromDegrees(-90), 0.5, true),
     
@@ -60,7 +60,7 @@ Chassis chassis = new Chassis();
 
   }
  private void configureBindings() {
-      commandController.a().onTrue(new InstantCommand(()->{chassis.setOdometryToForward();}));
+      if(controller.getCrossButton()) new InstantCommand(()->{chassis.setOdometryToForward();});
     }
    
   public Command getAutonomousCommand() {

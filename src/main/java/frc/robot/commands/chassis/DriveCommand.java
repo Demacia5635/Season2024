@@ -1,6 +1,7 @@
 package frc.robot.commands.chassis;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -10,17 +11,17 @@ import static frc.robot.subsystems.chassis.ChassisConstants.*;
 
 public class DriveCommand extends Command {
   private final Chassis chassis;
-  private final CommandXboxController controller;
+  private final PS4Controller controller;
 
   private boolean precisionDrive = false;
 
-  public DriveCommand(Chassis chassis, CommandXboxController controller) {
+  public DriveCommand(Chassis chassis, PS4Controller controller) {
     this.chassis = chassis;
     this.controller = controller;
 
     addRequirements(chassis);
 
-    controller.b().onTrue(new InstantCommand(() -> precisionDrive = !precisionDrive));
+    if(controller.getCircleButton()) new InstantCommand(() -> precisionDrive = !precisionDrive);
   }
 
   @Override
@@ -31,7 +32,7 @@ public class DriveCommand extends Command {
   public void execute() {
     double joyX = deadband(controller.getLeftY(), 0.1);
     double joyY = deadband(controller.getLeftX(), 0.1);
-    double rot = -(deadband(controller.getRightTriggerAxis(), 0.1) - deadband(controller.getLeftTriggerAxis(), 0.1));
+    double rot = -(deadband(controller.getR2Axis(), 0.1) - deadband(controller.getL2Axis(), 0.1));
     
     double velX = Math.pow(joyX, 3)* MAX_DRIVE_VELOCITY;
     double velY = Math.pow(joyY, 3) * MAX_DRIVE_VELOCITY;
