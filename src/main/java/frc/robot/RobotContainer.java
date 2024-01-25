@@ -10,36 +10,36 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 public class RobotContainer  {
   
-  Shooter shooter;
-  
-  public RobotContainer() {
-    shooter = new Shooter();
-    configureBindings();
-  }
-  
-
-  
-  /**
-     * 
-     * Use this method to define your trigger->command mappings. Triggers can be created via the
-     * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with an arbitrary
-     * predicate, or via the named factories in {@link
-     * edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for {@link
-     * CommandXboxController Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller
-     * PS4} controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
-     * joysticks}.
-     */
-    private void configureBindings() {
-      
+    Shooter shooter;
+    
+    public RobotContainer() {
+        shooter = new Shooter();
+        configureBindings();
     }
     
-  /**
-   * Use this to pass the autonomous command to the main {@link Robot} cass.
-   *
-   * @return the command to run in autonomous
-   */
-  public Command getAutonomousCommand() {
-    // return new InstantCommand(()-> shooter.setVel(40000), shooter);y
-    return new TurnAngle(shooter, 1, 0.01);
-  }
+
+    
+    /**
+         * 
+         * Use this method to define your trigger->command mappings. Triggers can be created via the
+         * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with an arbitrary
+         * predicate, or via the named factories in {@link
+         * edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for {@link
+         * CommandXboxController Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller
+         * PS4} controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
+         * joysticks}.
+         */
+        private void configureBindings() {
+        
+        }
+        
+    /**
+     * Use this to pass the autonomous command to the main {@link Robot} cass.
+     *
+     * @return the command to run in autonomous
+     */
+    public Command getAutonomousCommand() {
+        return new InstantCommand(()-> shooter.setVel(42550), shooter);
+        // return new TurnAngle(shooter, 1, 44000*0.2);
+    }
 }
