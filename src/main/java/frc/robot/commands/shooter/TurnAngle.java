@@ -10,15 +10,15 @@ import frc.robot.subsystems.shooter.Shooter;
 public class TurnAngle extends CommandBase {
     final Shooter shooter;
     double turns;
-    double vel;
+    double pow;
     double startPos;
 
     /** Creates a new TurnAngle. */
-    public TurnAngle(Shooter shooter, double turns, double vel) {
+    public TurnAngle(Shooter shooter, double turns, double pow) {
         // Use addRequirements() here to declare subsystem dependencies.
         this.shooter = shooter;
         this.turns = turns;
-        this.vel = vel;
+        this.pow = pow;
         addRequirements(shooter);
     }
 
@@ -26,23 +26,27 @@ public class TurnAngle extends CommandBase {
     @Override
     public void initialize() {
         shooter.neonEncoderReset();
+        // shooter.angleResetPos();
     }
 
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        shooter.neonSetPow(vel);
+        shooter.neonSetPow(pow);
+        // shooter.anlgeSetPow(pow);
     }
 
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
         shooter.neonSetPow(0);
+        // shooter.anlgeStop();
     }
 
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        return shooter.getNEONRev() >= turns+startPos;
+        // return shooter.getAnlgeEncoder() >= turns+startPos;
+        return shooter.neon.getEncoder().getPosition() >= turns+startPos;
     }
 }
