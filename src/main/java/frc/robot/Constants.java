@@ -120,7 +120,7 @@ public final class Constants {
 
         public static final double PULES_PER_REV = 2048;  
 
-        /* need to change based on the id of the falcon */
+        public static final int ANLGE_MOTOR_ID = 3;
         public static final int NEON_ID = 13;
 
         public static final int GEAR_RATIO = 4;
