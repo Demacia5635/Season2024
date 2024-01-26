@@ -19,7 +19,7 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 public class Shooter extends SubsystemBase {
 
     public CANSparkMax neon;
-    public TalonFX motorAngle;
+    // public TalonFX motorAngle;
 
     public final TalonFX motor1;
     public final TalonFX motor2;
@@ -39,7 +39,7 @@ public class Shooter extends SubsystemBase {
 
         neon = new CANSparkMax(NEON_ID, MotorType.kBrushless);
         neon.getEncoder().setPosition(0);
-        motorAngle = new TalonFX(ANLGE_MOTOR_ID);
+        // motorAngle = new TalonFX(ANLGE_MOTOR_ID);
 
         SmartDashboard.putData(this);
     }
@@ -51,17 +51,17 @@ public class Shooter extends SubsystemBase {
         neon.set(pow);
     }
     
-    public void anlgeSetPow(double pow){
-        motorAngle.set(ControlMode.PercentOutput, pow);
-    }
+    // public void anlgeSetPow(double pow){
+    //     motorAngle.set(ControlMode.PercentOutput, pow);
+    // }
 
     public void neonStop(){
         neon.stopMotor();
     }
 
-    public void anlgeStop(){
-        motorAngle.set(ControlMode.PercentOutput, 0);
-    }
+    // public void anlgeStop(){
+    //     motorAngle.set(ControlMode.PercentOutput, 0);
+    // }
 
     public void neonEncoderSet(double postion){
         neon.getEncoder().setPosition(postion);
@@ -89,22 +89,22 @@ public class Shooter extends SubsystemBase {
         // anlgeStop();
     }
     
-    public double getFalconAnlge(){
-        return (motorAngle.getSelectedSensorPosition()/ FALOCN_PULES_PER_ANGLE) - basePos;
-    }
+    // public double getFalconAnlge(){
+    //     return (motorAngle.getSelectedSensorPosition()/ FALOCN_PULES_PER_ANGLE) - basePos;
+    // }
 
     public double getNeonAngle(){
         return neon.getEncoder().getPosition() / NEON_PULES_PER_ANGLE;
     }
 
-    public void angleResetPos(){
-        basePos = motorAngle.getSelectedSensorPosition()/PULES_PER_REV * GEAR_RATIO;
-    }
+    // public void angleResetPos(){
+    //     basePos = motorAngle.getSelectedSensorPosition()/PULES_PER_REV * GEAR_RATIO;
+    // }
 
-    public void angleBrake(){ motorAngle.setNeutralMode(NeutralMode.Brake);}
-    public void angleCoast(){ motorAngle.setNeutralMode(NeutralMode.Coast);}
+    // public void angleBrake(){ motorAngle.setNeutralMode(NeutralMode.Brake);}
+    // public void angleCoast(){ motorAngle.setNeutralMode(NeutralMode.Coast);}
     
-    public double getAngleVel(){ return motorAngle.getSelectedSensorVelocity()*10/(PULES_PER_REV/360); }
+    // public double getAngleVel(){ return motorAngle.getSelectedSensorVelocity()*10/(PULES_PER_REV/360); }
 
     @Override
     public void initSendable(SendableBuilder builder) {
@@ -115,17 +115,17 @@ public class Shooter extends SubsystemBase {
         builder.addDoubleProperty("current amper motor 1", ()-> motor1.getSupplyCurrent(), null);
         builder.addDoubleProperty("current amper motor 2", ()-> motor2.getSupplyCurrent(), null);
         builder.addDoubleProperty("neon encoder", ()->neon.getEncoder().getPosition(), null);
-        builder.addDoubleProperty("angle motor encoder", this::getFalconAnlge, null);
+        // builder.addDoubleProperty("angle motor encoder", this::getFalconAnlge, null);
         builder.addDoubleProperty("base angle", ()->basePos, null);
         builder.addDoubleProperty("neon vel", ()->neon.getEncoder().getVelocity(), null);
         builder.addDoubleProperty("neon angle", this::getNeonAngle, null);
-        builder.addDoubleProperty("falcon vel", this::getAngleVel, null);
-        builder.addDoubleProperty("falcon encoder", this::getFalconAnlge, null);
+        // builder.addDoubleProperty("falcon vel", this::getAngleVel, null);
+        // builder.addDoubleProperty("falcon encoder", this::getFalconAnlge, null);
     
         SmartDashboard.putData("Reset neon", new InstantCommand(()-> neonEncoderReset()));
-        SmartDashboard.putData("Reset angle motor", new InstantCommand(()-> angleResetPos()));
-        SmartDashboard.putData("Angle Brake", new InstantCommand(()-> angleBrake()).ignoringDisable(true));
-        SmartDashboard.putData("Angle Coast", new InstantCommand(()-> angleCoast()).ignoringDisable(true));
+        // SmartDashboard.putData("Reset angle motor", new InstantCommand(()-> angleResetPos()));
+        // SmartDashboard.putData("Angle Brake", new InstantCommand(()-> angleBrake()).ignoringDisable(true));
+        // SmartDashboard.putData("Angle Coast", new InstantCommand(()-> angleCoast()).ignoringDisable(true));
     }
 
 }
