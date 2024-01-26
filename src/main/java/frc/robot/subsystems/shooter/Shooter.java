@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static frc.robot.Constants.ShooterConstants.*;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
@@ -18,7 +19,7 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 public class Shooter extends SubsystemBase {
 
     public CANSparkMax neon;
-    // public TalonFX motorAngle;
+    public TalonFX motorAngle;
 
     public final TalonFX motor1;
     public final TalonFX motor2;
@@ -89,12 +90,15 @@ public class Shooter extends SubsystemBase {
     }
     
     // public double getAnlgeEncoder(){
-    //     return (motorAngle.getSelectedSensorPosition()/PULES_PER_REV) - basePos;
+    //     return (motorAngle.getSelectedSensorPosition()/PULES_PER_REV * GEAR_RATIO) - basePos;
     // }
 
     // public void angleResetPos(){
-    //     basePos = motorAngle.getSelectedSensorPosition()/PULES_PER_REV;
+    //     basePos = motorAngle.getSelectedSensorPosition()/PULES_PER_REV * GEAR RATIO;
     // }
+
+    // public void angleBrake(){ motorAngle.setNeutralMode(NeutralMode.Brake);}
+    // public void angleCoast(){ motorAngle.setNeutralMode(NeutralMode.Coast);}
 
     @Override
     public void initSendable(SendableBuilder builder) {
@@ -108,8 +112,11 @@ public class Shooter extends SubsystemBase {
         // builder.addDoubleProperty("angle motor encoder", this::getAnlgeEncoder, null);
         builder.addDoubleProperty("base angle", ()->basePos, null);
     
+
         SmartDashboard.putData("Reset neon", new InstantCommand(()-> neonEncoderReset()));
         // SmartDashboard.putData("Reset angle motor", new InstantCommand(()-> angleResetPos()));
+        // SmartDashboard.putData("Angle Brake", new InstantCommand(()-> angleBrake()));
+        // SmartDashboard.putData("Angle Coast", new InstantCommand(()-> angleCoast()));
     }
 
 }
