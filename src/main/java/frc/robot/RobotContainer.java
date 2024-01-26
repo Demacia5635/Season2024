@@ -3,6 +3,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.commands.shooter.NeonControl;
 import frc.robot.commands.shooter.TurnAngle;
 import frc.robot.subsystems.shooter.Shooter;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -11,13 +12,13 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 public class RobotContainer  {
   
     Shooter shooter;
+    CommandXboxController controller;
     
     public RobotContainer() {
         shooter = new Shooter();
+        controller = new CommandXboxController(0);
         configureBindings();
     }
-    
-
     
     /**
          * 
@@ -30,7 +31,10 @@ public class RobotContainer  {
          * joysticks}.
          */
         private void configureBindings() {
-        
+            controller.a().onTrue(new TurnAngle(shooter, 5, 0.2));
+            controller.b().onTrue(new NeonControl(shooter, controller));
+            
+            controller.rightBumper().onTrue(new InstantCommand(()-> shooter.stopAll()));
         }
         
     /**
@@ -39,7 +43,7 @@ public class RobotContainer  {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
-        return new InstantCommand(()-> shooter.setVel(42550), shooter);
-        // return new TurnAngle(shooter, 1, 44000*0.2);
+        // return new InstantCommand(()-> shooter.setVel(42550), shooter);
+        return new TurnAngle(shooter, 5, 0.2);
     }
 }
