@@ -25,24 +25,24 @@ public class TurnAngle extends CommandBase {
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-        startPos = shooter.getAngleEncoder();
+        shooter.neonEncoderReset();
     }
 
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        shooter.setAngleVel(vel);
+        shooter.neonSetPow(vel);
     }
 
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
-        shooter.stopAngle();
+        shooter.neonSetPow(0);
     }
 
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        return shooter.getAngleEncoder() >= turns+startPos;
+        return shooter.getNEONRev() >= turns+startPos;
     }
 }
