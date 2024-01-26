@@ -125,5 +125,15 @@ public final class Constants {
 
         public static final int GEAR_RATIO = 4;
         public static final double NEON_PULES_PER_REV = 42 * GEAR_RATIO;
+
+        /* all of the var here are placeholders for now */
+        public static final double MIN_ANGLE = 0;
+        public static final double MAX_ANGLE = 90;
+        public static final double NEON_MIN_ANGLE_PULES = 0;
+        public static final double NEON_MAX_ANGLE_PULES = 90;
+        public static final double FALCON_MIN_ANGLE_PULES = 0;
+        public static final double FALCON_MAX_ANGLE_PULES = 90;
+        public static final double NEON_PULES_PER_ANGLE = (NEON_MIN_ANGLE_PULES - NEON_MAX_ANGLE_PULES) / (MIN_ANGLE - MAX_ANGLE);
+        public static final double FALOCN_PULES_PER_ANGLE = (FALCON_MIN_ANGLE_PULES - FALCON_MAX_ANGLE_PULES) / (MIN_ANGLE - MAX_ANGLE);
     }
 }
