@@ -12,9 +12,11 @@ import static frc.robot.Constants.ShooterConstants.*;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkLowLevel.MotorType;
 
 public class Shooter extends SubsystemBase {
-    public final TalonFX motorAngle;
+    public CANSparkMax neon;
     public final TalonFX motor1;
     public final TalonFX motor2;
 
@@ -31,17 +33,35 @@ public class Shooter extends SubsystemBase {
         motor2.config_kP(0, KP);
         motor2.config_kI(0, KI);
 
-        motorAngle = new TalonFX(MOTOR_ANGLE_ID);
+        neon = new CANSparkMax(NEON_ID, MotorType.kBrushless);
+        neon.getEncoder().setPosition(0);
 
-        basePos = motorAngle.getSelectedSensorPosition()/ PULES_PER_REV; 
-        
         SmartDashboard.putData(this);
     }
 
-    public void setAngleVel(double vel){
-        motorAngle.set(ControlMode.Velocity, vel);
+    /**
+     * @param pow must be from -1 to 1
+     */
+    public void neonSetPow(double pow){
+        neon.set(pow);
     }
 
+    public void neonStop(){
+        neon.stopMotor();
+    }
+
+    public void neonEncoderSet(double postion){
+        neon.getEncoder().setPosition(postion);
+    }
+
+    public void neonEncoderReset(){
+        neonEncoderSet(0);
+    }
+
+    public double getNEONRev(){
+        return neon.getEncoder().getPosition()/NEON_PULES_PER_REV;
+    }
+  
     public void setVel(double vel){
         double pow = KS + KV * vel;
         System.out.println("power = "+ pow);
@@ -54,12 +74,9 @@ public class Shooter extends SubsystemBase {
         motor2.set(ControlMode.PercentOutput, 0);
     }
     
-    public void stopAngle() {
-        motorAngle.set(ControlMode.PercentOutput, 0);
-    }
-    
-    public double getAngleEncoder(){
-        return motorAngle.getSelectedSensorPosition()/ PULES_PER_REV - basePos;
+    public void stopAll(){
+        neonStop();
+        // stop();
     }
 
     @Override
@@ -70,10 +87,10 @@ public class Shooter extends SubsystemBase {
         builder.addDoubleProperty("motor 2 speed", ()-> motor2.getSelectedSensorVelocity()*10/(PULES_PER_REV/360), null);
         builder.addDoubleProperty("current amper motor 1", ()-> motor1.getSupplyCurrent(), null);
         builder.addDoubleProperty("current amper motor 2", ()-> motor2.getSupplyCurrent(), null);
-        builder.addDoubleProperty("motor angle", this::getAngleEncoder, null);
-        builder.addDoubleProperty("motor angle speed", ()->motorAngle.getSelectedSensorVelocity(), null);
+        builder.addDoubleProperty("neon encoder", this::getNEONRev, null);
+        builder.addDoubleProperty("base angle", ()->basePos, null);
     
-        SmartDashboard.putData("reset base position", new InstantCommand(()-> basePos = motorAngle.getSelectedSensorPosition()/PULES_PER_REV).ignoringDisable(true));
+        SmartDashboard.putData("Reset neon", new InstantCommand(()-> neonEncoderReset()));
     }
 
     @Override
