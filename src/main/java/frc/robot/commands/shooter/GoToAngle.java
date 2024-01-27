@@ -44,50 +44,36 @@ public class GoToAngle extends Command {
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-        startAngle = shooter.getNeonAngle();
-        // startAngle = shooter.getFalconAnlge();
+        startAngle = shooter.getFalconAnlge();
     }
 
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        double pow = calc.trapezoid(shooter.neon.getEncoder().getVelocity(), maxPow, endPow, acc, (wantedAngle - shooter.getNeonAngle()));
-        // double pow = calc.trapezoid(shooter.getAngleVel(), maxPow, endPow, acc, (wantedAngle - shooter.falconGetAnlge()));
+        double pow = calc.trapezoid(shooter.getAngleVel(), maxPow, endPow, acc, (wantedAngle - shooter.getFalconAnlge()));
         System.out.println("angle pow: "+ pow);
-        shooter.neonSetPow(pow);
+        shooter.anlgeSetPow(pow);
     }
 
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
-        shooter.neonStop();
-        // shooter.anlgeStop();
+        shooter.anlgeStop();
     }
 
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        return neonIsPassed() || (Math.abs(shooter.getNeonAngle() - wantedAngle) <= 3);
-        // return falconIsPassed() || (Math.abs(shooter.getFalconAnlge() - wantedAngle) <= 3);
+        return isPassed() || (Math.abs(shooter.getFalconAnlge() - wantedAngle) <= 3);
     }
 
-    private boolean neonIsPassed(){
-        if ((wantedAngle-startAngle > 0) && (shooter.getNeonAngle() > wantedAngle)){
+    private boolean isPassed(){
+        if ((wantedAngle-startAngle > 0) && (shooter.getFalconAnlge() > wantedAngle)){
             return true;
-        } else if ((wantedAngle - startAngle < 0) && (shooter.getNeonAngle() < wantedAngle)){
+        } else if ((wantedAngle - startAngle < 0) && (shooter.getFalconAnlge() < wantedAngle)){
             return true;
         } else {
             return false;
         }
     }
-
-    // private boolean falconIsPassed(){
-    //     if ((wantedAngle-startAngle > 0) && (shooter.getFalconAnlge() > wantedAngle)){
-    //         return true;
-    //     } else if ((wantedAngle - startAngle < 0) && (shooter.getFalconAnlge() < wantedAngle)){
-    //         return true;
-    //     } else {
-    //         return false;
-    //     }
-    // }
 }
