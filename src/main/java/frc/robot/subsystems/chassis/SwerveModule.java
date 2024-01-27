@@ -242,7 +242,7 @@ public class SwerveModule implements Sendable {
         */
         double ff;
         double tgtV = MathUtil.clamp(v, currentVelocity-maxVelocityChange, currentVelocity+maxVelocityChange);
-        if(tgtV > 2.5) ff = moveFFMore.calculate(tgtV, currentVelocity);
+        if(Math.abs(tgtV) > 2.5) ff = moveFFMore.calculate(tgtV, currentVelocity);
         else ff = MoveFFLess.calculate(tgtV, currentVelocity);
         debug(" tgtV=" + tgtV + " cur V=" + currentVelocity + " ff=" + ff);
         moveMotor.set(ControlMode.Velocity, talonVelocity(tgtV), DemandType.ArbitraryFeedForward, ff);

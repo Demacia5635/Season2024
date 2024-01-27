@@ -27,10 +27,11 @@ public class RobotContainer implements Sendable{
   PS4Controller controller = new PS4Controller(1);  
   Chassis chassis = new Chassis();
   pathPoint[] points = {
-    new pathPoint(0, 0, Rotation2d.fromDegrees(-90), 0.5, true),
+    new pathPoint(0, 0, Rotation2d.fromDegrees(-90), 0.5, false),
     
     new pathPoint(-2, -2, Rotation2d.fromDegrees(-90), 0.7, true),
-    new pathPoint(0, -4, Rotation2d.fromDegrees(90), 0.5, false)
+    new pathPoint(0, -3, Rotation2d.fromDegrees(90), 0.5, true),
+    new pathPoint(-2, -4, Rotation2d.fromDegrees(90), 0.1, false)
    };
 
   pathPoint[] points1 = {
@@ -68,7 +69,7 @@ public class RobotContainer implements Sendable{
     }
    
   public Command getAutonomousCommand() {
-    return new PathFollow(chassis, points, 4, 14);
+    return new PathFollow(chassis, points, 3, 6);
     
   }
 }

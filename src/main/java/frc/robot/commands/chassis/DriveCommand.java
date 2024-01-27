@@ -23,7 +23,7 @@ public class DriveCommand extends Command {
 
     addRequirements(chassis);
 
-    if(controller.getCircleButton()) new InstantCommand(() -> precisionDrive = !precisionDrive);
+    commandXboxController.b().onTrue(new InstantCommand(() -> precisionDrive = !precisionDrive));
   }
 
   @Override

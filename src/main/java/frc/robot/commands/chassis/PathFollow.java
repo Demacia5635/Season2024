@@ -176,7 +176,7 @@ public class PathFollow extends CommandBase {
 
     driveVelocity = driveTrapezoid.calculate(totalLeft - segments[segmentIndex].distancePassed(chassisPose.getTranslation()),
      currentVelocity.getNorm(), 0);
-  
+    System.out.println("APRILTAG MODE: " + segments[segmentIndex].isAprilTagMode());
     if(segments[segmentIndex].isAprilTagMode())
     {
       velVector = new Translation2d(velVector.getX() / 10, velVector.getY() / 10);
@@ -209,7 +209,7 @@ public class PathFollow extends CommandBase {
 
   @Override
   public boolean isFinished() {
-    return totalLeft <= 0.01 && Math.abs(chassis.getAngle().getDegrees() - wantedAngle.getDegrees()) <= 3;
+    return totalLeft <= 0.01 && Math.abs(chassis.getAngle().getDegrees() - wantedAngle.getDegrees()) <= 0.5;
   }
 
 
