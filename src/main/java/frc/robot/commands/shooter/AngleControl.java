@@ -8,13 +8,13 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.shooter.Shooter;
 
-public class NeonControl extends Command {
+public class AngleControl extends Command {
 
     Shooter shooter;
     CommandXboxController controller;
 
     /** Creates a new NeonControl. */
-    public NeonControl(Shooter shooter, CommandXboxController controller) {
+    public AngleControl(Shooter shooter, CommandXboxController controller) {
         // Use addRequirements() here to declare subsystem dependencies.
         this.shooter = shooter;
         this.controller = controller;
@@ -28,13 +28,13 @@ public class NeonControl extends Command {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        shooter.neonSetPow(controller.getLeftY());
+        shooter.anlgeSetPow(controller.getLeftY()*0.5);
     }
 
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
-        shooter.neonStop();
+        shooter.anlgeStop();
     }
 
     // Returns true when the command should end.
