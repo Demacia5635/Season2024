@@ -21,7 +21,8 @@ public class SetModuleAngle extends Command {
     ShuffleboardTab tab;
     SwerveModule[] modules;
 
-    public SetModuleAngle(Chassis chassis) {
+    public 
+    SetModuleAngle(Chassis chassis) {
         this.chassis = chassis;
         modules = chassis.getModules();
         addRequirements(chassis);

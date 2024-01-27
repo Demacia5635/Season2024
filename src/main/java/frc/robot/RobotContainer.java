@@ -16,6 +16,9 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.PathFollow.Util.pathPoint;
 import frc.robot.commands.chassis.DriveCommand;
 import frc.robot.commands.chassis.PathFollow;
+import frc.robot.commands.chassis.RotateToAngleShooter;
+import frc.robot.commands.chassis.SetModuleAngle;
+import frc.robot.commands.chassis.TestSteerVandA;
 import frc.robot.subsystems.chassis.Chassis;
 
 
@@ -40,11 +43,11 @@ public class RobotContainer implements Sendable{
   Command test = new RunCommand(() -> {chassis.setVelocities(new ChassisSpeeds(-0.5, 0, 0));}, chassis).andThen(new WaitCommand(2),
   new RunCommand(() -> {chassis.setVelocities(new ChassisSpeeds(-0.4  , 0, 0));}, chassis).andThen(new WaitCommand(2)),
   new RunCommand(() -> {chassis.setVelocities(new ChassisSpeeds(0, 0, 0));}, chassis).andThen(new WaitCommand(2)));
-  double x = 0.2;
+  double x = 5;
 
 
-  
-  public RobotContainer() { 
+
+  public RobotContainer() {
     chassis.setDefaultCommand(drive);
 
     SmartDashboard.putData("RC", this);
@@ -56,7 +59,8 @@ public class RobotContainer implements Sendable{
   @Override
   public void initSendable(SendableBuilder builder) {
 
-    builder.addDoubleProperty("spinspeed", () -> Math.toDegrees(chassis.getChassisSpeeds().omegaRadiansPerSecond), null);
+    builder.addDoubleProperty("chassis angle",() -> chassis.getAngle().getDegrees(), null);
+
 
   }
  private void configureBindings() {
