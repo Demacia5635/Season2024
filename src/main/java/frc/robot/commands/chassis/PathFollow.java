@@ -4,12 +4,18 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.units.Velocity;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import static frc.robot.subsystems.chassis.ChassisConstants.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import frc.robot.PathFollow.Util.Leg;
 import frc.robot.PathFollow.Util.RoundedPoint;
 import frc.robot.PathFollow.Util.Segment;
@@ -18,6 +24,7 @@ import frc.robot.subsystems.chassis.*;
 import frc.robot.utils.TrapezoidNoam;
 
 public class PathFollow extends CommandBase {
+  
   Chassis chassis;
   RoundedPoint[] corners;
   Pose2d closestAprilTag = new Pose2d();
@@ -106,6 +113,7 @@ public class PathFollow extends CommandBase {
     }
     pathLength = segmentSum;
     totalLeft = pathLength;
+    
   }
 
 

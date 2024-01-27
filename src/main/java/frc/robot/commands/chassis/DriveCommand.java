@@ -12,11 +12,13 @@ import static frc.robot.subsystems.chassis.ChassisConstants.*;
 public class DriveCommand extends Command {
   private final Chassis chassis;
   private final PS4Controller controller;
+  private final CommandXboxController commandXboxController;
 
   private boolean precisionDrive = false;
 
-  public DriveCommand(Chassis chassis, PS4Controller controller) {
+  public DriveCommand(Chassis chassis, PS4Controller controller, CommandXboxController commandXboxController) {
     this.chassis = chassis;
+    this.commandXboxController = commandXboxController;
     this.controller = controller;
 
     addRequirements(chassis);
@@ -30,9 +32,9 @@ public class DriveCommand extends Command {
 
   @Override
   public void execute() {
-    double joyX = deadband(controller.getLeftY(), 0.1);
-    double joyY = deadband(controller.getLeftX(), 0.1);
-    double rot = -(deadband(controller.getR2Axis(), 0.1) - deadband(controller.getL2Axis(), 0.1));
+    double joyX = deadband(commandXboxController.getLeftY(), 0.1);
+    double joyY = deadband(commandXboxController.getLeftX(), 0.1);
+    double rot = -(deadband(commandXboxController.getRightTriggerAxis(), 0.1) - deadband(commandXboxController.getLeftTriggerAxis(), 0.1));
     
     double velX = Math.pow(joyX, 3)* MAX_DRIVE_VELOCITY;
     double velY = Math.pow(joyY, 3) * MAX_DRIVE_VELOCITY;
