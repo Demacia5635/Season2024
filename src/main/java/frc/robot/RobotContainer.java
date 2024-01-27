@@ -4,7 +4,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.shooter.GoToAngle;
-import frc.robot.commands.shooter.NeonControl;
+import frc.robot.commands.shooter.AngleControl;
 import frc.robot.commands.shooter.TurnAngle;
 import frc.robot.subsystems.shooter.Shooter;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -33,7 +33,7 @@ public class RobotContainer  {
          */
         private void configureBindings() {
             controller.a().onTrue(new TurnAngle(shooter, 5, 0.2));
-            controller.b().onTrue(new NeonControl(shooter, controller));
+            controller.b().onTrue(new AngleControl(shooter, controller));
             controller.x().onTrue(new GoToAngle(shooter, 45, 0.5, 0.1));
             
             controller.rightBumper().onTrue(new InstantCommand(()-> shooter.stopAll(),shooter).ignoringDisable(true));
