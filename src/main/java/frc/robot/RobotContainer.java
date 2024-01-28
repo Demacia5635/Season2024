@@ -16,18 +16,22 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.PathFollow.Util.pathPoint;
 import frc.robot.commands.chassis.DriveCommand;
 import frc.robot.commands.chassis.PathFollow;
+import frc.robot.commands.chassis.RotateToAngleShooter;
+import frc.robot.commands.chassis.SetModuleAngle;
+import frc.robot.commands.chassis.TestSteerVandA;
 import frc.robot.subsystems.chassis.Chassis;
 
 
 public class RobotContainer implements Sendable{
-//  CommandXboxController commandController = new CommandXboxController(0);
-  PS4Controller controller = new PS4Controller(0);  
+  CommandXboxController commandController = new CommandXboxController(0);
+  PS4Controller controller = new PS4Controller(1);  
   Chassis chassis = new Chassis();
   pathPoint[] points = {
-    new pathPoint(0, 0, Rotation2d.fromDegrees(-90), 0.5, true),
+    new pathPoint(0, 0, Rotation2d.fromDegrees(-90), 0.5, false),
     
     new pathPoint(-2, -2, Rotation2d.fromDegrees(-90), 0.7, true),
-    new pathPoint(0, -4, Rotation2d.fromDegrees(90), 0.5, false)
+    new pathPoint(0, -3, Rotation2d.fromDegrees(90), 0.5, true),
+    new pathPoint(-2, -4, Rotation2d.fromDegrees(90), 0.1, false)
    };
 
   pathPoint[] points1 = {
@@ -36,15 +40,15 @@ public class RobotContainer implements Sendable{
     new pathPoint(1, 0, Rotation2d.fromDegrees(0), 0, true),
   };
 
-  DriveCommand drive = new DriveCommand(chassis, controller);
+  DriveCommand drive = new DriveCommand(chassis, controller, commandController);
   Command test = new RunCommand(() -> {chassis.setVelocities(new ChassisSpeeds(-0.5, 0, 0));}, chassis).andThen(new WaitCommand(2),
   new RunCommand(() -> {chassis.setVelocities(new ChassisSpeeds(-0.4  , 0, 0));}, chassis).andThen(new WaitCommand(2)),
   new RunCommand(() -> {chassis.setVelocities(new ChassisSpeeds(0, 0, 0));}, chassis).andThen(new WaitCommand(2)));
-  double x = 0.2;
+  double x = 5;
 
 
-  
-  public RobotContainer() { 
+
+  public RobotContainer() {
     chassis.setDefaultCommand(drive);
 
     SmartDashboard.putData("RC", this);
@@ -56,7 +60,8 @@ public class RobotContainer implements Sendable{
   @Override
   public void initSendable(SendableBuilder builder) {
 
-    builder.addDoubleProperty("spinspeed", () -> Math.toDegrees(chassis.getChassisSpeeds().omegaRadiansPerSecond), null);
+    builder.addDoubleProperty("chassis angle",() -> chassis.getAngle().getDegrees(), null);
+
 
   }
  private void configureBindings() {
@@ -64,7 +69,7 @@ public class RobotContainer implements Sendable{
     }
    
   public Command getAutonomousCommand() {
-    return new PathFollow(chassis, points1, 4, 14);
+    return new PathFollow(chassis, points, 3, 6);
     
   }
 }

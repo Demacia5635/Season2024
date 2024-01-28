@@ -24,6 +24,7 @@ import frc.robot.utils.Trapezoid;
 import frc.robot.utils.Utils;
 import static frc.robot.subsystems.chassis.ChassisConstants.*;
 
+import static frc.robot.subsystems.chassis.ChassisConstants.*;
 
 /**
  * Swerve Module
@@ -37,7 +38,8 @@ public class SwerveModule implements Sendable {
     private double pulsePerDegree;
     private double pulsePerMeter;
 
-    private FeedForward_SVA moveFF;
+    private FeedForward_SVA MoveFFLess;
+    private FeedForward_SVA moveFFMore;
     private FeedForward_SVA steerFF;
     private Trapezoid steerTrapezoid;
 
@@ -75,7 +77,8 @@ public class SwerveModule implements Sendable {
         // set the controls
         // moveFF = new FeedForward_SVA_V2_VSQRT(constants.moveFF.KS, constants.moveFF.KV, constants.moveFF.KA,
         //     MOVE_KV2, MOVE_KVSQRT);
-        moveFF = new FeedForward_SVA(constants.moveFF.KS, constants.moveFF.KV, constants.moveFF.KA);
+        MoveFFLess = new FeedForward_SVA(constants.moveFFLess.KS, constants.moveFFLess.KV, constants.moveFFLess.KA);
+        moveFFMore = new FeedForward_SVA(constants.moveFFMore.KS, constants.moveFFMore.KV, constants.moveFFMore.KA);
         steerFF = new FeedForward_SVA(constants.steerFF.KS, constants.steerFF.KV, constants.steerFF.KA);
         setMovePID(0,constants.movePID.KP, constants.movePID.KI, constants.movePID.KD);
         setSteerPID(SteerVelocitySlot,constants.steerPID.KP, constants.steerPID.KI, constants.steerPID.KD);
@@ -237,8 +240,10 @@ public class SwerveModule implements Sendable {
             currentVelocity = lastMoveV;
         }
         */
+        double ff;
         double tgtV = MathUtil.clamp(v, currentVelocity-maxVelocityChange, currentVelocity+maxVelocityChange);
-        double ff = moveFF.calculate(tgtV, currentVelocity);
+        if(Math.abs(tgtV) > 2.5) ff = moveFFMore.calculate(tgtV, currentVelocity);
+        else ff = MoveFFLess.calculate(tgtV, currentVelocity);
         debug(" tgtV=" + tgtV + " cur V=" + currentVelocity + " ff=" + ff);
         moveMotor.set(ControlMode.Velocity, talonVelocity(tgtV), DemandType.ArbitraryFeedForward, ff);
         lastMoveA = tgtV - currentVelocity;

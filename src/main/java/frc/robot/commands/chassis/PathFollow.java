@@ -4,7 +4,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.proto.Trajectory;
+import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.units.Velocity;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -16,6 +17,10 @@ import edu.wpi.first.math.trajectory.Trajectory.State;
 
 import java.util.ArrayList;
 
+
+import java.util.ArrayList;
+import java.util.List;
+
 import frc.robot.PathFollow.Util.Leg;
 import frc.robot.PathFollow.Util.RoundedPoint;
 import frc.robot.PathFollow.Util.Segment;
@@ -24,6 +29,7 @@ import frc.robot.subsystems.chassis.*;
 import frc.robot.utils.TrapezoidNoam;
 
 public class PathFollow extends CommandBase {
+  
   Chassis chassis;
   RoundedPoint[] corners;
   Pose2d closestAprilTag = new Pose2d();
@@ -113,14 +119,6 @@ public class PathFollow extends CommandBase {
     pathLength = segmentSum;
     totalLeft = pathLength;
 
-    /*ArrayList <State> list = new ArrayList<>();
-    for(int i = 0; i < segments.length; i ++){
-      Translation2d[] pointsForView = segments[i].getPoints();
-      for(int j = 0; j < pointsForView.length; j ++){
-        State state = new State();
-        state.poseMeters = new Pose2d(pointsForView[j].getX(), pointsForView[j].getY(), points[j].getRotation());
-      }
-    }*/
 
     ArrayList <Translation2d> list = new ArrayList<>();
     for(int i = 0; i < segments.length; i ++){
@@ -193,7 +191,7 @@ public class PathFollow extends CommandBase {
 
     driveVelocity = driveTrapezoid.calculate(totalLeft - segments[segmentIndex].distancePassed(chassisPose.getTranslation()),
      currentVelocity.getNorm(), 0);
-  
+    System.out.println("APRILTAG MODE: " + segments[segmentIndex].isAprilTagMode());
     if(segments[segmentIndex].isAprilTagMode())
     {
       velVector = new Translation2d(velVector.getX() / 10, velVector.getY() / 10);
@@ -224,7 +222,7 @@ public class PathFollow extends CommandBase {
 
   @Override
   public boolean isFinished() {
-    return totalLeft <= 0.01 && Math.abs(chassis.getAngle().getDegrees() - wantedAngle.getDegrees()) <= 3;
+    return totalLeft <= 0.01 && Math.abs(chassis.getAngle().getDegrees() - wantedAngle.getDegrees()) <= 0.5;
   }
 
 
