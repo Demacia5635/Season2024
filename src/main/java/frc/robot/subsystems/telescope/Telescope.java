@@ -1,34 +1,57 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot.subsystems.telescope;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
-import static frc.robot.Constants.ClimbConstants.*;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+import static frc.robot.Constants.ClimbConstants.*;
 
 public class Telescope extends SubsystemBase {
   private final TalonFX rightMotor;
   private final TalonFX leftMotor;
-  /** Creates a new ClimbSubsystem. */
+  private final TalonSRX rightWormMotor;
+  private final TalonSRX leftWormMotor;
+  private final DigitalInput rightLimitSwitch;
+  private final DigitalInput leftLimitSwitch;
+
   public Telescope() {
     rightMotor = new TalonFX(RIGHT_CLIMB_MOTOR);
-    leftMotor = new TalonFX(LEFT_CLIMB_MOTOR); 
+    leftMotor = new TalonFX(LEFT_CLIMB_MOTOR);
+    rightWormMotor = new TalonSRX(RIGHT_WORM_MOTOR);
+    leftWormMotor = new TalonSRX(LEFT_WORM_MOTOR);
+    rightLimitSwitch = new DigitalInput(RIGHT_LIMIT_SWITCH);
+    leftLimitSwitch = new DigitalInput(LEFT_LIMIT_SWITCH);
   }
-  public void setRightPower(double p){
-    // Control motor speed until it reaches normal voltage
-    rightMotor.set(ControlMode.PercentOutput, p);
-    
+
+  public void setRightPower(double p) {
+    rightMotor.set(ControlMode.PercentOutput, p); 
   }
-  public void setLeftPower(double p){
-    // Control motor speed until it reaches normal voltage
+
+  public void setLeftPower(double p) {
     leftMotor.set(ControlMode.PercentOutput, p); 
   }
 
-  public void stop() {
+  public boolean getRightLimSwitch() {
+    return rightLimitSwitch.get();
+  }
+
+  public boolean getLeftLimSwitch() {
+    return leftLimitSwitch.get();
+  }
+
+  public void stopRight() {
     setRightPower(0);
+  }
+
+  public void stopLeft() {
     setLeftPower(0);
+  }
+
+  public void stop() {
+    stopRight();
+    stopLeft();
   }
 }
