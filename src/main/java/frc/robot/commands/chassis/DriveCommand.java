@@ -22,8 +22,8 @@ public class DriveCommand extends Command {
     this.chassis = chassis;
     this.commandXboxController = commandXboxController;
     this.controller = controller;
-    if(isRed) direction = -1;
-    else direction = 1;
+    if(isRed) direction = 1;
+    else direction = -1;
 
     addRequirements(chassis);
     commandXboxController.y().onTrue(new InstantCommand(() -> direction *= -1));

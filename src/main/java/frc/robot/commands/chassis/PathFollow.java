@@ -5,6 +5,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.units.Velocity;
 import edu.wpi.first.util.sendable.SendableBuilder;
@@ -69,7 +70,7 @@ public class PathFollow extends CommandBase {
     SmartDashboard.putData("Traj", trajField);
     this.points = points;
 
-    if(isRed){
+    if(!isRed){
       for(int i = 0; i < points.length; i++){
         points[i] = new pathPoint(points[i].getX(), fieldLength - points[i].getY(), points[i].getRotation(),
          points[i].getRadius(), points[i].isAprilTag());
@@ -137,7 +138,9 @@ public class PathFollow extends CommandBase {
         list.add(pointsForView[j]);
       }
     }
-    edu.wpi.first.math.trajectory.Trajectory traj = TrajectoryGenerator.generateTrajectory(points[0], list, points[points.length - 1], null);
+    TrajectoryConfig config = new TrajectoryConfig(maxVel, maxAcc);
+    edu.wpi.first.math.trajectory.Trajectory traj = TrajectoryGenerator.generateTrajectory(points[0],
+     list, points[points.length - 1], config);
     trajField.getObject("Trajectory").setTrajectory(traj);
   }
 
