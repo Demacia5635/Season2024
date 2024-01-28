@@ -26,7 +26,7 @@ public class DriveCommand extends Command {
     else direction = 1;
 
     addRequirements(chassis);
-
+    commandXboxController.y().onTrue(new InstantCommand(() -> direction *= -1));
     commandXboxController.b().onTrue(new InstantCommand(() -> precisionDrive = !precisionDrive));
   }
 
