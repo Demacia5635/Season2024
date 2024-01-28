@@ -26,9 +26,11 @@ public class RoundedPoint{
 
 
         this.cornerAngle = vectorAtoB.times(-1).getAngle().minus(vectorBtoC.getAngle());
+        //case for angle of the corner is close to 0 so only leg
         if(Math.abs(cornerAngle.getDegrees()) >= 175 && Math.abs(cornerAngle.getDegrees()) <= 180)
             this.radius = 0;
         else{
+            //case for radius bigger then max possible radius
             if(radius > getMaxRadius()){
                 radius = getMaxRadius();
                 System.out.println("radius is bigger then possible, new radius is: " + radius);

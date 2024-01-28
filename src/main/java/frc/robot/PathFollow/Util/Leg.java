@@ -12,16 +12,18 @@ import edu.wpi.first.math.geometry.Translation2d;
 
 
 public class Leg extends Segment{
-
     Translation2d totalVector;
-
     final Translation2d velDirection;
-
+    /**
+     * creates a leg type segment
+     * @param p1 the first point of the leg
+     * @param p2 the last point of the leg
+     * @param isAprilTagMode search for closet april tag mode
+     */
     public Leg(Translation2d p1, Translation2d p2, boolean isAprilTagMode)
     {
         super(p1,p2, isAprilTagMode);
         totalVector = p2.minus(p1);
-
         velDirection = totalVector.div(totalVector.getNorm());
     }
 

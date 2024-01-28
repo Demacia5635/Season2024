@@ -4,12 +4,18 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.proto.Trajectory;
 import edu.wpi.first.units.Velocity;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import static frc.robot.subsystems.chassis.ChassisConstants.*;
+import edu.wpi.first.math.trajectory.TrajectoryGenerator;
+import edu.wpi.first.math.trajectory.Trajectory.State;
+
+import java.util.ArrayList;
+
 import frc.robot.PathFollow.Util.Leg;
 import frc.robot.PathFollow.Util.RoundedPoint;
 import frc.robot.PathFollow.Util.Segment;
@@ -21,8 +27,7 @@ public class PathFollow extends CommandBase {
   Chassis chassis;
   RoundedPoint[] corners;
   Pose2d closestAprilTag = new Pose2d();
-  
-  
+
   Pose2d chassisPose = new Pose2d();
   double distanceOffset = 0.01;
   final double pathLength;
@@ -33,7 +38,7 @@ public class PathFollow extends CommandBase {
   Segment[] segments;
   Translation2d vecVel;
   Rotation2d wantedAngle;
-  Field2d trajField;
+
 
   TrapezoidNoam driveTrapezoid;
   TrapezoidNoam rotationTrapezoid;
@@ -53,7 +58,8 @@ public class PathFollow extends CommandBase {
    * 
    */
   public PathFollow(Chassis chassis,pathPoint[] points, double maxVel, double maxAcc) {
-    
+    Field2d trajField = new Field2d();
+    SmartDashboard.putData("Traj", trajField);
     this.points = points;
     //gets the wanted angle for the robot to finish the path in
    
@@ -106,6 +112,25 @@ public class PathFollow extends CommandBase {
     }
     pathLength = segmentSum;
     totalLeft = pathLength;
+
+    /*ArrayList <State> list = new ArrayList<>();
+    for(int i = 0; i < segments.length; i ++){
+      Translation2d[] pointsForView = segments[i].getPoints();
+      for(int j = 0; j < pointsForView.length; j ++){
+        State state = new State();
+        state.poseMeters = new Pose2d(pointsForView[j].getX(), pointsForView[j].getY(), points[j].getRotation());
+      }
+    }*/
+
+    ArrayList <Translation2d> list = new ArrayList<>();
+    for(int i = 0; i < segments.length; i ++){
+      Translation2d[] pointsForView = segments[i].getPoints();
+      for(int j = 0; j < pointsForView.length; j ++){
+        list.add(pointsForView[j]);
+      }
+    }
+    edu.wpi.first.math.trajectory.Trajectory traj = TrajectoryGenerator.generateTrajectory(points[0], list, points[points.length - 1], null);
+    trajField.getObject("Trajectory").setTrajectory(traj);
   }
 
 
@@ -184,8 +209,6 @@ public class PathFollow extends CommandBase {
       chassis.getAngle().getRadians(), wantedAngle.getRadians()) * MAX_OMEGA_VELOCITY;
       
 
-
-    System.out.println("ROTATION VELOCITY: " + Math.toDegrees( rotationVelocity));
     if(totalLeft <= 0.01) velVector = new Translation2d(0, 0);
     ChassisSpeeds speed = new ChassisSpeeds(velVector.getX(), velVector.getY(), rotationVelocity);
     chassis.setVelocities(speed);

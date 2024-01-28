@@ -3,6 +3,8 @@ package frc.robot.PathFollow.Util;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import frc.robot.subsystems.chassis.ChassisConstants;
+
 import static frc.robot.subsystems.chassis.ChassisConstants.*;
 public class CurrentPosOnField {
     
@@ -11,7 +13,7 @@ public class CurrentPosOnField {
         /**
          * get Zone based on
          * @param robotPos
-         * @return
+         * @return The zone the robot is in
          */
         public static Zone getZone(Translation2d robotPos){
             if(rectAMP.isInside(robotPos)) return AMP;
