@@ -16,8 +16,8 @@ public class ClimbManualCommand  extends Command{
 
     @Override
     public void execute() {
-        double powerRight = deadband(controller.getRightY(), 0.1);
-        double powerLeft = deadband(controller.getLeftY(), 0.1);
+        double powerLeft = deadband(controller.getRightY(), 0.1);
+        double powerRight = deadband(controller.getLeftY(), 0.1);
 
         telescope.setRightPower(powerRight);
         telescope.setLeftPower(powerLeft);
