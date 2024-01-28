@@ -36,10 +36,11 @@ public class RobotContainer implements Sendable{
   Chassis chassis = new Chassis();
   pathPoint[] points = {
     new pathPoint(0, 0, Rotation2d.fromDegrees(-90), 0.5, false),
-      new pathPoint(1, 1, Rotation2d.fromDegrees(-90), 0.5, false),
+    new pathPoint(1, 1, Rotation2d.fromDegrees(-90), .65, false),
+    new pathPoint(2, 0, Rotation2d.fromDegrees(90), 0.5, false),
 
-        new pathPoint(1, 14.5, Rotation2d.fromDegrees(-90), 0.5, false),
-
+    new pathPoint(3, 1, Rotation2d.fromDegrees(90), 0.5, false),
+    new pathPoint(4, 0, Rotation2d.fromDegrees(90), 0.5, false)
 
    };
 

@@ -49,6 +49,7 @@ public class PathFollow extends CommandBase {
 
   TrapezoidNoam driveTrapezoid;
   TrapezoidNoam rotationTrapezoid;
+  Field2d trajField = new Field2d();
   
   double driveVelocity = 0;
   double rotationVelocity = 0;
@@ -66,11 +67,10 @@ public class PathFollow extends CommandBase {
    * 
    */
   public PathFollow(Chassis chassis,pathPoint[] points, double maxVel, double maxAcc, boolean isRed) {
-    Field2d trajField = new Field2d();
     SmartDashboard.putData("Traj", trajField);
     this.points = points;
 
-    if(!isRed){
+    if(isRed){
       for(int i = 0; i < points.length; i++){
         points[i] = new pathPoint(points[i].getX(), fieldLength - points[i].getY(), points[i].getRotation(),
          points[i].getRadius(), points[i].isAprilTag());
@@ -101,7 +101,7 @@ public class PathFollow extends CommandBase {
     if(points.length < 3) {
       
       segments[0] = new Leg(points[0].getTranslation(), points[1].getTranslation(), points[1].isAprilTag());
-      System.out.println("------LESS THAN 3------");
+      System.out.println("------LESS THAN 3------");  
     }
     //case for more then 1 segment
     else 
@@ -131,17 +131,22 @@ public class PathFollow extends CommandBase {
     totalLeft = pathLength;
 
 
-    ArrayList <Translation2d> list = new ArrayList<>();
+    List <State> list = new ArrayList<>();
     for(int i = 0; i < segments.length; i ++){
       Translation2d[] pointsForView = segments[i].getPoints();
       for(int j = 0; j < pointsForView.length; j ++){
-        list.add(pointsForView[j]);
+        System.out.println("VALUE: " + pointsForView[j]);
+        State temp = new State();
+        temp.poseMeters = new Pose2d(pointsForView[j].getX(), pointsForView[j].getY(), pointsForView[j].getAngle()); 
+        list.add(temp);
       }
     }
-    TrajectoryConfig config = new TrajectoryConfig(maxVel, maxAcc);
-    edu.wpi.first.math.trajectory.Trajectory traj = TrajectoryGenerator.generateTrajectory(points[0],
-     list, points[points.length - 1], config);
-    trajField.getObject("Trajectory").setTrajectory(traj);
+    System.out.println("LIST: " + list);
+    /*Trajectory traj = TrajectoryGenerator.generateTrajectory(points[0],
+     list, points[points.length - 1], config);*/
+
+    Trajectory traj = new Trajectory(list);
+    trajField.getObject("TrajTEST").setTrajectory(traj);
   }
 
 
@@ -186,6 +191,8 @@ public class PathFollow extends CommandBase {
 
   @Override
   public void execute() {
+    trajField.setRobotPose(chassis.getPose());
+    
 
     
     chassisPose = chassis.getPose();
@@ -223,6 +230,7 @@ public class PathFollow extends CommandBase {
     if(totalLeft <= 0.01) velVector = new Translation2d(0, 0);
     ChassisSpeeds speed = new ChassisSpeeds(velVector.getX(), velVector.getY(), rotationVelocity);
     chassis.setVelocities(speed);
+    
   }
 
 
