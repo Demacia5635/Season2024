@@ -14,12 +14,16 @@ public class DriveCommand extends Command {
   private final PS4Controller controller;
   private final CommandXboxController commandXboxController;
 
+  private double direction;
+
   private boolean precisionDrive = false;
 
-  public DriveCommand(Chassis chassis, PS4Controller controller, CommandXboxController commandXboxController) {
+  public DriveCommand(Chassis chassis, PS4Controller controller, CommandXboxController commandXboxController, boolean isRed) {
     this.chassis = chassis;
     this.commandXboxController = commandXboxController;
     this.controller = controller;
+    if(isRed) direction = -1;
+    else direction = 1;
 
     addRequirements(chassis);
 
@@ -32,8 +36,8 @@ public class DriveCommand extends Command {
 
   @Override
   public void execute() {
-    double joyX = deadband(commandXboxController.getLeftY(), 0.1);
-    double joyY = deadband(commandXboxController.getLeftX(), 0.1);
+    double joyX = deadband(commandXboxController.getLeftY(), 0.1) * direction;
+    double joyY = deadband(commandXboxController.getLeftX(), 0.1) * direction;
     double rot = -(deadband(commandXboxController.getRightTriggerAxis(), 0.1) - deadband(commandXboxController.getLeftTriggerAxis(), 0.1));
     
     double velX = Math.pow(joyX, 3)* MAX_DRIVE_VELOCITY;

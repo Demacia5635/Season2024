@@ -11,6 +11,6 @@ public class leftPick3Close1Mid extends SequentialCommandGroup {
   public leftPick3Close1Mid(Chassis chassis, double maxVel, double maxAccel) {
     this.chassis = chassis;
     pathPoint[] points = (pathPoint[]) Chassis.pointsForAuto.toArray();
-    addCommands(new leftPick3Close1MidGEN(chassis, false), new PathFollow(chassis, points, maxVel, maxAccel));
+    addCommands(new leftPick3Close1MidGEN(chassis, false), new PathFollow(chassis, points, maxVel, maxAccel, false));
   }
 }

@@ -28,10 +28,11 @@ public class RobotContainer implements Sendable{
   Chassis chassis = new Chassis();
   pathPoint[] points = {
     new pathPoint(0, 0, Rotation2d.fromDegrees(-90), 0.5, false),
-    
-    new pathPoint(-2, -2, Rotation2d.fromDegrees(-90), 0.7, true),
-    new pathPoint(0, -3, Rotation2d.fromDegrees(90), 0.5, true),
-    new pathPoint(-2, -4, Rotation2d.fromDegrees(90), 0.1, false)
+      new pathPoint(1, 1, Rotation2d.fromDegrees(-90), 0.5, false),
+
+        new pathPoint(1, 14.5, Rotation2d.fromDegrees(-90), 0.5, false),
+
+
    };
 
   pathPoint[] points1 = {
@@ -69,7 +70,7 @@ public class RobotContainer implements Sendable{
     }
    
   public Command getAutonomousCommand() {
-    return new PathFollow(chassis, points, 3, 6);
+    return new PathFollow(chassis, points, 3, 6, true);
     
   }
 }

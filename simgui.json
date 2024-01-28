@@ -13,6 +13,8 @@
       "/SmartDashboard/FrontRight Steer Sysid": "Command",
       "/SmartDashboard/Set Modules Angle": "Command",
       "/SmartDashboard/Test Steer Velocity": "Command",
+      "/SmartDashboard/Traj": "Field2d",
+      "/SmartDashboard/go to 0": "Command",
       "/SmartDashboard/go to angle position": "Command",
       "/SmartDashboard/reset pose": "Command",
       "/SmartDashboard/reset wheels": "Command",

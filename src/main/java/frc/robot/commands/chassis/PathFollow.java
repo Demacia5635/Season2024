@@ -51,6 +51,7 @@ public class PathFollow extends CommandBase {
   
   double driveVelocity = 0;
   double rotationVelocity = 0;
+  double fieldLength = 16.54; //in meters
 
   double distancePassed = 0;
   pathPoint[] points;
@@ -58,15 +59,24 @@ public class PathFollow extends CommandBase {
 
   /** Creates a new path follower using the given points.
    * @param chassis 
-   * @param points 
+   * @param points from blue alliance
    * @param maxVel the max velocity in m/s
    * @param maxAccel the max accel in m/s2 (squared)
    * 
    */
-  public PathFollow(Chassis chassis,pathPoint[] points, double maxVel, double maxAcc) {
+  public PathFollow(Chassis chassis,pathPoint[] points, double maxVel, double maxAcc, boolean isRed) {
     Field2d trajField = new Field2d();
     SmartDashboard.putData("Traj", trajField);
     this.points = points;
+
+    if(isRed){
+      for(int i = 0; i < points.length; i++){
+        points[i] = new pathPoint(points[i].getX(), fieldLength - points[i].getY(), points[i].getRotation(),
+         points[i].getRadius(), points[i].isAprilTag());
+         System.out.println("New x: " + points[i].getX());
+         System.out.println("New y: " + points[i].getY());
+      }
+    }
     //gets the wanted angle for the robot to finish the path in
    
     //creates new coreners array of the "arc points" in the path
