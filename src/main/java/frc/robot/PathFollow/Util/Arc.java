@@ -36,6 +36,21 @@ public class Arc extends Segment{
     }
 
     @Override
+    public Translation2d[] getPoints()
+    {
+      Translation2d arrow = p1.minus(p2);
+      Translation2d[] points = new Translation2d[16];
+      double diffAngle = angle.getRadians();
+      int place = 0;
+        for (double i = 0; i < diffAngle; i = i + (diffAngle / 16)) {
+            points[place] = arrow.rotateBy(new Rotation2d(diffAngle));
+            place++;
+        }
+
+        return points;
+    }
+
+    @Override
     public Translation2d calc(Translation2d pos,double velocity)
     {
 

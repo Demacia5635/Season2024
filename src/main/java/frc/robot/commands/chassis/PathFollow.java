@@ -194,7 +194,7 @@ public class PathFollow extends CommandBase {
     System.out.println("APRILTAG MODE: " + segments[segmentIndex].isAprilTagMode());
     if(segments[segmentIndex].isAprilTagMode())
     {
-      velVector = new Translation2d(velVector.getX() / 10, velVector.getY() / 10);
+      // velVector = new Translation2d(velVector.getX() / 10, velVector.getY() / 10);
       wantedAngle = Rotation2d.fromDegrees(180   /*getClosestAprilTag().getRotation().getDegrees()*/);
 
     }
