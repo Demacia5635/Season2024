@@ -26,11 +26,11 @@ public class GoToNoteCommand extends Command {
 
  @Override
  public void execute() {
-    x = SmartDashboard.getNumberArray("llpython", new double[8]);
+    x = SmartDashboard.getNumberArray("limelight/llpython", new double[8]);
     angle = x[1];
     System.out.println(angle);
     ChassisSpeeds speeds = new ChassisSpeeds(0, 0, pid.calculate(chassis.getAngle().getDegrees() - startAngle, angle));
-    chassis.setVelocities(speeds);
+    //chassis.setVelocities(speeds);
  }
 
  @Override
