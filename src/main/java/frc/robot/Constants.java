@@ -124,12 +124,9 @@ public final class Constants {
         public static final int NEON_ID = 13;
 
         public static final int GEAR_RATIO = 4;
-
-        /* all of the var here are placeholders for now */
-        public static final double MIN_ANGLE = 0;
-        public static final double MAX_ANGLE = 90;
-        public static final double MIN_ANGLE_PULES = 0;
-        public static final double MAX_ANGLE_PULES = 90;
-        public static final double PULES_PER_ANGLE = (MIN_ANGLE_PULES - MAX_ANGLE_PULES) / (MIN_ANGLE - MAX_ANGLE);
+        
+        public static final double KA = 128;
+        public static final double KB = 136;
+        public static final double PULES_PER_MM = PULES_PER_REV / 8 * GEAR_RATIO;
     }
 }
