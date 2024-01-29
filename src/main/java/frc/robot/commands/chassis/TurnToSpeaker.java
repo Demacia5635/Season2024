@@ -41,8 +41,13 @@ public class TurnToSpeaker extends Command {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        ChassisSpeeds speeds = new ChassisSpeeds(0, 0, pid.calculate(chassis.getAngle().getDegrees(), wantedAngle) * 180);
-        chassis.setVelocities(speeds);
+        ChassisSpeeds speeds;
+        if (wantedAngle > chassis.getAngle().getDegrees()){
+            speeds = new ChassisSpeeds(0, 0, pid.calculate(chassis.getAngle().getDegrees(), wantedAngle) * 180);
+        } else {
+            speeds = new ChassisSpeeds(0, 0, -1*(pid.calculate(chassis.getAngle().getDegrees(), wantedAngle) * 180));
+        }
+            chassis.setVelocities(speeds);
     }
 
     // Called once the command ends or is interrupted.
