@@ -20,23 +20,26 @@ public class Shooter extends SubsystemBase {
 
     public TalonFX motorAngle;
 
-    // public final TalonFX motor1;
-    // public final TalonFX motor2;
+    public final TalonFX motor1;
+    public final TalonFX motor2;
 
     public double basePos = 0;
     
     /** Creates a new Shooter. */
     public Shooter() {
 
-        // motor1 = new TalonFX(MOTOR_1_ID);
-        // motor2 = new TalonFX(MOTOR_2_ID);
+        motor1 = new TalonFX(MOTOR_1_ID);
+        motor2 = new TalonFX(MOTOR_2_ID);
         
-        // motor1.config_kP(0, KP);
-        // motor1.config_kI(0, KI);
-        // motor2.config_kP(0, KP);
-        // motor2.config_kI(0, KI);
+        motor1.config_kP(0, KP);
+        motor1.config_kI(0, KI);
+        motor2.config_kP(0, KP);
+        motor2.config_kI(0, KI);
 
         motorAngle = new TalonFX(ANLGE_MOTOR_ID);
+        motorAngle.setInverted(true);
+
+        basePos = 0;
 
         SmartDashboard.putData(this);
     }
@@ -49,33 +52,29 @@ public class Shooter extends SubsystemBase {
         motorAngle.set(ControlMode.PercentOutput, 0);
     }
 
-    // public void setVel(double vel){
-    //     double pow = KS + KV * vel;
-    //     System.out.println("power = "+ pow);
-    //     motor1.set(ControlMode.PercentOutput, pow);
-    //     motor2.set(ControlMode.PercentOutput, pow);
-    // }
+    public void setVel(double vel){
+        double pow = KS + KV * vel;
+        System.out.println("power = "+ pow);
+        motor1.set(ControlMode.PercentOutput, pow);
+        motor2.set(ControlMode.PercentOutput, pow);
+    }
     
-    // public void stop(){
-    //     motor1.set(ControlMode.PercentOutput, 0);
-    //     motor2.set(ControlMode.PercentOutput, 0);
-    // }
+    public void stop(){
+        motor1.set(ControlMode.PercentOutput, 0);
+        motor2.set(ControlMode.PercentOutput, 0);
+    }
     
     public void stopAll(){
-        // stop();
+        stop();
         anlgeStop();
     }
     
-    public double getFalconAnlge(){
-        return (motorAngle.getSelectedSensorPosition()/ PULES_PER_ANGLE) - basePos;
-    }
-
     public double getAngleEncoder(){
-        return motorAngle.getSelectedSensorPosition()/ PULES_PER_REV - basePos;
+        return motorAngle.getSelectedSensorPosition()/ (PULES_PER_REV * GEAR_RATIO) - basePos;
     }
 
     public void angleResetPos(){
-        basePos = motorAngle.getSelectedSensorPosition()/PULES_PER_REV * GEAR_RATIO;
+        basePos += getAngleEncoder();
     }
 
     public void angleBrake(){ motorAngle.setNeutralMode(NeutralMode.Brake);}
@@ -83,20 +82,23 @@ public class Shooter extends SubsystemBase {
     
     public double getAngleVel(){ return motorAngle.getSelectedSensorVelocity()*10/(PULES_PER_REV/360); }
 
+    public double getDis(){
+        return motorAngle.getSelectedSensorPosition()/PULES_PER_MM;
+    }
+
     @Override
     public void initSendable(SendableBuilder builder) {
         super.initSendable(builder);
         
-        // builder.addDoubleProperty("motor 1 speed", ()-> motor1.getSelectedSensorVelocity()*10/(PULES_PER_REV/360), null);
-        // builder.addDoubleProperty("motor 2 speed", ()-> motor2.getSelectedSensorVelocity()*10/(PULES_PER_REV/360), null);
-        // builder.addDoubleProperty("current amper motor 1", ()-> motor1.getSupplyCurrent(), null);
-        // builder.addDoubleProperty("current amper motor 2", ()-> motor2.getSupplyCurrent(), null);
-        builder.addDoubleProperty("angle motor encoder", this::getFalconAnlge, null);
-        builder.addDoubleProperty("base angle", ()->basePos, null);
+        builder.addDoubleProperty("motor 1 speed", ()-> motor1.getSelectedSensorVelocity()*10/(PULES_PER_REV/360), null);
+        builder.addDoubleProperty("motor 2 speed", ()-> motor2.getSelectedSensorVelocity()*10/(PULES_PER_REV/360), null);
+        builder.addDoubleProperty("current amper motor 1", ()-> motor1.getSupplyCurrent(), null);
+        builder.addDoubleProperty("current amper motor 2", ()-> motor2.getSupplyCurrent(), null);
+        builder.addDoubleProperty("base pos", ()->basePos, null);
         builder.addDoubleProperty("falcon vel", this::getAngleVel, null);
-        builder.addDoubleProperty("falcon encoder", this::getFalconAnlge, null);
+        builder.addDoubleProperty("falcon encoder", this::getAngleEncoder, null);
     
-        SmartDashboard.putData("Reset angle motor", new InstantCommand(()-> angleResetPos()));
+        SmartDashboard.putData("Reset angle motor", new InstantCommand(()-> angleResetPos()).ignoringDisable(true));
         SmartDashboard.putData("Angle Brake", new InstantCommand(()-> angleBrake()).ignoringDisable(true));
         SmartDashboard.putData("Angle Coast", new InstantCommand(()-> angleCoast()).ignoringDisable(true));
     }
