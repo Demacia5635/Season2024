@@ -4,55 +4,42 @@
 
 package frc.robot.commands.shooter;
 
+import static frc.robot.Constants.ShooterConstants.KB;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.shooter.Shooter;
-import frc.robot.utils.TrapezoidCalc;
+import static frc.robot.Constants.ShooterConstants.*;
 
 public class GoToAngle extends Command {
-
+    
     Shooter shooter;
     double wantedAngle;
-    double maxPow;
-    double endPow;
-    TrapezoidCalc calc;
-    double acc;
-    double startAngle;
-    
-    /** Creates a new GotoAngle. */
-    public GoToAngle(Shooter shooter, double angle, double maxPow, double acc) {
-        // Use addRequirements() here to declare subsystem dependencies.
-        this.shooter = shooter;
-        this.wantedAngle = angle;
-        this.maxPow = maxPow;
-        this.endPow = 0;
-        this.calc = new TrapezoidCalc();
-        this.acc = acc;
-    }
+    double pow;
+    double wantedDis;
 
-    /** Creates a new GotoAngle. */
-    public GoToAngle(Shooter shooter, double angle, double maxPow, double acc, double endPow) {
+    /** Creates a new GoToAngle. */
+    public GoToAngle(Shooter shooter, double angle, double pow) {
         // Use addRequirements() here to declare subsystem dependencies.
         this.shooter = shooter;
         this.wantedAngle = angle;
-        this.maxPow = maxPow;
-        this.endPow = endPow;
-        this.calc = new TrapezoidCalc();
-        this.acc = acc;
+        this.pow = pow;
         addRequirements(shooter);
     }
 
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-        startAngle = shooter.getFalconAnlge();
+        wantedDis =  KB * Math.cos(wantedAngle * Math.PI / 180)+Math.sqrt(Math.pow(KA, 2) - Math.pow((KB * Math.sin(wantedAngle * Math.PI / 180)), 2));
     }
 
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        double pow = calc.trapezoid(shooter.getAngleVel(), maxPow, endPow, acc, (wantedAngle - shooter.getFalconAnlge()));
-        System.out.println("angle pow: "+ pow);
-        shooter.anlgeSetPow(pow);
+        if (wantedDis > shooter.getDis()){
+            shooter.anlgeSetPow(pow);    
+        } else{
+            shooter.anlgeSetPow(-1*pow);
+        }
     }
 
     // Called once the command ends or is interrupted.
@@ -64,16 +51,6 @@ public class GoToAngle extends Command {
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        return isPassed() || (Math.abs(shooter.getFalconAnlge() - wantedAngle) <= 3);
-    }
-
-    private boolean isPassed(){
-        if ((wantedAngle-startAngle > 0) && (shooter.getFalconAnlge() > wantedAngle)){
-            return true;
-        } else if ((wantedAngle - startAngle < 0) && (shooter.getFalconAnlge() < wantedAngle)){
-            return true;
-        } else {
-            return false;
-        }
+        return Math.abs(shooter.getDis()-wantedDis) < 3;
     }
 }
