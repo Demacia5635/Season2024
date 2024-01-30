@@ -32,9 +32,11 @@ public class RobotContainer  {
          * joysticks}.
          */
         private void configureBindings() {
-            controller.a().onTrue(new TurnAngle(shooter, 5, 0.2));
             controller.b().onTrue(new AngleControl(shooter, controller));
-            controller.x().onTrue(new GoToAngle(shooter, 40, 0.2));
+            controller.x().onTrue(new GoToAngle(shooter, 50, 1000, 300));
+            controller.a().onTrue(new GoToAngle(shooter, 30, 500, 100));
+            
+            controller.y().onTrue(new InstantCommand(()-> shooter.resetDis(), shooter));    
             
             controller.rightBumper().onTrue(new InstantCommand(()-> shooter.stopAll(),shooter).ignoringDisable(true));
         }
