@@ -33,7 +33,7 @@ public class Amp extends SubsystemBase{
     public final TalonFX m1;
     public CANSparkMax neo;
     public double startDeg;
-    public AnalogTrigger lightLimit;
+    public AnalogInput limitInput;
 
     //ArmFeedforward ff = new ArmFeedforward(Parameters.ks1, Parameters.kg1, Parameters.kv1, Parameters.ka1);
     //SimpleMotorFeedforward ff2 = new SimpleMotorFeedforward(Parameters.ks2, Parameters.kv2, Parameters.ka2);
@@ -45,8 +45,8 @@ public class Amp extends SubsystemBase{
         neo = new CANSparkMax(AmpDeviceID.M2, MotorType.kBrushless);
         neo.getEncoder().setPosition(0);
 
-        lightLimit = new AnalogTrigger(AmpDeviceID.LIGHT_LIMIT); //light limit switch port
-        lightLimit.setLimitsVoltage(4.5, 4.8); // Sets the trigger to enable at a voltage of 4 volts, and disable at a value of 1.5 volts
+        limitInput = new AnalogInput(AmpDeviceID.LIGHT_LIMIT);
+        limitInput.setAccumulatorInitialValue(0);
         
         SmartDashboard.putData(this);
 
@@ -94,8 +94,15 @@ public class Amp extends SubsystemBase{
     }
 
 
-    public boolean getLimitRun() {
-        return lightLimit.getTriggerState();
+    
+    public double getLimitVolt(){
+        return limitInput.getVoltage();
+    }
+    public boolean isNoteThere(){
+        if (getLimitVolt()<4.55){
+            return true;
+        }
+        return false;
     }
 
     public void setPowers(double p1, double p2){
@@ -170,7 +177,9 @@ public class Amp extends SubsystemBase{
         SmartDashboard.putNumber("Arm poseRad", getPoseRad());
         SmartDashboard.putNumber("neon encoder",getNeoRev());
         SmartDashboard.putNumber("start angle", startDeg);
-        SmartDashboard.putBoolean("Limit switch state", getLimitRun());
+        SmartDashboard.putBoolean("Limit switch state", isNoteThere());
+        SmartDashboard.putNumber("Limit switch Voltage", getLimitVolt());
+
     }
 
     
