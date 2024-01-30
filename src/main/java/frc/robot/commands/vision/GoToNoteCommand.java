@@ -10,9 +10,7 @@ public class GoToNoteCommand extends Command {
  private final Chassis chassis;
  private double angle;
  private double dist;
- private double startAngle;
  private double[] llpython;
- PIDController pid = new PIDController(0.31, 0.006,0.0000025);
 
  public GoToNoteCommand(Chassis chassis) {
     this.chassis = chassis;
@@ -21,7 +19,6 @@ public class GoToNoteCommand extends Command {
 
  @Override
  public void initialize() {
-    startAngle = chassis.getAngle().getDegrees();
     chassis.stop();
  }
 
@@ -30,14 +27,21 @@ public class GoToNoteCommand extends Command {
     llpython = NetworkTableInstance.getDefault().getTable("limelight").getEntry("llpython").getDoubleArray(new double[8]);
     angle = llpython[1];
     dist = llpython[0];
-    System.out.println(angle);
-    System.out.println(dist);
-    ChassisSpeeds speeds = new ChassisSpeeds(dist, 0, pid.calculate(chassis.getAngle().getDegrees() - startAngle, angle));
+    System.out.println("angle " + angle);
+    ChassisSpeeds speeds = new ChassisSpeeds(0, 0, 0.5*Math.signum(angle));
     chassis.setVelocities(speeds);
  }
 
  @Override
  public boolean isFinished() {
-    return Math.abs(chassis.getAngle().getDegrees() - startAngle) - angle <= 0.5;
+   return Math.abs(angle) <= 1;
+
+   
  }
+ @Override
+  public void end(boolean interrupted) {
+   chassis.stop();
+   System.out.println("doneeeeeeeeeeeeeee\n\n\n\n\n\n\n\n\n\n\n");
+  }
+
 }
