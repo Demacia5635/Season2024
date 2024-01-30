@@ -4,42 +4,63 @@
 
 package frc.robot.commands.shooter;
 
-import static frc.robot.Constants.ShooterConstants.KB;
-
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.utils.TrapezoidCalc;
+
 import static frc.robot.Constants.ShooterConstants.*;
 
 public class GoToAngle extends Command {
     
     Shooter shooter;
     double wantedAngle;
-    double pow;
+    TrapezoidCalc calc;
     double wantedDis;
+    double maxVel;
+    double acc;
+    double endVel;
+    double startDis;
 
     /** Creates a new GoToAngle. */
-    public GoToAngle(Shooter shooter, double angle, double pow) {
+    public GoToAngle(Shooter shooter, double angle, double maxVel, double acc) {
         // Use addRequirements() here to declare subsystem dependencies.
         this.shooter = shooter;
         this.wantedAngle = angle;
-        this.pow = pow;
+        this.calc = new TrapezoidCalc();
+        this.maxVel = maxVel;
+        this.acc = acc;
+        this.endVel = 0;
+        addRequirements(shooter);
+    }
+
+    /** Creates a new GoToAngle. */
+    public GoToAngle(Shooter shooter, double angle, double maxVel, double acc, double endVel) {
+        // Use addRequirements() here to declare subsystem dependencies.
+        this.shooter = shooter;
+        this.wantedAngle = angle;
+        this.calc = new TrapezoidCalc();
+        this.maxVel = maxVel;
+        this.acc = acc;
+        this.endVel = endVel;
         addRequirements(shooter);
     }
 
     // Called when the command is initially scheduled.
+    /**
+     * @see <a href="https://www.desmos.com/calculator/4ja9zotx82">Desmos Graph</a>
+     */
     @Override
     public void initialize() {
-        wantedDis =  KB * Math.cos(wantedAngle * Math.PI / 180)+Math.sqrt(Math.pow(KA, 2) - Math.pow((KB * Math.sin(wantedAngle * Math.PI / 180)), 2));
+        shooter.angleBrake();
+
+        // wantedDis =  KB * Math.cos(wantedAngle * Math.PI / 180)+Math.sqrt(Math.pow(KA, 2) - Math.pow((KB * Math.sin(wantedAngle * Math.PI / 180)), 2));
+        wantedDis = KA * Math.cos(wantedAngle * Math.PI / 180) + Math.sqrt(Math.pow(KA, 2) * Math.pow(Math.cos(wantedAngle * Math.PI / 180), 2) - Math.pow(KA, 2) + Math.pow(KB, 2));
     }
 
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        if (wantedDis > shooter.getDis()){
-            shooter.anlgeSetPow(pow);    
-        } else{
-            shooter.anlgeSetPow(-1*pow);
-        }
+        shooter.anlgeSetVel(calc.trapezoid(shooter.getAngleVel(), maxVel, endVel, acc, wantedDis - shooter.getDis()));
     }
 
     // Called once the command ends or is interrupted.
@@ -51,6 +72,17 @@ public class GoToAngle extends Command {
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        return Math.abs(shooter.getDis()-wantedDis) < 3;
+
+        if (!shooter.limits()){
+            if (!((wantedDis - startDis > 0) && (shooter.getDis() >= wantedDis))){
+                if (!((wantedDis - startDis < 0) && (shooter.getDis() <= wantedDis))){
+                    if (!(Math.abs(wantedDis - shooter.getDis()) < 1)){
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
     }
 }
