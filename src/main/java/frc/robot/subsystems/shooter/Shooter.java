@@ -13,17 +13,16 @@ import static frc.robot.Constants.ShooterConstants.*;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkLowLevel.MotorType;
 
 public class Shooter extends SubsystemBase {
 
-    public TalonFX motorAngle;
+    public final TalonFX motorAngle;
 
     public final TalonFX motor1;
     public final TalonFX motor2;
 
     public double basePos = 0;
+    public double baseDis;
     
     /** Creates a new Shooter. */
     public Shooter() {
@@ -42,10 +41,11 @@ public class Shooter extends SubsystemBase {
         basePos = 0;
 
         SmartDashboard.putData(this);
+        SmartDashboard.putData(null);
     }
 
-    public void anlgeSetPow(double pow){
-        motorAngle.set(ControlMode.PercentOutput, pow);
+    public void anlgeSetVel(double vel){
+        motorAngle.set(ControlMode.Velocity, vel*PULES_PER_MM);
     }
 
     public void anlgeStop(){
@@ -77,13 +77,26 @@ public class Shooter extends SubsystemBase {
         basePos += getAngleEncoder();
     }
 
+    public void resetDis(){
+        baseDis += getDis();
+        baseDis -= 320;
+    }
+
     public void angleBrake(){ motorAngle.setNeutralMode(NeutralMode.Brake);}
     public void angleCoast(){ motorAngle.setNeutralMode(NeutralMode.Coast);}
     
-    public double getAngleVel(){ return motorAngle.getSelectedSensorVelocity()*10/(PULES_PER_REV/360); }
+    public double getAngleVel(){ return motorAngle.getSelectedSensorVelocity()*10/(PULES_PER_REV * GEAR_RATIO / 360); }
 
     public double getDis(){
-        return motorAngle.getSelectedSensorPosition()/PULES_PER_MM;
+        return motorAngle.getSelectedSensorPosition()/PULES_PER_MM - baseDis;
+    }
+
+    public boolean limits(){
+        return getDis() >= 315 || getDis() <= 115;
+    }
+
+    public double getAngle(){
+        return Math.acos(-1 * ((Math.pow(KB, 2) - Math.pow(KA, 2) - Math.pow(getDis(), 2)) / (2 * KA * getDis()))) * 180 / Math.PI;
     }
 
     @Override
@@ -95,12 +108,15 @@ public class Shooter extends SubsystemBase {
         builder.addDoubleProperty("current amper motor 1", ()-> motor1.getSupplyCurrent(), null);
         builder.addDoubleProperty("current amper motor 2", ()-> motor2.getSupplyCurrent(), null);
         builder.addDoubleProperty("base pos", ()->basePos, null);
-        builder.addDoubleProperty("falcon vel", this::getAngleVel, null);
-        builder.addDoubleProperty("falcon encoder", this::getAngleEncoder, null);
+        builder.addDoubleProperty("angle vel", this::getAngleVel, null);
+        builder.addDoubleProperty("angle encoder", this::getAngleEncoder, null);
+        builder.addDoubleProperty("Distance", this::getDis, null);
+        builder.addDoubleProperty("base dis", ()-> baseDis, null);
+        builder.addDoubleProperty("Angle", this::getAngle, null);
     
         SmartDashboard.putData("Reset angle motor", new InstantCommand(()-> angleResetPos()).ignoringDisable(true));
+        SmartDashboard.putData("Dis reset", new InstantCommand(()-> resetDis()).ignoringDisable(true));
         SmartDashboard.putData("Angle Brake", new InstantCommand(()-> angleBrake()).ignoringDisable(true));
         SmartDashboard.putData("Angle Coast", new InstantCommand(()-> angleCoast()).ignoringDisable(true));
     }
-
 }
