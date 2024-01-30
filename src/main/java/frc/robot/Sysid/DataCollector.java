@@ -90,6 +90,7 @@ public class DataCollector {
             case KMeter:
                 return meter;
             case KCos:
+                System.out.println(" collect rad=" + rad + " cos = " + Math.cos(rad));
                 return Math.cos(rad);
             case KSin:
                 return Math.sin(rad);

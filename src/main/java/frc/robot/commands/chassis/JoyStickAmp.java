@@ -24,7 +24,7 @@ public class JoyStickAmp extends Command {
   }
   @Override
   public void initialize() {
-    amp.startDeg(amp.deg());
+    amp.startRad(amp.deg());
   }
 
   // Called when the command is initially scheduled.

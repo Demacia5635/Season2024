@@ -10,7 +10,6 @@ import frc.robot.subsystems.chassis.Amp;
 import frc.robot.utils.TrapezoidCalc;
 
 public class GoToAngleAmp extends Command {
-  CommandXboxController xboxController;
   Amp amp;
   double angleRad;
   double maxVelRad;
@@ -18,8 +17,7 @@ public class GoToAngleAmp extends Command {
   TrapezoidCalc trap;
 
   /** Creates a new GoToAngleAmp. */
-  public GoToAngleAmp(CommandXboxController xboxController, Amp amp, double angleRad, double maxVelRad, double acceleRad) {
-    this.xboxController = xboxController;
+  public GoToAngleAmp( Amp amp, double angleRad, double maxVelRad, double acceleRad) {
     this.amp = amp;
     this.angleRad = angleRad;
     this.maxVelRad = maxVelRad;
@@ -32,13 +30,18 @@ public class GoToAngleAmp extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    amp.neonEncoderReset();
+    amp.neoEncoderReset();
+    amp.startRad(amp.getPoseRad());
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double velRad = trap.trapezoid(amp.getVelArm(), maxVelRad, 0, Math.abs(acceleRad), angleRad);
+    double velRad = trap.trapezoid(amp.getVelRadArm(), maxVelRad, 0, Math.abs(acceleRad), angleRad-amp.getPoseRad());
+    if((amp.getPoseRad()>1.7)&&(amp.getPoseRad()<Math.PI*0.7)){
+      velRad += Math.PI*0.25;
+    }
+    
     amp.velFFArm(amp.getPoseRad(), velRad, acceleRad);
   }
 
@@ -51,7 +54,7 @@ public class GoToAngleAmp extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    if((amp.getPoseRad()>=angleRad-1/360*2*Math.PI)&&(amp.getPoseRad()<=angleRad+1/360*2*Math.PI)){
+    if((amp.getPoseRad()>=angleRad-10/360*2*Math.PI)&&(amp.getPoseRad()<=angleRad+10/360*2*Math.PI)){
       return true;
     }
     return false;

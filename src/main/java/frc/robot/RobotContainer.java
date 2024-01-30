@@ -1,5 +1,7 @@
 package frc.robot;
 
+import javax.swing.plaf.metal.MetalTheme;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 
@@ -12,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.chassis.DriveCommand;
+import frc.robot.commands.chassis.GoToAngleAmp;
 import frc.robot.commands.chassis.JoyStickAmp;
 import frc.robot.subsystems.chassis.Amp;
 import frc.robot.subsystems.chassis.Chassis;
@@ -73,7 +76,7 @@ public class RobotContainer implements Sendable{
    */
   public Command getAutonomousCommand() {
     //return null;
-    return new RunCommand(()-> chassis.setModulesAngularVelocity(50), chassis);
+    return new GoToAngleAmp(amp, Math.PI*0.7, Math.PI*0.4, Math.PI*0.5);
     // return new InstantCommand(() -> chassis.resetWheels(), chassis)
     // .andThen(new RunCommand(() -> chassis.setVelocities(new ChassisSpeeds(-2, 0, 0))).withTimeout(2).andThen(new InstantCommand(() -> chassis.stop())));
     //return new RunCommand(() -> chassis.getModule(2).setAngularVelocity(600));
