@@ -111,22 +111,21 @@ public final class Constants {
     public static class ShooterConstants {
         public static final int MOTOR_1_ID = 1;
         public static final int MOTOR_2_ID = 2;
+        public static final int ANLGE_MOTOR_ID = 3;
         
         public static final double KP = 0.3;
         public static final double KI = 0;
 
-        public static final double KV = 0.25/12000.0;
+        public static final double KV = 0.25/12000;
         public static final double KS = 0.15 - KV * 4000;
 
         public static final double PULES_PER_REV = 2048;  
 
-        public static final int ANLGE_MOTOR_ID = 3;
-        public static final int NEON_ID = 13;
-
         public static final int GEAR_RATIO = 4;
+        public static final double REV_PER_MM = 8;
+        public static final double PULES_PER_MM = PULES_PER_REV * GEAR_RATIO / REV_PER_MM;
         
-        public static final double KA = 128;
-        public static final double KB = 136;
-        public static final double PULES_PER_MM = PULES_PER_REV / 8 * GEAR_RATIO;
+        public static final double KA = 165;
+        public static final double KB = 161;
     }
 }
