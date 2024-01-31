@@ -4,6 +4,9 @@
 
 package frc.robot.commands.chassis;
 
+import static frc.robot.Constants.ShooterConstants.BLUE_ALLIANCE_SPEAKER_POSE2D;
+import static frc.robot.Constants.ShooterConstants.RED_ALLIANCE_SPEAKER_POSE2D;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -25,9 +28,9 @@ public class TurnToSpeaker extends Command {
         // Use addRequirements() here to declare subsystem dependencies.
         this.chassis = chassis;
         if (DriverStation.getAlliance().get() == Alliance.Blue) {
-            speaker = new Pose2d(0,0, null);
+            speaker = BLUE_ALLIANCE_SPEAKER_POSE2D;
         } else {
-            speaker = new Pose2d(0,0,null);
+            speaker = RED_ALLIANCE_SPEAKER_POSE2D;
         }
         addRequirements(chassis);
     }

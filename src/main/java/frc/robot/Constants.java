@@ -1,5 +1,7 @@
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 
@@ -127,5 +129,9 @@ public final class Constants {
         
         public static final double KA = 165;
         public static final double KB = 161;
+
+        public static final Pose2d BLUE_ALLIANCE_SPEAKER_POSE2D = new Pose2d(-0.15,2.1842, Rotation2d.fromDegrees(0));
+        public static final Pose2d RED_ALLIANCE_SPEAKER_POSE2D = new Pose2d(6.5273,2.1842, Rotation2d.fromDegrees(180));
+
     }
 }
