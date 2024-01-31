@@ -114,6 +114,7 @@ public final class Constants {
   
   public static final class VisionConstants {
 
+    public static final String Pi5CameraName = "Pi_Camera";
     public static final String Limelight2Name = "Limelight2";
     public static final String Limelight3Name = "Limelight3";
 

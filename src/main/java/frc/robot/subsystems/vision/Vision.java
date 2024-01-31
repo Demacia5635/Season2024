@@ -58,7 +58,7 @@ public class Vision extends SubsystemBase {
         this.buf3  = new VisionData[3];
         this.buf5 = new VisionData[5];
         this.Limelight2 = new PhotonCamera(Limelight2Name);
-        this.Limelight3 = new PhotonCamera(Limelight3Name);
+        this.Limelight3 = new PhotonCamera(Pi5CameraName);
         
         this.firstRun = true;
 
