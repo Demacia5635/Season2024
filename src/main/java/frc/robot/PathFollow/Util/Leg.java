@@ -30,7 +30,7 @@ public class Leg extends Segment{
     @Override
     public Translation2d calc(Translation2d position, double velocity)
     {
-
+        if(isAprilTagMode()) velocity = Math.min(velocity, 1);
         Translation2d relativePos = position.minus(p2);
 
         Rotation2d diffAngle = p1.minus(p2).getAngle().minus(relativePos.getAngle());

@@ -35,20 +35,12 @@ public class RobotContainer implements Sendable{
   PS4Controller controller = new PS4Controller(1);  
   Chassis chassis = new Chassis();
   pathPoint[] points = {
-    new pathPoint(0, 0, Rotation2d.fromDegrees(-90), 0.5, false),
-    new pathPoint(1, 1, Rotation2d.fromDegrees(-90), .65, false),
-    new pathPoint(2, 0, Rotation2d.fromDegrees(90), 0.5, false),
-
-    new pathPoint(3, 1, Rotation2d.fromDegrees(90), 0.5, false),
-    new pathPoint(4, 0, Rotation2d.fromDegrees(90), 0.5, false)
-
+    new pathPoint(0, 0, Rotation2d.fromDegrees(0), 0, true),
+    new pathPoint(3, 0, Rotation2d.fromDegrees(0), 0, true),
+    new pathPoint(0, 1, Rotation2d.fromDegrees(0), 0, false),
+    new pathPoint(1, 2, Rotation2d.fromDegrees(90), 0, false),
    };
 
-  pathPoint[] points1 = {
-    new pathPoint(0, 0, Rotation2d.fromDegrees(0), 0, true),
-    new pathPoint(0, -6, Rotation2d.fromDegrees(0), 0, true),
-    new pathPoint(1, 0, Rotation2d.fromDegrees(0), 0, true),
-  };
 
  
   Command test = new RunCommand(() -> {chassis.setVelocities(new ChassisSpeeds(-0.5, 0, 0));}, chassis).andThen(new WaitCommand(2),

@@ -44,7 +44,7 @@ public class Arc extends Segment{
       int place = 0;
         for (double i = 0;Math.abs(i) < Math.abs(diffAngle); i = i + (diffAngle / 4)) {
             points[place] = p2.plus(arrow.rotateBy(new Rotation2d(i)));
-            System.out.println("POINTS PLACE: " + points[place]);
+          
             place++;
         }
 
@@ -55,7 +55,7 @@ public class Arc extends Segment{
     public Translation2d calc(Translation2d pos,double velocity)
     {
 
-        
+        if(isAprilTagMode()) velocity = Math.min(velocity, 1);
         Translation2d relativePos = pos.minus(p2);
         double dFromCenter = relativePos.getNorm();
 
@@ -71,7 +71,7 @@ public class Arc extends Segment{
 
 
 
-        
+      
       return new Translation2d(velocity, tanAngle.plus(fixAngle));
     }
 

@@ -57,7 +57,6 @@ public class PathFollow extends CommandBase {
 
   double distancePassed = 0;
   pathPoint[] points;
-  PIDController rotationPidController = new PIDController(0.31, 0.006,0.0000025);
 
   /** Creates a new path follower using the given points.
    * @param chassis 
@@ -84,7 +83,7 @@ public class PathFollow extends CommandBase {
     corners = new RoundedPoint[points.length - 2];
     for(int i = 0; i < points.length - 2; i++)
     {
-      corners[i] = new RoundedPoint(points[i], points[i+1], points[i+2]);
+      corners[i] = new RoundedPoint(points[i], points[i+1], points[i+2], points[i].isAprilTag());
     }
     this.chassis = chassis;
     addRequirements(chassis);
@@ -114,7 +113,9 @@ public class PathFollow extends CommandBase {
       for(int i = 0; i < corners.length - 1; i +=1)
       {
         segments[segmentIndexCreator] = corners[i].getArc(); 
+        
         segments[segmentIndexCreator+1] = new Leg(corners[i].getCurveEnd(), corners[i+1].getCurveStart(), points[segmentIndexCreator].isAprilTag());
+        segments[segmentIndexCreator].setAprilTagMode(points[segmentIndexCreator].isAprilTag());
         segmentIndexCreator+=2;
       }
       //creates the last arc and leg
@@ -131,7 +132,7 @@ public class PathFollow extends CommandBase {
     totalLeft = pathLength;
 
 
-    List <State> list = new ArrayList<>();
+    /*List <State> list = new ArrayList<>();
     for(int i = 0; i < segments.length; i ++){
       Translation2d[] pointsForView = segments[i].getPoints();
       for(int j = 0; j < pointsForView.length; j ++){
@@ -143,10 +144,10 @@ public class PathFollow extends CommandBase {
     }
     System.out.println("LIST: " + list);
     /*Trajectory traj = TrajectoryGenerator.generateTrajectory(points[0],
-     list, points[points.length - 1], config);*/
+     list, points[points.length - 1], config);
 
     Trajectory traj = new Trajectory(list);
-    trajField.getObject("TrajTEST").setTrajectory(traj);
+    trajField.getObject("TrajTEST").setTrajectory(traj); */
   }
 
 
@@ -169,24 +170,26 @@ public class PathFollow extends CommandBase {
   }
 
   //calculates the position of the closet april tag and returns it's position
-  public Pose2d getClosestAprilTag(){
+  boolean foundAprilTag = false;
+  public Rotation2d getAngleApriltag(){
     Translation2d finalVector = new Translation2d(Integer.MAX_VALUE, Integer.MAX_VALUE);
-    int finalAprilTagIndex = 0;
     //checks the distance from each april tag and finds
-    for(int i = 0; i < 8; i++){
+    for(int i = 0; i < aprilTagsPositions.length; i++){
       
 
       Translation2d currentAprilTagVector = chassis.getPose().minus(aprilTagsPositions[i]).getTranslation();
 
      if(currentAprilTagVector.getNorm() < finalVector.getNorm()){
-      finalAprilTagIndex = i;
       finalVector = currentAprilTagVector;
      }
       
     }
+    foundAprilTag = true;
+
   
-    return new Pose2d(finalVector, aprilTagsPositions[finalAprilTagIndex].getRotation());
+    return finalVector.getAngle();
   }
+
 
 
   @Override
@@ -206,7 +209,7 @@ public class PathFollow extends CommandBase {
       if(segmentIndex != segments.length - 1 || segments[segmentIndex].getLength() <= 0.15)
         segmentIndex++;  
     }
-    wantedAngle = points[segmentIndex].getRotation();
+    
     Translation2d velVector = segments[segmentIndex].calc(chassisPose.getTranslation(), driveVelocity);
 
     driveVelocity = driveTrapezoid.calculate(totalLeft - segments[segmentIndex].distancePassed(chassisPose.getTranslation()),
@@ -214,10 +217,10 @@ public class PathFollow extends CommandBase {
     System.out.println("APRILTAG MODE: " + segments[segmentIndex].isAprilTagMode());
     if(segments[segmentIndex].isAprilTagMode())
     {
-      // velVector = new Translation2d(velVector.getX() / 10, velVector.getY() / 10);
-      wantedAngle = Rotation2d.fromDegrees(180   /*getClosestAprilTag().getRotation().getDegrees()*/);
+      if(!foundAprilTag) wantedAngle = getAngleApriltag();
 
     }
+    
 
     else{
       wantedAngle = points[segmentIndex].getRotation();
