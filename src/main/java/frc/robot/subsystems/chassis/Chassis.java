@@ -34,7 +34,7 @@ public class Chassis extends SubsystemBase {
   private final SwerveModule[] modules;
   private final Pigeon2 gyro;
 
-  private final SwerveDrivePoseEstimator poseEstimator;
+  private SwerveDrivePoseEstimator poseEstimator;
   private final Field2d field;
 
   private final Vision vision;
@@ -66,6 +66,7 @@ public class Chassis extends SubsystemBase {
     SmartDashboard.putData("reset wheels", new InstantCommand(() -> resetWheels()).ignoringDisable(true));
         SmartDashboard.putData("reset pose", new InstantCommand(() -> setOdometryToForward()).ignoringDisable(true));
 
+    
     SmartDashboard.putData("Chassis Move Sysid",
         (new Sysid(this::setModulesPower, this::getMoveVelocity, 0.1, 0.5, this)).getCommand());
     SmartDashboard.putData("Chassis Move Sysid2",
@@ -167,6 +168,12 @@ public class Chassis extends SubsystemBase {
     ChassisSpeeds relativeSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds, getAngle());
     SwerveModuleState[] states = KINEMATICS.toSwerveModuleStates(relativeSpeeds);
     setModuleStates(states);
+  }
+
+  public void resetOdometry(){
+    gyro.setYaw(0);
+    poseEstimator.resetPosition(getAngle(), getModulePositions(), getPose());
+
   }
 
   /**

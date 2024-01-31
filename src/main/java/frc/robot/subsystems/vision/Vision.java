@@ -16,6 +16,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.chassis.Chassis;
 import frc.robot.subsystems.vision.utils.SwerveDrivePoseEstimator;
@@ -48,6 +50,7 @@ public class Vision extends SubsystemBase {
     double lastUpdateTime;
     double lastUpdateTime5;
     boolean firstRun;
+    int countCycles;
 
 
     public Vision(Chassis chassis, SwerveDrivePoseEstimator estimator) {
@@ -60,11 +63,12 @@ public class Vision extends SubsystemBase {
         this.Limelight2 = new PhotonCamera(Limelight2Name);
         this.Limelight3 = new PhotonCamera(Pi5CameraName);
         
+        countCycles = 0;
         this.firstRun = true;
 
         //initializing photons pose estimators
         try {
-            this.photonPoseEstimatorForLimelight2 = new PhotonPoseEstimator(AprilTagFieldLayout.loadFromResource(AprilTagFields.k2024Crescendo.m_resourceFile),
+             this.photonPoseEstimatorForLimelight2 = new PhotonPoseEstimator(AprilTagFieldLayout.loadFromResource(AprilTagFields.k2024Crescendo.m_resourceFile),
              PoseStrategy.AVERAGE_BEST_TARGETS, Limelight2, robotCenterToLimelight2Transform);
 
              this.photonPoseEstimatorForLimelight3 = new PhotonPoseEstimator(AprilTagFieldLayout.loadFromResource(AprilTagFields.k2024Crescendo.m_resourceFile),
@@ -99,15 +103,20 @@ public class Vision extends SubsystemBase {
         SmartDashboard.putData("visionavg3", visionFieldavg3);
         SmartDashboard.putData("visionavg5", visionFieldavg5);
 
+        SmartDashboard.putData("resetVisionCycles", new InstantCommand(()->resetVisionResetCycles()).ignoringDisable(true));
+
     }
-    
+    public void resetVisionResetCycles(){
+        countCycles = 0;
+        SmartDashboard.putNumber("run bill", 1);
+    }
     //takes the visions snapshots from the buffer and medians or avg it and add vision mesurements to pose estimator
     public void updateRobotPose() {
         double time = getTime();
         if (validBuf(time)) {
             VisionData vData = median(buf3);
             VisionData vDataAvg = avg(buf3);
-            if (vData != null && vData.getPose() != null) {
+            if (vData != null && vData.getPose() != null && vDataAvg.getPose() != null && vDataAvg != null) {
                 poseEstimator.addVisionMeasurement(vData.pose, vData.timeStamp);
                 poseEstimatorField.setRobotPose(poseEstimator.getEstimatedPosition());
                 visionField3.setRobotPose(vData.getPose());
@@ -127,7 +136,7 @@ public class Vision extends SubsystemBase {
         if (validBuf5(time)) {
             VisionData vData5 = median(buf5);
             VisionData vDataAvg5 = avg(buf5);
-            if (vData5 != null && vData5.getPose() != null) {
+            if (vData5 != null && vData5.getPose() != null && vDataAvg5.getPose() != null && vDataAvg5 != null) {
                 visionField5.setRobotPose(vData5.getPose());
                 visionFieldavg5.setRobotPose(vDataAvg5.getPose());
                 lastUpdateTime5 = time;
@@ -158,9 +167,10 @@ public class Vision extends SubsystemBase {
                     if(estimatedRobotPose != null){
                         VisionData newVisionData = new VisionData(estimatedPose.toPose2d(), estimatedRobotPose.timestampSeconds);
                         VisionData newVisionData5 = new VisionData(estimatedPose.toPose2d(), estimatedRobotPose.timestampSeconds);
-                        if(firstRun){
+                        if(countCycles < 100){
+                            SmartDashboard.putNumber("cyclelesstan100", 1);
                             poseEstimator.resetPosition(chassis.getAngle(), chassis.getModulePositions(), newVisionData.getFalsePose());
-                            firstRun = false;
+                            // firstRun = false;
                         }
                         if (newVisionData != null && newVisionData.getPose() != null) {
                             lastData = next();
@@ -183,6 +193,7 @@ public class Vision extends SubsystemBase {
     @Override
     public void periodic() {
         super.periodic();
+        countCycles++;
 
         getNewDataFromLimelightX(Limelight.Limelight2);
         getNewDataFromLimelightX(Limelight.Limelight3);
@@ -363,6 +374,9 @@ public class Vision extends SubsystemBase {
                     && Math.abs(poseSample.getRotation().minus(pose.getRotation()).getDegrees()) < maxValidAngleDiff) {
                 diffrence = poseSample.getTranslation().getDistance(pose.getTranslation());
             } else {
+                if(poseSample != null){
+                    System.out.println("cleared on setDifference() func pose sample isnt null, " + poseSample.getRotation().getDegrees() + " " + pose.getRotation().getDegrees());
+                }
                 System.out.println("cleared on setDifference() func");
                 clear();
             }

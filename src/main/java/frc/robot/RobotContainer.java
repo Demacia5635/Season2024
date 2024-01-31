@@ -42,6 +42,8 @@ public class RobotContainer implements Sendable{
   public void initSendable(SendableBuilder builder) {
 
     builder.addDoubleProperty("chassis angle",() -> chassis.getAngle().getDegrees(), null);
+    SmartDashboard.putData("Reset Odometry", new InstantCommand(() -> chassis.resetOdometry()));
+
 
 
   }
@@ -49,6 +51,7 @@ public class RobotContainer implements Sendable{
     
     private void configureBindings() {
       commandController.a().onTrue(new InstantCommand(()->{chassis.setOdometryToForward();}));
+      commandController.y().onTrue(new InstantCommand(() -> chassis.resetOdometry()));
 //      commandController.start().onTrue(new InstantCommand(()->{chassis.setOdometryToForward();}));
         // code for controller to controll the gripper and the parallelogram
 
