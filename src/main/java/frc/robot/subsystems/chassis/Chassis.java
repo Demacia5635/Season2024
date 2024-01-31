@@ -19,7 +19,7 @@ import frc.robot.commands.chassis.CheckModulesSteerVelocity;
 import frc.robot.commands.chassis.SetModuleAngle;
 import frc.robot.commands.chassis.utils.TestVelocity;
 import frc.robot.utils.Utils;
-import frc.robot.subsystems.chassis.utils.SwerveModule;
+import frc.robot.subsystems.chassis.SwerveModule;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.utils.SwerveDrivePoseEstimator;
 
