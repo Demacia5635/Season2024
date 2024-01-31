@@ -64,10 +64,10 @@ public class Vision extends SubsystemBase {
 
         //initializing photons pose estimators
         try {
-            this.photonPoseEstimatorForLimelight2 = new PhotonPoseEstimator(AprilTagFieldLayout.loadFromResource(AprilTagFields.k2023ChargedUp.m_resourceFile),
+            this.photonPoseEstimatorForLimelight2 = new PhotonPoseEstimator(AprilTagFieldLayout.loadFromResource(AprilTagFields.k2024Crescendo.m_resourceFile),
              PoseStrategy.AVERAGE_BEST_TARGETS, Limelight2, robotCenterToLimelight2Transform);
 
-             this.photonPoseEstimatorForLimelight3 = new PhotonPoseEstimator(AprilTagFieldLayout.loadFromResource(AprilTagFields.k2023ChargedUp.m_resourceFile),
+             this.photonPoseEstimatorForLimelight3 = new PhotonPoseEstimator(AprilTagFieldLayout.loadFromResource(AprilTagFields.k2024Crescendo.m_resourceFile),
              PoseStrategy.AVERAGE_BEST_TARGETS, Limelight3, robotCenterToLimelight3Transform);
         } catch (IOException e) {
             System.out.println("problem with photon pose estimators");
