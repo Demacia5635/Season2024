@@ -57,6 +57,8 @@ public class PathFollow extends CommandBase {
 
   double distancePassed = 0;
   pathPoint[] points;
+  PIDController rotationPidController = new PIDController(0.31, 0.006,0.0000025);
+
 
   /** Creates a new path follower using the given points.
    * @param chassis 

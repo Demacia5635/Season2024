@@ -1,5 +1,7 @@
 package frc.robot.commands.chassis;
 
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -17,7 +19,10 @@ public class DriveCommand extends Command {
   private double direction;
 
   private boolean precisionDrive = false;
+  Rotation2d wantedAngleApriltag = new Rotation2d();
+  boolean rotateToApriltag = false;
 
+  PIDController rotationPidController = new PIDController(0.31, 0.006,0.0000025);
   public DriveCommand(Chassis chassis, PS4Controller controller, CommandXboxController commandXboxController, boolean isRed) {
     this.chassis = chassis;
     this.commandXboxController = commandXboxController;
@@ -26,8 +31,8 @@ public class DriveCommand extends Command {
     else direction = -1;
 
     addRequirements(chassis);
-    commandXboxController.y().onTrue(new InstantCommand(() -> direction *= -1));
     commandXboxController.b().onTrue(new InstantCommand(() -> precisionDrive = !precisionDrive));
+    commandXboxController.y().onTrue(new InstantCommand((() -> this.wantedAngleApriltag = chassis.getClosetAngleApriltag())).andThen(() -> rotateToApriltag = true));
   }
 
   @Override
@@ -38,12 +43,23 @@ public class DriveCommand extends Command {
   public void execute() {
     double joyX = deadband(commandXboxController.getLeftY(), 0.1) * direction;
     double joyY = deadband(commandXboxController.getLeftX(), 0.1) * direction;
+
+    
+
     double rot = -(deadband(commandXboxController.getRightTriggerAxis(), 0.1) - deadband(commandXboxController.getLeftTriggerAxis(), 0.1));
     
+    if(rot != 0){
+      rotateToApriltag = false;
+    }
+
     double velX = Math.pow(joyX, 3)* MAX_DRIVE_VELOCITY;
     double velY = Math.pow(joyY, 3) * MAX_DRIVE_VELOCITY;
     double velRot = Math.pow(rot, 3) * MAX_OMEGA_VELOCITY;
-    
+
+    if(rotateToApriltag == true)
+    {
+     velRot = rotationPid.calculate(chassis.getAngle().getDegrees(), wantedAngleApriltag.getDegrees());
+    }
     if (precisionDrive) {
       velX /= 4;
       velY /= 4;
