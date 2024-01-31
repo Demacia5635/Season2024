@@ -61,8 +61,7 @@ public class RobotContainer implements Sendable{
   public RobotContainer() {
 
     alliance = DriverStation.getAlliance().get();
-    if(alliance == Alliance.Red) isRed = true;
-    else isRed = false;
+    isRed = (alliance == Alliance.Red);
     DriveCommand drive = new DriveCommand(chassis, controller, commandController, isRed);
     chassis.setDefaultCommand(drive);
 

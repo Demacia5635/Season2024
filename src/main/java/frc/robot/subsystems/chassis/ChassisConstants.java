@@ -32,18 +32,28 @@ public final class ChassisConstants {
 
   public static final double CYCLE_DT = 0.02;
 
+  static Pose2d aprilTag1 = new Pose2d(inchToMeter(593.68),inchToMeter(0.245), Rotation2d.fromDegrees(120));
+  static Pose2d aprilTag2 = new Pose2d(inchToMeter(637.21),inchToMeter(34.79), Rotation2d.fromDegrees(120));
+  static Pose2d aprilTag3 = new Pose2d(inchToMeter(652.73),inchToMeter(196.17), Rotation2d.fromDegrees(180));
+  static Pose2d aprilTag4 = new Pose2d(inchToMeter(652.73),inchToMeter(218.42), Rotation2d.fromDegrees(180));
+  static Pose2d aprilTag5 = new Pose2d(inchToMeter(578.77),inchToMeter(323), Rotation2d.fromDegrees(270));
+  static Pose2d aprilTag6 = new Pose2d(inchToMeter(72.5),inchToMeter(323), Rotation2d.fromDegrees(270));
+  static Pose2d aprilTag7 = new Pose2d(inchToMeter(-1.5),inchToMeter(218.42), Rotation2d.fromDegrees(0));
+  static Pose2d aprilTag8 = new Pose2d(inchToMeter(-1.5),inchToMeter(196.17), Rotation2d.fromDegrees(0));
+  static Pose2d aprilTag9 = new Pose2d(inchToMeter(14.02),inchToMeter(34.79), Rotation2d.fromDegrees(60));
+  static Pose2d aprilTag10 = new Pose2d(inchToMeter(57.54),inchToMeter(9.68), Rotation2d.fromDegrees(60));
+  static Pose2d aprilTag11 = new Pose2d(inchToMeter(468.69),inchToMeter(146.19), Rotation2d.fromDegrees(300));
+  static Pose2d aprilTag12 = new Pose2d(inchToMeter(468.69), inchToMeter(177.10) ,Rotation2d.fromDegrees(60));
+  static Pose2d aprilTag13 = new Pose2d(inchToMeter(441.74),inchToMeter(161.62), Rotation2d.fromDegrees(180));
+  static Pose2d aprilTag14 = new Pose2d(inchToMeter(209.48),inchToMeter(161.62), Rotation2d.fromDegrees(0));
+  static Pose2d aprilTag15 = new Pose2d(inchToMeter(182.73),inchToMeter(177.10), Rotation2d.fromDegrees(120));
+  static Pose2d aprilTag16 = new Pose2d(inchToMeter(182.73),inchToMeter(146.19), Rotation2d.fromDegrees(240));
+  public final static Pose2d[] aprilTagsPositions = {aprilTag1, aprilTag2, aprilTag3, aprilTag4, aprilTag5, aprilTag6, aprilTag7, aprilTag8,
+     aprilTag9, aprilTag10, aprilTag11, aprilTag12, aprilTag13, aprilTag14, aprilTag15, aprilTag16};
 
-  /* need to change positions of april tags */
-  static Pose2d aprilTag1 = new Pose2d(0,0, Rotation2d.fromDegrees(0));
-  static Pose2d aprilTag2 = new Pose2d(0,0, Rotation2d.fromDegrees(0));
-  static Pose2d aprilTag3 = new Pose2d(0,0, Rotation2d.fromDegrees(0));
-  static Pose2d aprilTag4 = new Pose2d(0,0, Rotation2d.fromDegrees(0));
-  static Pose2d aprilTag5 = new Pose2d(0,0, Rotation2d.fromDegrees(0));
-  static Pose2d aprilTag6 = new Pose2d(0,0, Rotation2d.fromDegrees(0));
-  static Pose2d aprilTag7 = new Pose2d(0,0, Rotation2d.fromDegrees(0));
-  static Pose2d aprilTag8 = new Pose2d(0,0, Rotation2d.fromDegrees(0));
-  public final static Pose2d[] aprilTagsPositions = {aprilTag1, aprilTag2, aprilTag3, aprilTag4, aprilTag5, aprilTag6, aprilTag7, aprilTag8};
-
+  private static double inchToMeter(double inch){
+    return inch * 0.0254;
+  }
   public static PIDController rotationPid = new PIDController(0.0001, 0.0002,0.000002);
 
   public static final double MAX_DRIVE_VELOCITY = 4;
