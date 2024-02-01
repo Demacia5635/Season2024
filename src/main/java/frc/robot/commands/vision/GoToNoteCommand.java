@@ -8,8 +8,11 @@ import frc.robot.subsystems.chassis.Chassis;
 
 public class GoToNoteCommand extends Command {
  private final Chassis chassis;
- private double angle;
- private double dist;
+ private double Angle;
+ private double Dist;
+ private double Dist_OfSet;
+ private double No_Dist_OfSet;
+ private double Mol;
  private double[] llpython;
 
  public GoToNoteCommand(Chassis chassis) {
@@ -25,16 +28,19 @@ public class GoToNoteCommand extends Command {
  @Override
  public void execute() {
     llpython = NetworkTableInstance.getDefault().getTable("limelight").getEntry("llpython").getDoubleArray(new double[8]);
-    angle = llpython[1];
-    dist = llpython[0];
-    System.out.println("angle " + angle);
-    ChassisSpeeds speeds = new ChassisSpeeds(0, 0, 0.5*Math.signum(angle));
+    Angle = llpython[1];
+    Dist = llpython[0];
+    Mol = Dist * Math.tan(Angle);
+    Mol = Math.abs(No_Dist_OfSet - Mol);
+    Dist = Dist + Dist_OfSet;
+    Angle = Math.atan(Mol/Dist);
+    ChassisSpeeds speeds = new ChassisSpeeds(0, 0, 0.5*Math.signum(Angle));
     chassis.setVelocities(speeds);
  }
 
  @Override
  public boolean isFinished() {
-   return Math.abs(angle) <= 1;
+   return Math.abs(Angle) <= 1;
 
    
  }
