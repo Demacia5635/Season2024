@@ -28,7 +28,7 @@ public class AngleControl extends Command {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        shooter.anlgeSetVel(-1*(controller.getLeftY()*0.5));
+        shooter.anlgeSetVel(Math.abs(controller.getLeftY()) >= 0.3 ? -1*(controller.getLeftY() * 10000) : 0);
     }
 
     // Called once the command ends or is interrupted.
