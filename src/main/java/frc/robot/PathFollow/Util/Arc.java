@@ -42,6 +42,9 @@ public class Arc extends Segment{
       Translation2d[] points = new Translation2d[4];
       double diffAngle = angle.getRadians();
       int place = 0;
+      if(radius == 0){
+        return new Translation2d[] {p1, p2};
+      }
         for (double i = 0;Math.abs(i) < Math.abs(diffAngle); i = i + (diffAngle / 4)) {
             points[place] = p2.plus(arrow.rotateBy(new Rotation2d(i)));
           

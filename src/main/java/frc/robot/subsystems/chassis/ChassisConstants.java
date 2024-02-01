@@ -54,8 +54,7 @@ public final class ChassisConstants {
   private static double inchToMeter(double inch){
     return inch * 0.0254;
   }
-  public static PIDController rotationPid = new PIDController(0.0001, 0.0002,0.000002);
-
+  
   public static final double MAX_DRIVE_VELOCITY = 4;
   public static final double DRIVE_ACCELERATION = 30;
   public static final double MAX_STEER_VELOCITY = 600;

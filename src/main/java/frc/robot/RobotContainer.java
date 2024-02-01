@@ -34,9 +34,10 @@ public class RobotContainer implements Sendable{
   CommandXboxController commandController = new CommandXboxController(0);
   PS4Controller controller = new PS4Controller(1);  
   Chassis chassis = new Chassis();
+
   pathPoint[] points = {
-    new pathPoint(0, 0, Rotation2d.fromDegrees(0), 0, true),
-    new pathPoint(3, 0, Rotation2d.fromDegrees(0), 0, true),
+    new pathPoint(0, 2, Rotation2d.fromDegrees(0), 0, true),
+    new pathPoint(3, 1, Rotation2d.fromDegrees(0), 0, true),
     new pathPoint(0, 1, Rotation2d.fromDegrees(0), 0, false),
     new pathPoint(1, 2, Rotation2d.fromDegrees(90), 0, false),
    };
@@ -73,6 +74,8 @@ public class RobotContainer implements Sendable{
   }
  private void configureBindings() {
       if(controller.getCrossButton()) new InstantCommand(()->{chassis.setOdometryToForward();});
+    commandController.x().onTrue(new InstantCommand(()->{chassis.setOdometryToForward();}));
+    
     }
    
   public Command getAutonomousCommand() {

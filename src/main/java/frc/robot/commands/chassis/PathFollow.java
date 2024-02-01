@@ -73,7 +73,7 @@ public class PathFollow extends CommandBase {
 
     if(isRed){
       for(int i = 0; i < points.length; i++){
-        points[i] = new pathPoint(points[i].getX(), fieldLength - points[i].getY(), points[i].getRotation(),
+        points[i] = new pathPoint(points[i].getX(), fieldLength - points[i].getY(), points[i].getRotation().times(-1),
          points[i].getRadius(), points[i].isAprilTag());
          System.out.println("New x: " + points[i].getX());
          System.out.println("New y: " + points[i].getY());
@@ -82,6 +82,7 @@ public class PathFollow extends CommandBase {
     //gets the wanted angle for the robot to finish the path in
    
     //creates new coreners array of the "arc points" in the path
+    SmartDashboard.putNumber("points", points[0].getY());
     corners = new RoundedPoint[points.length - 2];
     for(int i = 0; i < points.length - 2; i++)
     {
@@ -114,6 +115,7 @@ public class PathFollow extends CommandBase {
       //creates arc than leg
       for(int i = 0; i < corners.length - 1; i +=1)
       {
+        
         segments[segmentIndexCreator] = corners[i].getArc(); 
         
         segments[segmentIndexCreator+1] = new Leg(corners[i].getCurveEnd(), corners[i+1].getCurveStart(), points[segmentIndexCreator].isAprilTag());
@@ -133,8 +135,7 @@ public class PathFollow extends CommandBase {
     pathLength = segmentSum;
     totalLeft = pathLength;
 
-
-    /*List <State> list = new ArrayList<>();
+    List <State> list = new ArrayList<>();
     for(int i = 0; i < segments.length; i ++){
       Translation2d[] pointsForView = segments[i].getPoints();
       for(int j = 0; j < pointsForView.length; j ++){
@@ -145,11 +146,9 @@ public class PathFollow extends CommandBase {
       }
     }
     System.out.println("LIST: " + list);
-    /*Trajectory traj = TrajectoryGenerator.generateTrajectory(points[0],
-     list, points[points.length - 1], config);
 
     Trajectory traj = new Trajectory(list);
-    trajField.getObject("TrajTEST").setTrajectory(traj); */
+    trajField.getObject("TrajTEST").setTrajectory(traj);
   }
 
 

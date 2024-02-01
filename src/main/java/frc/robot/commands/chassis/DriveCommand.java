@@ -21,8 +21,9 @@ public class DriveCommand extends Command {
   private boolean precisionDrive = false;
   Rotation2d wantedAngleApriltag = new Rotation2d();
   boolean rotateToApriltag = false;
+  PIDController rotationPidController = new PIDController(0.03, 0,0.0008);
 
-  PIDController rotationPidController = new PIDController(0.31, 0.006,0.0000025);
+
   public DriveCommand(Chassis chassis, PS4Controller controller, CommandXboxController commandXboxController, boolean isRed) {
     this.chassis = chassis;
     this.commandXboxController = commandXboxController;
@@ -30,6 +31,7 @@ public class DriveCommand extends Command {
     if(isRed) direction = 1;
     else direction = -1;
 
+    
     addRequirements(chassis);
     commandXboxController.b().onTrue(new InstantCommand(() -> precisionDrive = !precisionDrive));
     commandXboxController.y().onTrue(new InstantCommand((() -> this.wantedAngleApriltag = chassis.getClosetAngleApriltag())).andThen(() -> rotateToApriltag = true));
@@ -56,9 +58,19 @@ public class DriveCommand extends Command {
     double velY = Math.pow(joyY, 3) * MAX_DRIVE_VELOCITY;
     double velRot = Math.pow(rot, 3) * MAX_OMEGA_VELOCITY;
 
-    if(rotateToApriltag == true)
+    if(rotateToApriltag)
     {
-     velRot = rotationPid.calculate(chassis.getAngle().getDegrees(), wantedAngleApriltag.getDegrees());
+      
+      if(Math.abs(
+        (wantedAngleApriltag).minus(chassis.getAngle()).getDegrees()) >= -1 &&
+      Math.abs((wantedAngleApriltag).minus(chassis.getAngle()).getDegrees()) <= 1) {
+        velRot = 0;
+        rotateToApriltag = false;
+      }
+      else{
+        velRot = rotationPidController.calculate(chassis.getAngle().getDegrees(),wantedAngleApriltag.getDegrees())*Math.toRadians(180);
+      }
+     
     }
     if (precisionDrive) {
       velX /= 4;

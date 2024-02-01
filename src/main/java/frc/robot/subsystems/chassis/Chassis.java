@@ -284,8 +284,6 @@ public class Chassis extends SubsystemBase {
     Translation2d finalVector = new Translation2d(Integer.MAX_VALUE, Integer.MAX_VALUE);
     //checks the distance from each april tag and finds
     for(int i = 0; i < aprilTagsPositions.length; i++){
-      
-
       Translation2d currentAprilTagVector = getPose().minus(aprilTagsPositions[i]).getTranslation();
 
      if(currentAprilTagVector.getNorm() < finalVector.getNorm()){
@@ -294,8 +292,8 @@ public class Chassis extends SubsystemBase {
       
     }
 
-  
     return finalVector.getAngle();
+
   }
 
   @Override
