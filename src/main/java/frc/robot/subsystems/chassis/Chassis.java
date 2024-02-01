@@ -17,7 +17,6 @@ import frc.robot.Sysid.Sysid;
 import frc.robot.Sysid.Sysid.Gains;
 import frc.robot.commands.chassis.CheckModulesSteerVelocity;
 import frc.robot.commands.chassis.SetModuleAngle;
-import frc.robot.commands.chassis.utils.TestVelocity;
 import frc.robot.utils.Utils;
 import frc.robot.subsystems.chassis.SwerveModule;
 import frc.robot.subsystems.vision.Vision;
@@ -83,7 +82,6 @@ public class Chassis extends SubsystemBase {
         this)).getCommand());
     SmartDashboard.putData("Test Steer Velocity", (new CheckModulesSteerVelocity(this, 200)));
     SmartDashboard.putData("Set Modules Angle", (new SetModuleAngle(this)));
-    new TestVelocity("Chassis", this::setVelocity, this::getMoveVelocity, 0.05, this);
     SmartDashboard.putData("go to 0", new RunCommand(()->setModulesAngleFromSB(0), this));
 
     SmartDashboard.putNumber("ANG", 0);
