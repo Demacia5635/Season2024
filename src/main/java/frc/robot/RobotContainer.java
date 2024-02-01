@@ -5,7 +5,6 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.shooter.AngleControl;
 import frc.robot.commands.shooter.GoToAngle;
-import frc.robot.commands.shooter.TurnAngle;
 import frc.robot.subsystems.shooter.Shooter;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
@@ -33,8 +32,8 @@ public class RobotContainer  {
          */
         private void configureBindings() {
             controller.b().onTrue(new AngleControl(shooter, controller));
-            controller.x().onTrue(new GoToAngle(shooter, 50, 1000, 300));
-            controller.a().onTrue(new GoToAngle(shooter, 30, 500, 100));
+            controller.x().onTrue(new GoToAngle(shooter, 69, 10000, 8000));
+            controller.a().onTrue(new GoToAngle(shooter, 20, 10000, 7500));
             
             controller.y().onTrue(new InstantCommand(()-> shooter.resetDis(), shooter));    
             
@@ -47,7 +46,6 @@ public class RobotContainer  {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
-        // return new InstantCommand(()-> shooter.setVel(42550), shooter);
-        return new TurnAngle(shooter, 5, 0.2);
+        return new InstantCommand(()-> shooter.setVel(42550), shooter);
     }
 }
