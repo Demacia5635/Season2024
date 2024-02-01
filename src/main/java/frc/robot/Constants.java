@@ -1,5 +1,7 @@
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 
@@ -89,9 +91,9 @@ public final class Constants {
       public static final double BACKWARD_MOVE_KV = 0.263; //0.012314/12; //0.0862;
       public static final double BACKWARD_ANGLE_KS = 0.047;//0.52557/12.0; //0.05;
       public static final double BACKWARD_ANGLE_KV = 0.00056;//0.003737/12.0; //0.0962;
-
+      
       public static final double MAX_STEER_ERROR = 5;
-
+      
       public final int moveMotorId;
       public final int angleMotorId;
       public final int absoluteEncoderId;
@@ -108,20 +110,23 @@ public final class Constants {
     }
   }
 
-    public static class ShooterConstants {
+  public static class ShooterConstants {
         public static final int MOTOR_1_ID = 1;
         public static final int MOTOR_2_ID = 2;
-        
+            
         public static final double KP = 0.3;
         public static final double KI = 0;
         
         public static final double KV = 0.25/12000;
         public static final double KS = 0.15 - KV * 4000;
-
+        
         public static final int PULES_PER_REV = 2048;  
-
+      
+        public static final Pose2d BLUE_ALLIANCE_SPEAKER_POSE2D = new Pose2d(-0.15,2.1842, Rotation2d.fromDegrees(0));
+        public static final Pose2d RED_ALLIANCE_SPEAKER_POSE2D = new Pose2d(6.5273,2.1842, Rotation2d.fromDegrees(180));
+        
     }
-  
+    
     public static class ElevationConstants {
         public static final int MOTOR_ID = 3;
 
@@ -132,10 +137,11 @@ public final class Constants {
         
         public static final double KA = 165;
         public static final double KB = 161;
-    
+        
         public static final double KS = 0;
         public static final double KG = 0;
         public static final double KV = 0;
+        
 
     }
 }
