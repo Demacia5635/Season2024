@@ -6,7 +6,7 @@ package frc.robot.commands.shooter;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.shooter.Shooter;
-import frc.robot.utils.TrapezoidCalc;
+import frc.robot.utils.Trapezoid;
 
 import static frc.robot.Constants.ElevationConstants.*;
 
@@ -14,19 +14,17 @@ public class GoToAngle extends Command {
     
     Shooter shooter;
     double wantedAngle;
-    TrapezoidCalc calc;
+    Trapezoid calc;
     double wantedDis;
     double maxVel;
     double acc;
     double endVel;
     double startDis;
-    double diffrentDirectionMultyplier = 50;
     
     /** Creates a new GoToAngle. */
     public GoToAngle(Shooter shooter, double angle, double maxVel, double acc) {
         // Use addRequirements() here to declare subsystem dependencies.
         this.shooter = shooter;
-        this.calc = new TrapezoidCalc();
         this.wantedAngle = angle;
         this.maxVel = maxVel;
         this.acc = acc;
@@ -38,7 +36,6 @@ public class GoToAngle extends Command {
     public GoToAngle(Shooter shooter, double angle, double maxVel, double acc, double endVel) {
         // Use addRequirements() here to declare subsystem dependencies.
         this.shooter = shooter;
-        this.calc = new TrapezoidCalc();
         this.wantedAngle = angle;
         this.maxVel = maxVel;
         this.acc = acc;
@@ -54,21 +51,18 @@ public class GoToAngle extends Command {
     public void initialize() {
         shooter.angleBrake();
         startDis = shooter.getDis();
-
-        // wantedDis =  KB * Math.cos(wantedAngle * Math.PI / 180)+Math.sqrt(Math.pow(KA, 2) - Math.pow((KB * Math.sin(wantedAngle * Math.PI / 180)), 2));
+        calc = new Trapezoid(maxVel, acc);
         wantedDis = KA * Math.cos(wantedAngle * Math.PI / 180) + Math.sqrt(Math.pow(KA, 2) * Math.pow(Math.cos(wantedAngle * Math.PI / 180), 2) - Math.pow(KA, 2) + Math.pow(KB, 2));
     }
 
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        shooter.anlgeSetVel(calc.trapezoid(shooter.getAngleVel(), shooter.getDis() > wantedDis ? maxVel : maxVel*diffrentDirectionMultyplier, endVel,  shooter.getDis() > wantedDis ? acc : acc*diffrentDirectionMultyplier, wantedDis - shooter.getDis()));
-
-        // if (wantedDis > shooter.getDis()){
-        //     shooter.anlgeSetVel(maxVel);
-        // } else {
-        //     shooter.anlgeSetVel(-maxVel);
-        // }
+        if (!imFinished()){
+            double vel = calc.calculate(wantedDis - shooter.getDis(), shooter.getAngleVel(), 0);
+            // System.out.println("vel = "+ vel);
+            shooter.angleSetVel(vel);
+        }
     }
 
     // Called once the command ends or is interrupted.
@@ -77,13 +71,16 @@ public class GoToAngle extends Command {
         shooter.anlgeStop();
     }
 
-    
-    
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
+        
+        return  imFinished();
+    }
 
-        if (!shooter.limits()){
+    private boolean imFinished(){
+
+        if (!shooter.limits(wantedDis - startDis > 0)){
             if (!((wantedDis - startDis > 0) && (shooter.getDis() >= wantedDis))){
                 if (!((wantedDis - startDis < 0) && (shooter.getDis() <= wantedDis))){
                     if (!(Math.abs(wantedDis - shooter.getDis()) < 1)){
