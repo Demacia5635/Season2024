@@ -295,6 +295,11 @@ public class Chassis extends SubsystemBase {
   @Override
   public void periodic() {
     poseEstimator.update(getAngle(), getModulePositions());
+    testPoseEstimatorBuf3Avg.update(getAngle(), getModulePositions());
+    testPoseEstimatorBuf3Med.update(getAngle(), getModulePositions());
+    testPoseEstimatorBuf5Avg.update(getAngle(), getModulePositions());
+    testPoseEstimatorBuf5Med.update(getAngle(), getModulePositions());
+
     field.setRobotPose(getPose());
 
 

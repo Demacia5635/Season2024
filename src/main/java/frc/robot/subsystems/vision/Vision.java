@@ -144,7 +144,7 @@ public class Vision extends SubsystemBase {
             VisionData vDataMed = median(buf3Med);
             Pair<Pose2d, Double> vData3AvgPair = avg(buf5Avg);
             VisionData vDataAvg = new VisionData(vData3AvgPair.getFirst(), vData3AvgPair.getSecond(), testPoseEstimatorBuf3Avg)  ;
-                        if (vDataMed != null && vDataMed.getPose() != null && vDataAvg.getPose() != null && vDataAvg != null) {
+            if (vDataMed != null && vDataMed.getPose() != null && vDataAvg.getPose() != null && vDataAvg != null) {
                 testPoseEstimatorBuf3Med.addVisionMeasurement(vDataMed.pose, vDataMed.timeStamp);
                 testPoseEstimatorBuf3Avg.addVisionMeasurement(vDataAvg.pose, vDataAvg.timeStamp);
                 poseEstimatorField.setRobotPose(poseEstimator.getEstimatedPosition());
@@ -169,9 +169,11 @@ public class Vision extends SubsystemBase {
             VisionData vData5Med = median(buf5Med);
             Pair<Pose2d, Double> vData5AvgPair = avg(buf5Avg);
             VisionData vDataAvg5 = new VisionData(vData5AvgPair.getFirst(), vData5AvgPair.getSecond(), testPoseEstimatorBuf5Avg)  ;
+            SmartDashboard.putBoolean("updates", vData5Med != null && vData5Med.getPose() != null && vDataAvg5.getPose() != null && vDataAvg5 != null);
             if (vData5Med != null && vData5Med.getPose() != null && vDataAvg5.getPose() != null && vDataAvg5 != null) {
-                testPoseEstimatorBuf3Med.addVisionMeasurement(vData5Med.pose, vData5Med.timeStamp);
-                testPoseEstimatorBuf3Avg.addVisionMeasurement(vDataAvg5.pose, vDataAvg5.timeStamp);
+           
+                testPoseEstimatorBuf5Med.addVisionMeasurement(vData5Med.pose, vData5Med.timeStamp);
+                testPoseEstimatorBuf5Avg.addVisionMeasurement(vDataAvg5.pose, vDataAvg5.timeStamp);
                 
                 visionField5.setRobotPose(vData5Med.getPose());
                 visionFieldavg5.setRobotPose(vDataAvg5.getPose());
