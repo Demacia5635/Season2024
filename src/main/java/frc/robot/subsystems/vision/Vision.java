@@ -11,6 +11,7 @@ import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Timer;
@@ -42,8 +43,12 @@ public class Vision extends SubsystemBase {
     // declaring poseEstimator chassis and buffers 
     SwerveDrivePoseEstimator poseEstimator;
     Chassis chassis;
-    VisionData[] buf3;
-    VisionData[] buf5;
+    VisionData[] buf3Avg;
+    VisionData[] buf3Med;
+
+    VisionData[] buf5Avg;
+    VisionData[] buf5Med;
+
 
     int lastData;
     int lastData5;
@@ -52,14 +57,30 @@ public class Vision extends SubsystemBase {
     boolean firstRun;
     int countCycles;
 
+    SwerveDrivePoseEstimator testPoseEstimatorBuf3Avg;
+    SwerveDrivePoseEstimator testPoseEstimatorBuf3Med;
+    SwerveDrivePoseEstimator testPoseEstimatorBuf5Avg;
+    SwerveDrivePoseEstimator testPoseEstimatorBuf5Med;
 
-    public Vision(Chassis chassis, SwerveDrivePoseEstimator estimator) {
+    public Vision(Chassis chassis, SwerveDrivePoseEstimator estimator, SwerveDrivePoseEstimator testPoseEstimatorBuf3Avg, SwerveDrivePoseEstimator testPoseEstimatorBuf3Med, SwerveDrivePoseEstimator testPoseEstimatorBuf5Avg, SwerveDrivePoseEstimator testPoseEstimatorBuf5Med) {
+        
+        this.testPoseEstimatorBuf3Avg = testPoseEstimatorBuf3Avg;
+        this.testPoseEstimatorBuf3Med = testPoseEstimatorBuf3Med;
+        this.testPoseEstimatorBuf5Avg = testPoseEstimatorBuf5Avg;
+        this.testPoseEstimatorBuf5Med = testPoseEstimatorBuf5Med;
+        
+        
+        
+        
+        
         this.chassis = chassis;
         this.poseEstimator = estimator;
         this.lastData = -1;
         this.lastData5 = -1;
-        this.buf3  = new VisionData[3];
-        this.buf5 = new VisionData[5];
+        this.buf3Avg  = new VisionData[3];
+        this.buf5Avg = new VisionData[5];
+        this.buf3Med  = new VisionData[3];
+        this.buf5Med = new VisionData[5];
         this.Limelight2 = new PhotonCamera(Limelight2Name);
         this.Limelight3 = new PhotonCamera(Pi5CameraName);
         
@@ -79,11 +100,17 @@ public class Vision extends SubsystemBase {
         } 
         
         //initializing buffers
-        for (int i = 0; i < buf3.length; i++) {
-            this.buf3[i] = new VisionData(null, 0);
+        for (int i = 0; i < buf3Avg.length; i++) {
+            this.buf3Avg[i] = new VisionData(null, 0, testPoseEstimatorBuf3Avg);
         }
-        for (int i = 0; i < buf5.length; i++) {
-            this.buf5[i] = new VisionData(null, 0);
+        for (int i = 0; i < buf5Avg.length; i++) {
+            this.buf5Avg[i] = new VisionData(null, 0, testPoseEstimatorBuf5Avg);
+        }
+        for (int i = 0; i < buf3Med.length; i++) {
+            this.buf3Med[i] = new VisionData(null, 0, testPoseEstimatorBuf3Med);
+        }
+        for (int i = 0; i < buf5Med.length; i++) {
+            this.buf5Med[i] = new VisionData(null, 0, testPoseEstimatorBuf5Med);
         }
 
         //initializing fields for testing
@@ -114,17 +141,22 @@ public class Vision extends SubsystemBase {
     public void updateRobotPose() {
         double time = getTime();
         if (validBuf(time)) {
-            VisionData vData = median(buf3);
-            VisionData vDataAvg = avg(buf3);
-            if (vData != null && vData.getPose() != null && vDataAvg.getPose() != null && vDataAvg != null) {
-                poseEstimator.addVisionMeasurement(vData.pose, vData.timeStamp);
+            VisionData vDataMed = median(buf3Med);
+            Pair<Pose2d, Double> vData3AvgPair = avg(buf5Avg);
+            VisionData vDataAvg = new VisionData(vData3AvgPair.getFirst(), vData3AvgPair.getSecond(), testPoseEstimatorBuf3Avg)  ;
+                        if (vDataMed != null && vDataMed.getPose() != null && vDataAvg.getPose() != null && vDataAvg != null) {
+                testPoseEstimatorBuf3Med.addVisionMeasurement(vDataMed.pose, vDataMed.timeStamp);
+                testPoseEstimatorBuf3Avg.addVisionMeasurement(vDataAvg.pose, vDataAvg.timeStamp);
                 poseEstimatorField.setRobotPose(poseEstimator.getEstimatedPosition());
-                visionField3.setRobotPose(vData.getPose());
+                visionField3.setRobotPose(vDataMed.getPose());
                 visionFieldavg3.setRobotPose(vDataAvg.getPose());
                 lastUpdateTime = time;
-                time = vData.getTimeStamp();
+                time = vDataMed.getTimeStamp();
 
-                for (VisionData vd : buf3){
+                for (VisionData vd : buf3Med){
+                    vd.clear();
+                }
+                for (VisionData vd : buf3Avg){
                     vd.clear();
                 }
             }
@@ -134,15 +166,22 @@ public class Vision extends SubsystemBase {
     public void updateRobotPose5() {
         double time = getTime();
         if (validBuf5(time)) {
-            VisionData vData5 = median(buf5);
-            VisionData vDataAvg5 = avg(buf5);
-            if (vData5 != null && vData5.getPose() != null && vDataAvg5.getPose() != null && vDataAvg5 != null) {
-                visionField5.setRobotPose(vData5.getPose());
+            VisionData vData5Med = median(buf5Med);
+            Pair<Pose2d, Double> vData5AvgPair = avg(buf5Avg);
+            VisionData vDataAvg5 = new VisionData(vData5AvgPair.getFirst(), vData5AvgPair.getSecond(), testPoseEstimatorBuf5Avg)  ;
+            if (vData5Med != null && vData5Med.getPose() != null && vDataAvg5.getPose() != null && vDataAvg5 != null) {
+                testPoseEstimatorBuf3Med.addVisionMeasurement(vData5Med.pose, vData5Med.timeStamp);
+                testPoseEstimatorBuf3Avg.addVisionMeasurement(vDataAvg5.pose, vDataAvg5.timeStamp);
+                
+                visionField5.setRobotPose(vData5Med.getPose());
                 visionFieldavg5.setRobotPose(vDataAvg5.getPose());
                 lastUpdateTime5 = time;
-                time = vData5.getTimeStamp();
+                time = vData5Med.getTimeStamp();
 
-                for (VisionData vd : buf5){
+                for (VisionData vd : buf5Med){
+                    vd.clear();
+                }
+                for (VisionData vd : buf5Avg){
                     vd.clear();
                 }
                 
@@ -165,21 +204,35 @@ public class Vision extends SubsystemBase {
                     var estimatedRobotPose = PhotonUpdate.get();
                     var estimatedPose = estimatedRobotPose.estimatedPose;
                     if(estimatedRobotPose != null){
-                        VisionData newVisionData = new VisionData(estimatedPose.toPose2d(), estimatedRobotPose.timestampSeconds);
-                        VisionData newVisionData5 = new VisionData(estimatedPose.toPose2d(), estimatedRobotPose.timestampSeconds);
+                        VisionData newVisionData3Avg = new VisionData(estimatedPose.toPose2d(), estimatedRobotPose.timestampSeconds,testPoseEstimatorBuf3Avg);
+                        VisionData newVisionData5Avg = new VisionData(estimatedPose.toPose2d(), estimatedRobotPose.timestampSeconds,testPoseEstimatorBuf5Avg);
+                        VisionData newVisionData3Med = new VisionData(estimatedPose.toPose2d(), estimatedRobotPose.timestampSeconds,testPoseEstimatorBuf3Med);
+                        VisionData newVisionData5Med = new VisionData(estimatedPose.toPose2d(), estimatedRobotPose.timestampSeconds,testPoseEstimatorBuf5Med);
                         if(countCycles < 100){
                             SmartDashboard.putNumber("cyclelesstan100", 1);
-                            poseEstimator.resetPosition(chassis.getAngle(), chassis.getModulePositions(), newVisionData.getFalsePose());
+                            poseEstimator.resetPosition(chassis.getAngle(), chassis.getModulePositions(), newVisionData3Avg.getFalsePose());
+                            
+                            testPoseEstimatorBuf3Avg.resetPosition(chassis.getAngle(), chassis.getModulePositions(), newVisionData3Avg.getFalsePose());
+                            testPoseEstimatorBuf3Med.resetPosition(chassis.getAngle(), chassis.getModulePositions(), newVisionData3Avg.getFalsePose());
+                            testPoseEstimatorBuf5Avg.resetPosition(chassis.getAngle(), chassis.getModulePositions(), newVisionData3Avg.getFalsePose());
+                            testPoseEstimatorBuf5Med.resetPosition(chassis.getAngle(), chassis.getModulePositions(), newVisionData3Avg.getFalsePose());
+
+                            
                             // firstRun = false;
                         }
-                        if (newVisionData != null && newVisionData.getPose() != null) {
+                        if (newVisionData5Avg != null && newVisionData5Avg.getPose() != null && newVisionData3Avg != null &&
+                         newVisionData3Avg.getPose() != null && newVisionData5Med != null && 
+                         newVisionData5Med.getPose() != null&& newVisionData3Med != null && 
+                         newVisionData3Med.getPose() != null) {
                             lastData = next();
                             lastData5 = next5(); 
-                            buf3[lastData] = newVisionData;
-                            buf5[lastData5] = newVisionData5;
+                            buf3Avg[lastData] = newVisionData3Avg;
+                            buf5Avg[lastData5] = newVisionData5Avg;
+                            buf3Med[lastData] = newVisionData3Med;
+                            buf5Med[lastData5] = newVisionData5Med;
                             
 
-                            visionField.setRobotPose(newVisionData.getPose());
+                            visionField.setRobotPose(newVisionData3Avg.getPose());
                         }   
                     }
                 } catch (NoSuchElementException e) {
@@ -233,7 +286,7 @@ public class Vision extends SubsystemBase {
         return Timer.getFPGATimestamp();
     }
 
-    public  VisionData avg(VisionData[] visionDataArr) {
+    public  Pair<Pose2d, Double> avg(VisionData[] visionDataArr) {
 
         double averageX = 0.0;
         double averageY = 0.0;
@@ -255,7 +308,7 @@ public class Vision extends SubsystemBase {
         averageRotation /= visionDataArr.length;
         avarageTimeStamp /= visionDataArr.length;
         // Create a new Pose2d with the calculated averages
-        return new VisionData((new Pose2d(averageX, averageY, new Rotation2d(averageRotation))), avarageTimeStamp);
+        return new Pair<Pose2d, Double>((new Pose2d(averageX, averageY, new Rotation2d(averageRotation))), avarageTimeStamp);
     }
 
     Comparator<VisionData> comperator = new Comparator<VisionData>() {
@@ -274,7 +327,7 @@ public class Vision extends SubsystemBase {
 
     // BUF 3
     int next() {
-        return (lastData + 1) % buf3.length;
+        return (lastData + 1) % buf3Avg.length;
     }
 
     /*
@@ -284,7 +337,7 @@ public class Vision extends SubsystemBase {
     private boolean validBuf(double time) {
         
         double minTime = time - 1.2;
-        for (VisionData vData : buf3) {
+        for (VisionData vData : buf3Avg) {
             if (vData.getTimeStamp() < minTime) {
                 //System.out.println(vData.getTimeStamp() + ", " + minTime + ", " + (vData.getTimeStamp() < minTime));
                 return false;
@@ -302,7 +355,7 @@ public class Vision extends SubsystemBase {
     }
     // BUF 5
     int next5() {
-        return (lastData5 + 1) % buf5.length;
+        return (lastData5 + 1) % buf5Avg.length;
     }
     
     private boolean validBuf5(double time) {
@@ -313,7 +366,7 @@ public class Vision extends SubsystemBase {
         //     System.out.println(visionBill.timeStamp + ", in index:" + i);
         // }
         // System.out.println("---------------------------");
-        for (VisionData vData : buf5) {
+        for (VisionData vData : buf5Avg) {
             //System.out.println(vData.timeStamp);
             if (vData.getTimeStamp() < minTime) {
                 // System.out.println(vData.getTimeStamp() + ", " + minTime + ", " + (vData.getTimeStamp() < minTime));
@@ -339,13 +392,14 @@ public class Vision extends SubsystemBase {
         private double diffrence; // difference than odometry
         private Pose2d falsePose;
         private double falsetimeStamp;
+        private SwerveDrivePoseEstimator bufPoseEstimator;
     
-    
-        VisionData(Pose2d pose, double timeStamp) {
+        VisionData(Pose2d pose, double timeStamp, SwerveDrivePoseEstimator bufPoseEstimator) {
             this.pose = pose;
             this.timeStamp = timeStamp;
             this.falsePose = pose;
             this.falsetimeStamp = timeStamp;
+            this.bufPoseEstimator = bufPoseEstimator;
             if (timeStamp < 0) {
                 System.out.println("cleared at constructor, " + timeStamp);
                 clear();
@@ -369,7 +423,8 @@ public class Vision extends SubsystemBase {
         }
     
         protected void setDiffrence() {
-            Pose2d poseSample = poseEstimator.getSample(timeStamp);
+
+            Pose2d poseSample = this.bufPoseEstimator.getSample(timeStamp);
             if (poseSample != null
                     && Math.abs(poseSample.getRotation().minus(pose.getRotation()).getDegrees()) < maxValidAngleDiff) {
                 diffrence = poseSample.getTranslation().getDistance(pose.getTranslation());

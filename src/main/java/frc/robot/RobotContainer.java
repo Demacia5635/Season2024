@@ -65,7 +65,23 @@ public class RobotContainer implements Sendable{
    */
   public Command getAutonomousCommand() {
   
-    return new RunCommand(()-> chassis.setVelocities(new ChassisSpeeds(0, -2.7, 0)), chassis);
+    return new RunCommand(()-> chassis.setVelocities(new ChassisSpeeds(0.5, 0, 0)), chassis).withTimeout(4).
+    andThen(new RunCommand(()-> chassis.setVelocities(new ChassisSpeeds(-1, 0, 0)), chassis).withTimeout(3.5)).
+    andThen(new RunCommand(()-> chassis.setVelocities(new ChassisSpeeds(1.5, 0, 0)), chassis).withTimeout(3)).
+    andThen(new RunCommand(()-> chassis.setVelocities(new ChassisSpeeds(-2, 0, 0)), chassis).withTimeout(3)).
+    andThen(new RunCommand(()-> chassis.setVelocities(new ChassisSpeeds(2.5, 0, 0)), chassis).withTimeout(2.5)).
+    andThen(new RunCommand(()-> chassis.setVelocities(new ChassisSpeeds(-3, 0, 0)), chassis).withTimeout(2)).
+    andThen(new RunCommand(()-> chassis.setVelocities(new ChassisSpeeds(3.5, 0, 0)), chassis).withTimeout(1.5)).
+    andThen(new RunCommand(()-> chassis.setVelocities(new ChassisSpeeds(-4, 0, 0)), chassis).withTimeout(1));
+  
 
+    // return new RunCommand(()-> chassis.setVelocities(new ChassisSpeeds(0, 0.5, 0)), chassis).withTimeout(4).
+    // andThen(new RunCommand(()-> chassis.setVelocities(new ChassisSpeeds(0, -1, 0)), chassis).withTimeout(3.5)).
+    // andThen(new RunCommand(()-> chassis.setVelocities(new ChassisSpeeds(0, 1.5, 0)), chassis).withTimeout(3)).
+    // andThen(new RunCommand(()-> chassis.setVelocities(new ChassisSpeeds(0, -2, 0)), chassis).withTimeout(3)).
+    // andThen(new RunCommand(()-> chassis.setVelocities(new ChassisSpeeds(0, 2.5, 0)), chassis).withTimeout(2.5)).
+    // andThen(new RunCommand(()-> chassis.setVelocities(new ChassisSpeeds(0, -3, 0)), chassis).withTimeout(2)).
+    // andThen(new RunCommand(()-> chassis.setVelocities(new ChassisSpeeds(0, 3.5, 0)), chassis).withTimeout(1.5)).
+    // andThen(new RunCommand(()-> chassis.setVelocities(new ChassisSpeeds(0, -4, 0)), chassis).withTimeout(1));
   }
 }
