@@ -138,9 +138,9 @@ public final class Constants {
         public static final double KA = 165;
         public static final double KB = 161;
         
-        public static final double KS = 0;
+        public static final double KS = 0.056673856189171;
         public static final double KG = 0;
-        public static final double KV = 0;
+        public static final double KV = 0.000091655292302;
         
 
     }
