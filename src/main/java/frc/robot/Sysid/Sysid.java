@@ -199,7 +199,7 @@ public class Sysid {
         for (int i = 0; i < gains.length; i++) {
             result[i] = coef.get(i, 0);
             SmartDashboard.putNumber("SysID/" + gains[i], result[i]);
-            System.out.println("Sysid: " + gains[i] + " = " + result[i]);
+           // System.out.println("Sysid: " + gains[i] + " = " + result[i]);
         }
         SimpleMatrix p = dataCollector.data().mult(coef);
         SimpleMatrix e = dataCollector.power().minus(p);
@@ -208,7 +208,7 @@ public class Sysid {
         double avg = ee.elementSum() / ee.getNumRows();
         SmartDashboard.putNumber("Sysid/Max Error", max);
         SmartDashboard.putNumber("Sysid/Avg Error Sqr", avg);
-        System.out.println("Sysid: max error=" + max + " avg error squared=" + avg);
+       // System.out.println("Sysid: max error=" + max + " avg error squared=" + avg);
         double kp = (valueOf(Gains.KV, gains, result) + valueOf(Gains.KA, gains, result))/5.0;
         SmartDashboard.putNumber("Sysid/KP (Roborio)", kp);
         SmartDashboard.putNumber("Sysid/KP (Roborio)", kp);

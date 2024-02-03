@@ -55,12 +55,12 @@ public final class ChassisConstants {
     return inch * 0.0254;
   }
   
-  public static final double MAX_DRIVE_VELOCITY = 4;
-  public static final double DRIVE_ACCELERATION = 30;
+  public static final double MAX_DRIVE_VELOCITY = 4.1;
+  public static final double DRIVE_ACCELERATION = 50;
   public static final double MAX_STEER_VELOCITY = 600;
   public static final double STEER_ACCELERATION = 6000;
   public static final double MAX_STEER_ERROR = 1;
-    public static final double MAX_OMEGA_VELOCITY = Math.toRadians(480);
+    public static final double MAX_OMEGA_VELOCITY = Math.toRadians(650);
 
   public static final double MAX_OMEGA_ACCELERATION = Math.toRadians(720);
 
@@ -88,7 +88,7 @@ public final class ChassisConstants {
   public static final FF_Constants FRONT_STEER_FF = new FF_Constants(0.069108623637248, 0.00034365326824, 0.000702476229803);
   public static final FF_Constants BACK_STEER_FF = new FF_Constants(0.080821555555163, 0.000529165452406, 0.004994578577863);
   public static final FF_Constants MOVE_FF_LESS = new FF_Constants(0.05, 0.17, 0.02251759948634);
-  public static final FF_Constants MOVE_FF_MORE = new FF_Constants(0.08, 0.21, 0.02251759948634);
+  public static final FF_Constants MOVE_FF_MORE = new FF_Constants(0.085, 0.223, 0.03251759948634);
 
 
 
@@ -194,8 +194,8 @@ public final class ChassisConstants {
     public final PID_Constants movePID;
     public final PID_Constants steerPID;
     public final PID_Constants steerPositionPID;
-    public final FF_Constants moveFFLess;
-    public final FF_Constants moveFFMore;
+    public final FF_Constants moveFFSlow;
+    public final FF_Constants moveFFFast;
     public final FF_Constants steerFF;
     public final double pulsePerMeter;
     public final double pulsePerDegree;
@@ -211,8 +211,8 @@ public final class ChassisConstants {
       this.moduleTranslationOffset = moduleTranslationOffset;
       this.steerOffset = steerOffset;
       this.movePID = movePID;
-      this.moveFFLess = moveFFLess;
-      this.moveFFMore = moveFFMore;
+      this.moveFFSlow = moveFFLess;
+      this.moveFFFast = moveFFMore;
       this.steerFF = steerFF;
       this.steerPID = steerPID;
       this.pulsePerDegree = pulsePerDegree;

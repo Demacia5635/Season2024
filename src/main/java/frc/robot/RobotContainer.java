@@ -36,14 +36,9 @@ public class RobotContainer implements Sendable{
   Chassis chassis = new Chassis();
 
   pathPoint[] points = {
-    new pathPoint(0, 2, Rotation2d.fromDegrees(0), 0, true),
-    new pathPoint(3, 1, Rotation2d.fromDegrees(0), 0, true),
-    new pathPoint(0, 1, Rotation2d.fromDegrees(0), 0, false),
-    new pathPoint(1, 2, Rotation2d.fromDegrees(90), 0, false),
-   };
-
-
- 
+    new pathPoint(0, 0, Rotation2d.fromDegrees(0), 0, false),
+    new pathPoint(2, 0, Rotation2d.fromDegrees(0), 0, false),
+  };
   Command test = new RunCommand(() -> {chassis.setVelocities(new ChassisSpeeds(-0.5, 0, 0));}, chassis).andThen(new WaitCommand(2),
   new RunCommand(() -> {chassis.setVelocities(new ChassisSpeeds(-0.4  , 0, 0));}, chassis).andThen(new WaitCommand(2)),
   new RunCommand(() -> {chassis.setVelocities(new ChassisSpeeds(0, 0, 0));}, chassis).andThen(new WaitCommand(2)));
@@ -79,7 +74,7 @@ public class RobotContainer implements Sendable{
     }
    
   public Command getAutonomousCommand() {
-    return new PathFollow(chassis, points, 3, 6, isRed);
-    
+    return new PathFollow(chassis, points, 3, 6, DriverStation.getAlliance().get() == Alliance.Red);
+   
   }
 }

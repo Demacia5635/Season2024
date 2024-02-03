@@ -30,7 +30,6 @@ public class DriveCommand extends Command {
     this.controller = controller;
     if(isRed) direction = 1;
     else direction = -1;
-
     
     addRequirements(chassis);
     commandXboxController.b().onTrue(new InstantCommand(() -> precisionDrive = !precisionDrive));
@@ -54,9 +53,9 @@ public class DriveCommand extends Command {
       rotateToApriltag = false;
     }
 
-    double velX = Math.pow(joyX, 3)* MAX_DRIVE_VELOCITY;
-    double velY = Math.pow(joyY, 3) * MAX_DRIVE_VELOCITY;
-    double velRot = Math.pow(rot, 3) * MAX_OMEGA_VELOCITY;
+    double velX = Math.pow(joyX, 2)* MAX_DRIVE_VELOCITY * Math.signum(joyX);
+    double velY = Math.pow(joyY, 2) * MAX_DRIVE_VELOCITY * Math.signum(joyY);
+    double velRot = Math.pow(rot, 2) * MAX_OMEGA_VELOCITY * Math.signum(rot);
 
     if(rotateToApriltag)
     {
@@ -78,7 +77,7 @@ public class DriveCommand extends Command {
       velRot /= 4;
     }
 
-    System.out.println("target velocity= " + velRot);
+    //System.out.println("target velocity= " + velRot);
 
 
     ChassisSpeeds speeds = new ChassisSpeeds(velX, velY, velRot);

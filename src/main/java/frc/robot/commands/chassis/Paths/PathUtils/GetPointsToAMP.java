@@ -31,7 +31,7 @@ public class GetPointsToAMP extends Command {
      
     
     Zone zone = Zone.getZone(chassis.getPose().getTranslation());
-    System.out.println("ZONE: " + zone);
+    // System.out.println("ZONE: " + zone);
     switch (zone) {
       case STAGE:
         points.add(new pathPoint(11.811, 3.203, chassis.getAngle(), 0.15, false));

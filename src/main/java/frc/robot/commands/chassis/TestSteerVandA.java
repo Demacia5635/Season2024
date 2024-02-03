@@ -32,8 +32,8 @@ public class TestSteerVandA extends Command {
         n++;
         double v = module.getSteerVelocity();
         double a = module.getAngleDegrees();
-        System.out.println(" last power = " + power + " v=" + v + " angle =" + a + " delat V=" + (v - lastV)
-                + " delta angle=" + (a - lastAngle));
+        // System.out.println(" last power = " + power + " v=" + v + " angle =" + a + " delat V=" + (v - lastV)
+                // + " delta angle=" + (a - lastAngle));
         lastAngle = a;
         lastV = v;
         if (n == 5) {

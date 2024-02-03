@@ -69,7 +69,7 @@ public class TrapezoidNoam {
             double t = remainingDistance * 2 / (curentVelocity + targetVelocity);
             double a = (curentVelocity - targetVelocity)/t;
             lastV = Math.min(maxVelocity,curentVelocity - a*0.02);
-            if(debug) System.out.println(" reduce v - " + a + " maxV=" + maxVelocity + " maxA=" + maxAcceleration);
+          //  if(debug) System.out.println(" reduce v - " + a + " maxV=" + maxVelocity + " maxA=" + maxAcceleration);
         }
         if(debug) {
             System.out.println(" Trap: curV = " + baseCurV + " / " + curentVelocity + " next=" + lastV + " remain=" + remainingDistance);

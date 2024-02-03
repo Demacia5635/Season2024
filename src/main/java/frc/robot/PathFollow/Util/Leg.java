@@ -45,7 +45,7 @@ public class Leg extends Segment{
         Translation2d relativePos = position.minus(p1);
 
         //double distanceMoved = (relativePos.getX() * velDirection.getX()) + (relativePos.getY()*velDirection.getY());
-        return relativePos.getNorm();
+        return Math.abs(relativePos.getNorm());
     }
 
     @Override
