@@ -100,54 +100,54 @@ public class PathFollow extends CommandBase {
 
   @Override
   public void initialize() {
+    //sets first point to chassis pose to prevent bugs with red and blue alliance
     points[0] = new pathPoint(chassis.getPose().getX(), chassis.getPose().getY(), chassis.getAngle(), points[0].getRadius(), false);
+
+    //case for red alliance (blue is the default)
     if (isRed) {
       for (int i = 1; i < points.length; i++) {
         points[i] = new pathPoint(fieldLength - points[i].getX(), points[i].getY(), points[i].getRotation().times(-1),
             points[i].getRadius(), points[i].isAprilTag());
-        // System.out.println("New x: " + points[i].getX());
-        // System.out.println("New y: " + points[i].getY());
       }
-      corners = new RoundedPoint[points.length - 2];
-      for (int i = 0; i < points.length - 2; i++) {
-        corners[i] = new RoundedPoint(points[i], points[i + 1], points[i + 2], points[i].isAprilTag());
+    }
+    corners = new RoundedPoint[points.length - 2];
+    for (int i = 0; i < points.length - 2; i++) {
+      corners[i] = new RoundedPoint(points[i], points[i + 1], points[i + 2], points[i].isAprilTag());
+    }
+    // case for 1 segment, need to create only 1 leg
+    if (points.length < 3) {
+      segments[0] = new Leg(points[0].getTranslation(), points[1].getTranslation(), points[1].isAprilTag());
+      // System.out.println("------LESS THAN 3------");
+    }
+    // case for more then 1 segment
+    else {
+      // creates the first leg
+      segments[0] = corners[0].getAtoCurveLeg();
+
+      int segmentIndexCreator = 1;
+      // creates arc than leg
+      for (int i = 0; i < corners.length - 1; i += 1) {
+
+        segments[segmentIndexCreator] = corners[i].getArc();
+
+        segments[segmentIndexCreator + 1] = new Leg(corners[i].getCurveEnd(), corners[i + 1].getCurveStart(),
+          points[segmentIndexCreator].isAprilTag());
+        segments[segmentIndexCreator].setAprilTagMode(points[segmentIndexCreator].isAprilTag());
+        segmentIndexCreator += 2;
       }
-      // case for 1 segment, need to create only 1 leg
-      if (points.length < 3) {
-        segments[0] = new Leg(points[0].getTranslation(), points[1].getTranslation(), points[1].isAprilTag());
-        // System.out.println("------LESS THAN 3------");
-      }
-      // case for more then 1 segment
-      else {
-        // creates the first leg
-        segments[0] = corners[0].getAtoCurveLeg();
+      // creates the last arc and leg
+      segments[segments.length - 2] = corners[corners.length - 1].getArc();
+      segments[segments.length - 1] = corners[corners.length - 1].getCtoCurveLeg();
+    }
 
-        int segmentIndexCreator = 1;
-        // creates arc than leg
-        for (int i = 0; i < corners.length - 1; i += 1) {
-
-          segments[segmentIndexCreator] = corners[i].getArc();
-
-          segments[segmentIndexCreator + 1] = new Leg(corners[i].getCurveEnd(), corners[i + 1].getCurveStart(),
-              points[segmentIndexCreator].isAprilTag());
-          segments[segmentIndexCreator].setAprilTagMode(points[segmentIndexCreator].isAprilTag());
-          segmentIndexCreator += 2;
-        }
-        // creates the last arc and leg
-        segments[segments.length - 2] = corners[corners.length - 1].getArc();
-        segments[segments.length - 1] = corners[corners.length - 1].getCtoCurveLeg();
-      }
-
-      // calculates the length of the entire path
-      double segmentSum = 0;
-      for (Segment s : segments) {
-        segmentSum += s.getLength();
-      }
-      pathLength = segmentSum;
-      totalLeft = pathLength;
-
-      totalLeft = pathLength;
-      segmentIndex = 0;
+    // calculates the length of the entire path
+    double segmentSum = 0;
+    for (Segment s : segments) {
+      segmentSum += s.getLength();
+    }
+    pathLength = segmentSum;
+    totalLeft = pathLength;
+    segmentIndex = 0;
 
 
     List<State> list = new ArrayList<>();
@@ -163,9 +163,9 @@ public class PathFollow extends CommandBase {
     Trajectory traj = new Trajectory();
     trajField.getObject("TrajTEST").setTrajectory(traj);
 
-      vecVel = new Translation2d(0, 0);
-    }
+    vecVel = new Translation2d(0, 0);
   }
+
 
   // calculates the position of the closet april tag and returns it's position
   boolean foundAprilTag = false;
@@ -186,6 +186,7 @@ public class PathFollow extends CommandBase {
 
     return finalVector.getAngle();
   }
+  
 
   @Override
   public void execute() {

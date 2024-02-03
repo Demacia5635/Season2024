@@ -23,16 +23,16 @@ public class AutoChooser {
 
     Translation2d centerOfStage = new Translation2d();
 
-    private SendableChooser firstNote;
-    private SendableChooser secondNote;
-    private SendableChooser thirdNote;
-    private SendableChooser fourthNote;
-    private SendableChooser fifthhNote;
-    private SendableChooser startingZone;
+    private SendableChooser<Translation2d> firstNote;
+    private SendableChooser<Translation2d> secondNote;
+    private SendableChooser<Translation2d> thirdNote;
+    private SendableChooser<Translation2d> fourthNote;
+    private SendableChooser<Translation2d> fifthhNote;
+    private SendableChooser<Translation2d[]> startingZone;
 
 
     
-    List points = new ArrayList<pathPoint>();
+    List<pathPoint> points = new ArrayList<pathPoint>();
 
     
     public AutoChooser(boolean isRed){
@@ -51,26 +51,60 @@ public class AutoChooser {
         else currentZone = (Translation2d[]) startingZone.getSelected();
     }
 
+    
+
     private pathPoint[] goThroughStage(Translation2d startingPos, Translation2d finalPos){
         List<pathPoint> points = new ArrayList<pathPoint>();
         if((finalPos.getX() - startingPos.getX()) * direction > 0)
         {
            
             if(startingPos.getY() > centerOfStage.getY()) 
-                points.add(new pathPoint(0, 0, Rotation2d.fromDegrees(0), 0.3, false)); //TODO top of stage
-            else points.add(new pathPoint(0, 0, Rotation2d.fromDegrees(0), 0.3, false)); //TODO bottom of stage
-            points.add(new pathPoint(0, 0, Rotation2d.fromDegrees(180), 0.3, false)); // TODO cetner of stage
-            points.add(new pathPoint(0, 0, Rotation2d.fromDegrees(180), 0.3, false)); // TODO exit of stage
+                points.add(new pathPoint(12.283, 3.206, Rotation2d.fromDegrees(0), 0.3, false));
+            else points.add(new pathPoint(12.195, 5.023, Rotation2d.fromDegrees(0), 0.3, false)); 
+            points.add(new pathPoint(11.734, 4.247, Rotation2d.fromDegrees(180), 0.3, false)); 
+            points.add(new pathPoint(10.337, 4.231, Rotation2d.fromDegrees(180), 0.3, false)); 
         }
         else {
-            points.add(new pathPoint(0, 0, Rotation2d.fromDegrees(0), 0, false)); // TODO exit of stage
-            points.add(new pathPoint(0, 0, Rotation2d.fromDegrees(180), 0.3, false)); // TODO cetner of stage
+            points.add(new pathPoint(10.337, 4.231, Rotation2d.fromDegrees(180), 0.3, false));
+            points.add(new pathPoint(11.734, 4.247, Rotation2d.fromDegrees(180), 0.3, false)); 
             if(finalPos.getY() > centerOfStage.getY()){
-                points.add(new pathPoint(0, 0, Rotation2d.fromDegrees(0), 0.3, false)); //TODO top of stage
+                points.add(new pathPoint(12.195, 5.023, Rotation2d.fromDegrees(0), 0.3, false)); 
             }
-            else points.add(new pathPoint(0, 0, Rotation2d.fromDegrees(0), 0.3, false)); // TODO bottom of stage
+            else points.add(new pathPoint(12.283, 3.206, Rotation2d.fromDegrees(0), 0.3, false));
         }
         return (pathPoint[]) points.toArray();
+    }
+
+
+    public void showLegalPoints(Translation2d[] zone){
+        if(zone == zoneTop){
+            firstNote.setDefaultOption("none", new Translation2d());
+            secondNote.setDefaultOption("none", new Translation2d());
+            thirdNote.setDefaultOption("none", new Translation2d());
+            fourthNote.setDefaultOption("none", new Translation2d());
+            firstNote.addOption("Note Top", noteTop);
+            firstNote.addOption("Note Mid", noteMid);
+            firstNote.addOption("Note 1", note1);
+            firstNote.addOption("Note 2", note2);
+            secondNote.addOption("Note Top", noteTop);
+            secondNote.addOption("Note Mid", noteMid);
+            secondNote.addOption("Note 1", note1);
+            secondNote.addOption("Note 2", note2);
+            thirdNote.addOption("Note Top", noteTop);
+            thirdNote.addOption("Note Mid", noteMid);
+            thirdNote.addOption("Note 1", note1);
+            thirdNote.addOption("Note 2", note2);
+            fourthNote.addOption("Note Top", noteTop);
+            fourthNote.addOption("Note Mid", noteMid);
+            fourthNote.addOption("Note 1", note1);
+            fourthNote.addOption("Note 2", note2);
+            
+            
+            
+        }
+        else if(zone == zoneMid){
+            firstNote.addOption(null, note1);
+        }
     }
 
 }
