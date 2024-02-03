@@ -5,105 +5,72 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import frc.robot.PathFollow.Util.RectanglePos;
 import frc.robot.PathFollow.Util.pathPoint;
+import static frc.robot.subsystems.chassis.ChassisConstants.*;
 
 public class AutoChooser {
-    public enum PosToPass{
-        TOP, MID, BOTTOM;
-    }
-    public enum Notes{
-        note1, note2, note3, note4, note5, noteT, noteM, noteB;
-    }
+    Translation2d[] zoneTop = {noteTop, noteMid, note1, note2};
+    Translation2d[] zoneMid = {noteMid, noteBottom, note2, note3, note4};
+    Translation2d[] zoneBottom = {noteBottom, note4, note5};
+    Translation2d[] currentZone = {};
+
+    boolean isRed = false;
+    int direction = 0; //based on alliance
+
+    Translation2d centerOfStage = new Translation2d();
+
     private SendableChooser firstNote;
     private SendableChooser secondNote;
     private SendableChooser thirdNote;
     private SendableChooser fourthNote;
+    private SendableChooser fifthhNote;
+    private SendableChooser startingZone;
 
-    private SendableChooser goTopMidOrBottom;
-    private SendableChooser wantToDefend;
 
     
     List points = new ArrayList<pathPoint>();
 
     
-    public AutoChooser(){
-        firstNote.setDefaultOption("null", null);
-        firstNote.addOption("note top", Notes.noteT);
-        firstNote.addOption("note middle", Notes.noteM);
-        firstNote.addOption("note bottom", Notes.noteB);
-        firstNote.addOption("note top", Notes.note1);
-        firstNote.addOption("note middle", Notes.note2);
-        firstNote.addOption("note bottom", Notes.note3);
-        firstNote.addOption("note bottom", Notes.note4);
-        firstNote.addOption("note bottom", Notes.note5);
+    public AutoChooser(boolean isRed){
+        this.isRed = isRed;
+        direction = isRed ? 1 : -1;
 
-
-        secondNote.setDefaultOption("null", null);
-        secondNote.addOption("note top", Notes.noteT);
-        secondNote.addOption("note middle", Notes.noteM);
-        secondNote.addOption("note bottom", Notes.noteB);
-        secondNote.addOption("note top", Notes.note1);
-        secondNote.addOption("note middle", Notes.note2);
-        secondNote.addOption("note bottom", Notes.note3);
-        secondNote.addOption("note bottom", Notes.note4);
-        secondNote.addOption("note bottom", Notes.note5);
-
-        thirdNote.setDefaultOption("null", null);
-        thirdNote.addOption("note top", Notes.noteT);
-        thirdNote.addOption("note middle", Notes.noteM);
-        thirdNote.addOption("note bottom", Notes.noteB);
-        thirdNote.addOption("note top", Notes.note1);
-        thirdNote.addOption("note middle", Notes.note2);
-        thirdNote.addOption("note bottom", Notes.note3);
-        thirdNote.addOption("note bottom", Notes.note4);
-        thirdNote.addOption("note bottom", Notes.note5);
-
-        
-        fourthNote.setDefaultOption("null", null);
-        fourthNote.addOption("note top", Notes.noteT);
-        fourthNote.addOption("note middle", Notes.noteM);
-        fourthNote.addOption("note bottom", Notes.noteB);
-        fourthNote.addOption("note top", Notes.note1);
-        fourthNote.addOption("note middle", Notes.note2);
-        fourthNote.addOption("note bottom", Notes.note3);
-        fourthNote.addOption("note bottom", Notes.note4);
-        fourthNote.addOption("note bottom", Notes.note5);
-
-        wantToDefend.setDefaultOption("null", false);
-        wantToDefend.addOption("yes",  true);
-        wantToDefend.addOption("no", false);
-
-        goTopMidOrBottom.setDefaultOption("null", false);
-        goTopMidOrBottom.addOption("TOP",  PosToPass.TOP);
-        goTopMidOrBottom.addOption("MID", PosToPass.MID);        
-        goTopMidOrBottom.addOption("BOTTOM", PosToPass.BOTTOM);
-
+        startingZone.setDefaultOption("null", null);
+        startingZone.addOption("TOP", zoneTop);
+        startingZone.addOption("MIDDLE", zoneMid);
+        startingZone.addOption("BOTTOM", zoneBottom);
 
     }
-    
-    public Notes getFirstNote(){
-        return (Notes)firstNote.getSelected();
-    }
-    public Notes getSecondNote(){
-        return (Notes)secondNote.getSelected();
-    }
-    public Notes getThirdNote(){
-        return (Notes)thirdNote.getSelected();
-    }
-    public Notes getFourthNote(){
-        return (Notes)fourthNote.getSelected();
-    }
-    public boolean wantToDefend(){
-        if ((boolean)wantToDefend.getSelected()) return true;
-        return false;
+
+    public void setZone(){
+        if(startingZone.getSelected() == null) System.out.println("Zone not selected");
+        else currentZone = (Translation2d[]) startingZone.getSelected();
     }
 
-    public PosToPass getTopMidBottom(){
-        return (PosToPass) goTopMidOrBottom.getSelected();
+    private pathPoint[] goThroughStage(Translation2d startingPos, Translation2d finalPos){
+        List<pathPoint> points = new ArrayList<pathPoint>();
+        if((finalPos.getX() - startingPos.getX()) * direction > 0)
+        {
+           
+            if(startingPos.getY() > centerOfStage.getY()) 
+                points.add(new pathPoint(0, 0, Rotation2d.fromDegrees(0), 0.3, false)); //TODO top of stage
+            else points.add(new pathPoint(0, 0, Rotation2d.fromDegrees(0), 0.3, false)); //TODO bottom of stage
+            points.add(new pathPoint(0, 0, Rotation2d.fromDegrees(180), 0.3, false)); // TODO cetner of stage
+            points.add(new pathPoint(0, 0, Rotation2d.fromDegrees(180), 0.3, false)); // TODO exit of stage
+        }
+        else {
+            points.add(new pathPoint(0, 0, Rotation2d.fromDegrees(0), 0, false)); // TODO exit of stage
+            points.add(new pathPoint(0, 0, Rotation2d.fromDegrees(180), 0.3, false)); // TODO cetner of stage
+            if(finalPos.getY() > centerOfStage.getY()){
+                points.add(new pathPoint(0, 0, Rotation2d.fromDegrees(0), 0.3, false)); //TODO top of stage
+            }
+            else points.add(new pathPoint(0, 0, Rotation2d.fromDegrees(0), 0.3, false)); // TODO bottom of stage
+        }
+        return (pathPoint[]) points.toArray();
     }
-
 
 }

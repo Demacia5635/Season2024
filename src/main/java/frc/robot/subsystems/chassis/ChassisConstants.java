@@ -28,6 +28,15 @@ public final class ChassisConstants {
     new Translation2d(13.443, 5.745),
     new Translation2d(10.501, 2.35));
 
+  public static final Translation2d noteTop = new Translation2d(); //TODO
+  public static final Translation2d noteMid = new Translation2d();//TODO
+  public static final Translation2d noteBottom = new Translation2d(); //TODO
+  public static final Translation2d note1 = new Translation2d(); //TODO
+  public static final Translation2d note2 = new Translation2d(); //TODO
+  public static final Translation2d note3 = new Translation2d(); //TODO
+  public static final Translation2d note4 = new Translation2d(); //TODO
+  public static final Translation2d note5 = new Translation2d(); //TODO
+
   public static final int GYRO_ID = 15;
 
   public static final double CYCLE_DT = 0.02;

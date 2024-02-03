@@ -28,9 +28,7 @@ public class DriveCommand extends Command {
     this.chassis = chassis;
     this.commandXboxController = commandXboxController;
     this.controller = controller;
-    if(isRed) direction = 1;
-    else direction = -1;
-    
+    direction = isRed ? 1 : -1;
     addRequirements(chassis);
     commandXboxController.b().onTrue(new InstantCommand(() -> precisionDrive = !precisionDrive));
     commandXboxController.y().onTrue(new InstantCommand((() -> this.wantedAngleApriltag = chassis.getClosetAngleApriltag())).andThen(() -> rotateToApriltag = true));
