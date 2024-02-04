@@ -156,8 +156,22 @@ public final class Constants {
     }
     public static class Parameters{
       public static final double deadband = 0.2;
+      public static final boolean inverted = true;
       public static final double notePresenceVoltage = 4.55;
- 
+
+
+      public static final double intakeSpeed = 0;
+      public static final double intakeTransferSpeed = 0;
+      public static final double sensorToRestDist = 0;
+
+      public static final double shootVelocity = 0;
+      public static final double shootTime = 0;
+
+      
+      public static final double dispenseVelocity = 0;
+      public static final double dispenseTime = 0;
+
+
       public static final double kP = 0.0;
       public static final double kI = 0.000;
       public static final double kD = 0;

@@ -5,6 +5,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
  
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -20,6 +21,9 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
+import frc.robot.commands.chassis.DispenseCommand;
+import frc.robot.commands.chassis.IntakeCommand;
+import frc.robot.commands.chassis.ShootCommand;
 import frc.robot.Constants.IntakeConstants.*;
 public class Intake extends SubsystemBase{
     public final TalonFX motor;
@@ -28,7 +32,7 @@ public class Intake extends SubsystemBase{
     //SimpleMotorFeedforward ff2 = new SimpleMotorFeedforward(Parameters.ks2, Parameters.kv2, Parameters.ka2);
     public Intake(){
         motor = new TalonFX(IntakeDeviceID.MOTOR);
-        motor.setInverted(true);
+        motor.setInverted(Parameters.inverted);
  
         limitInput = new AnalogInput(IntakeDeviceID.LIGHT_LIMIT);
         limitInput.setAccumulatorInitialValue(0);
@@ -65,6 +69,22 @@ public class Intake extends SubsystemBase{
  
     public void setPower(double p1){
         motor.set(ControlMode.PercentOutput, p1);
+    }
+
+    public void setVelocity(double velocity) {
+        motor.set(ControlMode.Velocity, velocity);
+    }
+
+    public double getMotorCurrent() {
+        return motor.getOutputCurrent();
+    }
+
+    public TalonFX getIntakeMotor() {
+        return motor;
+    }
+
+    public double getEncoderPos() {
+        return motor.getSelectedSensorPosition();
     }
  
     public void setBrake(){
@@ -103,6 +123,7 @@ public class Intake extends SubsystemBase{
     public void periodic() {
         super.periodic();
         SmartDashboard.putNumber("Motor Power", getpower());
+        SmartDashboard.putNumber("Motor Current", getMotorCurrent());
         SmartDashboard.putNumber("Motor Velocity", getRadVelocity());
         SmartDashboard.putBoolean("Limit switch state", isNotePresent());
         SmartDashboard.putNumber("Limit switch voltage", getLimitVolt());
@@ -111,6 +132,7 @@ public class Intake extends SubsystemBase{
  
     @Override
     public void initSendable(SendableBuilder builder) {
-        super.initSendable(builder);
+    super.initSendable(builder);
     }
+
 }
