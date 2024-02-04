@@ -7,8 +7,7 @@ public final class Constants {
   public static class ClimbConstants {
     public final static int RIGHT_CLIMB_MOTOR = 1;
     public final static int LEFT_CLIMB_MOTOR = 2;
-    public final static int RIGHT_WORM_MOTOR = 0;
-    public final static int LEFT_WORM_MOTOR = 0;
+    public final static int BRAKE_MOTOR = 0;
     public final static int RIGHT_LIMIT_SWITCH = 0;
     public final static int LEFT_LIMIT_SWITCH = 0;
   }

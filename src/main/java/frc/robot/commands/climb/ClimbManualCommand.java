@@ -4,7 +4,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.telescope.Telescope;
 
-public class ClimbManualCommand  extends Command{
+public class ClimbManualCommand extends Command {
     private final Telescope telescope;
     private final XboxController controller;
 
@@ -12,6 +12,12 @@ public class ClimbManualCommand  extends Command{
         this.telescope = telescope;
         this.controller = xboxController;
         addRequirements(telescope);
+    }
+
+    @Override
+    public void initialize() {
+        telescope.stop();
+        telescope.release();
     }
 
     @Override
@@ -26,6 +32,7 @@ public class ClimbManualCommand  extends Command{
     @Override
     public void end(boolean interrupted) {
         telescope.stop();
+        telescope.brake();
     }
 
     private double deadband(double x, double threshold) {
