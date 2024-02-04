@@ -5,7 +5,6 @@
 package frc.robot.commands.chassis;
 
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.chassis.Amp;
@@ -34,7 +33,7 @@ public class JoyStickAmp extends Command {
   public void execute() {
     translation2d1 = Amp.getStickRight(xboxController);
     translation2d2 = Amp.getStickLeft(xboxController);
-    amp.setPowers(translation2d1.getY(), translation2d2.getY());
+    amp.setPowerArm(translation2d1.getY());
   }
 
   @Override

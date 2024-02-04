@@ -1,53 +1,63 @@
 package frc.robot.subsystems.chassis;
-import static frc.robot.Constants.AmpConstants;
-
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
+import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
+import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.sensors.Pigeon2;
+import com.revrobotics.CANSparkLowLevel.MotorType;
+import com.revrobotics.CANSparkMax;
 
-import edu.wpi.first.math.controller.ArmFeedforward;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.AnalogInput;
-import edu.wpi.first.wpilibj.AnalogTrigger;
-import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.Constants;
-import frc.robot.RobotContainer;
-import frc.robot.Constants.AmpConstants.*;
+import frc.robot.Constants.AmpConstants.AmpDeviceID;
+import frc.robot.Constants.AmpConstants.ConvertionParams;
+import frc.robot.Constants.AmpConstants.Parameters;
 import frc.robot.Sysid.Sysid;
 import frc.robot.Sysid.Sysid.Gains;
-import frc.robot.commands.chassis.JoyStickAmp;
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkLowLevel.MotorType;
 public class Amp extends SubsystemBase{
     public final Pigeon2 gyro;
     public final TalonFX m1;
-    public CANSparkMax neo;
+    public final TalonSRX m2;
+    public final CANSparkMax neo1;//small wheel
+    public final CANSparkMax neo2;//big wheel
     public double startDeg;
     public AnalogInput limitInput;
-
+    public int opticCount;
+    
     //ArmFeedforward ff = new ArmFeedforward(Parameters.ks1, Parameters.kg1, Parameters.kv1, Parameters.ka1);
     //SimpleMotorFeedforward ff2 = new SimpleMotorFeedforward(Parameters.ks2, Parameters.kv2, Parameters.ka2);
     public Amp(){
+        
         gyro = new Pigeon2(AmpDeviceID.GYRO);
+        
         m1 = new TalonFX(AmpDeviceID.M1);
         m1.setInverted(true);
 
-        neo = new CANSparkMax(AmpDeviceID.M2, MotorType.kBrushless);
-        neo.getEncoder().setPosition(0);
+        m1.configForwardLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyClosed, AmpDeviceID.M1);//lower limit switch
+        m1.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen, AmpDeviceID.M1);//upper limit switch
+        
+        m2 = new TalonSRX(AmpDeviceID.M2);
+        m2.setInverted(false);
+
+        neo1 = new CANSparkMax(AmpDeviceID.NEO1, MotorType.kBrushless);
+        neo1.getEncoder().setPosition(0);
+        neo2 = new CANSparkMax(AmpDeviceID.NEO2, MotorType.kBrushless);
+        neo2.getEncoder().setPosition(0);
 
         limitInput = new AnalogInput(AmpDeviceID.LIGHT_LIMIT);
         limitInput.setAccumulatorInitialValue(0);
         
+        opticCount = 0;
         SmartDashboard.putData(this);
 
         SmartDashboard.putData("BrakeDiff", new InstantCommand(
@@ -55,63 +65,109 @@ public class Amp extends SubsystemBase{
         SmartDashboard.putData("CoastDiff", new InstantCommand(
             ()->this.setCoast(),this).ignoringDisable(true));
     }
-
+    
     public void configDevices() {
         m1.config_kP(0, Parameters.KP1);
-        m1.config_kI(0, Parameters.ki1);
-        m1.config_kD(0, Parameters.kd1);
+        m1.config_kI(0, Parameters.KI1);
+        m1.config_kD(0, Parameters.KD1);
     }
 
     public void startRad(double startDeg){
         this.startDeg = startDeg;
     }
-    public void neoSetVel(double vel){
-        neo.set(vel);
+    public void neosSetVel(double vel1, double vel2){
+        neo1.set(vel1);
+        neo2.set(vel2);
     }
       
-    public void neoEncoderSet(double postion){
-        neo.getEncoder().setPosition(postion);
+    public void neoEncoderSet(double postion1, double postion2){
+        neo1.getEncoder().setPosition(postion1);
+        neo2.getEncoder().setPosition(postion2);
+
     }
       
     public void neoEncoderReset(){
-        neoEncoderSet(0);
+        neoEncoderSet(0,0);
+        neo1.setSmartCurrentLimit(25);
+        neo2.setSmartCurrentLimit(25);
     }
       
-    public double getNeoRev(){
-        return neo.getEncoder().getPosition()/ConvertionParams.NEO_PULES_PER_REV;
+    public double[] getNeosRev(){
+        double[] neos = new double[2];
+        neos[0] = neo1.getEncoder().getPosition()/ConvertionParams.NEO_PULES_PER_REV*ConvertionParams.NEO1GearRatio;
+        neos[1] = neo2.getEncoder().getPosition()/ConvertionParams.NEO_PULES_PER_REV*ConvertionParams.NEO2GearRatio;
+        return neos;
     }
-    public void neoMoveByRev(double vel, double rev){
-        double startPos = getNeoRev();
-        while (Math.abs(getNeoRev()-startPos+rev)==1){
-          neoSetVel(vel);
-          System.out.println("another"+(Math.abs(getNeoRev()-startPos+rev))+"rev");
+    public void neoMoveByRev(double vel1 ,double vel2, double rev1, double rev2){
+        double startPos1 = getNeosRev()[0];
+        double startPos2 = getNeosRev()[1];
+
+        while ((vel1!=0)&&(vel2!=0)){
+            if(Math.abs(getNeosRev()[0]-startPos1+rev1)<=0.05)
+                vel1 = 0;
+            if(Math.abs(getNeosRev()[1]-startPos2+rev2)<=0.05)
+                vel2 = 0;
+            neosSetVel(vel1,vel2);
+            
+            System.out.println("another neo1"+(Math.abs(getNeosRev()[0]-startPos1+rev1))+"rev");
+            System.out.println("another neo2"+(Math.abs(getNeosRev()[1]-startPos2+rev2))+"rev");
         }
     }
-    
+
+    public void setPowerSnowblower(double power) {
+        m2.set(TalonSRXControlMode.PercentOutput, power);
+    }
+    public double getSnowblowerA(){
+        return m2.getSupplyCurrent();
+    }
+    public void RunSnowblower(double pow){
+        if (getSnowblowerA()>400){
+            setPowerSnowblower(0);
+        } else{
+            setPowerSnowblower(pow);
+        }
+    }
+
+    public void setPowerArm(double p1){
+        m1.set(ControlMode.PercentOutput, p1);
+    }
     public double getpower(){
         double pMotor = m1.getMotorOutputPercent();
         return pMotor;
     }
 
+    private boolean isLimitSwitchClose() {
+        return m1.isFwdLimitSwitchClosed() == 1;
+    }
+    private boolean isLimitSwitchOpen() {
+        return m1.isRevLimitSwitchClosed() == 1;
+    }
 
-    
     public double getLimitVolt(){
         return limitInput.getVoltage();
     }
-    public boolean isNoteThere(){
-        if (getLimitVolt()<4.55){
-            return true;
+    public boolean didNotePass(){
+        return getLimitVolt()<4.55;
+    }
+    public void resetOpticCounts(){
+        opticCount = 0;
+    }
+    
+    /**
+     * 
+     * @param last the last output of the didNotePass function 
+     * @return true if the note is inside and false if not
+     */
+    public boolean isNoteThere(boolean last){
+        if((didNotePass() == true)&&(last == false)){
+            opticCount+=1;
         }
-        return false;
+        if(opticCount%2==0){
+            return false;
+        }
+        return true;
     }
 
-    public void setPowers(double p1, double p2){
-        m1.set(ControlMode.PercentOutput, p1);
-        neoSetVel(p2);
-    }
-    public void setPowerArm(double p1){
-        m1.set(ControlMode.PercentOutput, p1);
-    }
     public void setBrake(){
         System.out.println("brake Diff");
         m1.setNeutralMode(NeutralMode.Brake);
@@ -125,7 +181,7 @@ public class Amp extends SubsystemBase{
     }
 
     public static double deadband(double value) {
-        if (Math.abs(value)<Parameters.deadband) {
+        if (Math.abs(value)<Parameters.Deadband) {
             return 0;
         }
         return value;
@@ -160,13 +216,13 @@ public class Amp extends SubsystemBase{
     }
 
     public void velFFArm(double posRad, double velRad, double acceleRad) {
-        double ff = acceleRad*Parameters.ka1 + velRad*Parameters.kv1 + Parameters.kg1*Math.sin(posRad) + Math.signum(velRad)*Parameters.ks1;
-        double velMotor = (velRad/ConvertionParams.m1GearRatio)/100;
+        double ff = acceleRad*Parameters.KA1 + velRad*Parameters.KV1 + Parameters.KG1*Math.sin(posRad) + Math.signum(velRad)*Parameters.KS1;
+        double velMotor = (velRad/ConvertionParams.M1GearRatio)/100;
         m1.set(ControlMode.Velocity, velMotor, DemandType.ArbitraryFeedForward, ff);
     }
 
     public double getVelRadArm(){
-        return (m1.getSelectedSensorVelocity()*ConvertionParams.m1GearRatio/ConvertionParams.MOTOR_PULSES_PER_SPIN)*2*Math.PI;
+        return (m1.getSelectedSensorVelocity()*ConvertionParams.M1GearRatio/ConvertionParams.MOTOR_PULSES_PER_SPIN)*2*Math.PI;
     }
 
     @Override
@@ -175,10 +231,18 @@ public class Amp extends SubsystemBase{
         SmartDashboard.putNumber("Motor1 Power", getpower());
         SmartDashboard.putNumber("Motor1 Velocity", getVelRadArm());
         SmartDashboard.putNumber("Arm poseRad", getPoseRad());
-        SmartDashboard.putNumber("neon encoder",getNeoRev());
-        SmartDashboard.putNumber("start angle", startDeg);
-        SmartDashboard.putBoolean("Limit switch state", isNoteThere());
-        SmartDashboard.putNumber("Limit switch Voltage", getLimitVolt());
+        SmartDashboard.putNumber("Start angle", startDeg);
+
+        SmartDashboard.putNumber("SnowBlower ampere", getSnowblowerA());
+
+        SmartDashboard.putNumber("neo1 encoder",getNeosRev()[0]);
+        SmartDashboard.putNumber("neo2 encoder",getNeosRev()[0]);
+
+        SmartDashboard.putBoolean("Optic Limit switch state", didNotePass());
+        SmartDashboard.putNumber("Optic Limit switch Voltage", getLimitVolt());
+
+        SmartDashboard.putBoolean("Lower Limit switch state", isLimitSwitchClose());
+        SmartDashboard.putBoolean("Upper Limit switch state", isLimitSwitchOpen());
 
     }
 

@@ -5,7 +5,6 @@
 package frc.robot.commands.chassis;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.chassis.Amp;
 import frc.robot.utils.TrapezoidCalc;
 
@@ -54,9 +53,6 @@ public class GoToAngleAmp extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    if((amp.getPoseRad()>=angleRad-10/360*2*Math.PI)&&(amp.getPoseRad()<=angleRad+10/360*2*Math.PI)){
-      return true;
-    }
-    return false;
+    return ((amp.getPoseRad()>=angleRad-10/360*2*Math.PI)&&(amp.getPoseRad()<=angleRad+10/360*2*Math.PI));
   }
 }
