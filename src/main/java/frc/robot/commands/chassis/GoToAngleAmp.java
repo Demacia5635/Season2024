@@ -4,6 +4,7 @@
 
 package frc.robot.commands.chassis;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.chassis.Amp;
 import frc.robot.utils.TrapezoidCalc;
@@ -14,6 +15,8 @@ public class GoToAngleAmp extends Command {
   double maxVelRad;
   double acceleRad;
   TrapezoidCalc trap;
+  double startTime;
+  double startPulses;
 
   /** Creates a new GoToAngleAmp. */
   public GoToAngleAmp( Amp amp, double angleRad, double maxVelRad, double acceleRad) {
@@ -29,6 +32,11 @@ public class GoToAngleAmp extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    startTime = Timer.getFPGATimestamp();
+    startPulses = amp.m1.getSelectedSensorPosition();
+    if(amp.isOpen()){
+      amp.setPowerSnowblower(-0.2);
+    }
     amp.neoEncoderReset();
     amp.startRad(amp.getPoseRad());
   }
@@ -36,23 +44,32 @@ public class GoToAngleAmp extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double velRad = trap.trapezoid(amp.getVelRadArm(), maxVelRad, 0, Math.abs(acceleRad), angleRad-amp.getPoseRad());
-    if((amp.getPoseRad()>1.7)&&(amp.getPoseRad()<Math.PI*0.7)){
-      velRad += Math.PI*0.25;
+    if(Timer.getFPGATimestamp()-startTime == 1){
+      amp.setPowerSnowblower(0);
     }
-    
-    amp.velFFArm(amp.getPoseRad(), velRad, acceleRad);
+
+    double currentAngleRad = amp.getPoseByPulses(startPulses);
+    double velRad = trap.trapezoid(amp.getVelRadArm(), maxVelRad, 0.5, Math.abs(acceleRad), angleRad-currentAngleRad);
+    amp.setVel(velRad);
+    if((amp.isClose()||amp.isOpen())&&(Timer.getFPGATimestamp()-startTime > 1)){
+      amp.stop();
+      if(amp.isOpen()){
+        amp.runSnowblower(0.3, 350);
+      }
+    }
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    amp.setPowerSnowblower(0.1);
     amp.stop();
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return ((amp.getPoseRad()>=angleRad-10/360*2*Math.PI)&&(amp.getPoseRad()<=angleRad+10/360*2*Math.PI));
+    //return ((amp.getPoseRad()>=angleRad-10/360*2*Math.PI)&&(amp.getPoseRad()<=angleRad+10/360*2*Math.PI));
+    return (amp.getSnowblowerA()>=350)&&(Timer.getFPGATimestamp()-startTime >1);
   }
 }

@@ -19,9 +19,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.Constants.AmpConstants.AmpDeviceID;
-import frc.robot.Constants.AmpConstants.ConvertionParams;
-import frc.robot.Constants.AmpConstants.Parameters;
+import frc.robot.Constants.AmpConstants.*;
 import frc.robot.Sysid.Sysid;
 import frc.robot.Sysid.Sysid.Gains;
 public class Amp extends SubsystemBase{
@@ -120,8 +118,8 @@ public class Amp extends SubsystemBase{
     public double getSnowblowerA(){
         return m2.getSupplyCurrent();
     }
-    public void RunSnowblower(double pow){
-        if (getSnowblowerA()>400){
+    public void runSnowblower(double pow, double maxA){
+        if (getSnowblowerA()>maxA){
             setPowerSnowblower(0);
         } else{
             setPowerSnowblower(pow);
@@ -136,12 +134,22 @@ public class Amp extends SubsystemBase{
         return pMotor;
     }
 
-    private boolean isLimitSwitchClose() {
+    /**
+     * 
+     * @return true if the arm is fully closed
+     */
+    public boolean isClose() {
         return m1.isFwdLimitSwitchClosed() == 1;
     }
-    private boolean isLimitSwitchOpen() {
+    
+    /**
+     * 
+     * @return true if the arm is fully open
+     */
+    public boolean isOpen() {
         return m1.isRevLimitSwitchClosed() == 1;
     }
+
 
     public double getLimitVolt(){
         return limitInput.getVoltage();
@@ -214,15 +222,53 @@ public class Amp extends SubsystemBase{
     public double getPoseRad(){  
         return fixedDeg()/360*Math.PI*2;
     }
+    public double getPoseByPulses(double startPulses){
+        return (m1.getSelectedSensorPosition()-startPulses)/ConvertionParams.MOTOR_PULSES_PER_ANGLE/360*2*Math.PI;
+    }
 
-    public void velFFArm(double posRad, double velRad, double acceleRad) {
+
+    /**public void velFFArm(double posRad, double velRad, double acceleRad) {
         double ff = acceleRad*Parameters.KA1 + velRad*Parameters.KV1 + Parameters.KG1*Math.sin(posRad) + Math.signum(velRad)*Parameters.KS1;
         double velMotor = (velRad/ConvertionParams.M1GearRatio)/100;
         m1.set(ControlMode.Velocity, velMotor, DemandType.ArbitraryFeedForward, ff);
-    }
+    }**/
 
     public double getVelRadArm(){
         return (m1.getSelectedSensorVelocity()*ConvertionParams.M1GearRatio/ConvertionParams.MOTOR_PULSES_PER_SPIN)*2*Math.PI;
+    }
+
+    public int state;
+    public double FF(double wantedAnglerVel){
+        double angle = fixedDeg();
+        double rad = Math.toRadians(angle);
+        
+        if (wantedAnglerVel > 0){
+            if (angle <= 43){
+                state = 0;
+            } else {
+                state = 1;
+            }
+        } else {
+            if (fixedDeg() <= 43){
+                state = 2;
+            } else {
+                state = 3;
+            }
+        }
+
+        return (
+            armStatesParameters.KS[state] + 
+            wantedAnglerVel * armStatesParameters.KV[state] + 
+            (wantedAnglerVel-getVelRadArm()) * armStatesParameters.KA[state] + 
+            armStatesParameters.Kalpha[state] * angle + 
+            armStatesParameters.Ksin[state] * Math.sin(rad) +   
+            armStatesParameters.Kcos[state] * Math.cos(rad) + 
+            armStatesParameters.Kcossin[state] * Math.cos(rad) * Math.sin(rad)
+        );
+    }
+
+    public void setVel(double wantedAnglerVel){
+        m1.set(ControlMode.Velocity, wantedAnglerVel*ConvertionParams.MOTOR_PULSES_PER_ANGLE/10, DemandType.ArbitraryFeedForward, FF(wantedAnglerVel));
     }
 
     @Override
@@ -241,8 +287,8 @@ public class Amp extends SubsystemBase{
         SmartDashboard.putBoolean("Optic Limit switch state", didNotePass());
         SmartDashboard.putNumber("Optic Limit switch Voltage", getLimitVolt());
 
-        SmartDashboard.putBoolean("Lower Limit switch state", isLimitSwitchClose());
-        SmartDashboard.putBoolean("Upper Limit switch state", isLimitSwitchOpen());
+        SmartDashboard.putBoolean("Lower Limit switch state", isClose());
+        SmartDashboard.putBoolean("Upper Limit switch state", isOpen());
 
     }
 
