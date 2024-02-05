@@ -6,13 +6,11 @@ package frc.robot.commands.shooter;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.shooter.Shooter;
-import frc.robot.utils.Trapezoid;
 
 public class GoToDis extends Command {
     
     Shooter shooter;
     double wantedDis;
-    Trapezoid calc;
     double maxVel;
     double acc;
     double endVel;
@@ -48,45 +46,23 @@ public class GoToDis extends Command {
     public void initialize() {
         shooter.angleBrake();
         startDis = shooter.getDis();
-        calc = new Trapezoid(maxVel, acc);
     }
 
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        if (!imFinished()){
-            double vel = calc.calculate(wantedDis - shooter.getDis(), shooter.getAngleVel(), 0 );
-            // System.out.println("vel = "+ vel);
-            shooter.angleSetVel(vel);
-        }
+        shooter.angleMotionMagic(wantedDis, maxVel, acc);
     }
 
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
         shooter.anlgeStop();
-        if (!interrupted){
-            if (Math.abs(wantedDis - shooter.getDis()) < 1){
-                new GoToDis(shooter, wantedDis, maxVel, acc);
-            }
-        }
     }
 
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        
-        if (!shooter.limits(wantedDis - startDis > 0)){
-            if (!(Math.abs(wantedDis - shooter.getDis()) < 0.3)){
-                return false;
-            }
-        }
-    
-        return true;
-    }
-
-    private boolean imFinished(){
-
         if (!shooter.limits(wantedDis - startDis > 0)){
             if (!((wantedDis - startDis > 0) && (shooter.getDis() >= wantedDis))){
                 if (!((wantedDis - startDis < 0) && (shooter.getDis() <= wantedDis))){
