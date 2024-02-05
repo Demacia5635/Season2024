@@ -14,6 +14,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 public class Shooter extends SubsystemBase {
 
@@ -21,6 +22,7 @@ public class Shooter extends SubsystemBase {
 
     public final TalonFX motor1;
     public final TalonFX motor2;
+    public final TalonSRX motorFeeding;
 
     double baseDis = -322;
     ArmFeedforward elevationFF = new ArmFeedforward(KS, KG, KV);
@@ -30,6 +32,7 @@ public class Shooter extends SubsystemBase {
 
         motor1 = new TalonFX(MOTOR_1_ID);
         motor2 = new TalonFX(MOTOR_2_ID);
+        motorFeeding = new TalonSRX(MOTOR_FEEDING_ID);
         
         motorAngle = new TalonFX(MOTOR_ID);
         motorAngle.setInverted(true);
@@ -66,6 +69,14 @@ public class Shooter extends SubsystemBase {
         motor2.set(ControlMode.PercentOutput, pow);
     }
     
+    public void feedingSetPow(double pow){
+        motorFeeding.set(ControlMode.PercentOutput, pow);
+    }
+
+    public void feedingStop(){
+        motorFeeding.set(ControlMode.PercentOutput, 0);
+    }
+
     public void stop(){
         motor1.set(ControlMode.PercentOutput, 0);
         motor2.set(ControlMode.PercentOutput, 0);
@@ -74,6 +85,7 @@ public class Shooter extends SubsystemBase {
     public void stopAll(){
         stop();
         anlgeStop();
+        feedingStop();
     }
 
     public void angleBrake(){ 
