@@ -142,6 +142,8 @@ public final class Constants {
         public static final double KG = 0;
         public static final double KV = 0.000091655292302;
         
+        public static final double KP = 0.3;
+        public static final double KD = KP / 100;
 
     }
 }
