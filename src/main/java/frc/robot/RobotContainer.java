@@ -33,8 +33,8 @@ public class RobotContainer  {
          */
         private void configureBindings() {
             controller.b().onTrue(new AngleControl(shooter, controller));
-            controller.x().onTrue(new GoToDis(shooter, 245, 30000, 20000));
-            controller.a().onTrue(new GoToAngle(shooter, 39, 30000, 20000));
+            controller.a().onTrue(new GoToAngle(shooter, 20, 1000, 1000));
+            controller.x().onTrue(new GoToDis(shooter, 300, 1000, 1000));
             
             controller.y().onTrue(new InstantCommand(()-> shooter.resetDis(), shooter));    
             
