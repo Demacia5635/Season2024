@@ -9,9 +9,6 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.ElevationConstants;
-import frc.robot.Constants.ShooterConstants;
-import static frc.robot.Constants.ElevationConstants.*;
 import static frc.robot.Constants.ShooterConstants.*;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
@@ -26,7 +23,7 @@ public class Shooter extends SubsystemBase {
     public final TalonFX motor2;
 
     double baseDis = -322;
-    ArmFeedforward elevationFF = new ArmFeedforward(ElevationConstants.KS, ElevationConstants.KG, ElevationConstants.KV);
+    ArmFeedforward elevationFF = new ArmFeedforward(KS, KG, KV);
     
     /** Creates a new Shooter. */
     public Shooter() {
@@ -34,18 +31,13 @@ public class Shooter extends SubsystemBase {
         motor1 = new TalonFX(MOTOR_1_ID);
         motor2 = new TalonFX(MOTOR_2_ID);
         
-        motor1.config_kP(0, ShooterConstants.KP);
-        motor1.config_kI(0, KI);
-        motor2.config_kP(0, ShooterConstants.KP);
-        motor2.config_kI(0, KI);
-
         motorAngle = new TalonFX(MOTOR_ID);
         motorAngle.setInverted(true);
 
         SmartDashboard.putData(this);
         SmartDashboard.putData(null);
 
-        motorAngle.config_kP(0, ElevationConstants.KP);
+        motorAngle.config_kP(0, KP);
         motorAngle.config_kD(0, KD);
     }
     
@@ -69,9 +61,7 @@ public class Shooter extends SubsystemBase {
         motorAngle.set(ControlMode.PercentOutput, 0);
     }
 
-    public void setVel(double vel){
-        double pow = ShooterConstants.KS + ShooterConstants.KV * vel;
-        System.out.println("power = "+ pow);
+    public void setPow(double pow){
         motor1.set(ControlMode.PercentOutput, pow);
         motor2.set(ControlMode.PercentOutput, pow);
     }
@@ -85,19 +75,19 @@ public class Shooter extends SubsystemBase {
         stop();
         anlgeStop();
     }
+
+    public void angleBrake(){ 
+        motorAngle.setNeutralMode(NeutralMode.Brake);
+    }
+    public void angleCoast(){ 
+        motorAngle.setNeutralMode(NeutralMode.Coast);
+    }
     
     public void resetDis(){
         motorAngle.setSelectedSensorPosition(0);
         baseDis = -322;
     }
-
-    public void angleBrake(){ motorAngle.setNeutralMode(NeutralMode.Brake);}
-    public void angleCoast(){ motorAngle.setNeutralMode(NeutralMode.Coast);}
     
-    public double getAngleVel(){ 
-        return motorAngle.getSelectedSensorVelocity()*10/(ShooterConstants.PULES_PER_REV * GEAR_RATIO / 360); 
-    }
-
     public double getDis(){
         return motorAngle.getSelectedSensorPosition()/PULES_PER_MM - baseDis;
     }
@@ -111,16 +101,28 @@ public class Shooter extends SubsystemBase {
         return isUpDirection ? getDis() >= 322 : getDis() <= 98;
     }
 
+    public double getAngleVel(){ 
+        return motorAngle.getSelectedSensorVelocity()*10/(PULES_PER_REV * GEAR_RATIO / 360); 
+    }
+
     public double getAngle(){
-        return Math.acos(-1 * ((Math.pow(KB, 2) - Math.pow(KA, 2) - Math.pow(getDis(), 2)) / (2 * KA * getDis()))) * 180 / Math.PI;
+        double angle = (
+        Math.acos(-1 * ((Math.pow(KB, 2) - 
+        Math.pow(KA, 2) - 
+        Math.pow(getDis(), 2)) / 
+        (2 * KA * getDis()))) * 
+        180 / Math.PI
+        );
+        
+        return angle;
     }
 
     @Override
     public void initSendable(SendableBuilder builder) {
         super.initSendable(builder);
         
-        builder.addDoubleProperty("motor 1 speed", ()-> motor1.getSelectedSensorVelocity()*10/(ShooterConstants.PULES_PER_REV/360), null);
-        builder.addDoubleProperty("motor 2 speed", ()-> motor2.getSelectedSensorVelocity()*10/(ShooterConstants.PULES_PER_REV/360), null);
+        builder.addDoubleProperty("motor 1 speed", ()-> motor1.getSelectedSensorVelocity()*10/(PULES_PER_REV/360), null);
+        builder.addDoubleProperty("motor 2 speed", ()-> motor2.getSelectedSensorVelocity()*10/(PULES_PER_REV/360), null);
         builder.addDoubleProperty("current amper motor 1", ()-> motor1.getSupplyCurrent(), null);
         builder.addDoubleProperty("current amper motor 2", ()-> motor2.getSupplyCurrent(), null);
         builder.addDoubleProperty("angle vel", this::getAngleVel, null);
