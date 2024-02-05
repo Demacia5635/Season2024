@@ -58,11 +58,7 @@ public class GoToAngle extends Command {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        if (!imFinished()){
-            double vel = calc.calculate(wantedDis - shooter.getDis(), shooter.getAngleVel(), 0);
-            // System.out.println("vel = "+ vel);
-            shooter.angleSetVel(vel);
-        }
+        shooter.angleMotionMagic(wantedDis, maxVel, acc);
     }
 
     // Called once the command ends or is interrupted.
@@ -74,12 +70,6 @@ public class GoToAngle extends Command {
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        
-        return  imFinished();
-    }
-
-    private boolean imFinished(){
-
         if (!shooter.limits(wantedDis - startDis > 0)){
             if (!((wantedDis - startDis > 0) && (shooter.getDis() >= wantedDis))){
                 if (!((wantedDis - startDis < 0) && (shooter.getDis() <= wantedDis))){
