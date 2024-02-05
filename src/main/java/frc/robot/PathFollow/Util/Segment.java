@@ -28,6 +28,7 @@ public class Segment {
         Translation2d[] pArr = {p1,p2}; 
         return pArr;
     }
+    
     public void setAprilTagMode(boolean aprilMode){ this.aprilMode = aprilMode;};
     @Override
     public String toString() {

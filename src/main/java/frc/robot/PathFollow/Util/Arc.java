@@ -15,6 +15,11 @@ public class Arc extends Segment{
     Rotation2d angle;
     double maxVel = 2;
 
+    Translation2d vectorAtoB;
+    Translation2d vectorBtoC;
+    Translation2d point1;
+    Translation2d point2;
+    Translation2d point3;
 
     final Translation2d startVector;
     final double radius;
@@ -52,6 +57,53 @@ public class Arc extends Segment{
         }
 
         return points;
+    }
+
+    
+    public double calcSlope(Translation2d point1, Translation2d point2){
+      return (point2.getY() - point1.getY()) / (point2.getX() - point1.getX());
+  }
+
+  public double calcXIntersection(double y, double b, Translation2d point1, Translation2d point2){
+      return (y - b) / calcSlope(point1, point2); 
+  }
+
+  public double calcYIntersection(double x, double b, Translation2d point1, Translation2d point2){
+      return (calcSlope(point1, point2) * x) + b;
+  }
+
+  public boolean checkLeg(RectanglePos rectangle, Translation2d point1, Translation2d point2){
+      double slope = calcSlope(point1, point2);
+      // y = mx+*b*
+      double b = (-slope) * point1.getX() + point1.getY();
+      double x = calcXIntersection(rectangle.bottomLeft.getY(), b, point1, point2);
+      if(rectangle.isInside(new Translation2d(x, rectangle.bottomLeft.getY()))){
+          return false;
+      }
+      double y = calcYIntersection(rectangle.bottomLeft.getX(), b, point1, point2);
+      if(rectangle.isInside(new Translation2d(rectangle.bottomLeft.getX(), y))){
+          return false;
+      }
+      x = calcXIntersection(rectangle.topRight.getY(), b, point1, point2);
+      if(rectangle.isInside(new Translation2d(x, rectangle.topRight.getY()))){
+          return false;
+      }
+      y = calcYIntersection(rectangle.topRight.getX(), b, point1, point2);
+      if(rectangle.isInside(new Translation2d(rectangle.topRight.getX(), y))){
+          return false;
+      }
+      return true;
+
+  }   
+
+    public boolean isLegal(RectanglePos rectangle, RoundedPoint point){
+
+      point1 = point.aPoint;
+      point2 = point.bPoint;
+      point3 = point.cPoint;
+      return checkLeg(rectangle,point1, point2) && checkLeg(rectangle,point2, point3);
+
+
     }
 
     @Override

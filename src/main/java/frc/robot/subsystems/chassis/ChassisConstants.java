@@ -9,6 +9,17 @@ import frc.robot.PathFollow.Util.RectanglePos;
 
 public final class ChassisConstants {
 
+  public static double robotLength = -1; //TODO
+
+  public static RectanglePos[] avoid = {
+    new RectanglePos(new Translation2d(), new Translation2d()), // TODO
+    new RectanglePos(new Translation2d(), new Translation2d()), // TODO
+    new RectanglePos(new Translation2d(), new Translation2d()), // TODO
+    new RectanglePos(new Translation2d(), new Translation2d()), // TODO
+    new RectanglePos(new Translation2d(), new Translation2d()), // TODO
+    new RectanglePos(new Translation2d(), new Translation2d()), // TODO
+  };
+
    /** from blue alliance, in meters */
   public static RectanglePos rectAMP = new RectanglePos(   
     new Translation2d(16.534, 0.502),

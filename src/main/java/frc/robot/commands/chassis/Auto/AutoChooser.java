@@ -8,7 +8,9 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import frc.robot.PathFollow.Util.Arc;
 import frc.robot.PathFollow.Util.RectanglePos;
+import frc.robot.PathFollow.Util.Segment;
 import frc.robot.PathFollow.Util.pathPoint;
 import static frc.robot.subsystems.chassis.ChassisConstants.*;
 
@@ -106,5 +108,6 @@ public class AutoChooser {
             firstNote.addOption(null, note1);
         }
     }
+
 
 }

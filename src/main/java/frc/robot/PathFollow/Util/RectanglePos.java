@@ -4,16 +4,22 @@ package frc.robot.PathFollow.Util;
 import edu.wpi.first.math.geometry.Translation2d;
 
 public class RectanglePos {
-    private Translation2d topRight;
-    private Translation2d bottomLeft;
+    public Translation2d topLeft;
+    public Translation2d bottomRight;
+    public Translation2d topRight;
+    public Translation2d bottomLeft;
     public RectanglePos(Translation2d topRight, Translation2d bottomLeft){
-        if(bottomLeft.getY() >= topRight.getY() || bottomLeft.getX() >= topRight.getX()){}
-            // System.out.println("WRONG INPUT IN RECTANGLE");
+        if(bottomLeft.getY() >= topRight.getY() || bottomLeft.getX() >= topRight.getX()){
+            System.out.println("WRONG INPUT IN RECTANGLE");
+        }
+            
             
         
         else{
             this.bottomLeft = bottomLeft;
             this.topRight = topRight;
+            topLeft = new Translation2d(bottomLeft.getX(), topRight.getY());
+            bottomRight = new Translation2d(topRight.getX(), bottomLeft.getY());
         }
         
     }

@@ -22,7 +22,9 @@ import java.util.ArrayList;
 import java.util.ArrayList;
 import java.util.List;
 
+import frc.robot.PathFollow.Util.Arc;
 import frc.robot.PathFollow.Util.Leg;
+import frc.robot.PathFollow.Util.RectanglePos;
 import frc.robot.PathFollow.Util.RoundedPoint;
 import frc.robot.PathFollow.Util.Segment;
 import frc.robot.PathFollow.Util.pathPoint;
@@ -99,6 +101,13 @@ public class PathFollow extends CommandBase {
     return segments[segmentIndex].toString();
   }
 
+
+  
+  public Arc fixLeg(RoundedPoint point){
+
+    return point.getArc();
+  }
+
   @Override
   public void initialize() {
     //sets first point to chassis pose to prevent bugs with red and blue alliance
@@ -128,11 +137,23 @@ public class PathFollow extends CommandBase {
       int segmentIndexCreator = 1;
       // creates arc than leg
       for (int i = 0; i < corners.length - 1; i += 1) {
-
-        segments[segmentIndexCreator] = corners[i].getArc();
-
-        segments[segmentIndexCreator + 1] = new Leg(corners[i].getCurveEnd(), corners[i + 1].getCurveStart(),
+        Arc arc = corners[i].getArc();
+        Leg leg = new Leg(corners[i].getCurveEnd(), corners[i + 1].getCurveStart(),
           points[segmentIndexCreator].isAprilTag());
+        Segment fixedLeg = leg;
+          for(int j = 0; i < avoid.length; i++){
+            if(!leg.isLegal(avoid[j])){
+              RoundedPoint corner = new RoundedPoint(corners[i].getCurveEnd(),
+               leg.calcFixPoint(avoid[j], wantedAngle).getTranslation(),
+                corners[i+1].getCurveStart(), false);
+              fixedLeg = corner.getArc();
+            }
+            
+          }
+
+        segments[segmentIndexCreator] = arc;
+
+        segments[segmentIndexCreator + 1] = leg;
         segments[segmentIndexCreator].setAprilTagMode(points[segmentIndexCreator].isAprilTag());
         segmentIndexCreator += 2;
       }
