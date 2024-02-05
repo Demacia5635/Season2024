@@ -7,8 +7,7 @@ package frc.robot.commands.shooter;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.utils.Trapezoid;
-
-import static frc.robot.Constants.ElevationConstants.*;
+import static frc.robot.Constants.ShooterConstants.*;
 
 public class GoToAngle extends Command {
     
