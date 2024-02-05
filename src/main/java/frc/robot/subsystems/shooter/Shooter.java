@@ -129,6 +129,13 @@ public class Shooter extends SubsystemBase {
         return angle;
     }
 
+    /** for future use still needs to set var */
+    public boolean isRunDone(){
+        double regularAmper = 0;
+        double deltaAmper = 0;
+        return Math.abs(regularAmper - motor1.getSupplyCurrent()) > deltaAmper;
+    }
+
     @Override
     public void initSendable(SendableBuilder builder) {
         super.initSendable(builder);
