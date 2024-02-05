@@ -47,6 +47,6 @@ public class RobotContainer  {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
-        return new InstantCommand(()-> shooter.setVel(42550), shooter);
+        return new InstantCommand(()-> shooter.setPow(0.953125));
     }
 }
