@@ -7,9 +7,11 @@ public final class Constants {
   public static class ClimbConstants {
     public final static int RIGHT_CLIMB_MOTOR = 1;
     public final static int LEFT_CLIMB_MOTOR = 2;
-    public final static int BRAKE_MOTOR = 0;
+    public final static int BRAKE_MOTORS = 0;
     public final static int RIGHT_LIMIT_SWITCH = 0;
     public final static int LEFT_LIMIT_SWITCH = 0;
+    public final static double BRAKE_CURRENT_THRESHOLD = 0;
+    public final static double CLIMB_POWER = 0.6;
   }
   public static final double CYCLE_DT = 0.02;
   public static final int CONTROLLER_PORT = 0;

@@ -2,37 +2,37 @@ package frc.robot.commands.climb;
 
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.telescope.Telescope;
+import frc.robot.subsystems.climb.ClimbSubsystem;
 
 public class ClimbManualCommand extends Command {
-    private final Telescope telescope;
-    private final XboxController controller;
+    private final ClimbSubsystem s_Telescope;
+    private final XboxController s_Controller;
 
-    public ClimbManualCommand(Telescope telescope, XboxController xboxController) {
-        this.telescope = telescope;
-        this.controller = xboxController;
+    public ClimbManualCommand(ClimbSubsystem telescope, XboxController xboxController) {
+        this.s_Telescope = telescope;
+        this.s_Controller = xboxController;
         addRequirements(telescope);
     }
 
     @Override
     public void initialize() {
-        telescope.stop();
-        telescope.release();
+        s_Telescope.stop();
+        s_Telescope.s_Braker.release();
     }
 
     @Override
     public void execute() {
-        double powerLeft = deadband(controller.getRightY(), 0.1);
-        double powerRight = deadband(controller.getLeftY(), 0.1);
+        double powerRight = deadband(s_Controller.getLeftY(), 0.1);
+        double powerLeft = deadband(s_Controller.getRightY(), 0.1);
 
-        telescope.setRightPower(powerRight);
-        telescope.setLeftPower(powerLeft);
+        s_Telescope.setRightPower(powerRight);
+        s_Telescope.setLeftPower(powerLeft);
     }
 
     @Override
     public void end(boolean interrupted) {
-        telescope.stop();
-        telescope.brake();
+        s_Telescope.s_Braker.brake();
+        s_Telescope.stop();
     }
 
     private double deadband(double x, double threshold) {
