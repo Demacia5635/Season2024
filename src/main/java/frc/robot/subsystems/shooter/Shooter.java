@@ -25,7 +25,7 @@ public class Shooter extends SubsystemBase {
     public final TalonFX motor1;
     public final TalonFX motor2;
 
-    double baseDis = -240.8916015625; 
+    double baseDis = -322;
     ArmFeedforward elevationFF = new ArmFeedforward(ElevationConstants.KS, ElevationConstants.KG, ElevationConstants.KV);
     
     /** Creates a new Shooter. */
@@ -34,9 +34,9 @@ public class Shooter extends SubsystemBase {
         motor1 = new TalonFX(MOTOR_1_ID);
         motor2 = new TalonFX(MOTOR_2_ID);
         
-        motor1.config_kP(0, KP);
+        motor1.config_kP(0, ShooterConstants.KP);
         motor1.config_kI(0, KI);
-        motor2.config_kP(0, KP);
+        motor2.config_kP(0, ShooterConstants.KP);
         motor2.config_kI(0, KI);
 
         motorAngle = new TalonFX(MOTOR_ID);
@@ -44,6 +44,15 @@ public class Shooter extends SubsystemBase {
 
         SmartDashboard.putData(this);
         SmartDashboard.putData(null);
+
+        motorAngle.config_kP(0, ElevationConstants.KP);
+        motorAngle.config_kD(0, KD);
+    }
+    
+    public void angleMotionMagic(double dis, double maxVel, double acc) {
+        motorAngle.configMotionCruiseVelocity(maxVel);
+        motorAngle.configMotionAcceleration(acc);
+        motorAngle.set(ControlMode.MotionMagic, (PULES_PER_MM * (dis+baseDis)));
     }
 
     public void angleSetVel(double vel){
