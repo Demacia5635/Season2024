@@ -37,7 +37,7 @@ public class RobotContainer implements Sendable{
 
   pathPoint[] points = {
     new pathPoint(0, 0, Rotation2d.fromDegrees(0), 0, false),
-    new pathPoint(2, 0, Rotation2d.fromDegrees(0), 0, false),
+    new pathPoint(2, 3, Rotation2d.fromDegrees(0), 0, false),
   };
   Command test = new RunCommand(() -> {chassis.setVelocities(new ChassisSpeeds(-0.5, 0, 0));}, chassis).andThen(new WaitCommand(2),
   new RunCommand(() -> {chassis.setVelocities(new ChassisSpeeds(-0.4  , 0, 0));}, chassis).andThen(new WaitCommand(2)),

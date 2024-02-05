@@ -55,6 +55,7 @@ public class PathFollow extends CommandBase {
   double fieldLength = 16.54; // in meters
   boolean isRed;
 
+  Trajectory traj;
   double distancePassed = 0;
   pathPoint[] points;
   PIDController rotationPidController = new PIDController(0.31, 0.006, 0.0000025);
@@ -106,7 +107,7 @@ public class PathFollow extends CommandBase {
     //case for red alliance (blue is the default)
     if (isRed) {
       for (int i = 1; i < points.length; i++) {
-        points[i] = new pathPoint(fieldLength - points[i].getX(), points[i].getY(), points[i].getRotation().times(-1),
+        points[i] = new pathPoint(fieldLength - points[i].getX(), points[i].getY(), points[i].getRotation().minus(Rotation2d.fromDegrees(180)),
             points[i].getRadius(), points[i].isAprilTag());
       }
     }
@@ -160,7 +161,7 @@ public class PathFollow extends CommandBase {
     
     // System.out.println("LIST: " + list);
 
-    Trajectory traj = new Trajectory();
+    traj = new Trajectory(list);
     trajField.getObject("TrajTEST").setTrajectory(traj);
 
     vecVel = new Translation2d(0, 0);
