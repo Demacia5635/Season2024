@@ -87,8 +87,8 @@ public class Shooter extends SubsystemBase {
     }
     
     public void resetDis(){
-        baseDis += getDis();
-        baseDis -= 318;
+        motorAngle.setSelectedSensorPosition(0);
+        baseDis = -322;
     }
 
     public void angleBrake(){ motorAngle.setNeutralMode(NeutralMode.Brake);}
@@ -127,6 +127,7 @@ public class Shooter extends SubsystemBase {
         builder.addDoubleProperty("Distance", this::getDis, null);
         builder.addDoubleProperty("base dis", ()-> baseDis, null);
         builder.addDoubleProperty("Angle", this::getAngle, null);
+        builder.addDoubleProperty("encoder", ()->motorAngle.getSelectedSensorPosition(), null);
     
         SmartDashboard.putData("Dis reset", new InstantCommand(()-> resetDis()).ignoringDisable(true));
         SmartDashboard.putData("Angle Brake", new InstantCommand(()-> angleBrake()).ignoringDisable(true));
