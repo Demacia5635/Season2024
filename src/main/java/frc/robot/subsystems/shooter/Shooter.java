@@ -94,11 +94,12 @@ public class Shooter extends SubsystemBase {
     }
 
     public boolean limits(boolean isUpDirection){
-        if (isUpDirection){
-            return getDis() >= 322;
-        } else {
-            return getDis() <= 98;
-        }
+        // if (isUpDirection){
+        //     return getDis() >= 322;
+        // } else {
+        //     return getDis() <= 98;
+        // }
+        return isUpDirection ? getDis() >= 322 : getDis() <= 98;
     }
 
     public double getAngle(){
