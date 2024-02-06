@@ -6,6 +6,7 @@ package frc.robot.subsystems.shooter;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -24,6 +25,8 @@ public class Shooter extends SubsystemBase {
     public final TalonFX motor2;
     public final TalonSRX motorFeeding;
 
+    public AnalogInput limitInput;
+
     double baseDis = -322;
     ArmFeedforward elevationFF = new ArmFeedforward(KS, KG, KV);
     
@@ -36,12 +39,15 @@ public class Shooter extends SubsystemBase {
         
         motorAngle = new TalonFX(MOTOR_ID);
         motorAngle.setInverted(true);
+        
+        motorAngle.config_kP(0, KP);
+        motorAngle.config_kD(0, KD);
+
+        limitInput = new AnalogInput(LIMIT_INPUT_ID);
+        limitInput.setAccumulatorInitialValue(0);
 
         SmartDashboard.putData(this);
         SmartDashboard.putData(null);
-
-        motorAngle.config_kP(0, KP);
-        motorAngle.config_kD(0, KD);
     }
     
     public void angleMotionMagic(double dis, double maxVel, double acc) {
@@ -115,6 +121,13 @@ public class Shooter extends SubsystemBase {
 
     public double getAngleVel(){ 
         return motorAngle.getSelectedSensorVelocity()*10/(PULES_PER_REV * GEAR_RATIO / 360); 
+    }
+
+     public double getLimitVolt(){
+        return limitInput.getVoltage();
+    }
+    public boolean didNotePass(){
+        return getLimitVolt()<4.55;
     }
 
     public double getAngle(){
