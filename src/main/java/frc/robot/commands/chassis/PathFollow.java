@@ -55,6 +55,7 @@ public class PathFollow extends CommandBase {
   double driveVelocity = 0;
   double rotationVelocity = 0;
   static double  fieldLength = 16.54; // in meters
+  static double fieldHeight = 8.1026; // in meters
   boolean isRed;
 
   Trajectory traj;
@@ -105,6 +106,10 @@ public class PathFollow extends CommandBase {
 
   public static double convertAlliance(double x){
     return fieldLength - x;
+  }
+
+  public static double fixY(double y){
+    return fieldHeight - y;
   }
 
   @Override

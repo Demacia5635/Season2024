@@ -20,6 +20,7 @@ public class AutoChooser {
     Translation2d PointToShootTOP = new Translation2d(PathFollow.convertAlliance(14.070), 1.835);
     Translation2d PointToShootMID = new Translation2d(PathFollow.convertAlliance(14.264), 3.160);
     Translation2d PointToShootBOTTOM = new Translation2d(PathFollow.convertAlliance(14.760), 5.463);
+    
 
 
     Translation2d[] zoneTop = {noteTop, noteMid, note1, note2};
@@ -84,14 +85,26 @@ public class AutoChooser {
         return (pathPoint[]) points.toArray();
     }
 
-    /*public pathPoint[] createPoints(){
+    public pathPoint[] createPoints(){
         List<pathPoint> points = new ArrayList<pathPoint>();
-        for(int i = 0; i < currentZone.length; i++){
-            //first point is automatically set to chassis position
-            points.add(new pathPoint(0 , 0, null, 0, isRed));
 
+        points.add(new pathPoint(0 , 0, null, 0, false));
+        if(currentZone == zoneTop){
+            if(firstNote.getSelected() != null){
+                for(int i = 0; i < currentZone.length; i++){
+                    points.add(new pathPoint(zoneTop[i].getX(), zoneTop[i].getY(), Rotation2d.fromDegrees(180), 0.1, false)); 
+                    points.add(new pathPoint(PointToShootTOP.getX(), PointToShootTOP.getX(), Rotation2d.fromDegrees(-1), 0.4, false));//TODO add rotationToSpeaker
+                }
+            }
         }
-    }*/
+
+
+
+       return (pathPoint[]) points.toArray();
+            
+
+    }
+    
 
 
 

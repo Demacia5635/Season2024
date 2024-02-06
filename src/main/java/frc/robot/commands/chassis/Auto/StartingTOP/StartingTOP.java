@@ -11,9 +11,8 @@ public class StartingTOP extends SequentialCommandGroup {
   Chassis chassis;
   public StartingTOP(Chassis chassis, double maxVel, double maxAccel) {
     this.chassis = chassis;
-    pathPoint[] pointsBeforeWait = (pathPoint[]) Chassis.pointsForAuto.toArray();
-    pathPoint[] pointsAfterWait = (pathPoint[]) Chassis.pointsForAuto.toArray();
+    pathPoint[] points = (pathPoint[]) Chassis.pointsForAuto.toArray();
 
-    addCommands(new StratingTOPGen(chassis), new PathFollow(chassis, pointsBeforeWait, maxVel, maxAccel, false));
+    addCommands(new StratingTOPGen(chassis), new PathFollow(chassis, points, maxVel, maxAccel, false));
   }
 }

@@ -31,17 +31,16 @@ public class StratingTOPGen extends Command {
 
     points.add(new pathPoint(chassis.getPose().getX(),chassis.getPose().getY(), chassis.getAngle(),
      0.1, false));
-    points.add(new pathPoint(PathFollow.convertAlliance(14.112), 1.689, Rotation2d.fromDegrees(180), 0, false));
-    points.add(new pathPoint(PathFollow.convertAlliance(14.510), 2.577, Rotation2d.fromDegrees(-1), 0.4, false)); //TODO add rotationToSpeaker
-    points.add(new pathPoint(PathFollow.convertAlliance(14.510), 2.577, Rotation2d.fromDegrees(180), 0.4, false));
-    points.add(new pathPoint(PathFollow.convertAlliance(13.994), 3.187, Rotation2d.fromDegrees(-1), 0.4, false)); //TODO add rotationToSpeaker
-    points.add(new pathPoint(chassis.getPose().getX(),chassis.getPose().getY(), chassis.getAngle(), 0.1, false));
-    points.add(new pathPoint(PathFollow.convertAlliance(10.597), 1.601, Rotation2d.fromDegrees(180), 0.5, false));
-    points.add(new pathPoint(PathFollow.convertAlliance(10.597), 1.601, Rotation2d.fromDegrees(180), 0.5, false));
-    points.add(new pathPoint(PathFollow.convertAlliance(8.713), 1.273, Rotation2d.fromDegrees(180), 0.1, false));
+    points.add(new pathPoint(PathFollow.convertAlliance(14.112), PathFollow.fixY(1.689), Rotation2d.fromDegrees(180), 0, false));
+    points.add(new pathPoint(PathFollow.convertAlliance(14.510), PathFollow.fixY(2.577), Rotation2d.fromDegrees(-1), 0.4, false)); //TODO add rotationToSpeaker
+    
+    points.add(new pathPoint(PathFollow.convertAlliance(13.994), PathFollow.fixY(3.187), Rotation2d.fromDegrees(-1), 0.4, false)); //TODO add rotationToSpeaker
+    points.add(new pathPoint(PathFollow.convertAlliance(10.597), PathFollow.fixY(1.601), Rotation2d.fromDegrees(180), 0.5, false));
+    points.add(new pathPoint(PathFollow.convertAlliance(10.597), PathFollow.fixY(1.601), Rotation2d.fromDegrees(180), 0.5, false));
+    points.add(new pathPoint(PathFollow.convertAlliance(8.713), PathFollow.fixY(1.273), Rotation2d.fromDegrees(180), 0.1, false));
     points.add(new pathPoint(PointToShoot.getX(), PointToShoot.getY(), Rotation2d.fromDegrees(-1), 0.4, false)); //TODO add rotationToSpeaker
-    points.add(new pathPoint(PathFollow.convertAlliance(8.692), 2.918, Rotation2d.fromDegrees(180), 0, false));
-    points.add(new pathPoint(PathFollow.convertAlliance(10.872), 1.977, Rotation2d.fromDegrees(150), 0.4, false));
+    points.add(new pathPoint(PathFollow.convertAlliance(8.692), PathFollow.fixY(2.918), Rotation2d.fromDegrees(180), 0, false));
+    points.add(new pathPoint(PathFollow.convertAlliance(10.872), PathFollow.fixY(1.977), Rotation2d.fromDegrees(150), 0.4, false));
     points.add(new pathPoint(PointToShoot.getX(), PointToShoot.getY(), Rotation2d.fromDegrees(-1), 0, false)); //TODO add rotationToSpeaker
     Chassis.pointsForAuto = points;
 
