@@ -116,6 +116,8 @@ public final class Constants {
         public static final int MOTOR_2_ID = 2;
         public static final int MOTOR_FEEDING_ID = 4;
         
+        public static final int LIMIT_INPUT_ID = 5;
+        
         public static final Pose2d BLUE_ALLIANCE_SPEAKER_POSE2D = new Pose2d(-0.15,2.1842, Rotation2d.fromDegrees(0));
         public static final Pose2d RED_ALLIANCE_SPEAKER_POSE2D = new Pose2d(6.5273,2.1842, Rotation2d.fromDegrees(180));
 
