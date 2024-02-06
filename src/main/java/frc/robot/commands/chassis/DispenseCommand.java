@@ -4,7 +4,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.Constants.*;
-import frc.robot.subsystems.chassis.Intake;
+import frc.robot.subsystems.Intake;
 
 public class DispenseCommand extends CommandBase {
     private final Intake intake;

@@ -1,4 +1,4 @@
-package frc.robot.subsystems.chassis;
+package frc.robot.subsystems;
 import static frc.robot.Constants.IntakeConstants;
  
 import com.ctre.phoenix.motorcontrol.ControlMode;
@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants;
@@ -127,12 +128,15 @@ public class Intake extends SubsystemBase{
         SmartDashboard.putNumber("Motor Velocity", getRadVelocity());
         SmartDashboard.putBoolean("Limit switch state", isNotePresent());
         SmartDashboard.putNumber("Limit switch voltage", getLimitVolt());
+        
     }
  
  
     @Override
     public void initSendable(SendableBuilder builder) {
     super.initSendable(builder);
+    SmartDashboard.putNumber("power", 0);
+    SmartDashboard.putData("set power", new RunCommand(()-> setPower(0.1), this));
     }
 
 }

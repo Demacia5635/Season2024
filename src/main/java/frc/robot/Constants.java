@@ -147,7 +147,7 @@ public final class Constants {
  
   public static class IntakeConstants{
     public static class IntakeDeviceID{
-      public static final int MOTOR = 0;
+      public static final int MOTOR = 23;
       public static final int LIGHT_LIMIT = 0;
     }
     public static class ConvertionParams {
