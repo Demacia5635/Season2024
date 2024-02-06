@@ -13,34 +13,28 @@ public class GoToDis extends Command {
     double wantedDis;
     double maxVel;
     double acc;
-    double endVel;
     double startDis;
-    
-    /** Creates a new GoToAngle. */
+
+    /**
+     * creates a new command that goes to a specifig distance
+     * @param shooter the shooter we want to control angle motor of
+     * @param dis the wanted dis in mm
+     * @param maxVel the max velocity of the trapezoid in pules per 1/10 sec
+     * @param acc the acc of the trapezoid in pules per 1/10 sec
+     */
     public GoToDis(Shooter shooter, double dis, double maxVel, double acc) {
         // Use addRequirements() here to declare subsystem dependencies.
         this.shooter = shooter;
         this.wantedDis = dis;
         this.maxVel = maxVel;
         this.acc = acc;
-        this.endVel = 0;
-        addRequirements(shooter);
-    }
-
-    /** Creates a new GoToAngle. */
-    public GoToDis(Shooter shooter, double dis, double maxVel, double acc, double endVel) {
-        // Use addRequirements() here to declare subsystem dependencies.
-        this.shooter = shooter;
-        this.wantedDis = dis;
-        this.maxVel = maxVel;
-        this.acc = acc;
-        this.endVel = endVel;
         addRequirements(shooter);
     }
 
     // Called when the command is initially scheduled.
     /**
-     * Desmos - {@link https://www.desmos.com/calculator/4ja9zotx82}
+     * set the angle motor in brake mode
+     * set the start dis
      */
     @Override
     public void initialize() {
@@ -49,18 +43,29 @@ public class GoToDis extends Command {
     }
 
     // Called every time the scheduler runs while the command is scheduled.
+    /**using the motion magic control mode to go to the specific dis */
     @Override
     public void execute() {
         shooter.angleMotionMagic(wantedDis, maxVel, acc);
     }
 
     // Called once the command ends or is interrupted.
+    /**stop the angle motor when the command have finished */
     @Override
     public void end(boolean interrupted) {
         shooter.anlgeStop();
     }
 
     // Returns true when the command should end.
+    /**
+     * every headline is for every if condition
+     * @limits use the limits function from shooter to check if the anlge motor have not run off
+     * @passWantedPositive if the direction is positive and the dis is passed the wanted dis
+     * @passWantedNegative if the direction is negative and the dis is passed the wanted dis
+     * @abs if the abs distance between the current dis and the wanted dis is exactly or less than 1 mm
+     * 
+     * @return if the function have finished
+     */
     @Override
     public boolean isFinished() {
         if (!shooter.limits(wantedDis - startDis > 0)){
