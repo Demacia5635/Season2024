@@ -54,7 +54,7 @@ public class PathFollow extends CommandBase {
 
   double driveVelocity = 0;
   double rotationVelocity = 0;
-  double fieldLength = 16.54; // in meters
+  static double  fieldLength = 16.54; // in meters
   boolean isRed;
 
   Trajectory traj;
@@ -102,10 +102,9 @@ public class PathFollow extends CommandBase {
   }
 
 
-  
-  public Arc fixLeg(RoundedPoint point){
 
-    return point.getArc();
+  public static double convertAlliance(double x){
+    return fieldLength - x;
   }
 
   @Override
@@ -116,8 +115,9 @@ public class PathFollow extends CommandBase {
     //case for red alliance (blue is the default)
     if (isRed) {
       for (int i = 1; i < points.length; i++) {
-        points[i] = new pathPoint(fieldLength - points[i].getX(), points[i].getY(), points[i].getRotation().minus(Rotation2d.fromDegrees(180)),
-            points[i].getRadius(), points[i].isAprilTag());
+        points[i] = new pathPoint(convertAlliance(points[i].getTranslation().getX()), points[i].getTranslation().getY(),
+         points[i].getRotation().minus(Rotation2d.fromDegrees(180)),
+          points[i].getRadius(), points[i].isAprilTag());
       }
     }
     corners = new RoundedPoint[points.length - 2];
@@ -143,9 +143,9 @@ public class PathFollow extends CommandBase {
         Segment fixedLeg = leg;
           for(int j = 0; i < avoid.length; i++){
             if(!leg.isLegal(avoid[j])){
-              RoundedPoint corner = new RoundedPoint(corners[i].getCurveEnd(),
-               leg.calcFixPoint(avoid[j], wantedAngle).getTranslation(),
-                corners[i+1].getCurveStart(), false);
+              RoundedPoint corner = new RoundedPoint(new pathPoint(corners[i].getCurveEnd().getX(), corners[i].getCurveEnd().getY(), Rotation2d.fromDegrees(-1), -1, false),
+               leg.calcFixPoint(avoid[j], wantedAngle),
+               new pathPoint(corners[i+1].getCurveStart().getX(), corners[i+1].getCurveStart().getY(), Rotation2d.fromDegrees(-1), -1, false), false);
               fixedLeg = corner.getArc();
             }
             
@@ -153,7 +153,7 @@ public class PathFollow extends CommandBase {
 
         segments[segmentIndexCreator] = arc;
 
-        segments[segmentIndexCreator + 1] = leg;
+        segments[segmentIndexCreator + 1] = fixedLeg;
         segments[segmentIndexCreator].setAprilTagMode(points[segmentIndexCreator].isAprilTag());
         segmentIndexCreator += 2;
       }
