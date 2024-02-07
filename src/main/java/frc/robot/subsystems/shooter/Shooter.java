@@ -124,6 +124,10 @@ public class Shooter extends SubsystemBase {
         motorFeeding.set(ControlMode.PercentOutput, 0);
     }
 
+    public double getFeedingEncoderPose() {
+        return motorFeeding.getSelectedSensorPosition();
+    }
+
     /**important saftey function that will stop all the motors in this subsystem */
     public void stopAll(){
         stop();
@@ -191,7 +195,7 @@ public class Shooter extends SubsystemBase {
      * @author Adar
      */
     public boolean didNotePass(){
-        return getLimitVolt()<4.55;
+        return getLimitVolt()<ShooterConstants.VOLTAGE_IS_NOTE_DETECTED;
     }
 
     /**

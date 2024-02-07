@@ -19,8 +19,8 @@ public class ShootCommand extends CommandBase {
 
     @Override
     public void initialize() {
-        intake.setVelocity(IntakeConstants.Parameters.shootVelocity); // Set shoot velocity
-        withTimeout(IntakeConstants.Parameters.shootTime); // Set timeout for shooting
+        intake.setVelocity(IntakeConstants.Parameters.SHOOT_VELOCITY); // Set shoot velocity
+        withTimeout(IntakeConstants.Parameters.SHOOT_TIME); // Set timeout for shooting
     }
 
     @Override

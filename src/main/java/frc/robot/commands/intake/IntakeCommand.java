@@ -29,13 +29,14 @@ public class IntakeCommand extends CommandBase {
     public void execute() {
         // Check for note reaching resting spot based on encoder counts, but only after
         // initialization
-        if (initialEncoderCount > 0 && intake.getEncoderPos() >= initialEncoderCount + Parameters.sensorToRestDist) {
+        if (initialEncoderCount > 0 && intake.getEncoderPos() >= initialEncoderCount + Parameters.SENSOR_TO_REST_DIST) {
             intake.setVelocity(0); // Stop motors if resting position reached
         } else if (noteWasDetected) { // Note detected, use transfer speed
-            intake.setVelocity(Parameters.intakeTransferSpeed); // Run motors at transfer speed
+            intake.setVelocity(Parameters.INTAKE_TRANSFER_SPEED); // Run motors at transfer speed
         } else {
-            intake.setVelocity(Parameters.intakeSpeed); // Run motors at intake speed until note is detected
+            intake.setVelocity(Parameters.INTAKE_SPEED); // Run motors at intake speed until note is detected
         }
+
 
         if (noteWasDetected) { // Placeholder for sensor detection
             if (initialEncoderCount == 0) { // Initialize only when note is first detected
@@ -47,7 +48,7 @@ public class IntakeCommand extends CommandBase {
     @Override
     public boolean isFinished() {
         // Command ends when note is detected and reaches resting spot
-        return noteWasDetected && intake.getEncoderPos() >= initialEncoderCount + Parameters.sensorToRestDist;
+        return noteWasDetected && intake.getEncoderPos() >= initialEncoderCount + Parameters.SENSOR_TO_REST_DIST;
     }
 
     @Override

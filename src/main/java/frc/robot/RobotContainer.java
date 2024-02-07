@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.shooter.AngleControl;
+import frc.robot.commands.shooter.FeedShooter;
 import frc.robot.commands.shooter.GoToAngle;
 import frc.robot.commands.shooter.GoToDis;
 import frc.robot.subsystems.shooter.Shooter;
@@ -31,6 +32,9 @@ import frc.robot.commands.chassis.PathFollow;
 import frc.robot.commands.chassis.RotateToAngleShooter;
 import frc.robot.commands.chassis.SetModuleAngle;
 import frc.robot.commands.chassis.TestSteerVandA;
+import frc.robot.commands.intake.IntakeCommand;
+import frc.robot.commands.intake.ShootCommand;
+import frc.robot.subsystems.amp.Amp;
 import frc.robot.subsystems.chassis.Chassis;
 import frc.robot.subsystems.intake.Intake;
 
@@ -51,6 +55,15 @@ public class RobotContainer implements Sendable{
   new RunCommand(() -> {chassis.setVelocities(new ChassisSpeeds(0, 0, 0));}, chassis).andThen(new WaitCommand(2)));
   double x = 5;
 
+  Shooter shooter;
+  Amp amp;
+  Intake intake;
+
+  Command intake2shooter;
+  Command intake2amp;
+  Command shoot;
+  Command amplify;
+
 
 
   public RobotContainer() {
@@ -61,9 +74,18 @@ public class RobotContainer implements Sendable{
     chassis.setDefaultCommand(drive);
 
     SmartDashboard.putData("RC", this);
+    shooter = new Shooter();
+    amp = new Amp();
+    intake = new Intake();
     
 
     configureBindings();
+  }
+
+  public void createCommands() {
+
+    intake2shooter = new IntakeCommand(intake).andThen(new ShootCommand(intake).alongWith(new FeedShooter(shooter)));
+
   }
 
 

@@ -19,8 +19,8 @@ public class DispenseCommand extends CommandBase {
 
     @Override
     public void initialize() {
-        intake.setVelocity(IntakeConstants.Parameters.dispenseVelocity); // Set dispense velocity
-        withTimeout(IntakeConstants.Parameters.dispenseTime); // Set timeout for dispensing
+        intake.setVelocity(IntakeConstants.Parameters.DISPENSE_VELOCITY); // Set dispense velocity
+        withTimeout(IntakeConstants.Parameters.DISPENSE_TIME); // Set timeout for dispensing
     }
 
     @Override

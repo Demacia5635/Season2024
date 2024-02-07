@@ -36,4 +36,14 @@ public class ShooterConstants {
         /*set up the PID of the angle motor */
         public static final double KP = 0.3;
         public static final double KD = KP / 100;
+
+        public static final double SHOOTER_TRANSFER_SPEED = 0;
+        public static final double SHOOTER_SPEED = 0;
+        public static final double DIST_LEFT_SENSOR = 0;
+        public static final double VOLTAGE_IS_NOTE_DETECTED = 4.5;
+
+
+
+
+
     }

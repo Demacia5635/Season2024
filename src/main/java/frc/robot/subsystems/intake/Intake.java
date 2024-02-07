@@ -32,7 +32,7 @@ public class Intake extends SubsystemBase{
     //SimpleMotorFeedforward ff2 = new SimpleMotorFeedforward(Parameters.ks2, Parameters.kv2, Parameters.ka2);
     public Intake(){
         motor = new TalonFX(IntakeDeviceID.MOTOR);
-        motor.setInverted(Parameters.inverted);
+        motor.setInverted(Parameters.IS_INVERTED);
  
         limitInput = new AnalogInput(IntakeDeviceID.LIGHT_LIMIT);
         limitInput.setAccumulatorInitialValue(0);
@@ -46,9 +46,9 @@ public class Intake extends SubsystemBase{
     }
  
     public void configDevices() {
-        motor.config_kP(0, Parameters.kP);
-        motor.config_kI(0, Parameters.kI);
-        motor.config_kD(0, Parameters.kD);
+        motor.config_kP(0, Parameters.KP);
+        motor.config_kI(0, Parameters.KI);
+        motor.config_kD(0, Parameters.KD);
     }
  
     public double getpower(){
@@ -61,7 +61,7 @@ public class Intake extends SubsystemBase{
     }
  
     public boolean isNotePresent(){
-        if (getLimitVolt() < Parameters.notePresenceVoltage){
+        if (getLimitVolt() < Parameters.NOT_PRESENCE_VOLTAGE){
             return true;
         }
         return false;
@@ -100,7 +100,7 @@ public class Intake extends SubsystemBase{
     }
  
     public static double deadband(double value) {
-        if (Math.abs(value)<Parameters.deadband) {
+        if (Math.abs(value)<Parameters.DEADBAND) {
             return 0;
         }
         return value;
@@ -116,7 +116,7 @@ public class Intake extends SubsystemBase{
  
  
     public double getRadVelocity(){
-        return (motor.getSelectedSensorVelocity()*ConvertionParams.MotorGearRatio/ConvertionParams.MOTOR_PULSES_PER_SPIN)*2*Math.PI;
+        return (motor.getSelectedSensorVelocity()*ConvertionParams.MOTOR_GEAR_RATIO/ConvertionParams.MOTOR_PULSES_PER_SPIN)*2*Math.PI;
     }
  
     @Override
