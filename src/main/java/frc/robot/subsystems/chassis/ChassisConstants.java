@@ -1,49 +1,46 @@
 package frc.robot.subsystems.chassis;
 
+import java.nio.file.Path;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import frc.robot.PathFollow.Util.RectanglePos;
+import frc.robot.commands.chassis.PathFollow;
 
 public final class ChassisConstants {
 
+    public static double AUTO_MAX_VELOCITY = 3;
+    public static double AUTO_MAX_ACCEL = 6;
   
 
-  public static double robotLength = -1; //TODO
+  public static double robotLength = 100; //in cm
 
-  public static RectanglePos[] avoid = {
-    new RectanglePos(new Translation2d(), new Translation2d()), // TODO
-    new RectanglePos(new Translation2d(), new Translation2d()), // TODO
-    new RectanglePos(new Translation2d(), new Translation2d()), // TODO
-    new RectanglePos(new Translation2d(), new Translation2d()), // TODO
-    new RectanglePos(new Translation2d(), new Translation2d()), // TODO
-    new RectanglePos(new Translation2d(), new Translation2d()), // TODO
-  };
-
+ 
    /** from blue alliance, in meters */
-  public static RectanglePos rectAMP = new RectanglePos(   
-    new Translation2d(16.534, 0.502),
-    new Translation2d(13.229, 0));
+ public static RectanglePos rectAMP = new RectanglePos(   
+    new Translation2d(PathFollow.convertAlliance(16.534), PathFollow.fixY(0.502)),
+    new Translation2d(PathFollow.convertAlliance(13.229), 0));
   /** from blue alliance, in meters */
   public static RectanglePos rectSPEAKER = new RectanglePos(
-    new Translation2d(16.515, 4.076),
-    new Translation2d(14.596, 0.395));
+    new Translation2d(PathFollow.convertAlliance(16.515), PathFollow.fixY(4.076)),
+    new Translation2d(PathFollow.convertAlliance(14.596),PathFollow.fixY( 0.395)));
    
   /** from blue alliance, in meters */
   public static RectanglePos rectSOURCE = new RectanglePos(
 
-    new Translation2d(1.850, 8.156),
-    new Translation2d(0.027, 6.515));
+    new Translation2d(PathFollow.convertAlliance(1.850), PathFollow.fixY(8.156)),
+    new Translation2d(PathFollow.convertAlliance(0.027), PathFollow.fixY(6.515)));
   /** from blue alliance, in meters */
   public static RectanglePos rectSTAGE = new RectanglePos(
-    new Translation2d(13.443, 5.745),
-    new Translation2d(10.501, 2.35));
-
-  public static final Translation2d noteTop = new Translation2d(); //TODO
-  public static final Translation2d noteMid = new Translation2d();//TODO
-  public static final Translation2d noteBottom = new Translation2d(); //TODO
+    new Translation2d(PathFollow.convertAlliance(13.443), PathFollow.fixY(5.745)),
+    new Translation2d(PathFollow.convertAlliance(10.501), PathFollow.fixY(2.35)));
+ 
+  public static final Translation2d noteTop = new Translation2d(PathFollow.convertAlliance(13.646), PathFollow.fixY(1.183));
+  public static final Translation2d noteMid = new Translation2d(PathFollow.convertAlliance(13.646), PathFollow.fixY(2.634));
+  public static final Translation2d noteBottom = new Translation2d(PathFollow.convertAlliance(13.646), PathFollow.fixY(4.087));
   public static final Translation2d note1 = new Translation2d(); //TODO
   public static final Translation2d note2 = new Translation2d(); //TODO
   public static final Translation2d note3 = new Translation2d(); //TODO

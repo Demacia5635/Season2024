@@ -10,7 +10,10 @@ public class RectanglePos {
     public Translation2d bottomLeft;
     public RectanglePos(Translation2d topRight, Translation2d bottomLeft){
         if(bottomLeft.getY() >= topRight.getY() || bottomLeft.getX() >= topRight.getX()){
-            System.out.println("WRONG INPUT IN RECTANGLE");
+
+            //WRONG INPUT IN RECTANGLE Bottom left: Translation2d(X: 11.32, Y: 3.13) top right: Translation2d(X: 6.01, Y: 5.65)
+            
+            System.out.println("WRONG INPUT IN RECTANGLE Bottom left: " + bottomLeft +" top right: " + topRight);
         }
             
             

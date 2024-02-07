@@ -57,7 +57,7 @@ public class Leg extends Segment{
                 return new pathPoint(rectangle.topRight.getX() + offset, rectangle.topRight.getY() + offset, angle , 0.5, false);
             }
             else{
-                return new pathPoint(rectangle.bottomLeft.getX() + offset, rectangle.bottomLeft.getY() + offset, angle , 0.5, false);
+                return new pathPoint(rectangle.bottomLeft.getX() - offset, rectangle.bottomLeft.getY() - offset, angle , 0.5, false);
             }
         }
         else if(calcSlope() > 0){
@@ -66,17 +66,17 @@ public class Leg extends Segment{
                 return new pathPoint(rectangle.topLeft.getX() + offset, rectangle.topLeft.getY() + offset, angle, 0.5, false);
             }
             else{
-                return new pathPoint(rectangle.bottomRight.getX() + offset, rectangle.bottomRight.getY() + offset, angle , 0.5, false);
+                return new pathPoint(rectangle.bottomRight.getX() - offset, rectangle.bottomRight.getY() - offset, angle , 0.5, false);
             }
         }
         else{
             if(p1.getY() > (rectangle.topRight.getY() - rectangle.bottomRight.getY()) / 2){
                 return new pathPoint((rectangle.bottomLeft.getX() + rectangle.topRight.getX()) / 2,
-                 rectangle.topRight.getY() + robotLength + 20 /*Safety measurment */, angle, 0.5, false);
+                 rectangle.topRight.getY() + robotLength + 15 /*Safety measurment */, angle, 0.5, false);
             }
             else{
                 return new pathPoint((rectangle.bottomLeft.getX() + rectangle.topRight.getX()) / 2,
-                 rectangle.bottomLeft.getY() - robotLength - 20 /*Safety measurment */, angle, 0.5, false);
+                 rectangle.bottomLeft.getY() - robotLength - 15 /*Safety measurment */, angle, 0.5, false);
             }
         }
 

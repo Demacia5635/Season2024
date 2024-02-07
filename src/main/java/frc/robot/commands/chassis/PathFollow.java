@@ -22,9 +22,7 @@ import java.util.ArrayList;
 import java.util.ArrayList;
 import java.util.List;
 
-import frc.robot.PathFollow.Util.Arc;
 import frc.robot.PathFollow.Util.Leg;
-import frc.robot.PathFollow.Util.RectanglePos;
 import frc.robot.PathFollow.Util.RoundedPoint;
 import frc.robot.PathFollow.Util.Segment;
 import frc.robot.PathFollow.Util.pathPoint;
@@ -54,8 +52,8 @@ public class PathFollow extends CommandBase {
 
   double driveVelocity = 0;
   double rotationVelocity = 0;
-  static double  fieldLength = 16.54; // in meters
-  static double fieldHeight = 8.1026; // in meters
+  static double fieldLength = 16.54; // in meters
+  static double fieldHeight = 8.21; //in meters
   boolean isRed;
 
   Trajectory traj;
@@ -102,16 +100,6 @@ public class PathFollow extends CommandBase {
     return segments[segmentIndex].toString();
   }
 
-
-
-  public static double convertAlliance(double x){
-    return fieldLength - x;
-  }
-
-  public static double fixY(double y){
-    return fieldHeight - y;
-  }
-
   @Override
   public void initialize() {
     //sets first point to chassis pose to prevent bugs with red and blue alliance
@@ -120,9 +108,8 @@ public class PathFollow extends CommandBase {
     //case for red alliance (blue is the default)
     if (isRed) {
       for (int i = 1; i < points.length; i++) {
-        points[i] = new pathPoint(convertAlliance(points[i].getTranslation().getX()), points[i].getTranslation().getY(),
-         points[i].getRotation().minus(Rotation2d.fromDegrees(180)),
-          points[i].getRadius(), points[i].isAprilTag());
+        points[i] = new pathPoint(fieldLength - points[i].getX(), points[i].getY(), points[i].getRotation().minus(Rotation2d.fromDegrees(180)),
+            points[i].getRadius(), points[i].isAprilTag());
       }
     }
     corners = new RoundedPoint[points.length - 2];
@@ -142,23 +129,11 @@ public class PathFollow extends CommandBase {
       int segmentIndexCreator = 1;
       // creates arc than leg
       for (int i = 0; i < corners.length - 1; i += 1) {
-        Arc arc = corners[i].getArc();
-        Leg leg = new Leg(corners[i].getCurveEnd(), corners[i + 1].getCurveStart(),
+
+        segments[segmentIndexCreator] = corners[i].getArc();
+
+        segments[segmentIndexCreator + 1] = new Leg(corners[i].getCurveEnd(), corners[i + 1].getCurveStart(),
           points[segmentIndexCreator].isAprilTag());
-        Segment fixedLeg = leg;
-          for(int j = 0; i < avoid.length; i++){
-            if(!leg.isLegal(avoid[j])){
-              RoundedPoint corner = new RoundedPoint(new pathPoint(corners[i].getCurveEnd().getX(), corners[i].getCurveEnd().getY(), Rotation2d.fromDegrees(-1), -1, false),
-               leg.calcFixPoint(avoid[j], wantedAngle),
-               new pathPoint(corners[i+1].getCurveStart().getX(), corners[i+1].getCurveStart().getY(), Rotation2d.fromDegrees(-1), -1, false), false);
-              fixedLeg = corner.getArc();
-            }
-            
-          }
-
-        segments[segmentIndexCreator] = arc;
-
-        segments[segmentIndexCreator + 1] = fixedLeg;
         segments[segmentIndexCreator].setAprilTagMode(points[segmentIndexCreator].isAprilTag());
         segmentIndexCreator += 2;
       }
@@ -212,6 +187,13 @@ public class PathFollow extends CommandBase {
     foundAprilTag = true;
 
     return finalVector.getAngle();
+  }
+
+  public static double convertAlliance(double x){
+    return fieldLength - x; 
+  }
+  public static double fixY(double y){
+    return fieldHeight - y;
   }
   
 

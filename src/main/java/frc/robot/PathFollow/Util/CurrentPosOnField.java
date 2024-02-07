@@ -16,11 +16,12 @@ public class CurrentPosOnField {
          * @return The zone the robot is in
          */
         public static Zone getZone(Translation2d robotPos){
-            if(rectAMP.isInside(robotPos)) return AMP;
+            /*if(rectAMP.isInside(robotPos)) return AMP;
             if(rectSPEAKER.isInside((robotPos))) return SPEKAER;
             if(rectSOURCE.isInside(robotPos)) return SOURCE;
             if(rectSTAGE.isInside(robotPos)) return STAGE;
-            return OPEN;       
+            return OPEN;  */
+            return AMP;     
         }
     }
 
