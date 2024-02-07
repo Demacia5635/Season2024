@@ -24,6 +24,7 @@ public class AutoChooser {
     Translation2d PointToShootTOP = new Translation2d(PathFollow.convertAlliance(14.070), PathFollow.fixY(1.835));
     Translation2d PointToShootMID = new Translation2d(PathFollow.convertAlliance(14.264), PathFollow.fixY(3.160));
     Translation2d PointToShootBOTTOM = new Translation2d(PathFollow.convertAlliance(14.760), PathFollow.fixY(5.463));
+    Translation2d AnchorPointBottom = new Translation2d(PathFollow.convertAlliance(12.421), PathFollow.fixY(-6.279));
     
 
 
@@ -139,7 +140,24 @@ public class AutoChooser {
         }
         //case for starting in bottom
         else{
-
+            for(int indexOfNote = 0; indexOfNote < currentZone.length; indexOfNote++){
+                if(notesToPick[indexOfNote] != null){
+                    if(notesToPick[indexOfNote] == noteBottom){
+                        points.add(new pathPoint(notesToPick[indexOfNote].getX(), notesToPick[indexOfNote].getY(),
+                        Rotation2d.fromDegrees(180), 0, false));
+                    }
+                    else{
+                        points.add(new pathPoint(AnchorPointBottom.getX(), AnchorPointBottom.getY(), Rotation2d.fromDegrees(180),
+                         0.5, false));
+                        points.add(new pathPoint(notesToPick[indexOfNote].getX(), notesToPick[indexOfNote].getY(), Rotation2d.fromDegrees(180),
+                        0.3, false));
+                        points.add(new pathPoint(AnchorPointBottom.getX(), AnchorPointBottom.getY(), Rotation2d.fromDegrees(180),
+                         0.5, false));
+                        points.add(new pathPoint(PointToShootBOTTOM.getX(), PointToShootBOTTOM.getX(), Rotation2d.fromDegrees(-1), 0.1, false));//TODO add rotationToSpeaker 
+                    }
+                    
+                }
+            }
 
         }
        return (pathPoint[]) points.toArray();
