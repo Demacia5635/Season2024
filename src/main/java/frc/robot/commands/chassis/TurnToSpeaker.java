@@ -12,7 +12,8 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.chassis.Chassis;
-import static frc.robot.Constants.ShooterConstants.*;
+import frc.robot.subsystems.shooter.ShooterConstants;
+import frc.robot.subsystems.shooter.ShooterConstants.*;
 
 public class TurnToSpeaker extends Command {
     
@@ -25,7 +26,7 @@ public class TurnToSpeaker extends Command {
     public TurnToSpeaker(Chassis chassis) {
         // Use addRequirements() here to declare subsystem dependencies.
         this.chassis = chassis;
-        speaker = DriverStation.getAlliance().get() == Alliance.Red ? RED_ALLIANCE_SPEAKER_POSE2D : BLUE_ALLIANCE_SPEAKER_POSE2D ;
+        speaker = DriverStation.getAlliance().get() == Alliance.Red ? ShooterConstants.RED_ALLIANCE_SPEAKER_POSE2D : ShooterConstants.BLUE_ALLIANCE_SPEAKER_POSE2D ;
         addRequirements(chassis);
     }
 
