@@ -1,5 +1,5 @@
 package frc.robot.subsystems.intake;
-import static frc.robot.Constants.IntakeConstants;
+import frc.robot.subsystems.intake.IntakeConstants;
  
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
@@ -20,11 +20,10 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.Constants;
 import frc.robot.RobotContainer;
-import frc.robot.commands.chassis.DispenseCommand;
-import frc.robot.commands.chassis.IntakeCommand;
-import frc.robot.commands.chassis.ShootCommand;
+import frc.robot.commands.intake.DispenseCommand;
+import frc.robot.commands.intake.IntakeCommand;
+import frc.robot.commands.intake.ShootCommand;
 import frc.robot.subsystems.intake.IntakeConstants.*;
 public class Intake extends SubsystemBase{
     public final TalonFX motor;

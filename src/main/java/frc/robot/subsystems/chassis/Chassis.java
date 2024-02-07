@@ -1,17 +1,5 @@
 package frc.robot.subsystems.chassis;
 
-import static frc.robot.Constants.ChassisConstants.GYRO_ID;
-import static frc.robot.Constants.ChassisConstants.KINEMATICS;
-import static frc.robot.Constants.ChassisConstants.MODULE_BACK_LEFT;
-import static frc.robot.Constants.ChassisConstants.MODULE_BACK_RIGHT;
-import static frc.robot.Constants.ChassisConstants.MODULE_FRONT_LEFT;
-import static frc.robot.Constants.ChassisConstants.MODULE_FRONT_RIGHT;
-
-import java.util.Arrays;
-
-import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.sensors.Pigeon2;
-
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
