@@ -26,6 +26,7 @@ import frc.robot.commands.chassis.RotateToAngleShooter;
 import frc.robot.commands.chassis.SetModuleAngle;
 import frc.robot.commands.chassis.TestSteerVandA;
 import frc.robot.subsystems.chassis.Chassis;
+import frc.robot.subsystems.intake.Intake;
 
 
 public class RobotContainer implements Sendable{
