@@ -3,7 +3,7 @@ package frc.robot.commands.chassis;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import frc.robot.Constants.*;
+import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.intake.Intake;
 
 public class ShootCommand extends CommandBase {

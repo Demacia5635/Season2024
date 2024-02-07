@@ -3,7 +3,7 @@ package frc.robot.commands.chassis;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import frc.robot.Constants.IntakeConstants.Parameters;
+import frc.robot.subsystems.intake.IntakeConstants.Parameters;
 import frc.robot.subsystems.intake.Intake;
 
 public class IntakeCommand extends CommandBase {
