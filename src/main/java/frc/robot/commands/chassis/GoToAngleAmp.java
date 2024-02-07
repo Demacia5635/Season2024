@@ -6,7 +6,7 @@ package frc.robot.commands.chassis;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.chassis.Amp;
+import frc.robot.subsystems.Amp;
 import frc.robot.utils.TrapezoidCalc;
 
 public class GoToAngleAmp extends Command {
