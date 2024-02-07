@@ -1,20 +1,24 @@
 
 package frc.robot.commands.chassis.Auto;
 
+import static frc.robot.subsystems.chassis.ChassisConstants.note1;
+import static frc.robot.subsystems.chassis.ChassisConstants.note2;
+import static frc.robot.subsystems.chassis.ChassisConstants.note3;
+import static frc.robot.subsystems.chassis.ChassisConstants.note4;
+import static frc.robot.subsystems.chassis.ChassisConstants.note5;
+import static frc.robot.subsystems.chassis.ChassisConstants.noteBottom;
+import static frc.robot.subsystems.chassis.ChassisConstants.noteMid;
+import static frc.robot.subsystems.chassis.ChassisConstants.noteTop;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import frc.robot.PathFollow.Util.Arc;
-import frc.robot.PathFollow.Util.RectanglePos;
-import frc.robot.PathFollow.Util.Segment;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.PathFollow.Util.pathPoint;
 import frc.robot.commands.chassis.PathFollow;
-
-import static frc.robot.subsystems.chassis.ChassisConstants.*;
 
 public class AutoChooser {
     Translation2d PointToShootTOP = new Translation2d(PathFollow.convertAlliance(14.070), PathFollow.fixY(1.835));
@@ -34,11 +38,6 @@ public class AutoChooser {
 
     Translation2d centerOfStage = new Translation2d(PathFollow.convertAlliance(11.734), PathFollow.fixY(4.247));
 
-    private SendableChooser<Translation2d> firstNote;
-    private SendableChooser<Translation2d> secondNote;
-    private SendableChooser<Translation2d> thirdNote;
-    private SendableChooser<Translation2d> fourthNote;
-    private SendableChooser<Translation2d> fifthhNote;
     private SendableChooser<Translation2d[]> startingZone;
 
 
@@ -61,7 +60,6 @@ public class AutoChooser {
         if(startingZone.getSelected() == null) System.out.println("Zone not selected");
         else currentZone = (Translation2d[]) startingZone.getSelected();
     }
-
     
 
     private pathPoint[] goThroughStage(Translation2d startingPos, Translation2d finalPos){
@@ -88,11 +86,11 @@ public class AutoChooser {
 
     public pathPoint[] createPoints(){
         List<pathPoint> points = new ArrayList<pathPoint>();
-        notesToPick[0] = firstNote.getSelected();
-        notesToPick[1] = secondNote.getSelected();
-        notesToPick[2] = thirdNote.getSelected();
-        notesToPick[3] = fourthNote.getSelected();
-        notesToPick[4] = fifthhNote.getSelected();
+        notesToPick[0] = (Translation2d) SmartDashboard.getData("Note 1");
+        notesToPick[1] = (Translation2d) SmartDashboard.getData("Note 2");
+        notesToPick[2] = (Translation2d) SmartDashboard.getData("Note 3");
+        notesToPick[3] = (Translation2d) SmartDashboard.getData("Note 4");
+        notesToPick[4] = (Translation2d) SmartDashboard.getData("Note 5");
 
         points.add(new pathPoint(0 , 0, null, 0, false));
         if(currentZone == zoneTop){
@@ -142,88 +140,45 @@ public class AutoChooser {
         //case for starting in bottom
         else{
 
+
         }
        return (pathPoint[]) points.toArray();
         
     }
     
     public void showLegalPoints(Translation2d[] zone){
-        if(zone == zoneTop){
-            firstNote.setDefaultOption("none", new Translation2d());
-            secondNote.setDefaultOption("none", new Translation2d());
-            thirdNote.setDefaultOption("none", new Translation2d());
-            fourthNote.setDefaultOption("none", new Translation2d());
-            firstNote.addOption("Note Top", noteTop);
-            firstNote.addOption("Note Mid", noteMid);
-            firstNote.addOption("Note 1", note1);
-            firstNote.addOption("Note 2", note2);
-            secondNote.addOption("Note Top", noteTop);
-            secondNote.addOption("Note Mid", noteMid);
-            secondNote.addOption("Note 1", note1);
-            secondNote.addOption("Note 2", note2);
-            thirdNote.addOption("Note Top", noteTop);
-            thirdNote.addOption("Note Mid", noteMid);
-            thirdNote.addOption("Note 1", note1);
-            thirdNote.addOption("Note 2", note2);
-            fourthNote.addOption("Note Top", noteTop);
-            fourthNote.addOption("Note Mid", noteMid);
-            fourthNote.addOption("Note 1", note1);
-            fourthNote.addOption("Note 2", note2);
-            
-            
-            
+        if (zone == zoneTop){
+            for (int i = 0; i < zone.length; i++) {
+                SendableChooser<Translation2d> chooser = new SendableChooser<>();
+                chooser.setDefaultOption("None", null);
+                chooser.addOption("Note Top", noteTop);
+                chooser.addOption("Note Mid", noteMid);
+                chooser.addOption("Note 1", note1);
+                chooser.addOption("Note 2", note2);
+                SmartDashboard.putData("Note " + i+1, chooser);
+            }
         }
-        else if(zone == zoneMid){
-            firstNote.setDefaultOption("none", null);
-            firstNote.addOption("Note Mid", noteMid);
-            firstNote.addOption("Note Bottom", noteBottom);
-            firstNote.addOption("Note 2", note2);
-            firstNote.addOption("Note 3", note3);
-            firstNote.addOption("Note 4", note4);
-
-            secondNote.setDefaultOption("none", null);
-            secondNote.addOption("Note Mid", noteMid);
-            secondNote.addOption("Note Bottom", noteBottom);
-            secondNote.addOption("Note 2", note2);
-            secondNote.addOption("Note 3", note3);
-            secondNote.addOption("Note 4", note4);
-
-            thirdNote.setDefaultOption("none", null);
-            thirdNote.addOption("Note Mid", noteMid);
-            thirdNote.addOption("Note Bottom", noteBottom);
-            thirdNote.addOption("Note 2", note2);
-            thirdNote.addOption("Note 3", note3);
-            thirdNote.addOption("Note 4", note4);
-
-            fourthNote.setDefaultOption("none", null);
-            fourthNote.addOption("Note Mid", noteMid);
-            fourthNote.addOption("Note Bottom", noteBottom);
-            fourthNote.addOption("Note 2", note2);
-            fourthNote.addOption("Note 3", note3);
-            fourthNote.addOption("Note 4", note4);
-
-            fifthhNote.setDefaultOption("none", null);
-            fifthhNote.addOption("Note Mid", noteMid);
-            fifthhNote.addOption("Note Bottom", noteBottom);
-            fifthhNote.addOption("Note 2", note2);
-            fifthhNote.addOption("Note 3", note3);
-            fifthhNote.addOption("Note 4", note4);
+        else if (zone == zoneMid) {
+            for (int i = 0; i < zone.length; i++) {
+                SendableChooser<Translation2d> chooser = new SendableChooser<>();
+                chooser.setDefaultOption("none", null);
+                chooser.addOption("Note Mid", noteMid);
+                chooser.addOption("Note Bottom", noteBottom);
+                chooser.addOption("Note 2", note2);
+                chooser.addOption("Note 3", note3);
+                chooser.addOption("Note 4", note4);
+                SmartDashboard.putData("Note " + i+1, chooser);
+            }
         }
-        else{
-            firstNote.setDefaultOption("none", null);
-            firstNote.addOption("Note Bottom", noteBottom);
-            firstNote.addOption("Note 4", note4);
-            firstNote.addOption("Note 5", note5);
-
-            secondNote.setDefaultOption("none", null);
-            secondNote.addOption("Note Bottom", noteBottom);
-            secondNote.addOption("Note 4", note4);
-            secondNote.addOption("Note 5", note5);
-
-            thirdNote.setDefaultOption("none", null);
-            thirdNote.addOption("Note Bottom", noteBottom);
-            thirdNote.addOption("Note 4", note4);
-            thirdNote.addOption("Note 5", note5);
+        else if (zone == zoneBottom) {
+            for (int i = 0; i < zone.length; i++) {
+                SendableChooser<Translation2d> chooser = new SendableChooser<>();
+                chooser.setDefaultOption("none", null);
+                chooser.addOption("Note Bottom", noteBottom);
+                chooser.addOption("Note 4", note4);
+                chooser.addOption("Note 5", note5);
+                SmartDashboard.putData("Note " + i+1, chooser);
+            }
         }
         
     }
