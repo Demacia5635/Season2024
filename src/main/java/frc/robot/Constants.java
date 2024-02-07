@@ -147,29 +147,32 @@ public final class Constants {
  
   public static class IntakeConstants{
     public static class IntakeDeviceID{
-      public static final int MOTOR = 23;
+      public static final int MOTOR = 24;
       public static final int LIGHT_LIMIT = 0;
     }
     public static class ConvertionParams {
-      public static final double MotorGearRatio = 1/999; // (1/number)
+      public static final double MotorGearRatio = 1/1.9; // (1/number)
       public static final double MOTOR_PULSES_PER_SPIN = 2048;
     }
     public static class Parameters{
       public static final double deadband = 0.2;
       public static final boolean inverted = true;
-      public static final double notePresenceVoltage = 4.55;
+      public static final double notePresenceVoltage = 4.6;
 
 
-      public static final double intakeSpeed = 0;
-      public static final double intakeTransferSpeed = 0;
-      public static final double sensorToRestDist = 0;
+      public static final double intakeSpeed = 1;
+      public static double intakeTransferSpeedPreSensor = 0.6;
+      public static final double intakeTransferSpeed = 0.45;
+      public static final double numFinalRotation = 3.8;
+      public static final double CRITICAL_CURRENT = 100;
+      public static final double sensorToRestDist = ConvertionParams.MOTOR_PULSES_PER_SPIN*ConvertionParams.MotorGearRatio*numFinalRotation;
 
       public static final double shootVelocity = 0;
       public static final double shootTime = 0;
 
       
-      public static final double dispenseVelocity = 0;
-      public static final double dispenseTime = 0;
+      public static final double dispenseVelocity = -0.4;
+      public static final double dispenseTime = 1;
 
 
       public static final double kP = 0.0;

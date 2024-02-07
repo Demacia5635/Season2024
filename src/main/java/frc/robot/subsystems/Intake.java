@@ -76,6 +76,10 @@ public class Intake extends SubsystemBase{
         motor.set(ControlMode.Velocity, velocity);
     }
 
+    public boolean isCriticalCurrent() {
+        return motor.getOutputCurrent()>=Parameters.CRITICAL_CURRENT;
+    }
+
     public double getMotorCurrent() {
         return motor.getOutputCurrent();
     }
@@ -136,7 +140,8 @@ public class Intake extends SubsystemBase{
     public void initSendable(SendableBuilder builder) {
     super.initSendable(builder);
     SmartDashboard.putNumber("power", 0);
-    SmartDashboard.putData("set power", new RunCommand(()-> setPower(0.1), this));
+    SmartDashboard.putData("set power", new RunCommand(()-> setPower(SmartDashboard.getNumber("power", 0)), this));
+    SmartDashboard.putData("dispense", new DispenseCommand(this));
     }
 
 }

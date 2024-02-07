@@ -9,9 +9,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.commands.chassis.DispenseCommand;
 import frc.robot.commands.chassis.DriveCommand;
+import frc.robot.commands.chassis.IntakeCommand;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.chassis.Chassis;
 
@@ -69,7 +72,7 @@ public class RobotContainer implements Sendable{
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return null;
+    return new IntakeCommand(intake).andThen(new WaitCommand(2), new DispenseCommand(intake));
     // return new RunCommand(()-> chassis.setModulesAngularVelocity(50), chassis);
     // return new InstantCommand(() -> chassis.resetWheels(), chassis)
     // .andThen(new RunCommand(() -> chassis.setVelocities(new ChassisSpeeds(-2, 0, 0))).withTimeout(2).andThen(new InstantCommand(() -> chassis.stop())));
