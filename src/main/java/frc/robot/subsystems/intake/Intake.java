@@ -1,4 +1,4 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.intake;
 import static frc.robot.Constants.IntakeConstants;
  
 import com.ctre.phoenix.motorcontrol.ControlMode;
@@ -25,7 +25,7 @@ import frc.robot.RobotContainer;
 import frc.robot.commands.chassis.DispenseCommand;
 import frc.robot.commands.chassis.IntakeCommand;
 import frc.robot.commands.chassis.ShootCommand;
-import frc.robot.Constants.IntakeConstants.*;
+import frc.robot.subsystems.intake.IntakeConstants.*;
 public class Intake extends SubsystemBase{
     public final TalonFX motor;
     public AnalogInput limitInput;
