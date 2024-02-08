@@ -21,9 +21,9 @@ public class LedController {
         led.stop();
     }
 
-    public void changeColor(int h, int s, int v) {
+    public void changeColor(int r, int g, int b) {
         for (int i = 0; i < buffer.getLength(); i++) {
-            buffer.setHSV(i, h, s, v);
+            buffer.setRGB(i, r, g, b);
         }
         led.start();
         led.setData(buffer);

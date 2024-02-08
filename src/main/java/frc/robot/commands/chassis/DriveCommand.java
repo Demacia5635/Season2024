@@ -27,7 +27,7 @@ public class DriveCommand extends Command {
     addRequirements(chassis);
 
     controller.b().onTrue(new InstantCommand(() -> precisionDrive = !precisionDrive));
-    Leds = new LedController(9, 13);
+    Leds = new LedController(9, 200);
   }
 
   @Override
@@ -57,8 +57,11 @@ public class DriveCommand extends Command {
     chassis.setVelocities(speeds);
 
     llpython = NetworkTableInstance.getDefault().getTable("limelight").getEntry("llpython").getDoubleArray(new double[8]);
-    while(llpython[0] != 0 ){
-      Leds.changeColor(10, 200, 200);
+    if(llpython[0] != 0 ){
+      Leds.changeColor(0, 255, 0);
+    }
+    else{
+      Leds.changeColor(75, 0, 130);
     }
   }
 
