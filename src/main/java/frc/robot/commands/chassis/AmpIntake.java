@@ -12,6 +12,9 @@ public class AmpIntake extends Command {
   boolean last;
   double v1;
   double v2;
+  double countRev[] = new double[2];
+  double count1;
+  double count2;
   /** Creates a new AmpIntake. */
   public AmpIntake(Amp amp, double v1, double v2) {
     this.amp = amp;
@@ -31,18 +34,33 @@ public class AmpIntake extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    
     if(amp.isClose()){
       if(!amp.isNoteThere(last)){
         amp.neosSetVel(v1, v2);
+        countRev = amp.getNeosRev();
+        count1 = countRev[0];
+        count2 = countRev[1];
       }else {
-        amp.neosSetVel(0, 0);
+        if(amp.getNeosRev()[0]-count1 >=2){
+          amp.neosSetVel(0, 0);
+        }else{
+          amp.neosSetVel(v1, v2);
+        } 
       }
     }
     if(amp.isOpen()){
       if(amp.isNoteThere(last)){
         amp.neosSetVel(-v1, -v2);
+        countRev = amp.getNeosRev();
+        count1 = countRev[0];
+        count2 = countRev[1];
       }else {
-        amp.neosSetVel(0, 0);
+        if(count1- amp.getNeosRev()[0] >=2){
+          amp.neosSetVel(0, 0);
+        }else{
+          amp.neosSetVel(v1, v2);
+        } 
       }
     }    
     last = amp.didNotePass();
