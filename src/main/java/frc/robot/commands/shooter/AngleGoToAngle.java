@@ -9,7 +9,7 @@ import frc.robot.subsystems.shooter.Shooter;
 import static frc.robot.Constants.ShooterConstants.*;
 
 /** commands that goes to a specific angle */
-public class GoToAngle extends Command {
+public class AngleGoToAngle extends Command {
     
     /**the shooter that being used */
     Shooter shooter;
@@ -33,8 +33,7 @@ public class GoToAngle extends Command {
      * @param maxVel the max velocity of the trapezoid in pules per 1/10 sec
      * @param acc the acc of the trapezoid  in pules per 1/10 sec
      */
-    public GoToAngle(Shooter shooter, double angle, double maxVel, double acc) {
-        // Use addRequirements() here to declare subsystem dependencies.
+    public AngleGoToAngle(Shooter shooter, double angle, double maxVel, double acc) {
         this.shooter = shooter;
         this.wantedAngle = angle;
         this.maxVel = maxVel;
@@ -82,7 +81,7 @@ public class GoToAngle extends Command {
      */
     @Override
     public boolean isFinished() {
-        if (!shooter.limits(wantedDis - startDis > 0)){
+        if (!shooter.isAtLimits(wantedDis - startDis > 0)){
             if (!((wantedDis - startDis > 0) && (shooter.getDis() >= wantedDis))){
                 if (!((wantedDis - startDis < 0) && (shooter.getDis() <= wantedDis))){
                     if (!(Math.abs(wantedDis - shooter.getDis()) < 1)){
