@@ -113,10 +113,10 @@ public final class Constants {
     public static class ShooterConstants {
 
         /*set up the id for all the motors */
-        public static final int MOTOR_ID = 3;
+        public static final int MOTOR_ANGLE_ID = 4;
         public static final int MOTOR_1_ID = 1;
         public static final int MOTOR_2_ID = 2;
-        public static final int MOTOR_FEEDING_ID = 4;
+        public static final int MOTOR_FEEDING_ID = 3;
         
         /*set up the id of the sensor */
         public static final int LIMIT_INPUT_ID = 5;

@@ -47,7 +47,7 @@ public class Shooter extends SubsystemBase {
         motor2 = new TalonFX(MOTOR_2_ID);
         motorFeeding = new TalonSRX(MOTOR_FEEDING_ID);
         
-        motorAngle = new TalonFX(MOTOR_ID);
+        motorAngle = new TalonFX(MOTOR_ANGLE_ID);
         motorAngle.setInverted(true);
         
         motorAngle.config_kP(0, KP);
