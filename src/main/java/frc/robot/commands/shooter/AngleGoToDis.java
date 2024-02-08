@@ -7,7 +7,7 @@ package frc.robot.commands.shooter;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.shooter.Shooter;
 
-public class GoToDis extends Command {
+public class AngleGoToDis extends Command {
     
     Shooter shooter;
     double wantedDis;
@@ -22,8 +22,7 @@ public class GoToDis extends Command {
      * @param maxVel the max velocity of the trapezoid in pules per 1/10 sec
      * @param acc the acc of the trapezoid in pules per 1/10 sec
      */
-    public GoToDis(Shooter shooter, double dis, double maxVel, double acc) {
-        // Use addRequirements() here to declare subsystem dependencies.
+    public AngleGoToDis(Shooter shooter, double dis, double maxVel, double acc) {
         this.shooter = shooter;
         this.wantedDis = dis;
         this.maxVel = maxVel;
@@ -68,7 +67,7 @@ public class GoToDis extends Command {
      */
     @Override
     public boolean isFinished() {
-        if (!shooter.limits(wantedDis - startDis > 0)){
+        if (!shooter.isAtLimits(wantedDis - startDis > 0)){
             if (!((wantedDis - startDis > 0) && (shooter.getDis() >= wantedDis))){
                 if (!((wantedDis - startDis < 0) && (shooter.getDis() <= wantedDis))){
                     if (!(Math.abs(wantedDis - shooter.getDis()) < 1)){
