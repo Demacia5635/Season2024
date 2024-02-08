@@ -48,6 +48,6 @@ public class RobotContainer  {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
-        return new InstantCommand(()-> shooter.setPow(0.953125));
+        return new ShooterShoot(shooter, 0.7, 1, 40000, 45, 10000, 10000);
     }
 }
