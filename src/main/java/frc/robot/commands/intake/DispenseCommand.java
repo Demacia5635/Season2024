@@ -18,9 +18,16 @@ public class DispenseCommand extends CommandBase {
     }
 
     @Override
-    public void initialize() {
-        intake.setVelocity(IntakeConstants.Parameters.DISPENSE_VELOCITY); // Set dispense velocity
-        withTimeout(IntakeConstants.Parameters.DISPENSE_TIME); // Set timeout for dispensing
+    public void execute() {
+        intake.setPower(IntakeConstants.Parameters.DISPENSE_POWER); // Set dispense velocity
+        // withTimeout(IntakeConstants.Parameters.DISPENSE_TIME); // Set timeout for dispensing
+    }
+
+    @Override
+    public boolean isFinished() {
+        // Command ends when current falls under minimum
+        //return intake.getMotorCurrent() < IntakeConstants.Parameters.MIN_CURRENT_TO_AMP;
+        return false;
     }
 
     @Override

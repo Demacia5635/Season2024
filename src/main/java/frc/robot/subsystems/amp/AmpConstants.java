@@ -43,4 +43,21 @@ public class AmpConstants{
         public static final double[] Kcos = {-1.202533577, 0, 0, 0.870858412, 0};
         public static final double[] Kcossin = {5.16955116, 0, 0, -5.614001788, 0};
     }
+
+
+    public static class CommandParams {
+    
+      public static final double NUM_OF_ROTATION = 2;
+      public static final double v1 = 0;
+      public static final double v2 = 0;
+
+      public static final double ANGLE_RADIANS_AMP = 0;
+      public static final double MAX_VEL_RAD = 0;
+      public static final double MAX_ACCEL_RAD = 0;
+
+
+
+      
+    }
+
   }

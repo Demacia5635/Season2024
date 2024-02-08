@@ -28,6 +28,10 @@ public class FeedShooter extends CommandBase {
     public void execute() {
         // Check for note reaching resting spot based on encoder counts, but only after
         // initialization
+
+        if(shooter.didNotePass()) noteWasDetected = true;
+
+
         if (initialEncoderCount > 0 && shooter.getFeedingEncoderPose() >= initialEncoderCount + ShooterConstants.DIST_LEFT_SENSOR) {
             shooter.feedingSetPow(0); // Stop motors if resting position reached
         } else if (noteWasDetected) { // Note detected, use transfer speed
@@ -36,6 +40,8 @@ public class FeedShooter extends CommandBase {
             shooter.feedingSetPow(ShooterConstants.SHOOTER_SPEED); // Run motors at intake speed until note is detected
         }
 
+
+        
 
         if (noteWasDetected) { // Placeholder for sensor detection
             if (initialEncoderCount == 0) { // Initialize only when note is first detected

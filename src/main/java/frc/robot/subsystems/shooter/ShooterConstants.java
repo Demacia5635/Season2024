@@ -44,6 +44,21 @@ public class ShooterConstants {
 
 
 
+        public static class CommandParam {
+        
+            public static final double ANGLE_COLLECT = 0;
+            public static final double ANGLE_DEFAULT = 0;
+            public static final double ANGLE_SHOOT = 0;
+            public static final double MAX_VEL = 0;
+            public static final double MAX_ACCCEL= 0;
+
+            public static final double SHOOT_POWER = 0;
+
+
+
+
+            
+        }
 
 
     }
