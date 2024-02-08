@@ -159,7 +159,7 @@ public class Shooter extends SubsystemBase {
      * @param isUpDirection if the velocity the motor moves is positive or negative
      * @return if the limits have passed (false means you are fine)
      */
-    public boolean limits(boolean isUpDirection){
+    public boolean isAtLimits(boolean isUpDirection){
         // if (isUpDirection){
         //     return getDis() >= 322;
         // } else {
@@ -249,7 +249,7 @@ public class Shooter extends SubsystemBase {
      * @return if the limit volt is smaller than 4.55
      * @author Adar
      */
-    public boolean didNotePass(){
+    public boolean isNote(){
         return getLimitVolt()<4.55;
     }
 
