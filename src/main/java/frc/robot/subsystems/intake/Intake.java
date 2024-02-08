@@ -1,5 +1,5 @@
-package frc.robot.subsystems;
-import static frc.robot.Constants.IntakeConstants;
+package frc.robot.subsystems.intake;
+import frc.robot.subsystems.intake.IntakeConstants;
  
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
@@ -20,25 +20,29 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.Constants;
 import frc.robot.RobotContainer;
-import frc.robot.commands.chassis.DispenseCommand;
-import frc.robot.commands.chassis.IntakeCommand;
-import frc.robot.commands.chassis.ShootCommand;
-import frc.robot.Constants.IntakeConstants.*;
+import frc.robot.commands.intake.DispenseCommand;
+import frc.robot.commands.intake.IntakeCommand;
+import frc.robot.commands.intake.ShootCommand;
+import frc.robot.subsystems.intake.IntakeConstants.*;
 public class Intake extends SubsystemBase{
     public final TalonFX motor;
     public AnalogInput limitInput;
+    public DigitalInput limitMechanical;
  
     //SimpleMotorFeedforward ff2 = new SimpleMotorFeedforward(Parameters.ks2, Parameters.kv2, Parameters.ka2);
     public Intake(){
         motor = new TalonFX(IntakeDeviceID.MOTOR);
-        motor.setInverted(Parameters.inverted);
+        motor.setInverted(Parameters.IS_INVERTED);
  
         limitInput = new AnalogInput(IntakeDeviceID.LIGHT_LIMIT);
         limitInput.setAccumulatorInitialValue(0);
+
+        limitMechanical = new DigitalInput(IntakeDeviceID.MECHANICAL_LIMIT);
  
         SmartDashboard.putData(this);
+
+        setBrake();
  
         SmartDashboard.putData("Brake", new InstantCommand(
             ()->this.setBrake(),this).ignoringDisable(true));
@@ -47,9 +51,9 @@ public class Intake extends SubsystemBase{
     }
  
     public void configDevices() {
-        motor.config_kP(0, Parameters.kP);
-        motor.config_kI(0, Parameters.kI);
-        motor.config_kD(0, Parameters.kD);
+        motor.config_kP(0, Parameters.KP);
+        motor.config_kI(0, Parameters.KI);
+        motor.config_kD(0, Parameters.KD);
     }
  
     public double getpower(){
@@ -62,10 +66,18 @@ public class Intake extends SubsystemBase{
     }
  
     public boolean isNotePresent(){
-        if (getLimitVolt() < Parameters.notePresenceVoltage){
+        if (getLimitVolt() < Parameters.NOT_PRESENCE_VOLTAGE){
             return true;
         }
         return false;
+    }
+
+    public boolean isCriticalCurrent() {
+        return motor.getOutputCurrent()>=Parameters.CRITICAL_CURRENT;
+    }
+
+    public boolean isNoteMechanicalLimit() {
+        return limitMechanical.get();
     }
  
     public void setPower(double p1){
@@ -74,10 +86,6 @@ public class Intake extends SubsystemBase{
 
     public void setVelocity(double velocity) {
         motor.set(ControlMode.Velocity, velocity);
-    }
-
-    public boolean isCriticalCurrent() {
-        return motor.getOutputCurrent()>=Parameters.CRITICAL_CURRENT;
     }
 
     public double getMotorCurrent() {
@@ -105,7 +113,7 @@ public class Intake extends SubsystemBase{
     }
  
     public static double deadband(double value) {
-        if (Math.abs(value)<Parameters.deadband) {
+        if (Math.abs(value)<Parameters.DEADBAND) {
             return 0;
         }
         return value;
@@ -121,7 +129,7 @@ public class Intake extends SubsystemBase{
  
  
     public double getRadVelocity(){
-        return (motor.getSelectedSensorVelocity()*ConvertionParams.MotorGearRatio/ConvertionParams.MOTOR_PULSES_PER_SPIN)*2*Math.PI;
+        return (motor.getSelectedSensorVelocity()*ConvertionParams.MOTOR_GEAR_RATIO/ConvertionParams.MOTOR_PULSES_PER_SPIN)*2*Math.PI;
     }
  
     @Override
@@ -141,7 +149,6 @@ public class Intake extends SubsystemBase{
     super.initSendable(builder);
     SmartDashboard.putNumber("power", 0);
     SmartDashboard.putData("set power", new RunCommand(()-> setPower(SmartDashboard.getNumber("power", 0)), this));
-    SmartDashboard.putData("dispense", new DispenseCommand(this));
     }
 
 }

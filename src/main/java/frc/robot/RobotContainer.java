@@ -12,11 +12,11 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.commands.chassis.DispenseCommand;
 import frc.robot.commands.chassis.DriveCommand;
-import frc.robot.commands.chassis.IntakeCommand;
-import frc.robot.subsystems.Intake;
+import frc.robot.commands.intake.DispenseCommand;
+import frc.robot.commands.intake.IntakeCommand;
 import frc.robot.subsystems.chassis.Chassis;
+import frc.robot.subsystems.intake.Intake;
 
 
 public class RobotContainer implements Sendable{

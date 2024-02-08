@@ -1,15 +1,13 @@
-package frc.robot.commands.chassis;
+package frc.robot.commands.intake;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import frc.robot.Constants.*;
-import frc.robot.Constants.IntakeConstants.Parameters;
-import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.intake.IntakeConstants;
+import frc.robot.subsystems.intake.Intake;
 
 public class DispenseCommand extends CommandBase {
     private final Intake intake;
-    private double count = 0;
 
     public DispenseCommand(Intake intake) {
         this.intake = intake;
@@ -20,15 +18,16 @@ public class DispenseCommand extends CommandBase {
     }
 
     @Override
-    public void initialize() {
-        intake.setPower(IntakeConstants.Parameters.dispenseVelocity);  // Set timeout for dispensing
-        count+=0.02;
+    public void execute() {
+        intake.setPower(IntakeConstants.Parameters.DISPENSE_POWER); // Set dispense velocity
+        // withTimeout(IntakeConstants.Parameters.DISPENSE_TIME); // Set timeout for dispensing
     }
-
 
     @Override
     public boolean isFinished() {
-        return count>=Parameters.dispenseTime;
+        // Command ends when current falls under minimum
+        //return intake.getMotorCurrent() < IntakeConstants.Parameters.MIN_CURRENT_TO_AMP;
+        return false;
     }
 
     @Override

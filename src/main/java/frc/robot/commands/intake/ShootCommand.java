@@ -1,15 +1,14 @@
-package frc.robot.commands.chassis;
+package frc.robot.commands.intake;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import frc.robot.Constants.*;
-import frc.robot.Constants.IntakeConstants.Parameters;
-import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.intake.IntakeConstants;
+import frc.robot.subsystems.intake.IntakeConstants.Parameters;
+import frc.robot.subsystems.intake.Intake;
 
 public class ShootCommand extends CommandBase {
     private final Intake intake;
-    private double count = 0;;
 
     public ShootCommand(Intake intake) {
         this.intake = intake;
@@ -21,13 +20,14 @@ public class ShootCommand extends CommandBase {
 
     @Override
     public void execute() {
-        count+=0.02;
-        intake.setVelocity(IntakeConstants.Parameters.shootVelocity); // Set shoot velocity
+        intake.setVelocity(IntakeConstants.Parameters.SHOOT_POWER); // Set shoot velocity
+        // withTimeout(IntakeConstants.Parameters.SHOOT_TIME); // Set timeout for shooting
     }
 
     @Override
     public boolean isFinished() {
-        return count>=Parameters.dispenseTime;
+        // Command ends when current falls under minimum
+        return intake.getMotorCurrent() < IntakeConstants.Parameters.MIN_CURRENT_TO_SHOOTER;
     }
 
     @Override
