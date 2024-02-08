@@ -169,20 +169,79 @@ public class Shooter extends SubsystemBase {
     }
 
     /**
-     * get the current velocity of the angle motor
-     * @return the angle motor velocity angles per sec
-     */
-    public double getAngleVel(){ 
-        return motorAngle.getSelectedSensorVelocity()*10/(PULES_PER_REV * GEAR_RATIO / 360); 
-    }
-
-    /**
      * get the limit input voltage
      * @return the limit input voltage
      * @author Adar
      */ 
     public double getLimitVolt(){
         return limitInput.getVoltage();
+    }
+
+    /**
+     * get the vel of every motor
+     * @param motor the wanted motor 
+     * <pre>
+     * capable param:
+     * 1 - motor 1
+     * 2 - motor 2
+     * 3 - feeding motor
+     * 4 - angle motor
+     * </pre>
+     * @return the wanted motor velocity in degree per sec
+     * @exception 3 - that is a snowblower so return in pules per sec
+     * @exception default - if the param motor is not listed above the function will return 0
+     */
+    public double getMotorVel(int motor){
+        switch (motor) {
+
+            case 1:
+                return motor1.getSelectedSensorVelocity()*10/(PULES_PER_REV/360);
+
+            case 2:
+                return motor2.getSelectedSensorVelocity()*10/(PULES_PER_REV/360);
+
+            case 3:
+                return motorFeeding.getSelectedSensorVelocity()*10;
+
+            case 4:
+                return motorAngle.getSelectedSensorVelocity()*10/(PULES_PER_REV/360);
+            
+            default:
+                return 0;
+        }
+    }
+
+    /**
+     * get the amper of every motor
+     * @param motor the wanted motor 
+     * <pre>
+     * capable param:
+     * 1 - motor 1
+     * 2 - motor 2
+     * 3 - feeding motor
+     * 4 - angle motor
+     * </pre>
+     * @return the wanted motor amper
+     * @exception default - if the param motor is not listed above the function will return 0
+     */
+    public double getSupplyCurrent(int motor){
+        switch (motor) {
+
+            case 1:
+                return motor1.getSupplyCurrent();
+
+            case 2:
+                return motor2.getSupplyCurrent();
+
+            case 3:
+                return motorFeeding.getSupplyCurrent();
+
+            case 4:
+                return motorAngle.getSupplyCurrent();
+
+            default:
+                return 0;
+        }
     }
 
     /**
@@ -226,16 +285,18 @@ public class Shooter extends SubsystemBase {
     public void initSendable(SendableBuilder builder) {
         super.initSendable(builder);
         
-        builder.addDoubleProperty("motor 1 speed", ()-> motor1.getSelectedSensorVelocity()*10/(PULES_PER_REV/360), null);
-        builder.addDoubleProperty("motor 2 speed", ()-> motor2.getSelectedSensorVelocity()*10/(PULES_PER_REV/360), null);
-        builder.addDoubleProperty("current amper motor 1", ()-> motor1.getSupplyCurrent(), null);
-        builder.addDoubleProperty("current amper motor 2", ()-> motor2.getSupplyCurrent(), null);
-        builder.addDoubleProperty("angle vel", this::getAngleVel, null);
+        /*put on ShuffleBoard all the builders */
+        builder.addDoubleProperty("motor 1 speed", ()-> getMotorVel(1), null);
+        builder.addDoubleProperty("motor 2 speed", ()-> getMotorVel(2), null);
+        builder.addDoubleProperty("current amper motor 1", ()-> getSupplyCurrent(1), null);
+        builder.addDoubleProperty("current amper motor 2", ()-> getSupplyCurrent(2), null);
+        builder.addDoubleProperty("angle vel", ()-> getMotorVel(4), null);
         builder.addDoubleProperty("Distance", this::getDis, null);
         builder.addDoubleProperty("base dis", ()-> baseDis, null);
         builder.addDoubleProperty("Angle", this::getAngle, null);
         builder.addDoubleProperty("encoder", ()->motorAngle.getSelectedSensorPosition(), null);
     
+        /*put on ShuffleBoard all the cmds */
         SmartDashboard.putData("Dis reset", new InstantCommand(()-> resetDis()).ignoringDisable(true));
         SmartDashboard.putData("Angle Brake", new InstantCommand(()-> angleBrake()).ignoringDisable(true));
         SmartDashboard.putData("Angle Coast", new InstantCommand(()-> angleCoast()).ignoringDisable(true));
