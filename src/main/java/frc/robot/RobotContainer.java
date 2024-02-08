@@ -13,11 +13,11 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.commands.AmpIntake;
+import frc.robot.commands.amp.AmpIntake;
+import frc.robot.commands.amp.GoToAngleAmp;
 import frc.robot.commands.chassis.DriveCommand;
-import frc.robot.commands.chassis.GoToAngleAmp;
 import frc.robot.commands.chassis.JoyStickAmp;
-import frc.robot.subsystems.Amp;
+import frc.robot.subsystems.amp.Amp;
 import frc.robot.subsystems.chassis.Chassis;
 
 

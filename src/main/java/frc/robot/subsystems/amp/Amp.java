@@ -1,4 +1,4 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.amp;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
@@ -19,7 +19,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.Constants.AmpConstants.*;
+import frc.robot.subsystems.amp.AmpConstants.*;
 import frc.robot.Sysid.Sysid;
 import frc.robot.Sysid.Sysid.Gains;
 public class Amp extends SubsystemBase{

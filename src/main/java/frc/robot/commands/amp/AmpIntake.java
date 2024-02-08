@@ -2,10 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands;
+package frc.robot.commands.amp;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.Amp;
+import frc.robot.subsystems.amp.Amp;
+import frc.robot.subsystems.amp.AmpConstants;
 
 public class AmpIntake extends Command {
   Amp amp;
@@ -42,7 +43,7 @@ public class AmpIntake extends Command {
         count1 = countRev[0];
         count2 = countRev[1];
       }else {
-        if(amp.getNeosRev()[0]-count1 >=2){
+        if(amp.getNeosRev()[0]-count1 >=AmpConstants.CommandParams.NUM_OF_ROTATION){
           amp.neosSetVel(0, 0);
         }else{
           amp.neosSetVel(v1, v2);
@@ -56,7 +57,7 @@ public class AmpIntake extends Command {
         count1 = countRev[0];
         count2 = countRev[1];
       }else {
-        if(count1- amp.getNeosRev()[0] >=2){
+        if(count1- amp.getNeosRev()[0] >=AmpConstants.CommandParams.NUM_OF_ROTATION){
           amp.neosSetVel(0, 0);
         }else{
           amp.neosSetVel(v1, v2);
@@ -75,6 +76,6 @@ public class AmpIntake extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return (((amp.isOpen() ) && (count1- amp.getNeosRev()[0] >=AmpConstants.CommandParams.NUM_OF_ROTATION) && (!amp.isNoteThere(last))) || ((amp.isClose()) && (amp.getNeosRev()[0]-count1 >=AmpConstants.CommandParams.NUM_OF_ROTATION) && (amp.isNoteThere(last))) );
   }
 }
