@@ -20,7 +20,6 @@ public class AngleControl extends Command {
      * @param controller the controller we want to get the jostick
      */
     public AngleControl(Shooter shooter, CommandXboxController controller) {
-        // Use addRequirements() here to declare subsystem dependencies.
         this.shooter = shooter;
         this.controller = controller;
         addRequirements(shooter);
