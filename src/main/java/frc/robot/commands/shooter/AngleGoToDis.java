@@ -7,12 +7,18 @@ package frc.robot.commands.shooter;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.shooter.Shooter;
 
+/**command that makes the angle motor go to a specific dis */
 public class AngleGoToDis extends Command {
     
+    /**the shooter we want to use */
     Shooter shooter;
+    /**the wanted angle */
     double wantedDis;
+    /**the max velocity wanted for the trapezoid */
     double maxVel;
+    /**the acc wanted for the trapezoid */
     double acc;
+    /**the start dis of the angle motor being used in isFinish */
     double startDis;
 
     /**

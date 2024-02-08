@@ -11,7 +11,9 @@ import frc.robot.subsystems.shooter.Shooter;
 /**command that control angle */
 public class AngleControl extends Command {
 
+    /**the shooter that want to be used */
     Shooter shooter;
+    /**the controller we want to use */
     CommandXboxController controller;
 
     /**
