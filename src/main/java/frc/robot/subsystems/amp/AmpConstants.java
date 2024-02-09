@@ -47,7 +47,7 @@ public class AmpConstants{
 
     public static class CommandParams {
     
-      public static final double NUM_OF_ROTATION = 2;
+      public static final double NUM_OF_ROTATION = 5;
       public static final double v1 = 0;
       public static final double v2 = 0;
 

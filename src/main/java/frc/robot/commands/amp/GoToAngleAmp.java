@@ -34,7 +34,7 @@ public class GoToAngleAmp extends Command {
   public void initialize() {
     startTime = Timer.getFPGATimestamp();
     startPulses = amp.m1.getSelectedSensorPosition();
-    if(amp.isOpen()){
+    if(amp.isOpen(startPulses)){
       amp.setPowerSnowblower(-0.2);
     }
     amp.neoEncoderReset();
@@ -51,9 +51,9 @@ public class GoToAngleAmp extends Command {
     double currentAngleRad = amp.getPoseByPulses(startPulses);
     double velRad = trap.trapezoid(amp.getVelRadArm(), maxVelRad, 0.5, Math.abs(acceleRad), angleRad-currentAngleRad);
     amp.setVel(velRad, startPulses);
-    if((amp.isClose()||amp.isOpen())&&(Timer.getFPGATimestamp()-startTime > 0.5)){
+    if((amp.isClose()||amp.isOpen(startPulses))&&(Timer.getFPGATimestamp()-startTime > 0.5)){
       amp.stop();
-      if(amp.isOpen()){
+      if(amp.isOpen(startPulses)){
         amp.runSnowblower(0.3, 350);
       }
     }

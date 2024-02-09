@@ -16,8 +16,8 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.amp.AmpIntake;
 import frc.robot.commands.amp.GoToAngleAmp;
 import frc.robot.commands.chassis.DriveCommand;
-import frc.robot.commands.chassis.JoyStickAmp;
 import frc.robot.subsystems.amp.Amp;
+import frc.robot.subsystems.amp.JoyStickAmp;
 import frc.robot.subsystems.chassis.Chassis;
 
 
@@ -78,9 +78,9 @@ public class RobotContainer implements Sendable{
   public Command getAutonomousCommand() {
     //return null;
     //return new GoToAngleAmp(amp, Math.PI*0.7, Math.PI*0.4, Math.PI*0.5);
-    return new AmpIntake(amp, 2,1).withTimeout(3)
+    /**return new AmpIntake(amp, 2,1).withTimeout(3)
     .andThen(new GoToAngleAmp(amp, Math.PI*0.7, Math.PI*0.4, Math.PI*0.5))
-    .andThen(new AmpIntake(amp, 2,1));
+    .andThen(new AmpIntake(amp, 2,1));**/
     // return new InstantCommand(() -> chassis.resetWheels(), chassis)
     // .andThen(new RunCommand(() -> chassis.setVelocities(new ChassisSpeeds(-2, 0, 0))).withTimeout(2).andThen(new InstantCommand(() -> chassis.stop())));
     //return new RunCommand(() -> chassis.getModule(2).setAngularVelocity(600));
@@ -89,5 +89,6 @@ public class RobotContainer implements Sendable{
     //return new RunCommand(()->{chassis.getModule(2).setAngularPower(0.049 + 300*0.0003);},chassis).withTimeout(3)
     //  .andThen(new InstantCommand(()->{SmartDashboard.putNumber("FF TEST",  chassis.getModule(2).getAngularVelocity());
     //chassis.stop();}));
+    return new AmpIntake(amp, -0.5, -0.25);
   }
 }

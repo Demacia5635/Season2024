@@ -8,8 +8,11 @@ import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.sensors.Pigeon2;
+import com.fasterxml.jackson.annotation.JsonCreator.Mode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.SparkMaxAnalogSensor;
+import com.revrobotics.CANAnalog.AnalogMode;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.util.sendable.SendableBuilder;
@@ -29,7 +32,7 @@ public class Amp extends SubsystemBase{
     public final CANSparkMax neo1;//small wheel
     public final CANSparkMax neo2;//big wheel
     public double startDeg;
-    public AnalogInput limitInput;
+    public SparkMaxAnalogSensor limitInput;
     public int opticCount;
     
     //ArmFeedforward ff = new ArmFeedforward(Parameters.ks1, Parameters.kg1, Parameters.kv1, Parameters.ka1);
@@ -52,8 +55,9 @@ public class Amp extends SubsystemBase{
         neo2 = new CANSparkMax(AmpDeviceID.NEO2, MotorType.kBrushless);
         neo2.getEncoder().setPosition(0);
 
-        limitInput = new AnalogInput(AmpDeviceID.LIGHT_LIMIT);
-        limitInput.setAccumulatorInitialValue(0);
+        // limitInput = new AnalogInput(AmpDeviceID.LIGHT_LIMIT);
+        limitInput = neo2.getAnalog(AnalogMode.kAbsolute);
+        //limitInput.setAccumulatorInitialValue(0);
         
         opticCount = 0;
         SmartDashboard.putData(this);
@@ -139,23 +143,28 @@ public class Amp extends SubsystemBase{
      * @return true if the arm is fully closed
      */
     public boolean isClose() {
-        return m1.isFwdLimitSwitchClosed() == 1;
+        //return m1.isFwdLimitSwitchClosed() == 1;
+        return true;
     }
     
     /**
      * 
      * @return true if the arm is fully open
      */
-    public boolean isOpen() {
-        return m1.isRevLimitSwitchClosed() == 1;
+    public boolean isOpen(double startPulses) {
+        //return m1.isRevLimitSwitchClosed() == 1;
+        if(getPoseByPulses(startPulses)>= Math.PI/2 ){
+            return true;
+        }
+        return false;
     }
 
 
     public double getLimitVolt(){
-        return limitInput.getVoltage();
+        return limitInput.getPosition();
     }
     public boolean didNotePass(){
-        return getLimitVolt()<4.55;
+        return getLimitVolt()<2.5;
     }
     public void resetOpticCounts(){
         opticCount = 0;
@@ -291,7 +300,7 @@ public class Amp extends SubsystemBase{
         SmartDashboard.putNumber("Optic Limit switch Voltage", getLimitVolt());
 
         SmartDashboard.putBoolean("Lower Limit switch state", isClose());
-        SmartDashboard.putBoolean("Upper Limit switch state", isOpen());
+        SmartDashboard.putBoolean("Upper Limit switch state", isOpen(startDeg));
 
     }
 
