@@ -23,7 +23,7 @@ import frc.robot.subsystems.amp.AmpConstants.*;
 import frc.robot.Sysid.Sysid;
 import frc.robot.Sysid.Sysid.Gains;
 public class Amp extends SubsystemBase{
-    public final Pigeon2 gyro;
+    //public final Pigeon2 gyro;
     public final TalonFX m1;
     public final TalonSRX m2;
     public final CANSparkMax neo1;//small wheel
@@ -36,7 +36,7 @@ public class Amp extends SubsystemBase{
     //SimpleMotorFeedforward ff2 = new SimpleMotorFeedforward(Parameters.ks2, Parameters.kv2, Parameters.ka2);
     public Amp(){
         
-        gyro = new Pigeon2(AmpDeviceID.GYRO);
+        //gyro = new Pigeon2(AmpDeviceID.GYRO);
         
         m1 = new TalonFX(AmpDeviceID.M1);
         m1.setInverted(true);
@@ -203,7 +203,7 @@ public class Amp extends SubsystemBase{
         return new Translation2d(deadband(controller.getRightX()), deadband(controller.getRightY()));
     }
 
-    public double deg(){
+    /**public double deg(){
         double fixedDeg = gyro.getYaw();
         if(fixedDeg>0){
             while (fixedDeg >=360){
@@ -221,7 +221,7 @@ public class Amp extends SubsystemBase{
     }
     public double getPoseRad(){  
         return fixedDeg()/360*Math.PI*2;
-    }
+    }**/
     public double getPoseByPulses(double startPulses){
         return (m1.getSelectedSensorPosition()-startPulses)/ConvertionParams.MOTOR_PULSES_PER_ANGLE/360*2*Math.PI;
     }
@@ -238,21 +238,24 @@ public class Amp extends SubsystemBase{
     }
 
     public int state;
-    public double FF(double wantedAnglerVel){
-        double angle = fixedDeg();
+    public double FF(double wantedAnglerVel, double startPulses){
+        double angle = getPoseByPulses(startPulses);
         double rad = Math.toRadians(angle);
         
         if (wantedAnglerVel > 0){
-            if (angle <= 43){
+            if (angle <= 36){
                 state = 0;
             } else {
+                if(angle>=72){
+                    state = 2;
+                }
                 state = 1;
             }
         } else {
-            if (fixedDeg() <= 43){
-                state = 2;
-            } else {
+            if (angle >= 55){
                 state = 3;
+            } else {
+                state = 4;
             }
         }
 
@@ -267,8 +270,8 @@ public class Amp extends SubsystemBase{
         );
     }
 
-    public void setVel(double wantedAnglerVel){
-        m1.set(ControlMode.Velocity, wantedAnglerVel*ConvertionParams.MOTOR_PULSES_PER_ANGLE/10, DemandType.ArbitraryFeedForward, FF(wantedAnglerVel));
+    public void setVel(double wantedAnglerVel, double startPulses){
+        m1.set(ControlMode.Velocity, wantedAnglerVel*ConvertionParams.MOTOR_PULSES_PER_ANGLE/10, DemandType.ArbitraryFeedForward, FF(wantedAnglerVel, startPulses));
     }
 
     @Override
@@ -276,7 +279,7 @@ public class Amp extends SubsystemBase{
         super.periodic();
         SmartDashboard.putNumber("Motor1 Power", getpower());
         SmartDashboard.putNumber("Motor1 Velocity", getVelRadArm());
-        SmartDashboard.putNumber("Arm poseRad", getPoseRad());
+        //SmartDashboard.putNumber("Arm poseRad", getPoseRad());
         SmartDashboard.putNumber("Start angle", startDeg);
 
         SmartDashboard.putNumber("SnowBlower ampere", getSnowblowerA());
@@ -294,13 +297,13 @@ public class Amp extends SubsystemBase{
 
     
 
-    @Override
+    /**@Override
     public void initSendable(SendableBuilder builder) {
         super.initSendable(builder);
         Command cmd = new Sysid(new Gains[] { Gains.KS, Gains.KV, Gains.KA, Gains.KCos}, this::setPowerArm,
-         this::getVelRadArm, this::getPoseRad, null, 0.12, 0.2 ,3, 0.5,0.5, this).getCommand();
+         this::getVelRadArm, this::getPoseByPulses(startPulses), null, 0.12, 0.2 ,3, 0.5,0.5, this).getCommand();
         SmartDashboard.putData("Amp SYSID", cmd);
-    }
+    }**/
     
     
 }
