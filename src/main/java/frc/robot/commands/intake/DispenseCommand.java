@@ -8,6 +8,7 @@ import frc.robot.subsystems.intake.Intake;
 
 public class DispenseCommand extends CommandBase {
     private final Intake intake;
+    private double count = 0;
 
     public DispenseCommand(Intake intake) {
         this.intake = intake;
@@ -19,15 +20,17 @@ public class DispenseCommand extends CommandBase {
 
     @Override
     public void execute() {
+        count +=0.02;
         intake.setPower(IntakeConstants.Parameters.DISPENSE_POWER); // Set dispense velocity
+        
         // withTimeout(IntakeConstants.Parameters.DISPENSE_TIME); // Set timeout for dispensing
     }
 
     @Override
     public boolean isFinished() {
         // Command ends when current falls under minimum
-        //return intake.getMotorCurrent() < IntakeConstants.Parameters.MIN_CURRENT_TO_AMP;
-        return false;
+        return (intake.getMotorCurrent() < IntakeConstants.Parameters.MIN_CURRENT_TO_AMP) && (count > IntakeConstants.Parameters.DISPENSE_TIME);
+        //return false;
     }
 
     @Override
