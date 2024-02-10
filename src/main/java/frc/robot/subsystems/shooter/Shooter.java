@@ -237,6 +237,8 @@ public class Shooter extends SubsystemBase {
         //     return getDis() <= 98;
         // }
         return isUpDirection ? getDis() >= 322 : getDis() <= 98;
+    public boolean isSupplyLimit(int motor){
+        return getSupplyCurrent(motor) >= 25;
     }
 
     /**
@@ -358,7 +360,7 @@ public class Shooter extends SubsystemBase {
     public boolean isRunDone(){
         double regularAmper = 0;
         double deltaAmper = 0;
-        return Math.abs(regularAmper - motor1.getSupplyCurrent()) > deltaAmper;
+        return Math.abs(regularAmper - getSupplyCurrent(1)) > deltaAmper;
     }
 
     @Override

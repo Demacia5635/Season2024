@@ -46,8 +46,9 @@ public class AngleControl extends Command {
     }
 
     // Returns true when the command should end.
+    /**checks if the amper is more than the limit */
     @Override
     public boolean isFinished() {
-        return false;
+        return shooter.isSupplyLimit(4);
     }
 }

@@ -81,11 +81,13 @@ public class AngleGoToAngle extends Command {
      */
     @Override
     public boolean isFinished() {
-        if (!shooter.isAtLimits(wantedDis - startDis > 0)){
-            if (!((wantedDis - startDis > 0) && (shooter.getDis() >= wantedDis))){
-                if (!((wantedDis - startDis < 0) && (shooter.getDis() <= wantedDis))){
-                    if (!(Math.abs(wantedDis - shooter.getDis()) < 1)){
-                        return false;
+        if (!shooter.isSupplyLimit(4)){
+            if (!shooter.isDisLimits(wantedDis - startDis > 0)){
+                if (!((wantedDis - startDis > 0) && (shooter.getDis() >= wantedDis))){
+                    if (!((wantedDis - startDis < 0) && (shooter.getDis() <= wantedDis))){
+                        if (!(Math.abs(wantedDis - shooter.getDis()) < 1)){
+                            return false;
+                        }
                     }
                 }
             }
