@@ -43,7 +43,7 @@ public class AngleGoToDis extends Command {
      */
     @Override
     public void initialize() {
-        shooter.angleBrake();
+        shooter.brake(4);
         startDis = shooter.getDis();
     }
 

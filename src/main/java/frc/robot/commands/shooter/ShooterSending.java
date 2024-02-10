@@ -33,10 +33,16 @@ public class ShooterSending extends Command {
     }
 
     // Called when the command is initially scheduled.
-    /**reset the count */
+    /**
+     * reset the coount
+     * put the motor at brake 
+     */
     @Override
     public void initialize() {
         count = 0;
+        shooter.brake(1);
+        shooter.brake(2);
+        shooter.brake(3);
     }
 
     // Called every time the scheduler runs while the command is scheduled.

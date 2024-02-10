@@ -31,8 +31,12 @@ public class ShooterPowering extends Command {
     }
 
     // Called when the command is initially scheduled.
+    /**put the shooting motor at brake */
     @Override
-    public void initialize() {}
+    public void initialize() {
+        shooter.brake(1);
+        shooter.brake(2);
+    }
 
     // Called every time the scheduler runs while the command is scheduled.
     /**giving the motor power */

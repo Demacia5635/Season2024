@@ -49,7 +49,7 @@ public class AngleGoToAngle extends Command {
      */
     @Override
     public void initialize() {
-        shooter.angleBrake();
+        shooter.brake(4);
         startDis = shooter.getDis();
 
         wantedDis = KA * Math.cos(wantedAngle * Math.PI / 180) + Math.sqrt(Math.pow(KA, 2) * Math.pow(Math.cos(wantedAngle * Math.PI / 180), 2) - Math.pow(KA, 2) + Math.pow(KB, 2));

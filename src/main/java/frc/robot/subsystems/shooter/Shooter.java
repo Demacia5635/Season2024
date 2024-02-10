@@ -141,13 +141,74 @@ public class Shooter extends SubsystemBase {
         feedingStop();
     }
 
-    /**make the angle motor on brake */
-    public void angleBrake(){ 
-        motorAngle.setNeutralMode(NeutralMode.Brake);
+    /**
+     * set brake mod to a motor
+     * @param motor the wanted motor
+     * <pre>
+     * capable param:
+     * 1 - motor 1
+     * 2 - motor 2
+     * 3 - feeding motor
+     * 4 - angle motor
+     * </pre>
+     */
+    public void brake(int motor){ 
+        switch (motor) {
+
+            case 1:
+                motor1.setNeutralMode(NeutralMode.Brake);
+                break;
+
+            case 2:
+                motor2.setNeutralMode(NeutralMode.Brake);
+                break;
+
+            case 3:
+                motorFeeding.setNeutralMode(NeutralMode.Brake);
+                break;
+
+            case 4:
+                motor1.setNeutralMode(NeutralMode.Brake);
+                break;
+
+            default:
+                break;
+        }
     }
-    /**make the angle motor on coast */
-    public void angleCoast(){ 
-        motorAngle.setNeutralMode(NeutralMode.Coast);
+    
+    /**
+     * set up coast to a motor  
+     * @param motor the wanted motor
+     * <pre>
+     * capable param:
+     * 1 - motor 1
+     * 2 - motor 2
+     * 3 - feeding motor
+     * 4 - angle motor
+     * </pre>
+     */
+    public void coast(int motor){ 
+        switch (motor) {
+
+            case 1:
+                motor1.setNeutralMode(NeutralMode.Coast);
+                break;
+
+            case 2:
+                motor2.setNeutralMode(NeutralMode.Coast);
+                break;
+
+            case 3:
+                motorFeeding.setNeutralMode(NeutralMode.Coast);
+                break;
+
+            case 4:
+                motor1.setNeutralMode(NeutralMode.Coast);
+                break;
+
+            default:
+                break;
+        }
     }
     
     /**reset the base dis of the angle motor also reset the encoder of the angle motor */
@@ -318,8 +379,10 @@ public class Shooter extends SubsystemBase {
     
         /*put on ShuffleBoard all the cmds */
         SmartDashboard.putData("Dis reset", new InstantCommand(()-> resetDis()).ignoringDisable(true));
-        SmartDashboard.putData("Angle Brake", new InstantCommand(()-> angleBrake()).ignoringDisable(true));
-        SmartDashboard.putData("Angle Coast", new InstantCommand(()-> angleCoast()).ignoringDisable(true));
+        SmartDashboard.putData("Angle Brake", new InstantCommand(()-> brake(4)).ignoringDisable(true));
+        SmartDashboard.putData("Angle Coast", new InstantCommand(()-> coast(4)).ignoringDisable(true));
+    }
+
     @Override
     public void periodic() {
         super.periodic();
