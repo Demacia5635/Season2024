@@ -82,7 +82,7 @@ public class RobotContainer implements Sendable{
 
     //SmartDashboard.putData("RC", this);
     // shooter = new Shooter();
-    // amp = new Amp();
+    amp = new Amp();
     intake = new Intake();
     
 
@@ -135,7 +135,8 @@ public class RobotContainer implements Sendable{
   public Command getAutonomousCommand() {
     //return new PathFollow(chassis, points, 3, 6, DriverStation.getAlliance().get() == Alliance.Red);
    
-    return new IntakeCommand(intake).andThen(new WaitCommand(1.5), new DispenseCommand(intake));
+    return new IntakeCommand(intake).andThen(new WaitCommand(1.5), new DispenseCommand(intake).alongWith(
+      new AmpIntake(amp, AmpConstants.CommandParams.v1, AmpConstants.CommandParams.v2)));
 
   }
 }

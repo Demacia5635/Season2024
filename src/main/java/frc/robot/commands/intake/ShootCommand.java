@@ -13,7 +13,7 @@ public class ShootCommand extends CommandBase {
     public ShootCommand(Intake intake) {
         this.intake = intake;
         addRequirements(intake);
-
+        intake.setBrake();
         SmartDashboard.putData("Shoot Notes", new InstantCommand(
                 () -> new ShootCommand(intake).schedule()).withTimeout(3));
     }
