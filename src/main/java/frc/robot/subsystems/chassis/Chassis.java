@@ -209,8 +209,8 @@ public class Chassis extends SubsystemBase {
     double Note_X = llpython[2];
     double Note_Y = llpython[3];
 
-    pathPoint note = new pathPoint0(Note_X, Note_Y, null, Note_Y, false)
-    new ParallelCommandGroup(new PathFollow(null, null, Note_X, Note_Y, false))
+    pathPoint note = new pathPoint(Note_X, Note_Y, null, Note_Y, false);
+    new ParallelCommandGroup(new PathFollow(null, null, Note_X, Note_Y, false));
   }
 
   /**
