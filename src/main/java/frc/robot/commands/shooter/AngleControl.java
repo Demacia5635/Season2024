@@ -35,7 +35,8 @@ public class AngleControl extends Command {
     /**if the joystick is less than 0.3 that means its does not meant to be there and calibrate to 0 */
     @Override
     public void execute() {
-        shooter.angleSetPow(Math.abs(controller.getLeftY()) >= 0.3 ? -1*(controller.getLeftY() * 0.5) : 0);
+        double pow = Math.abs(controller.getLeftY()) >= 0.3 ? -1*(controller.getLeftY() * 0.5) : 0;
+        shooter.angleSetPow(pow);
     }
 
     // Called once the command ends or is interrupted.
