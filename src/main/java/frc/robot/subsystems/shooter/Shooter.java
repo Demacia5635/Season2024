@@ -33,7 +33,7 @@ public class Shooter extends SubsystemBase {
     public final TalonSRX motorFeeding;
 
     /**the sensor that detect if there is a note in the shooter */
-    public AnalogInput limitInput;
+    AnalogInput analogInput;
 
     /**a var that calculate the distance of the angle changer*/
     double baseDis = -322;
@@ -56,8 +56,8 @@ public class Shooter extends SubsystemBase {
         motorAngle.config_kP(0, KP);
         motorAngle.config_kD(0, KD);
 
-        limitInput = new AnalogInput(LIMIT_INPUT_ID);
-        limitInput.setAccumulatorInitialValue(0);
+        analogInput = new AnalogInput(ANALOG_INPUT_ID);
+        analogInput.setAccumulatorInitialValue(0);
         limitSwitch = new DigitalInput(LIMIT_SWITCH_ID);
 
         SmartDashboard.putData(this);
@@ -177,8 +177,8 @@ public class Shooter extends SubsystemBase {
      * @return the limit input voltage
      * @author Adar
      */ 
-    public double getLimitVolt(){
-        return limitInput.getVoltage();
+    public double getAnalogVolt(){
+        return analogInput.getVoltage();
     }
 
     /**
@@ -254,7 +254,9 @@ public class Shooter extends SubsystemBase {
      * @author Adar
      */
     public boolean isNote(){
-        return getLimitVolt()<4.55;
+        return getAnalogVolt()<4.55;
+    }
+
     /**
      * get if the angle is at the end
      * @return if the limit switch is pressed

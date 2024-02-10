@@ -118,8 +118,8 @@ public final class Constants {
         public static final int MOTOR_2_ID = 2;
         public static final int MOTOR_FEEDING_ID = 3;
         
-        public static final int LIMIT_INPUT_ID = 5;
         /*set up the id of the sensors */
+        public static final int ANALOG_INPUT_ID = 5;
         public static final int LIMIT_SWITCH_ID = 6;
         
         /*set up the location of the 2 speakers */
