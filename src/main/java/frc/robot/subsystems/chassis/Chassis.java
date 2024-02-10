@@ -180,6 +180,8 @@ public class Chassis extends SubsystemBase {
     setModuleStates(states);
   }
 
+
+
   /**
    * Returns the velocity vector
    * 
@@ -207,21 +209,6 @@ public class Chassis extends SubsystemBase {
     Arrays.stream(modules).forEach((module) -> module.setNeutralMode(mode));
   }
 
-  public void GoToNote(Intake intake){
-    double[] llpython = NetworkTableInstance.getDefault().getTable("limelight").getEntry("llpython").getDoubleArray(new double[8]);
-    double Angle = llpython[1];
-    double Note_X = llpython[2];
-    double Note_Y = llpython[3];
-    
-
-    pathPoint note = new pathPoint(Note_X, Note_Y, getAngle().plus(Rotation2d.fromDegrees(Angle)), 0, false);
-    pathPoint[] points = {new pathPoint(0, 0, Rotation2d.fromDegrees(0), 0, false),
-    note};
-
-    
-    new ParallelCommandGroup(new PathFollow(this, points, 4, 8, DriverStation.getAlliance().get() == Alliance.Red), new IntakeCommand(intake)).schedule();;
-    
-  }
 
   /**
    * Returns the angle of the gyro
@@ -269,6 +256,8 @@ public class Chassis extends SubsystemBase {
     }
     return angles;
   }
+
+  
 
   /**
    * Sets the state of every module
