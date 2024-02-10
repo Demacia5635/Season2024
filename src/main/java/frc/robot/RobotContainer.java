@@ -29,6 +29,7 @@ import frc.robot.subsystems.shooter.ShooterConstants;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.PathFollow.Util.pathPoint;
 import frc.robot.commands.amp.AmpIntake;
+import frc.robot.commands.amp.AmpIntake2;
 import frc.robot.commands.amp.GoToAngleAmp;
 import frc.robot.commands.amp.JoyStickAmp;
 import frc.robot.commands.amp.GoToAngleAmp;
@@ -135,8 +136,13 @@ public class RobotContainer implements Sendable{
   public Command getAutonomousCommand() {
     //return new PathFollow(chassis, points, 3, 6, DriverStation.getAlliance().get() == Alliance.Red);
    
-    return new IntakeCommand(intake).andThen(new WaitCommand(1.5), new DispenseCommand(intake).alongWith(
-      new AmpIntake(amp, AmpConstants.CommandParams.v1, AmpConstants.CommandParams.v2)));
+    //return new IntakeCommand(intake).andThen(new AmpIntake2(amp));
+    //.alongWith(new AmpIntake(amp, AmpConstants.CommandParams.v1, AmpConstants.CommandParams.v2))
+    return new IntakeCommand(intake).andThen(new WaitCommand(1.5), new DispenseCommand(intake).raceWith(
+      new AmpIntake2(amp)
+    ));
+    //return new AmpIntake(amp, AmpConstants.CommandParams.v1, AmpConstants.CommandParams.v2);
+    //return new RunCommand(()->amp.neo1.set(0.5), amp);
 
   }
 }

@@ -48,6 +48,9 @@ public class Intake extends SubsystemBase{
             ()->this.setBrake(),this).ignoringDisable(true));
         SmartDashboard.putData("Coast", new InstantCommand(
             ()->this.setCoast(),this).ignoringDisable(true));
+
+        SmartDashboard.putData("Intake", new IntakeCommand(this));
+        SmartDashboard.putData("Dispense", new DispenseCommand(this));
     }
  
     public void configDevices() {

@@ -13,6 +13,7 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkMaxAnalogSensor;
 import com.revrobotics.CANAnalog.AnalogMode;
+import com.revrobotics.CANSparkBase.IdleMode;
 
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -21,11 +22,13 @@ import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.amp.AmpConstants.*;
 import frc.robot.Sysid.Sysid;
 import frc.robot.Sysid.Sysid.Gains;
+import frc.robot.commands.amp.AmpIntake2;
 public class Amp extends SubsystemBase{
     //public final Pigeon2 gyro;
     public final TalonFX m1;
@@ -62,6 +65,12 @@ public class Amp extends SubsystemBase{
         openFF = new SimpleMotorFeedforward(AmpConstants.armStatesParameters.openFF[0], AmpConstants.armStatesParameters.openFF[1], AmpConstants.armStatesParameters.openFF[2]);
         closeFF = new SimpleMotorFeedforward(AmpConstants.armStatesParameters.closeFF[0], AmpConstants.armStatesParameters.closeFF[1], AmpConstants.armStatesParameters.closeFF[2]);
 
+
+        setNeosBrake();
+
+        SmartDashboard.putData("intake amp", new AmpIntake2(this));
+        SmartDashboard.putNumber("amp power", 0);
+        SmartDashboard.putData("set power amp", new RunCommand(()->setNeosPower(0.5), this));
 
 
         // limitInput = new AnalogInput(AmpDeviceID.LIGHT_LIMIT);
@@ -107,6 +116,15 @@ public class Amp extends SubsystemBase{
         neo2.setSmartCurrentLimit(25);
     }
       
+
+
+    public void neosSetInverted(boolean isInvert) {
+
+        neo1.setInverted(isInvert);
+        neo2.setInverted(isInvert);
+
+    }
+
     public double[] getNeosRev(){
         double[] neos = new double[2];
         neos[0] = neo1.getEncoder().getPosition()/ConvertionParams.NEO_PULES_PER_REV*ConvertionParams.NEO1GearRatio;
@@ -198,6 +216,12 @@ public class Amp extends SubsystemBase{
         return true;
     }
 
+
+
+    public boolean isNote() {
+        return limitInput.getVoltage() <= Parameters.NOTE_VOLTAGE;
+    }
+
     public void setBrake(){
         System.out.println("brake Diff");
         m1.setNeutralMode(NeutralMode.Brake);
@@ -246,6 +270,11 @@ public class Amp extends SubsystemBase{
     }**/
     public double getPoseByPulses(double startPulses){
         return (m1.getSelectedSensorPosition()-startPulses)/ConvertionParams.MOTOR_PULSES_PER_ANGLE/360*2*Math.PI;
+    }
+
+
+    public double getNeoPoseByPulses(){
+        return (neo1.getEncoder().getPosition());
     }
 
 
@@ -329,6 +358,45 @@ public class Amp extends SubsystemBase{
         SmartDashboard.putBoolean("Lower Limit switch state", isClose());
         SmartDashboard.putBoolean("Upper Limit switch state", isOpen(startDeg));
 
+    }
+
+    public boolean isCriticalCurrent() {
+        // TODO Auto-generated method stub
+        return neo1.getOutputCurrent() >= Parameters.CRITICAL_CURRENT;
+    }
+
+    public void setNeosPower(double p1, double p2) {
+        neo1.set(p1);
+        neo2.set(p2);
+    }
+
+     public void setNeosPower(double p) {
+        neo1.set(p);
+        neo2.set(p);
+    }
+
+    public double getMotorCurrent() {
+        // TODO Auto-generated method stub
+        return neo1.getOutputCurrent();
+    }
+
+    public void setCoastArm() {
+       m1.setNeutralMode(NeutralMode.Coast);
+    }
+
+    public void setBrakeArm() {
+        // TODO Auto-generated method stub
+         m1.setNeutralMode(NeutralMode.Brake);
+    }
+
+    public void setNeosBrake() {
+        neo1.setIdleMode(IdleMode.kBrake);
+        neo2.setIdleMode(IdleMode.kBrake);
+    }
+
+    public void setNeosCoast() {
+        neo1.setIdleMode(IdleMode.kCoast);
+        neo2.setIdleMode(IdleMode.kCoast);
     }
 
     

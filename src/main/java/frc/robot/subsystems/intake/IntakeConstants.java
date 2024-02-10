@@ -14,9 +14,9 @@ public class IntakeConstants {
       public static class Parameters{
         public static final double DEADBAND = 0.2;
         public static final boolean IS_INVERTED = true;
-        public static final double NOT_PRESENCE_VOLTAGE = 4.1;
+        public static final double NOT_PRESENCE_VOLTAGE = 3.3;
 
-        public static final double MIN_CURRENT_TO_AMP = 70;
+        public static final double MIN_CURRENT_TO_AMP = 50;
         public static final double MIN_CURRENT_TO_SHOOTER = 10;
         
   
@@ -24,8 +24,8 @@ public class IntakeConstants {
         public static final double INTAKE_POWER = 1;
         public static final double INTAKE_TRANSFER_POWER = 0.45;
         public static final double NUM_FINAL_ROTATIONS = 0;
-        public static final double SENSOR_TO_REST_DIST = ConvertionParams.MOTOR_PULSES_PER_SPIN*ConvertionParams.MOTOR_GEAR_RATIO*NUM_FINAL_ROTATIONS;
-        public static final double INTAKE_PRE_LIMIT_POWER = 0.5;
+        public static final double SENSOR_TO_REST_DIST = ConvertionParams.MOTOR_PULSES_PER_SPIN/ConvertionParams.MOTOR_GEAR_RATIO*NUM_FINAL_ROTATIONS;
+        public static final double INTAKE_PRE_LIMIT_POWER = 0.4;
   
         public static final double SHOOT_POWER = 0;
         public static final double SHOOT_TIME = 0;
