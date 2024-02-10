@@ -14,6 +14,7 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkMaxAnalogSensor;
 import com.revrobotics.CANAnalog.AnalogMode;
 
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.AnalogInput;
@@ -34,6 +35,9 @@ public class Amp extends SubsystemBase{
     public double startDeg;
     public SparkMaxAnalogSensor limitInput;
     public int opticCount;
+    public SimpleMotorFeedforward openFF;
+    public SimpleMotorFeedforward closeFF;
+
     
     //ArmFeedforward ff = new ArmFeedforward(Parameters.ks1, Parameters.kg1, Parameters.kv1, Parameters.ka1);
     //SimpleMotorFeedforward ff2 = new SimpleMotorFeedforward(Parameters.ks2, Parameters.kv2, Parameters.ka2);
@@ -55,6 +59,11 @@ public class Amp extends SubsystemBase{
         neo2 = new CANSparkMax(AmpDeviceID.NEO2, MotorType.kBrushless);
         neo2.getEncoder().setPosition(0);
 
+        openFF = new SimpleMotorFeedforward(AmpConstants.armStatesParameters.openFF[0], AmpConstants.armStatesParameters.openFF[1], AmpConstants.armStatesParameters.openFF[2]);
+        closeFF = new SimpleMotorFeedforward(AmpConstants.armStatesParameters.closeFF[0], AmpConstants.armStatesParameters.closeFF[1], AmpConstants.armStatesParameters.closeFF[2]);
+
+
+
         // limitInput = new AnalogInput(AmpDeviceID.LIGHT_LIMIT);
         limitInput = neo2.getAnalog(AnalogMode.kAbsolute);
         //limitInput.setAccumulatorInitialValue(0);
@@ -66,6 +75,10 @@ public class Amp extends SubsystemBase{
             ()->this.setBrake(),this).ignoringDisable(true));
         SmartDashboard.putData("CoastDiff", new InstantCommand(
             ()->this.setCoast(),this).ignoringDisable(true));
+
+
+            SmartDashboard.putData("Amp Move Sysid",
+        (new Sysid(this::setPowerArm, this::getVelRadArm, 0.3, 0.7, this)).getCommand());
     }
     
     public void configDevices() {
@@ -243,7 +256,21 @@ public class Amp extends SubsystemBase{
     }**/
 
     public double getVelRadArm(){
-        return (m1.getSelectedSensorVelocity()*ConvertionParams.M1GearRatio/ConvertionParams.MOTOR_PULSES_PER_SPIN)*2*Math.PI;
+        return (m1.getSelectedSensorVelocity()*10)/ConvertionParams.PULSE_PER_RAD;
+    }
+
+    public double getArmAngle() {
+         return (m1.getSelectedSensorPosition())/ConvertionParams.PULSE_PER_RAD;
+    }
+
+    public void setArmVelocityOpen(double velRad) {
+        m1.set(ControlMode.Velocity, velRad/10*AmpConstants.ConvertionParams.PULSE_PER_RAD,
+        DemandType.ArbitraryFeedForward, openFF.calculate(velRad));
+    }
+
+     public void setArmVelocityClose(double velRad) {
+        m1.set(ControlMode.Velocity, velRad/10*AmpConstants.ConvertionParams.PULSE_PER_RAD,
+        DemandType.ArbitraryFeedForward, closeFF.calculate(velRad));
     }
 
     public int state;

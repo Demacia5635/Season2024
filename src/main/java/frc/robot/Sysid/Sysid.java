@@ -52,7 +52,7 @@ public class Sysid {
     double powerCycleDelay;         // delay between power cycles
     Subsystem[] subsystems;         // for add requirements
     static double defaultDuration = 2;
-    static double defaultDelay = 1;
+    static double defaultDelay = 0.5;
     Gains[] gains;                  // the gains we are looking for
     double[] result=null;           // the result, after analyze
 

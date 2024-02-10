@@ -1,7 +1,7 @@
 package frc.robot.subsystems.amp;
 public class AmpConstants{
     public static class AmpDeviceID{
-      public static final int M1 = 1;      
+      public static final int M1 = 15;      
       public static final int M2 = 2;
       public static final int NEO1 = 3;
       public static final int NEO2 = 4;
@@ -9,12 +9,18 @@ public class AmpConstants{
       public static final int LIGHT_LIMIT = 0;
     }
     public static class ConvertionParams {
-      public static final double M1GearRatio = 1/96;// (1/number)
-      public static final double NEO1GearRatio = 1/12;// (1/number)
-      public static final double NEO2GearRatio = 1/12;// (1/number)
+      public static final double M1GearRatio = 1/96;
+      public static final double NEO1GearRatio = 1/12;
+      public static final double NEO2GearRatio = 1/12;
+
+
+
 
       public static final double MOTOR_PULSES_PER_SPIN = 2048;
       public static final double NEO_PULES_PER_REV = 4096;
+
+
+      public static final double PULSE_PER_RAD = MOTOR_PULSES_PER_SPIN/M1GearRatio/2/Math.PI;
 
       public static final double MOTOR_PULSES_PER_ANGLE = MOTOR_PULSES_PER_SPIN/M1GearRatio/360;
     }
@@ -24,6 +30,12 @@ public class AmpConstants{
       public static final double KP1 = 0.1;
       public static final double KI1= 0.005;
       public static final double KD1 = 0;
+
+      public static final double MAX_ARM_VEL_OPEN = 2*Math.PI;
+      public static final double MAX_ARM_ACCEL_OPEN = 5*Math.PI;
+
+      public static final double OPEN_ANGLE = Math.PI/2;
+
     
     }
     public static class armStatesParameters{
@@ -42,6 +54,11 @@ public class AmpConstants{
         public static final double[] Ksin = {-15.69829677, 0, 0, 18.36092613, 0};
         public static final double[] Kcos = {-1.202533577, 0, 0, 0.870858412, 0};
         public static final double[] Kcossin = {5.16955116, 0, 0, -5.614001788, 0};
+
+
+        public static final double[] openFF = {0, 0, 0};
+        public static final double[] closeFF = {0, 0, 0};
+
     }
 
 

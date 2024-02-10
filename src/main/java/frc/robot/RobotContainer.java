@@ -15,9 +15,9 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.amp.AmpIntake;
 import frc.robot.commands.amp.GoToAngleAmp;
+import frc.robot.commands.amp.JoyStickAmp;
 import frc.robot.commands.chassis.DriveCommand;
 import frc.robot.subsystems.amp.Amp;
-import frc.robot.subsystems.amp.JoyStickAmp;
 import frc.robot.subsystems.chassis.Chassis;
 
 
@@ -89,6 +89,7 @@ public class RobotContainer implements Sendable{
     //return new RunCommand(()->{chassis.getModule(2).setAngularPower(0.049 + 300*0.0003);},chassis).withTimeout(3)
     //  .andThen(new InstantCommand(()->{SmartDashboard.putNumber("FF TEST",  chassis.getModule(2).getAngularVelocity());
     //chassis.stop();}));
-    return new AmpIntake(amp, -0.5, -0.25);
+    //return new AmpIntake(amp, -0.5, -0.25);
+    return new RunCommand(()->amp.setPowerArm(0.5), amp);
   }
 }
