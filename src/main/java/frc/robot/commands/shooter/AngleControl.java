@@ -11,7 +11,9 @@ import frc.robot.subsystems.shooter.Shooter;
 /**command that control angle */
 public class AngleControl extends Command {
 
+    /**the shooter that want to be used */
     Shooter shooter;
+    /**the controller we want to use */
     CommandXboxController controller;
 
     /**
@@ -20,7 +22,6 @@ public class AngleControl extends Command {
      * @param controller the controller we want to get the jostick
      */
     public AngleControl(Shooter shooter, CommandXboxController controller) {
-        // Use addRequirements() here to declare subsystem dependencies.
         this.shooter = shooter;
         this.controller = controller;
         addRequirements(shooter);
@@ -34,7 +35,8 @@ public class AngleControl extends Command {
     /**if the joystick is less than 0.3 that means its does not meant to be there and calibrate to 0 */
     @Override
     public void execute() {
-        shooter.angleSetPow(Math.abs(controller.getLeftY()) >= 0.3 ? -1*(controller.getLeftY() * 0.5) : 0);
+        double pow = Math.abs(controller.getLeftY()) >= 0.3 ? -1*(controller.getLeftY() * 0.5) : 0;
+        shooter.angleSetPow(pow);
     }
 
     // Called once the command ends or is interrupted.
@@ -45,8 +47,9 @@ public class AngleControl extends Command {
     }
 
     // Returns true when the command should end.
+    /**checks if the amper is more than the limit */
     @Override
     public boolean isFinished() {
-        return false;
+        return shooter.isSupplyLimit(4);
     }
 }

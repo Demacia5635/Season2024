@@ -7,6 +7,7 @@ package frc.robot.subsystems.shooter;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.AnalogInput;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -32,29 +33,38 @@ public class Shooter extends SubsystemBase {
     public final TalonSRX motorFeeding;
 
     /**the sensor that detect if there is a note in the shooter */
-    public AnalogInput limitInput;
+    AnalogInput analogInput;
 
     /**a var that calculate the distance of the angle changer*/
-    double baseDis = -322;
+    double baseDis;
 
     /** @deprecated Unused bcz switch to motionMagic from velocity*/
-    ArmFeedforward elevationFF = new ArmFeedforward(ShooterConstants.KS, ShooterConstants.KG, ShooterConstants.KV);
+    ArmFeedforward elevationFF;
     
+    DigitalInput limitSwitch;
+
     /**creates a new shooter and angle changer*/
     public Shooter() {
+        /*set up vars */
 
         motor1 = new TalonFX(ShooterConstants.MOTOR_1_ID);
+
         motor2 = new TalonFX(ShooterConstants.MOTOR_2_ID);
+
         motorFeeding = new TalonSRX(ShooterConstants.MOTOR_FEEDING_ID);
         
-        motorAngle = new TalonFX(ShooterConstants.MOTOR_ID);
-        motorAngle.setInverted(true);
-        
+        motorAngle = new TalonFX(ShooterConstants.MOTOR_ANGLE_ID);
         motorAngle.config_kP(0, ShooterConstants.KP);
         motorAngle.config_kD(0, ShooterConstants.KD);
 
-        limitInput = new AnalogInput(ShooterConstants.LIMIT_INPUT_ID);
-        limitInput.setAccumulatorInitialValue(0);
+        analogInput = new AnalogInput(ShooterConstants.ANALOG_INPUT_ID);
+        analogInput.setAccumulatorInitialValue(0);
+
+        baseDis = -ShooterConstants.MAX_DIS;
+
+        elevationFF = new ArmFeedforward(ShooterConstants.KS, ShooterConstants.KG, ShooterConstants.KV);
+
+        limitSwitch = new DigitalInput(ShooterConstants.LIMIT_SWITCH_ID);
 
         SmartDashboard.putData(this);
         SmartDashboard.putData(null);
@@ -135,19 +145,80 @@ public class Shooter extends SubsystemBase {
         feedingStop();
     }
 
-    /**make the angle motor on brake */
-    public void angleBrake(){ 
-        motorAngle.setNeutralMode(NeutralMode.Brake);
+    /**
+     * set brake mod to a motor
+     * @param motor the wanted motor
+     * <pre>
+     * capable param:
+     * 1 - motor 1
+     * 2 - motor 2
+     * 3 - feeding motor
+     * 4 - angle motor
+     * </pre>
+     */
+    public void brake(int motor){ 
+        switch (motor) {
+
+            case 1:
+                motor1.setNeutralMode(NeutralMode.Brake);
+                break;
+
+            case 2:
+                motor2.setNeutralMode(NeutralMode.Brake);
+                break;
+
+            case 3:
+                motorFeeding.setNeutralMode(NeutralMode.Brake);
+                break;
+
+            case 4:
+                motor1.setNeutralMode(NeutralMode.Brake);
+                break;
+
+            default:
+                break;
+        }
     }
-    /**make the angle motor on coast */
-    public void angleCoast(){ 
-        motorAngle.setNeutralMode(NeutralMode.Coast);
+    
+    /**
+     * set up coast to a motor  
+     * @param motor the wanted motor
+     * <pre>
+     * capable param:
+     * 1 - motor 1
+     * 2 - motor 2
+     * 3 - feeding motor
+     * 4 - angle motor
+     * </pre>
+     */
+    public void coast(int motor){ 
+        switch (motor) {
+
+            case 1:
+                motor1.setNeutralMode(NeutralMode.Coast);
+                break;
+
+            case 2:
+                motor2.setNeutralMode(NeutralMode.Coast);
+                break;
+
+            case 3:
+                motorFeeding.setNeutralMode(NeutralMode.Coast);
+                break;
+
+            case 4:
+                motor1.setNeutralMode(NeutralMode.Coast);
+                break;
+
+            default:
+                break;
+        }
     }
     
     /**reset the base dis of the angle motor also reset the encoder of the angle motor */
     public void resetDis(){
         motorAngle.setSelectedSensorPosition(0);
-        baseDis = -322;
+        baseDis = -ShooterConstants.MAX_DIS;
     }
     
     /**
@@ -163,21 +234,12 @@ public class Shooter extends SubsystemBase {
      * @param isUpDirection if the velocity the motor moves is positive or negative
      * @return if the limits have passed (false means you are fine)
      */
-    public boolean limits(boolean isUpDirection){
-        // if (isUpDirection){
-        //     return getDis() >= 322;
-        // } else {
-        //     return getDis() <= 98;
-        // }
-        return isUpDirection ? getDis() >= 322 : getDis() <= 98;
+    public boolean isDisLimits(boolean isUpDirection){
+        return isUpDirection ? getDis() >= ShooterConstants.MAX_DIS : getDis() <= ShooterConstants.MIN_DIS;
     }
 
-    /**
-     * get the current velocity of the angle motor
-     * @return the angle motor velocity angles per sec
-     */
-    public double getAngleVel(){ 
-        return motorAngle.getSelectedSensorVelocity()*10/(ShooterConstants.PULES_PER_REV * ShooterConstants.GEAR_RATIO / 360); 
+    public boolean isSupplyLimit(int motor){
+        return getSupplyCurrent(motor) >= 25;
     }
 
     /**
@@ -185,8 +247,75 @@ public class Shooter extends SubsystemBase {
      * @return the limit input voltage
      * @author Adar
      */ 
-    public double getLimitVolt(){
-        return limitInput.getVoltage();
+    public double getAnalogVolt(){
+        return analogInput.getVoltage();
+    }
+
+    /**
+     * get the vel of every motor
+     * @param motor the wanted motor 
+     * <pre>
+     * capable param:
+     * 1 - motor 1
+     * 2 - motor 2
+     * 3 - feeding motor
+     * 4 - angle motor
+     * </pre>
+     * @return the wanted motor velocity in degree per sec
+     * @exception 3 - that is a snowblower so return in pules per sec
+     * @exception default - if the param motor is not listed above the function will return 0
+     */
+    public double getMotorVel(int motor){
+        switch (motor) {
+
+            case 1:
+                return motor1.getSelectedSensorVelocity()*10/(ShooterConstants.PULES_PER_REV/360);
+
+            case 2:
+                return motor2.getSelectedSensorVelocity()*10/(ShooterConstants.PULES_PER_REV/360);
+
+            case 3:
+                return motorFeeding.getSelectedSensorVelocity()*10;
+
+            case 4:
+                return motorAngle.getSelectedSensorVelocity()*10/(ShooterConstants.PULES_PER_REV/360);
+            
+            default:
+                return 0;
+        }
+    }
+
+    /**
+     * get the amper of every motor
+     * @param motor the wanted motor 
+     * <pre>
+     * capable param:
+     * 1 - motor 1
+     * 2 - motor 2
+     * 3 - feeding motor
+     * 4 - angle motor
+     * </pre>
+     * @return the wanted motor amper
+     * @exception default - if the param motor is not listed above the function will return 0
+     */
+    public double getSupplyCurrent(int motor){
+        switch (motor) {
+
+            case 1:
+                return motor1.getSupplyCurrent();
+
+            case 2:
+                return motor2.getSupplyCurrent();
+
+            case 3:
+                return motorFeeding.getSupplyCurrent();
+
+            case 4:
+                return motorAngle.getSupplyCurrent();
+
+            default:
+                return 0;
+        }
     }
 
     /**
@@ -194,8 +323,17 @@ public class Shooter extends SubsystemBase {
      * @return if the limit volt is smaller than 4.55
      * @author Adar
      */
-    public boolean didNotePass(){
-        return getLimitVolt()<ShooterConstants.VOLTAGE_IS_NOTE_DETECTED;
+    public boolean isNote(){
+        return getAnalogVolt()<ShooterConstants.VOLT_NOTE_PRESENT;
+    }
+
+    /**
+     * get if the angle is at the end
+     * @return if the limit switch is pressed
+     */
+    public boolean isLimit(){
+        /*can change if see that limit switch return inverted */
+        return limitSwitch.get();
     }
 
     /**
@@ -223,25 +361,38 @@ public class Shooter extends SubsystemBase {
     public boolean isRunDone(){
         double regularAmper = 0;
         double deltaAmper = 0;
-        return Math.abs(regularAmper - motor1.getSupplyCurrent()) > deltaAmper;
+        return Math.abs(regularAmper - getSupplyCurrent(1)) > deltaAmper;
     }
 
     @Override
     public void initSendable(SendableBuilder builder) {
         super.initSendable(builder);
         
-        builder.addDoubleProperty("motor 1 speed", ()-> motor1.getSelectedSensorVelocity()*10/(ShooterConstants.PULES_PER_REV/360), null);
-        builder.addDoubleProperty("motor 2 speed", ()-> motor2.getSelectedSensorVelocity()*10/(ShooterConstants.PULES_PER_REV/360), null);
-        builder.addDoubleProperty("current amper motor 1", ()-> motor1.getSupplyCurrent(), null);
-        builder.addDoubleProperty("current amper motor 2", ()-> motor2.getSupplyCurrent(), null);
-        builder.addDoubleProperty("angle vel", this::getAngleVel, null);
+        /*put on ShuffleBoard all the builders */
+        builder.addDoubleProperty("motor 1 speed", ()-> getMotorVel(1), null);
+        builder.addDoubleProperty("motor 2 speed", ()-> getMotorVel(2), null);
+        builder.addDoubleProperty("current amper motor 1", ()-> getSupplyCurrent(1), null);
+        builder.addDoubleProperty("current amper motor 2", ()-> getSupplyCurrent(2), null);
+        builder.addDoubleProperty("angle vel", ()-> getMotorVel(4), null);
         builder.addDoubleProperty("Distance", this::getDis, null);
         builder.addDoubleProperty("base dis", ()-> baseDis, null);
         builder.addDoubleProperty("Angle", this::getAngle, null);
         builder.addDoubleProperty("encoder", ()->motorAngle.getSelectedSensorPosition(), null);
+        builder.addBooleanProperty("Limit switch", ()->isLimit(), null);
     
+        /*put on ShuffleBoard all the cmds */
         SmartDashboard.putData("Dis reset", new InstantCommand(()-> resetDis()).ignoringDisable(true));
-        SmartDashboard.putData("Angle Brake", new InstantCommand(()-> angleBrake()).ignoringDisable(true));
-        SmartDashboard.putData("Angle Coast", new InstantCommand(()-> angleCoast()).ignoringDisable(true));
+        SmartDashboard.putData("Angle Brake", new InstantCommand(()-> brake(4)).ignoringDisable(true));
+        SmartDashboard.putData("Angle Coast", new InstantCommand(()-> coast(4)).ignoringDisable(true));
+    }
+
+    @Override
+    public void periodic() {
+        super.periodic();
+        
+        /*if the angle is at the end it reset the dis */
+        if (isLimit()){
+            resetDis();
+        }
     }
 }

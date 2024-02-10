@@ -21,9 +21,8 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.shooter.AngleControl;
-import frc.robot.commands.shooter.FeedShooter;
-import frc.robot.commands.shooter.GoToAngle;
-import frc.robot.commands.shooter.GoToDis;
+import frc.robot.commands.shooter.AngleGoToAngle;
+import frc.robot.commands.shooter.ShooterFeeding;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterConstants;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -82,7 +81,7 @@ public class RobotContainer implements Sendable{
     // chassis.setDefaultCommand(drive);
 
     //SmartDashboard.putData("RC", this);
-    // shooter = new Shooter();
+    shooter = new Shooter();
     amp = new Amp();
     intake = new Intake();
     
@@ -94,11 +93,11 @@ public class RobotContainer implements Sendable{
 
     //for check, can add wait command between and then
 
-    // intake2shooter = new GoToAngle(shooter, ShooterConstants.CommandParam.ANGLE_COLLECT,
-    //  ShooterConstants.CommandParam.MAX_VEL, ShooterConstants.CommandParam.MAX_ACCCEL)
-    // .andThen(new IntakeCommand(intake), new ShootCommand(intake).alongWith(new FeedShooter(shooter)), 
-    //  new GoToAngle(shooter, ShooterConstants.CommandParam.ANGLE_DEFAULT,
-    //  ShooterConstants.CommandParam.MAX_VEL, ShooterConstants.CommandParam.MAX_ACCCEL));
+    intake2shooter = new AngleGoToAngle(shooter, ShooterConstants.CommandParams.ANGLE_COLLECT,
+     ShooterConstants.CommandParams.MAX_VEL, ShooterConstants.CommandParams.MAX_ACCCEL)
+    .andThen(new IntakeCommand(intake), new ShootCommand(intake).alongWith(new ShooterFeeding(shooter, ShooterConstants.CommandParams.FEED_POWER)), 
+     new AngleGoToAngle(shooter, ShooterConstants.CommandParams.ANGLE_DEFAULT,
+     ShooterConstants.CommandParams.MAX_VEL, ShooterConstants.CommandParams.MAX_ACCCEL));
 
     // intake2amp = new IntakeCommand(intake)
     // .andThen(new DispenseCommand(intake)
@@ -114,6 +113,10 @@ public class RobotContainer implements Sendable{
     //   new RunCommand(() -> shooter.setPow(ShooterConstants.CommandParam.SHOOT_POWER), shooter)
     //  ).andThen(new FeedShooter(shooter));
 
+
+    Command intake2ampnoshooter =  new IntakeCommand(intake).andThen(new WaitCommand(1.5), new DispenseCommand(intake).raceWith(
+      new AmpIntake2(amp)
+    ));
 
 
 
@@ -138,9 +141,7 @@ public class RobotContainer implements Sendable{
    
     //return new IntakeCommand(intake).andThen(new AmpIntake2(amp));
     //.alongWith(new AmpIntake(amp, AmpConstants.CommandParams.v1, AmpConstants.CommandParams.v2))
-    return new IntakeCommand(intake).andThen(new WaitCommand(1.5), new DispenseCommand(intake).raceWith(
-      new AmpIntake2(amp)
-    ));
+   return intake2shooter;
     //return new AmpIntake(amp, AmpConstants.CommandParams.v1, AmpConstants.CommandParams.v2);
     //return new RunCommand(()->amp.neo1.set(0.5), amp);
 

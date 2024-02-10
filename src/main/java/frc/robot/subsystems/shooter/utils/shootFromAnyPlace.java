@@ -8,13 +8,13 @@ import java.util.Arrays;
 import java.util.Comparator;
 
 /**util that will store the entire lookup table and can send back the angle and the pow needed by dis */
-public class shootFromAnyPlace {
+public class ShootFromAnyPlace {
     private double[][] lookupTable = {
         {0,0,0},{0,0,0},{0,0,0}
     };
 
     /**creates a new shootFromAnyPlace class */
-    public shootFromAnyPlace(){}
+    public ShootFromAnyPlace(){}
 
     /**
      * sort an array

@@ -6,37 +6,31 @@ package frc.robot.commands.shooter;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.shooter.Shooter;
-import static frc.robot.subsystems.shooter.ShooterConstants.*;
 
-/** commands that goes to a specific angle */
-public class GoToAngle extends Command {
+/**command that makes the angle motor go to a specific dis */
+public class AngleGoToDis extends Command {
     
-    /**the shooter that being used */
+    /**the shooter we want to use */
     Shooter shooter;
     /**the wanted angle */
-    double wantedAngle;
-    /**
-     * the wanted dis based on the wanted angle
-     * being caculate by f(x) in Desmos - {@link https://www.desmos.com/calculator/4ja9zotx82} */
     double wantedDis;
-    /**the max velocity wanted to the trapezoid */
+    /**the max velocity wanted for the trapezoid */
     double maxVel;
     /**the acc wanted for the trapezoid */
     double acc;
     /**the start dis of the angle motor being used in isFinish */
     double startDis;
-    
+
     /**
-     * creates a new command that goes to a specific angle
+     * creates a new command that goes to a specifig distance
      * @param shooter the shooter we want to control angle motor of
-     * @param angle the wanted angle in degrees
+     * @param dis the wanted dis in mm
      * @param maxVel the max velocity of the trapezoid in pules per 1/10 sec
-     * @param acc the acc of the trapezoid  in pules per 1/10 sec
+     * @param acc the acc of the trapezoid in pules per 1/10 sec
      */
-    public GoToAngle(Shooter shooter, double angle, double maxVel, double acc) {
-        // Use addRequirements() here to declare subsystem dependencies.
+    public AngleGoToDis(Shooter shooter, double dis, double maxVel, double acc) {
         this.shooter = shooter;
-        this.wantedAngle = angle;
+        this.wantedDis = dis;
         this.maxVel = maxVel;
         this.acc = acc;
         addRequirements(shooter);
@@ -46,14 +40,11 @@ public class GoToAngle extends Command {
     /**
      * set the angle motor in brake mode
      * set the start dis
-     * caculate the wanted dis based on f(x) in desmos {@link https://www.desmos.com/calculator/4ja9zotx82} 
      */
     @Override
     public void initialize() {
-        shooter.angleBrake();
+        shooter.brake(4);
         startDis = shooter.getDis();
-
-        wantedDis = KA * Math.cos(wantedAngle * Math.PI / 180) + Math.sqrt(Math.pow(KA, 2) * Math.pow(Math.cos(wantedAngle * Math.PI / 180), 2) - Math.pow(KA, 2) + Math.pow(KB, 2));
     }
 
     // Called every time the scheduler runs while the command is scheduled.
@@ -82,11 +73,13 @@ public class GoToAngle extends Command {
      */
     @Override
     public boolean isFinished() {
-        if (!shooter.limits(wantedDis - startDis > 0)){
-            if (!((wantedDis - startDis > 0) && (shooter.getDis() >= wantedDis))){
-                if (!((wantedDis - startDis < 0) && (shooter.getDis() <= wantedDis))){
-                    if (!(Math.abs(wantedDis - shooter.getDis()) < 1)){
-                        return false;
+        if (!shooter.isSupplyLimit(4)){
+            if (!shooter.isDisLimits(wantedDis - startDis > 0)){
+                if (!((wantedDis - startDis > 0) && (shooter.getDis() >= wantedDis))){
+                    if (!((wantedDis - startDis < 0) && (shooter.getDis() <= wantedDis))){
+                        if (!(Math.abs(wantedDis - shooter.getDis()) < 1)){
+                            return false;
+                        }
                     }
                 }
             }
