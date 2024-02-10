@@ -36,28 +36,34 @@ public class Shooter extends SubsystemBase {
     AnalogInput analogInput;
 
     /**a var that calculate the distance of the angle changer*/
-    double baseDis = -322;
+    double baseDis;
 
     /** @deprecated Unused bcz switch to motionMagic from velocity*/
-    ArmFeedforward elevationFF = new ArmFeedforward(KS, KG, KV);
+    ArmFeedforward elevationFF;
     
     DigitalInput limitSwitch;
 
     /**creates a new shooter and angle changer*/
     public Shooter() {
+        /*set up vars */
 
         motor1 = new TalonFX(MOTOR_1_ID);
+
         motor2 = new TalonFX(MOTOR_2_ID);
+
         motorFeeding = new TalonSRX(MOTOR_FEEDING_ID);
         
         motorAngle = new TalonFX(MOTOR_ANGLE_ID);
-        motorAngle.setInverted(true);
-        
         motorAngle.config_kP(0, KP);
         motorAngle.config_kD(0, KD);
 
         analogInput = new AnalogInput(ANALOG_INPUT_ID);
         analogInput.setAccumulatorInitialValue(0);
+
+        baseDis = -MAX_DIS;
+
+        elevationFF = new ArmFeedforward(KS, KG, KV);
+
         limitSwitch = new DigitalInput(LIMIT_SWITCH_ID);
 
         SmartDashboard.putData(this);
