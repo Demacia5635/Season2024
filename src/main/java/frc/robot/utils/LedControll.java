@@ -3,11 +3,11 @@ package frc.robot.utils;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 
-public class LedController {
+public class LedControll {
     private AddressableLED led;
     private AddressableLEDBuffer buffer;
 
-    public LedController(int port, int count) {
+    public LedControll(int port, int count) {
         led = new AddressableLED(port);
         buffer = new AddressableLEDBuffer(count);
         led.setLength(buffer.getLength());

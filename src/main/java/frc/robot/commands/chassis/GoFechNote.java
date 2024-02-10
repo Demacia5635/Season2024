@@ -2,8 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands;
+package frc.robot.commands.chassis;
 
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.chassis.Chassis;
 import frc.robot.subsystems.intake.Intake;
@@ -17,6 +20,8 @@ public class GoFechNote extends Command {
   private double Angle;
   private double Note_X;
   private double Note_Y;
+  double rotationVelocity;
+  PIDController rotationPidController = new PIDController(0.31, 0.006, 0.0000025);
   public GoFechNote(Chassis chassis, Intake intake) {
     this.chassis = chassis;
     this.intake = intake;
@@ -31,21 +36,23 @@ public class GoFechNote extends Command {
   @Override
   public void execute() {
     llpython = NetworkTableInstance.getDefault().getTable("limelight").getEntry("llpython").getDoubleArray(new double[8]);
-    Dist = llpython[0];
     Angle = llpython[1];
     Note_X = llpython[2];
     Note_Y = llpython[3];
-    Translation2d notePos = new Translation2d(chassis.getPose.getTranslation().getX() + Note_X, chassis.getPose().getTranslation.getY() + Note_Y);
-    Translation2d vectorToNote = notePos.minus(chassis.getPose().getTranslation());
+    rotationVelocity = (Angle <= 1 && Angle >= -1) ? 0 : rotationPidController.calculate(chassis.getAngle().getDegrees(),Angle)*Math.PI/2;
+    ChassisSpeeds speeds = new ChassisSpeeds(1.5,0, rotationVelocity);
+    chassis.setVelocities(speeds);
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    chassis.stop();
+  }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return Dist == 0;
   }
 }

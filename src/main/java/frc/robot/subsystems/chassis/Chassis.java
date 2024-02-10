@@ -7,16 +7,19 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Sysid.Sysid;
 import frc.robot.Sysid.Sysid.Gains;
 import frc.robot.commands.chassis.CheckModulesSteerVelocity;
+import frc.robot.commands.chassis.PathFollow;
 import frc.robot.commands.chassis.SetModuleAngle;
 import frc.robot.commands.chassis.utils.TestVelocity;
 import frc.robot.utils.Utils;
@@ -198,6 +201,16 @@ public class Chassis extends SubsystemBase {
    */
   public void setNeutralMode(NeutralMode mode) {
     Arrays.stream(modules).forEach((module) -> module.setNeutralMode(mode));
+  }
+
+  public static void GoToNote(){
+    double[] llpython = NetworkTableInstance.getDefault().getTable("limelight").getEntry("llpython").getDoubleArray(new double[8]);
+    double Angle = llpython[1];
+    double Note_X = llpython[2];
+    double Note_Y = llpython[3];
+
+    pathPoint note = new pathPoint0(Note_X, Note_Y, null, Note_Y, false)
+    new ParallelCommandGroup(new PathFollow(null, null, Note_X, Note_Y, false))
   }
 
   /**
