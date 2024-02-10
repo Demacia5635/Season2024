@@ -230,13 +230,10 @@ public class Shooter extends SubsystemBase {
      * @param isUpDirection if the velocity the motor moves is positive or negative
      * @return if the limits have passed (false means you are fine)
      */
-    public boolean isAtLimits(boolean isUpDirection){
-        // if (isUpDirection){
-        //     return getDis() >= 322;
-        // } else {
-        //     return getDis() <= 98;
-        // }
-        return isUpDirection ? getDis() >= 322 : getDis() <= 98;
+    public boolean isDisLimits(boolean isUpDirection){
+        return isUpDirection ? getDis() >= MAX_DIS : getDis() <= MIN_DIS;
+    }
+
     public boolean isSupplyLimit(int motor){
         return getSupplyCurrent(motor) >= 25;
     }
