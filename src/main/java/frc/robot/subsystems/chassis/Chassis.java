@@ -9,6 +9,8 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -22,6 +24,8 @@ import frc.robot.commands.chassis.CheckModulesSteerVelocity;
 import frc.robot.commands.chassis.PathFollow;
 import frc.robot.commands.chassis.SetModuleAngle;
 import frc.robot.commands.chassis.utils.TestVelocity;
+import frc.robot.commands.intake.IntakeCommand;
+import frc.robot.subsystems.intake.Intake;
 import frc.robot.utils.Utils;
 import frc.robot.PathFollow.Util.pathPoint;
 import frc.robot.commands.chassis.utils.ResetWheelCommand;
@@ -203,14 +207,20 @@ public class Chassis extends SubsystemBase {
     Arrays.stream(modules).forEach((module) -> module.setNeutralMode(mode));
   }
 
-  public static void GoToNote(){
+  public void GoToNote(Intake intake){
     double[] llpython = NetworkTableInstance.getDefault().getTable("limelight").getEntry("llpython").getDoubleArray(new double[8]);
     double Angle = llpython[1];
     double Note_X = llpython[2];
     double Note_Y = llpython[3];
+    
 
-    pathPoint note = new pathPoint(Note_X, Note_Y, null, Note_Y, false);
-    new ParallelCommandGroup(new PathFollow(null, null, Note_X, Note_Y, false));
+    pathPoint note = new pathPoint(Note_X, Note_Y, getAngle().plus(Rotation2d.fromDegrees(Angle)), 0, false);
+    pathPoint[] points = {new pathPoint(0, 0, Rotation2d.fromDegrees(0), 0, false),
+    note};
+
+    
+    new ParallelCommandGroup(new PathFollow(this, points, 4, 8, DriverStation.getAlliance().get() == Alliance.Red), new IntakeCommand(intake)).schedule();;
+    
   }
 
   /**
