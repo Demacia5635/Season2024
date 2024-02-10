@@ -3,8 +3,11 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot.commands.amp;
+package frc.robot.commands.amp;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.amp.Amp;
+import frc.robot.subsystems.amp.AmpConstants;
 import frc.robot.subsystems.amp.Amp;
 import frc.robot.subsystems.amp.AmpConstants;
 
@@ -16,6 +19,7 @@ public class AmpIntake extends Command {
   double countRev[] = new double[2];
   double count1;
   double count2;
+  double startPulses;
   /** Creates a new AmpIntake. */
   public AmpIntake(Amp amp, double v1, double v2) {
     this.amp = amp;
@@ -30,6 +34,7 @@ public class AmpIntake extends Command {
   public void initialize() {
     amp.neoEncoderReset();
     last = false;
+    startPulses = amp.m1.getSelectedSensorPosition();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -42,7 +47,15 @@ public class AmpIntake extends Command {
         countRev = amp.getNeosRev();
         count1 = countRev[0];
         count2 = countRev[1];
+        countRev = amp.getNeosRev();
+        count1 = countRev[0];
+        count2 = countRev[1];
       }else {
+        if(amp.getNeosRev()[0]-count1 >=AmpConstants.CommandParams.NUM_OF_ROTATION){
+          amp.neosSetVel(0, 0);
+        }else{
+          amp.neosSetVel(v1, v2);
+        } 
         if(amp.getNeosRev()[0]-count1 >=AmpConstants.CommandParams.NUM_OF_ROTATION){
           amp.neosSetVel(0, 0);
         }else{
@@ -50,13 +63,18 @@ public class AmpIntake extends Command {
         } 
       }
     }
-    if(amp.isOpen()){
+    if(amp.isOpen(startPulses)){
       if(amp.isNoteThere(last)){
         amp.neosSetVel(-v1, -v2);
         countRev = amp.getNeosRev();
         count1 = countRev[0];
         count2 = countRev[1];
       }else {
+        if(count1- amp.getNeosRev()[0] >=AmpConstants.CommandParams.NUM_OF_ROTATION){
+          amp.neosSetVel(0, 0);
+        }else{
+          amp.neosSetVel(v1, v2);
+        } 
         if(count1- amp.getNeosRev()[0] >=AmpConstants.CommandParams.NUM_OF_ROTATION){
           amp.neosSetVel(0, 0);
         }else{
@@ -76,6 +94,6 @@ public class AmpIntake extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return (((amp.isOpen() ) && (count1- amp.getNeosRev()[0] >=AmpConstants.CommandParams.NUM_OF_ROTATION) && (!amp.isNoteThere(last))) || ((amp.isClose()) && (amp.getNeosRev()[0]-count1 >=AmpConstants.CommandParams.NUM_OF_ROTATION) && (amp.isNoteThere(last))) );
+    return (((amp.isOpen(startPulses) ) && (count1- amp.getNeosRev()[0] >=AmpConstants.CommandParams.NUM_OF_ROTATION) && (!amp.isNoteThere(last))) || ((amp.isClose()) && (amp.getNeosRev()[0]-count1 >=AmpConstants.CommandParams.NUM_OF_ROTATION) && (amp.isNoteThere(last))) );
   }
 }

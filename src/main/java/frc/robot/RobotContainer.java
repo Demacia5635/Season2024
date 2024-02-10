@@ -30,6 +30,8 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.PathFollow.Util.pathPoint;
 import frc.robot.commands.amp.AmpIntake;
 import frc.robot.commands.amp.GoToAngleAmp;
+import frc.robot.commands.amp.JoyStickAmp;
+import frc.robot.commands.amp.GoToAngleAmp;
 import frc.robot.commands.chassis.DriveCommand;
 import frc.robot.commands.chassis.PathFollow;
 import frc.robot.commands.chassis.RotateToAngleShooter;
