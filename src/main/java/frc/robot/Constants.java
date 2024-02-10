@@ -128,13 +128,13 @@ public final class Constants {
 
         /*motor falcon stats */
         public static final int PULES_PER_REV = 2048;
-        public static final int GEAR_RATIO = 4;
+        public static final int GEAR_RATIO = 2;
         public static final int REV_PER_MM = 8;
         public static final int PULES_PER_MM = PULES_PER_REV * GEAR_RATIO / REV_PER_MM;
         
         /*the length of profiles in the angle changer */
-        public static final double KA = 165;
-        public static final double KB = 161;
+        public static final double KA = 136;
+        public static final double KB = 128;
         
         /*set up the feedForward var of the angle changer */
         public static final double KS = 0.056673856189171;
@@ -144,5 +144,9 @@ public final class Constants {
         /*set up the PID of the angle motor */
         public static final double KP = 0.3;
         public static final double KD = KP / 100;
+
+        public static final double MAX_DIS = 243;
+        public static final double MIN_DIS = 100;
+
     }
 }

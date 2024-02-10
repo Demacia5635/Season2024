@@ -147,7 +147,7 @@ public class Shooter extends SubsystemBase {
     /**reset the base dis of the angle motor also reset the encoder of the angle motor */
     public void resetDis(){
         motorAngle.setSelectedSensorPosition(0);
-        baseDis = -322;
+        baseDis = -MAX_DIS;
     }
     
     /**
