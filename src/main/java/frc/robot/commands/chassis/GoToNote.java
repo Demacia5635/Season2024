@@ -17,24 +17,15 @@ public class GoToNote extends Command {
   Intake intake;
   Chassis chassis;
   double velocity;
-  IntakeCommand intakeCommand;
   PIDController rotationPidController = new PIDController(0.31, 0.006, 0.0000025);
 
   
-  public GoToNote(Intake intake, Chassis chassis) {
+  public GoToNote(Chassis chassis) {
     this.chassis = chassis;
-    this.intake = intake;
-    addRequirements(chassis, intake);
+    addRequirements(chassis);
   }
 
   
-  @Override
-  public void initialize() {
-    intakeCommand = new IntakeCommand(intake);
-    intakeCommand.schedule();
-    
-    
-  }
 
   
   @Override
@@ -58,13 +49,7 @@ public class GoToNote extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    chassis.stop();
-    intakeCommand.end(true);
-  }
+    chassis.stop();  }
 
   
-  @Override
-  public boolean isFinished() {
-    return intakeCommand.isFinished();
-  }
 }

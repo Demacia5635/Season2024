@@ -38,20 +38,20 @@ public class AmpConstants{
       public static final double MAX_ARM_ACCEL_OPEN = 5*Math.PI;
 
       public static final double OPEN_ANGLE = Math.PI/2;
+      public static final double CLOSE_ANGLE = 0;
+      public static final double MAX_ARM_VEL_CLOSE = 0;
+      public static final double MAX_ARM_ACCEL_CLOSE = 0;
 
       public static final double NUMBER_OF_ROTATION = 0.8;
-
       public static final double SENSOR_TO_REST_DIST = NUMBER_OF_ROTATION/(ConvertionParams.NEO1GearRatio);
-
       public static final double NOTE_VOLTAGE = 2.8;
-
       public static final double CRITICAL_CURRENT = 0;
-
       public static final double INTAKE_TRANSFER_POWER = 0.4;
-
       public static final double INTAKE_POWER = 0.4;
-
       public static final double INTAKE_PRE_LIMIT_POWER = 0.4;
+
+
+  
 
     
     }
@@ -88,6 +88,7 @@ public class AmpConstants{
       public static final double ANGLE_RADIANS_AMP = 0;
       public static final double MAX_VEL_RAD = 0;
       public static final double MAX_ACCEL_RAD = 0;
+    public static final double ANGLE_RADIANS_CLOSE = 0;
 
 
 

@@ -18,7 +18,6 @@ public class ShooterFeeding extends Command {
     /**
      * creates a new command that feeding the shooter a note
      * @param shooter the wanted shooter
-     * @param feedingPow the wanted power of the feeding motor -1 to 1
      */
     public ShooterFeeding(Shooter shooter, double feedingPow) {
         this.shooter = shooter;
