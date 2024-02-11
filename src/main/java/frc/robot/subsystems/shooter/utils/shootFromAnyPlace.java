@@ -8,13 +8,13 @@ import java.util.Arrays;
 import java.util.Comparator;
 
 /**util that will store the entire lookup table and can send back the angle and the pow needed by dis */
-public class ShootFromAnyPlace {
+public class shootFromAnyPlace {
     private double[][] lookupTable = {
         {0,0,0},{0,0,0},{0,0,0}
     };
 
     /**creates a new shootFromAnyPlace class */
-    public ShootFromAnyPlace(){}
+    public shootFromAnyPlace(){}
 
     /**
      * sort an array
@@ -49,7 +49,7 @@ public class ShootFromAnyPlace {
 
     /**
      * get the wanted angle base on the dis
-     * @param dis the dis the chassis is currently in, in mm
+     * @param dis the dis the chassis is currently in, in meters
      * @return the wanted angle to shoot perfect for the speakr
      */
     public double getAngle(double dis){

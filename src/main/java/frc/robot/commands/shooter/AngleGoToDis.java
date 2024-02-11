@@ -58,7 +58,7 @@ public class AngleGoToDis extends Command {
     /**stop the angle motor when the command have finished */
     @Override
     public void end(boolean interrupted) {
-        shooter.anlgeStop();
+        shooter.angleStop();
     }
 
     // Returns true when the command should end.

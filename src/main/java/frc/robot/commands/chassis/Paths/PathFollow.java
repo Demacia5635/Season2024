@@ -1,4 +1,4 @@
-package frc.robot.commands.chassis;
+package frc.robot.commands.chassis.Paths;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;

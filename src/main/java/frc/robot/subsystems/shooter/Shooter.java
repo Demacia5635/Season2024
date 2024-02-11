@@ -103,7 +103,7 @@ public class Shooter extends SubsystemBase {
     }
 
     /**stop the angle motor */
-    public void anlgeStop(){
+    public void angleStop(){
         motorAngle.set(ControlMode.PercentOutput, 0);
     }
 
@@ -141,7 +141,7 @@ public class Shooter extends SubsystemBase {
     /**important saftey function that will stop all the motors in this subsystem */
     public void stopAll(){
         stop();
-        anlgeStop();
+        angleStop();
         feedingStop();
     }
 

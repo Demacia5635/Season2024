@@ -13,14 +13,14 @@ import frc.robot.commands.intake.IntakeCommand;
 import frc.robot.subsystems.chassis.Chassis;
 import frc.robot.subsystems.intake.Intake;
 
-public class GoToNote extends Command {
+public class DriveToNote extends Command {
   Intake intake;
   Chassis chassis;
   double velocity;
   PIDController rotationPidController = new PIDController(0.31, 0.006, 0.0000025);
 
   
-  public GoToNote(Chassis chassis) {
+  public DriveToNote(Chassis chassis) {
     this.chassis = chassis;
     addRequirements(chassis);
   }

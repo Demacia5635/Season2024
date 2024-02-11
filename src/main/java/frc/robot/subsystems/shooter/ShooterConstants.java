@@ -16,8 +16,9 @@ public class ShooterConstants {
         public static final int LIMIT_SWITCH_ID = 6;
         
         /*set up the location of the 2 speakers */
-        public static final Pose2d BLUE_ALLIANCE_SPEAKER_POSE2D = new Pose2d(-0.15,2.1842, Rotation2d.fromDegrees(0));
-        public static final Pose2d RED_ALLIANCE_SPEAKER_POSE2D = new Pose2d(6.5273,2.1842, Rotation2d.fromDegrees(180));
+        public static final Pose2d BLUE_ALLIANCE_SPEAKER = new Pose2d(-0.15,2.1842, Rotation2d.fromDegrees(0));
+        //TODO fix it impossible 
+        public static final Pose2d RED_ALLIANCE_SPEAKER = new Pose2d(6.5273,2.1842, Rotation2d.fromDegrees(180));
 
         /*motor falcon stats */
         public static final int PULES_PER_REV = 2048;

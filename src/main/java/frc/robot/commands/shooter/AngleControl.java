@@ -43,7 +43,7 @@ public class AngleControl extends Command {
     /**stop the angle motor when finishing the command */
     @Override
     public void end(boolean interrupted) {
-        shooter.anlgeStop();
+        shooter.angleStop();
     }
 
     // Returns true when the command should end.
