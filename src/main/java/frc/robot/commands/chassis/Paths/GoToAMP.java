@@ -3,7 +3,6 @@ package frc.robot.commands.chassis.Paths;
 
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.PathFollow.Util.pathPoint;
-import frc.robot.commands.chassis.PathFollow;
 import frc.robot.commands.chassis.Paths.PathUtils.GetPointsToAMP;
 import frc.robot.subsystems.chassis.Chassis;
 

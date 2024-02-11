@@ -52,7 +52,8 @@ public class PathFollow extends CommandBase {
 
   double driveVelocity = 0;
   double rotationVelocity = 0;
-  double fieldLength = 16.54; // in meters
+  static double fieldLength = 16.54; // in meters
+  static double fieldHeight = 8.21; // in meters
   boolean isRed;
 
   Trajectory traj;
@@ -186,6 +187,14 @@ public class PathFollow extends CommandBase {
     foundAprilTag = true;
 
     return finalVector.getAngle();
+  }
+
+  
+  public static double convertAlliance(double x){
+    return fieldLength - x; 
+  }
+  public static double fixY(double y){
+    return fieldHeight - y;
   }
   
 
