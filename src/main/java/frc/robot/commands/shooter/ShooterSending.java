@@ -6,6 +6,7 @@ package frc.robot.commands.shooter;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.shooter.Shooter.SHOOTER_MOTOR;
 
 /**command that will send the note from the feeding motor to the shooting motor */
 public class ShooterSending extends Command {
@@ -40,11 +41,8 @@ public class ShooterSending extends Command {
     @Override
     public void initialize() {
         count = 0;
-        shooter.brake(1);
-        shooter.brake(2);
-        shooter.brake(3);
+        shooter.brake(SHOOTER_MOTOR.UP, SHOOTER_MOTOR.DOWN, SHOOTER_MOTOR.FEEDING);
     }
-
     // Called every time the scheduler runs while the command is scheduled.
     /**setting pow to every motor */
     @Override

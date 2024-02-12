@@ -6,6 +6,7 @@ package frc.robot.commands.shooter;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.shooter.Shooter.SHOOTER_MOTOR;
 
 /**command that will power up the shooter */
 public class ShooterPowering extends Command {
@@ -34,8 +35,7 @@ public class ShooterPowering extends Command {
     /**put the shooting motor at brake */
     @Override
     public void initialize() {
-        shooter.brake(1);
-        shooter.brake(2);
+        shooter.brake(SHOOTER_MOTOR.UP, SHOOTER_MOTOR.DOWN);
     }
 
     // Called every time the scheduler runs while the command is scheduled.
@@ -54,6 +54,6 @@ public class ShooterPowering extends Command {
     /**checks if the shooter have come to the wanted vel */
     @Override
     public boolean isFinished() {
-        return shooter.getMotorVel(1) >= maxVel && shooter.getMotorVel(2) >= maxVel;
+        return shooter.getMotorVel(SHOOTER_MOTOR.UP) >= maxVel && shooter.getMotorVel(SHOOTER_MOTOR.DOWN) >= maxVel;
     }
 }

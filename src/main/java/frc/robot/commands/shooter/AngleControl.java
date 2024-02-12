@@ -7,6 +7,7 @@ package frc.robot.commands.shooter;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.shooter.Shooter.SHOOTER_MOTOR;
 
 /**command that control angle */
 public class AngleControl extends Command {
@@ -50,6 +51,6 @@ public class AngleControl extends Command {
     /**checks if the amper is more than the limit */
     @Override
     public boolean isFinished() {
-        return shooter.isSupplyLimit(4);
+        return shooter.isSupplyLimit(SHOOTER_MOTOR.ANGLE);
     }
 }

@@ -6,6 +6,7 @@ package frc.robot.commands.shooter;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.shooter.Shooter.SHOOTER_MOTOR;
 
 /**command that makes the angle motor go to a specific dis */
 public class AngleGoToDis extends Command {
@@ -43,7 +44,7 @@ public class AngleGoToDis extends Command {
      */
     @Override
     public void initialize() {
-        shooter.brake(4);
+        shooter.brake(SHOOTER_MOTOR.ANGLE);
         startDis = shooter.getDis();
     }
 
@@ -73,7 +74,7 @@ public class AngleGoToDis extends Command {
      */
     @Override
     public boolean isFinished() {
-        if (!shooter.isSupplyLimit(4)){
+        if (!shooter.isSupplyLimit(SHOOTER_MOTOR.ANGLE)){
             if (!shooter.isDisLimits(wantedDis - startDis > 0)){
                 if (!((wantedDis - startDis > 0) && (shooter.getDis() >= wantedDis))){
                     if (!((wantedDis - startDis < 0) && (shooter.getDis() <= wantedDis))){

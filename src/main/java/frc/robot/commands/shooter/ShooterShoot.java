@@ -7,6 +7,7 @@ package frc.robot.commands.shooter;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.shooter.Shooter.SHOOTER_MOTOR;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
@@ -27,7 +28,7 @@ public class ShooterShoot extends SequentialCommandGroup {
     public ShooterShoot(Shooter shooter, double feedingPow, double shootingPow, double shootingMaxVel, double angle, double angleMaxVel, double angleAcc) {
         addRequirements(shooter);
         addCommands(
-            new InstantCommand(()-> {for(int i = 1; i < 5; i++ ) { shooter.brake(i); }}, shooter),
+            new InstantCommand(()-> { shooter.brake(SHOOTER_MOTOR.UP, SHOOTER_MOTOR.DOWN, SHOOTER_MOTOR.FEEDING, SHOOTER_MOTOR.ANGLE); }, shooter),
             new ShooterFeeding(shooter, feedingPow),
             new AngleGoToAngle(shooter, angle, angleMaxVel, angleAcc),
             new ShooterPowering(shooter, shootingPow, shootingMaxVel),

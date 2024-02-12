@@ -25,9 +25,9 @@ public class Shooter extends SubsystemBase {
     public final TalonFX motorAngle;
 
     /**the motors that move the rollers */
-    public final TalonFX motor1; 
+    public final TalonFX motorUP; 
     /**the motors that move the rollers */
-    public final TalonFX motor2;
+    public final TalonFX motorDown;
     
     /**the motor that feeds the notes to the shooter */
     public final TalonSRX motorFeeding;
@@ -41,15 +41,32 @@ public class Shooter extends SubsystemBase {
     /** @deprecated Unused bcz switch to motionMagic from velocity*/
     ArmFeedforward elevationFF;
     
+    /**the limit switch on the angle changer machanism */
     DigitalInput limitSwitch;
+
+    /**
+     * <pre>
+     * enum SHOOTER_MOTOR that contains all motors of the shooter
+     * UP - the shooting motor thats up
+     * DOWN - the shooting motor thats down
+     * FEEDING - the feeding motor
+     * ANGLE - the motor of the angle changer
+     * </pre>
+     */
+    public enum SHOOTER_MOTOR {
+        UP,
+        DOWN,
+        FEEDING,
+        ANGLE,
+    }
 
     /**creates a new shooter and angle changer*/
     public Shooter() {
         /*set up vars */
 
-        motor1 = new TalonFX(ShooterConstants.MOTOR_1_ID);
+        motorUP = new TalonFX(ShooterConstants.MOTOR_UP_ID);
 
-        motor2 = new TalonFX(ShooterConstants.MOTOR_2_ID);
+        motorDown = new TalonFX(ShooterConstants.MOTOR_DOWN_ID);
 
         motorFeeding = new TalonSRX(ShooterConstants.MOTOR_FEEDING_ID);
         
@@ -112,13 +129,13 @@ public class Shooter extends SubsystemBase {
      * @param pow the wanted pow from -1 to 1
      */
     public void setPow(double pow){
-        motor1.set(ControlMode.PercentOutput, pow);
-        motor2.set(ControlMode.PercentOutput, pow);
+        motorUP.set(ControlMode.PercentOutput, pow);
+        motorDown.set(ControlMode.PercentOutput, pow);
     }
     
     public void stop(){
-        motor1.set(ControlMode.PercentOutput, 0);
-        motor2.set(ControlMode.PercentOutput, 0);
+        motorUP.set(ControlMode.PercentOutput, 0);
+        motorDown.set(ControlMode.PercentOutput, 0);
     }
     
     /**
@@ -146,72 +163,63 @@ public class Shooter extends SubsystemBase {
     }
 
     /**
-     * set brake mod to a motor
-     * @param motor the wanted motor
-     * <pre>
-     * capable param:
-     * 1 - motor 1
-     * 2 - motor 2
-     * 3 - feeding motor
-     * 4 - angle motor
-     * </pre>
+     * set brake mode to motors
+     * @param motor the wanted motors
      */
-    public void brake(int motor){ 
-        switch (motor) {
-
-            case 1:
-                motor1.setNeutralMode(NeutralMode.Brake);
-                break;
-
-            case 2:
-                motor2.setNeutralMode(NeutralMode.Brake);
-                break;
-
-            case 3:
-                motorFeeding.setNeutralMode(NeutralMode.Brake);
-                break;
-
-            case 4:
-                motor1.setNeutralMode(NeutralMode.Brake);
-                break;
-
-            default:
-                break;
+    public void brake(SHOOTER_MOTOR... motor){ 
+        for (SHOOTER_MOTOR i : motor) {
+            switch (i) {
+                case UP:
+                    motorUP.setNeutralMode(NeutralMode.Brake);
+                    break;
+    
+                case DOWN:
+                    motorDown.setNeutralMode(NeutralMode.Brake);
+                    break;
+    
+                case FEEDING:
+                    motorFeeding.setNeutralMode(NeutralMode.Brake);
+                    break;
+    
+                case ANGLE:
+                    motorUP.setNeutralMode(NeutralMode.Brake);
+                    break;
+    
+                default:
+                    break;
+            }
+            
         }
     }
     
     /**
-     * set up coast to a motor  
-     * @param motor the wanted motor
-     * <pre>
-     * capable param:
-     * 1 - motor 1
-     * 2 - motor 2
-     * 3 - feeding motor
-     * 4 - angle motor
-     * </pre>
+     * set up coast to motors 
+     * @param motor the wanted motors
      */
-    public void coast(int motor){ 
-        switch (motor) {
-
-            case 1:
-                motor1.setNeutralMode(NeutralMode.Coast);
-                break;
-
-            case 2:
-                motor2.setNeutralMode(NeutralMode.Coast);
-                break;
-
-            case 3:
-                motorFeeding.setNeutralMode(NeutralMode.Coast);
-                break;
-
-            case 4:
-                motor1.setNeutralMode(NeutralMode.Coast);
-                break;
-
-            default:
-                break;
+    public void coast(SHOOTER_MOTOR... motor){ 
+        for (SHOOTER_MOTOR i : motor) {
+            switch (i) {
+    
+                case UP:
+                    motorUP.setNeutralMode(NeutralMode.Coast);
+                    break;
+    
+                case DOWN:
+                    motorDown.setNeutralMode(NeutralMode.Coast);
+                    break;
+    
+                case FEEDING:
+                    motorFeeding.setNeutralMode(NeutralMode.Coast);
+                    break;
+    
+                case ANGLE:
+                    motorUP.setNeutralMode(NeutralMode.Coast);
+                    break;
+    
+                default:
+                    break;
+            }
+            
         }
     }
     
@@ -238,7 +246,7 @@ public class Shooter extends SubsystemBase {
         return isUpDirection ? getDis() >= ShooterConstants.MAX_DIS : getDis() <= ShooterConstants.MIN_DIS;
     }
 
-    public boolean isSupplyLimit(int motor){
+    public boolean isSupplyLimit(SHOOTER_MOTOR motor){
         return getSupplyCurrent(motor) >= 25;
     }
 
@@ -254,30 +262,23 @@ public class Shooter extends SubsystemBase {
     /**
      * get the vel of every motor
      * @param motor the wanted motor 
-     * <pre>
-     * capable param:
-     * 1 - motor 1
-     * 2 - motor 2
-     * 3 - feeding motor
-     * 4 - angle motor
-     * </pre>
      * @return the wanted motor velocity in degree per sec
-     * @exception 3 - that is a snowblower so return in pules per sec
+     * @exception FEEDING - that is a snowblower so return in pules per sec
      * @exception default - if the param motor is not listed above the function will return 0
      */
-    public double getMotorVel(int motor){
+    public double getMotorVel(SHOOTER_MOTOR motor){
         switch (motor) {
 
-            case 1:
-                return motor1.getSelectedSensorVelocity()*10/(ShooterConstants.PULES_PER_REV/360);
+            case UP:
+                return motorUP.getSelectedSensorVelocity()*10/(ShooterConstants.PULES_PER_REV/360);
 
-            case 2:
-                return motor2.getSelectedSensorVelocity()*10/(ShooterConstants.PULES_PER_REV/360);
+            case DOWN:
+                return motorDown.getSelectedSensorVelocity()*10/(ShooterConstants.PULES_PER_REV/360);
 
-            case 3:
+            case FEEDING:
                 return motorFeeding.getSelectedSensorVelocity()*10;
 
-            case 4:
+            case ANGLE:
                 return motorAngle.getSelectedSensorVelocity()*10/(ShooterConstants.PULES_PER_REV/360);
             
             default:
@@ -288,29 +289,22 @@ public class Shooter extends SubsystemBase {
     /**
      * get the amper of every motor
      * @param motor the wanted motor 
-     * <pre>
-     * capable param:
-     * 1 - motor 1
-     * 2 - motor 2
-     * 3 - feeding motor
-     * 4 - angle motor
-     * </pre>
      * @return the wanted motor amper
      * @exception default - if the param motor is not listed above the function will return 0
      */
-    public double getSupplyCurrent(int motor){
+    public double getSupplyCurrent(SHOOTER_MOTOR motor){
         switch (motor) {
 
-            case 1:
-                return motor1.getSupplyCurrent();
+            case UP:
+                return motorUP.getSupplyCurrent();
 
-            case 2:
-                return motor2.getSupplyCurrent();
+            case DOWN:
+                return motorDown.getSupplyCurrent();
 
-            case 3:
+            case FEEDING:
                 return motorFeeding.getSupplyCurrent();
 
-            case 4:
+            case ANGLE:
                 return motorAngle.getSupplyCurrent();
 
             default:
@@ -361,7 +355,7 @@ public class Shooter extends SubsystemBase {
     public boolean isRunDone(){
         double regularAmper = 0;
         double deltaAmper = 0;
-        return Math.abs(regularAmper - getSupplyCurrent(1)) > deltaAmper;
+        return Math.abs(regularAmper - getSupplyCurrent(SHOOTER_MOTOR.UP)) > deltaAmper;
     }
 
     @Override
@@ -369,11 +363,11 @@ public class Shooter extends SubsystemBase {
         super.initSendable(builder);
         
         /*put on ShuffleBoard all the builders */
-        builder.addDoubleProperty("motor 1 speed", ()-> getMotorVel(1), null);
-        builder.addDoubleProperty("motor 2 speed", ()-> getMotorVel(2), null);
-        builder.addDoubleProperty("current amper motor 1", ()-> getSupplyCurrent(1), null);
-        builder.addDoubleProperty("current amper motor 2", ()-> getSupplyCurrent(2), null);
-        builder.addDoubleProperty("angle vel", ()-> getMotorVel(4), null);
+        builder.addDoubleProperty("motor up speed", ()-> getMotorVel(SHOOTER_MOTOR.UP), null);
+        builder.addDoubleProperty("motor down speed", ()-> getMotorVel(SHOOTER_MOTOR.DOWN), null);
+        builder.addDoubleProperty("current amper motor 1", ()-> getSupplyCurrent(SHOOTER_MOTOR.UP), null);
+        builder.addDoubleProperty("current amper motor 2", ()-> getSupplyCurrent(SHOOTER_MOTOR.DOWN), null);
+        builder.addDoubleProperty("angle vel", ()-> getMotorVel(SHOOTER_MOTOR.ANGLE), null);
         builder.addDoubleProperty("Distance", this::getDis, null);
         builder.addDoubleProperty("base dis", ()-> baseDis, null);
         builder.addDoubleProperty("Angle", this::getAngle, null);
@@ -382,8 +376,14 @@ public class Shooter extends SubsystemBase {
     
         /*put on ShuffleBoard all the cmds */
         SmartDashboard.putData("Dis reset", new InstantCommand(()-> resetDis()).ignoringDisable(true));
-        SmartDashboard.putData("Angle Brake", new InstantCommand(()-> brake(4)).ignoringDisable(true));
-        SmartDashboard.putData("Angle Coast", new InstantCommand(()-> coast(4)).ignoringDisable(true));
+        SmartDashboard.putData("motor up Brake", new InstantCommand(()-> brake(SHOOTER_MOTOR.UP)).ignoringDisable(true));
+        SmartDashboard.putData("motor up Coast", new InstantCommand(()-> coast(SHOOTER_MOTOR.UP)).ignoringDisable(true));
+        SmartDashboard.putData("motor down Brake", new InstantCommand(()-> brake(SHOOTER_MOTOR.DOWN)).ignoringDisable(true));
+        SmartDashboard.putData("motor down Coast", new InstantCommand(()-> coast(SHOOTER_MOTOR.DOWN)).ignoringDisable(true));
+        SmartDashboard.putData("motor feeding Brake", new InstantCommand(()-> brake(SHOOTER_MOTOR.FEEDING)).ignoringDisable(true));
+        SmartDashboard.putData("motor feeding Coast", new InstantCommand(()-> coast(SHOOTER_MOTOR.FEEDING)).ignoringDisable(true));
+        SmartDashboard.putData("motor angle Brake", new InstantCommand(()-> brake(SHOOTER_MOTOR.ANGLE)).ignoringDisable(true));
+        SmartDashboard.putData("motor angle Coast", new InstantCommand(()-> coast(SHOOTER_MOTOR.ANGLE)).ignoringDisable(true));
     }
 
     @Override
