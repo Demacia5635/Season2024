@@ -7,25 +7,22 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import com.ctre.phoenix.sensors.Pigeon2;
-import com.fasterxml.jackson.annotation.JsonCreator.Mode;
+import com.revrobotics.CANAnalog.AnalogMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkMaxAnalogSensor;
-import com.revrobotics.CANAnalog.AnalogMode;
 
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.subsystems.amp.AmpConstants.*;
 import frc.robot.Sysid.Sysid;
-import frc.robot.Sysid.Sysid.Gains;
+import frc.robot.subsystems.amp.AmpConstants.AmpDeviceID;
+import frc.robot.subsystems.amp.AmpConstants.ConvertionParams;
+import frc.robot.subsystems.amp.AmpConstants.Parameters;
+import frc.robot.subsystems.amp.AmpConstants.armStatesParameters;
 public class Amp extends SubsystemBase{
     //public final Pigeon2 gyro;
     public final TalonFX m1;
@@ -37,6 +34,7 @@ public class Amp extends SubsystemBase{
     public int opticCount;
     public SimpleMotorFeedforward openFF;
     public SimpleMotorFeedforward closeFF;
+    
 
     
     //ArmFeedforward ff = new ArmFeedforward(Parameters.ks1, Parameters.kg1, Parameters.kv1, Parameters.ka1);
@@ -279,20 +277,22 @@ public class Amp extends SubsystemBase{
         double rad = Math.toRadians(angle);
         
         if (wantedAnglerVel > 0){
-            if (angle <= 36){
+            /**if (angle <= 36){
                 state = 0;
             } else {
                 if(angle>=72){
                     state = 2;
                 }
                 state = 1;
-            }
+            }**/
+            state = 0;
         } else {
-            if (angle >= 55){
+            /**if (angle >= 55){
                 state = 3;
             } else {
                 state = 4;
-            }
+            }**/
+            state = 1;
         }
 
         return (
