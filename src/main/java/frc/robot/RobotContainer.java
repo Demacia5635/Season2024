@@ -78,7 +78,7 @@ public class RobotContainer implements Sendable{
    
   public Command getAutonomousCommand() {
     return new SequentialCommandGroup(new PathFollow(chassis, points1, 2, 4, 1, DriverStation.getAlliance().get() == Alliance.Red)
-    .andThen(new PathFollow(chassis, points2, 2, 1, 0, DriverStation.getAlliance().get() == Alliance.Red)));
+    .andThen(new PathFollow(chassis, points2, 2, 4, 0, DriverStation.getAlliance().get() == Alliance.Red)));
    
   }
 }
