@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
@@ -361,29 +362,35 @@ public class Shooter extends SubsystemBase {
     @Override
     public void initSendable(SendableBuilder builder) {
         super.initSendable(builder);
+
+        SmartDashboard.putData("feeding", new RunCommand(()->feedingSetPow(0.5), this));
+        SmartDashboard.putData("shooter", new RunCommand(()->setPow(0.5), this));
+        SmartDashboard.putData("angle shooter", new RunCommand(()->angleSetPow(0.2), this));
+
+        SmartDashboard.putNumber("analog input", getAnalogVolt());
         
-        /*put on ShuffleBoard all the builders */
-        builder.addDoubleProperty("motor up speed", ()-> getMotorVel(SHOOTER_MOTOR.UP), null);
-        builder.addDoubleProperty("motor down speed", ()-> getMotorVel(SHOOTER_MOTOR.DOWN), null);
-        builder.addDoubleProperty("current amper motor 1", ()-> getSupplyCurrent(SHOOTER_MOTOR.UP), null);
-        builder.addDoubleProperty("current amper motor 2", ()-> getSupplyCurrent(SHOOTER_MOTOR.DOWN), null);
-        builder.addDoubleProperty("angle vel", ()-> getMotorVel(SHOOTER_MOTOR.ANGLE), null);
-        builder.addDoubleProperty("Distance", this::getDis, null);
-        builder.addDoubleProperty("base dis", ()-> baseDis, null);
-        builder.addDoubleProperty("Angle", this::getAngle, null);
-        builder.addDoubleProperty("encoder", ()->motorAngle.getSelectedSensorPosition(), null);
-        builder.addBooleanProperty("Limit switch", ()->isLimit(), null);
+        // /*put on ShuffleBoard all the builders */
+        // builder.addDoubleProperty("motor up speed", ()-> getMotorVel(SHOOTER_MOTOR.UP), null);
+        // builder.addDoubleProperty("motor down speed", ()-> getMotorVel(SHOOTER_MOTOR.DOWN), null);
+        // builder.addDoubleProperty("current amper motor 1", ()-> getSupplyCurrent(SHOOTER_MOTOR.UP), null);
+        // builder.addDoubleProperty("current amper motor 2", ()-> getSupplyCurrent(SHOOTER_MOTOR.DOWN), null);
+        // builder.addDoubleProperty("angle vel", ()-> getMotorVel(SHOOTER_MOTOR.ANGLE), null);
+        // builder.addDoubleProperty("Distance", this::getDis, null);
+        // builder.addDoubleProperty("base dis", ()-> baseDis, null);
+        // builder.addDoubleProperty("Angle", this::getAngle, null);
+        // builder.addDoubleProperty("encoder", ()->motorAngle.getSelectedSensorPosition(), null);
+        // builder.addBooleanProperty("Limit switch", ()->isLimit(), null);
     
-        /*put on ShuffleBoard all the cmds */
-        SmartDashboard.putData("Dis reset", new InstantCommand(()-> resetDis()).ignoringDisable(true));
-        SmartDashboard.putData("motor up Brake", new InstantCommand(()-> brake(SHOOTER_MOTOR.UP)).ignoringDisable(true));
-        SmartDashboard.putData("motor up Coast", new InstantCommand(()-> coast(SHOOTER_MOTOR.UP)).ignoringDisable(true));
-        SmartDashboard.putData("motor down Brake", new InstantCommand(()-> brake(SHOOTER_MOTOR.DOWN)).ignoringDisable(true));
-        SmartDashboard.putData("motor down Coast", new InstantCommand(()-> coast(SHOOTER_MOTOR.DOWN)).ignoringDisable(true));
-        SmartDashboard.putData("motor feeding Brake", new InstantCommand(()-> brake(SHOOTER_MOTOR.FEEDING)).ignoringDisable(true));
-        SmartDashboard.putData("motor feeding Coast", new InstantCommand(()-> coast(SHOOTER_MOTOR.FEEDING)).ignoringDisable(true));
-        SmartDashboard.putData("motor angle Brake", new InstantCommand(()-> brake(SHOOTER_MOTOR.ANGLE)).ignoringDisable(true));
-        SmartDashboard.putData("motor angle Coast", new InstantCommand(()-> coast(SHOOTER_MOTOR.ANGLE)).ignoringDisable(true));
+        // /*put on ShuffleBoard all the cmds */
+        // SmartDashboard.putData("Dis reset", new InstantCommand(()-> resetDis()).ignoringDisable(true));
+        // SmartDashboard.putData("motor up Brake", new InstantCommand(()-> brake(SHOOTER_MOTOR.UP)).ignoringDisable(true));
+        // SmartDashboard.putData("motor up Coast", new InstantCommand(()-> coast(SHOOTER_MOTOR.UP)).ignoringDisable(true));
+        // SmartDashboard.putData("motor down Brake", new InstantCommand(()-> brake(SHOOTER_MOTOR.DOWN)).ignoringDisable(true));
+        // SmartDashboard.putData("motor down Coast", new InstantCommand(()-> coast(SHOOTER_MOTOR.DOWN)).ignoringDisable(true));
+        // SmartDashboard.putData("motor feeding Brake", new InstantCommand(()-> brake(SHOOTER_MOTOR.FEEDING)).ignoringDisable(true));
+        // SmartDashboard.putData("motor feeding Coast", new InstantCommand(()-> coast(SHOOTER_MOTOR.FEEDING)).ignoringDisable(true));
+        // SmartDashboard.putData("motor angle Brake", new InstantCommand(()-> brake(SHOOTER_MOTOR.ANGLE)).ignoringDisable(true));
+        // SmartDashboard.putData("motor angle Coast", new InstantCommand(()-> coast(SHOOTER_MOTOR.ANGLE)).ignoringDisable(true));
     }
 
     @Override

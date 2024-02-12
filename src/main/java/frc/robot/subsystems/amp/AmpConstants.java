@@ -4,20 +4,17 @@ import static frc.robot.subsystems.chassis.ChassisConstants.MOTOR_PULSES_PER_ROT
 
 public class AmpConstants{
     public static class AmpDeviceID{
-      public static final int M1 = 15;      
-      public static final int M2 = 2;
-      public static final int NEO1 = 4;
-      public static final int NEO2 = 3;
-      public static final int GYRO = 14;
+      public static final int M1 = 21;      
+      public static final int M2 = 22;
+      public static final int NEO1 = 23;
+      public static final int NEO2 = 24;
       public static final int LIGHT_LIMIT = 0;
+      public static final int MAGNETIC_SENSOR_ID = 0;
     }
     public static class ConvertionParams {
       public static final double M1GearRatio = 1/96.0;
       public static final double NEO1GearRatio = 1/8.0;
       public static final double NEO2GearRatio = 1/8.0;
-
-
-
 
       public static final double MOTOR_PULSES_PER_SPIN = 2048;
       public static final double NEO_PULES_PER_REV = 42;
@@ -44,7 +41,7 @@ public class AmpConstants{
 
       public static final double NUMBER_OF_ROTATION = 0.8;
       public static final double SENSOR_TO_REST_DIST = NUMBER_OF_ROTATION/(ConvertionParams.NEO1GearRatio);
-      public static final double NOTE_VOLTAGE = 2.8;
+      public static final double NOTE_VOLTAGE = 2.7;
       public static final double CRITICAL_CURRENT = 0;
       public static final double INTAKE_TRANSFER_POWER = 0.4;
       public static final double INTAKE_POWER = 0.4;

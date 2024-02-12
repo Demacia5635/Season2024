@@ -37,7 +37,7 @@ public final class ChassisConstants {
   public static final Translation2d note4 = new Translation2d(); //TODO
   public static final Translation2d note5 = new Translation2d(); //TODO
 
-  public static final int GYRO_ID = 15;
+  public static final int GYRO_ID = 19;
 
   public static final double CYCLE_DT = 0.02;
 
@@ -109,7 +109,7 @@ public final class ChassisConstants {
 
 
   public final static SwerveModuleConstants FRONT_LEFT = new SwerveModuleConstants(
-      3, 4, 12,
+      5, 6, 13,
       new Translation2d(0.332, 0.277),
       257.607421875,
       MOVE_PID,
@@ -123,7 +123,7 @@ public final class ChassisConstants {
       false,
       FRONT_INTEGRAL_ZONE);
   public final static SwerveModuleConstants FRONT_RIGHT = new SwerveModuleConstants(
-      5, 6, 13,
+      3, 4, 12,
       new Translation2d(0.332, -0.277),
       290.7,
       MOVE_PID,

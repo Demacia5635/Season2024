@@ -9,6 +9,7 @@ import frc.robot.subsystems.intake.Intake;
 
 public class ShootCommand extends CommandBase {
     private final Intake intake;
+    private double count = 0;
 
     public ShootCommand(Intake intake) {
         this.intake = intake;
@@ -20,6 +21,7 @@ public class ShootCommand extends CommandBase {
 
     @Override
     public void execute() {
+        count+=0.02;
         intake.setVelocity(IntakeConstants.Parameters.SHOOT_POWER); // Set shoot velocity
         // withTimeout(IntakeConstants.Parameters.SHOOT_TIME); // Set timeout for shooting
     }
@@ -27,7 +29,7 @@ public class ShootCommand extends CommandBase {
     @Override
     public boolean isFinished() {
         // Command ends when current falls under minimum
-        return intake.getMotorCurrent() < IntakeConstants.Parameters.MIN_CURRENT_TO_SHOOTER;
+        return (intake.getMotorCurrent() < IntakeConstants.Parameters.MIN_CURRENT_TO_SHOOTER) && (count > IntakeConstants.Parameters.SHOOT_TIME);
     }
 
     @Override

@@ -21,7 +21,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Sysid.Sysid;
 import frc.robot.Sysid.Sysid.Gains;
 import frc.robot.commands.chassis.CheckModulesSteerVelocity;
-import frc.robot.commands.chassis.PathFollow;
 import frc.robot.commands.chassis.SetModuleAngle;
 import frc.robot.commands.chassis.utils.TestVelocity;
 import frc.robot.commands.intake.IntakeCommand;

@@ -56,7 +56,7 @@ public class DataCollector {
      * @param power
      */
     public void collect(double power) {
-        if (power<=0) {
+        if (power>=0) {
             this.power.set(nextRow, 0, power);
         double v = getVelocity.get();
         double rad = getRadians != null? getRadians.get():0;

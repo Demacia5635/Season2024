@@ -28,7 +28,6 @@ import frc.robot.subsystems.intake.IntakeConstants.*;
 public class Intake extends SubsystemBase{
     public final TalonFX motor;
     public AnalogInput limitInput;
-    public DigitalInput limitMechanical;
  
     //SimpleMotorFeedforward ff2 = new SimpleMotorFeedforward(Parameters.ks2, Parameters.kv2, Parameters.ka2);
     public Intake(){
@@ -38,8 +37,6 @@ public class Intake extends SubsystemBase{
         limitInput = new AnalogInput(IntakeDeviceID.LIGHT_LIMIT);
         limitInput.setAccumulatorInitialValue(0);
 
-        limitMechanical = new DigitalInput(IntakeDeviceID.MECHANICAL_LIMIT);
- 
         SmartDashboard.putData(this);
 
         setBrake();
@@ -77,10 +74,6 @@ public class Intake extends SubsystemBase{
 
     public boolean isCriticalCurrent() {
         return motor.getOutputCurrent()>=Parameters.CRITICAL_CURRENT;
-    }
-
-    public boolean isNoteMechanicalLimit() {
-        return limitMechanical.get();
     }
  
     public void setPower(double p1){

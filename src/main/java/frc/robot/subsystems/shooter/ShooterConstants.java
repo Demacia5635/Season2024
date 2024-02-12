@@ -6,14 +6,14 @@ import edu.wpi.first.math.geometry.Rotation2d;
 public class ShooterConstants {
 
         /*set up the id for all the motors */
-        public static final int MOTOR_ANGLE_ID = 4;
-        public static final int MOTOR_UP_ID = 1;
-        public static final int MOTOR_DOWN_ID = 2;
-        public static final int MOTOR_FEEDING_ID = 3;
+        public static final int MOTOR_ANGLE_ID = 33;
+        public static final int MOTOR_UP_ID = 31;
+        public static final int MOTOR_DOWN_ID = 32;
+        public static final int MOTOR_FEEDING_ID = 34;
         
         /*set up the id of the sensors */
-        public static final int ANALOG_INPUT_ID = 5;
-        public static final int LIMIT_SWITCH_ID = 6;
+        public static final int ANALOG_INPUT_ID = 1;
+        public static final int LIMIT_SWITCH_ID = 1;
         
         /*set up the location of the 2 speakers */
         public static final Pose2d BLUE_ALLIANCE_SPEAKER = new Pose2d(-0.15,2.1842, Rotation2d.fromDegrees(0));

@@ -16,7 +16,6 @@ public class GoToAngleAmp extends Command {
   double acceleRad;
   TrapezoidCalc trap;
   double startTime;
-  double startPulses;
 
   /** Creates a new GoToAngleAmp. */
   public GoToAngleAmp( Amp amp, double angleRad, double maxVelRad, double acceleRad) {
@@ -33,12 +32,11 @@ public class GoToAngleAmp extends Command {
   @Override
   public void initialize() {
     startTime = Timer.getFPGATimestamp();
-    startPulses = amp.m1.getSelectedSensorPosition();
-    if(amp.isOpen(startPulses)){
+    if(amp.isOpen()){
       amp.setPowerSnowblower(-0.2);
     }
     amp.neoEncoderReset();
-    amp.startRad(amp.getPoseByPulses(startPulses));
+    amp.startRad(amp.getPoseByPulses());
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -48,12 +46,12 @@ public class GoToAngleAmp extends Command {
       amp.setPowerSnowblower(0);
     }
 
-    double currentAngleRad = amp.getPoseByPulses(startPulses);
+    double currentAngleRad = amp.getPoseByPulses();
     double velRad = trap.trapezoid(amp.getVelRadArm(), maxVelRad, 0.5, Math.abs(acceleRad), angleRad-currentAngleRad);
-    amp.setVel(velRad, startPulses);
-    if((amp.isClose()||amp.isOpen(startPulses))&&(Timer.getFPGATimestamp()-startTime > 0.5)){
+    amp.setVel(velRad);
+    if((amp.isClose()||amp.isOpen())&&(Timer.getFPGATimestamp()-startTime > 0.5)){
       amp.stop();
-      if(amp.isOpen(startPulses)){
+      if(amp.isOpen()){
         amp.runSnowblower(0.3, 350);
       }
     }
