@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -37,14 +38,14 @@ public class RobotContainer implements Sendable{
   PS4Controller controller = new PS4Controller(1);  
   Chassis chassis = new Chassis();
 
-  pathPoint[] points = {
+  pathPoint[] points1 = {
     new pathPoint(0, 0, Rotation2d.fromDegrees(0), 0, false),
-    new pathPoint(11.528, 3.452, Rotation2d.fromDegrees(0), 0, false)
+    new pathPoint(2, 0, Rotation2d.fromDegrees(0), 0, false)
   };
-  Command test = new RunCommand(() -> {chassis.setVelocities(new ChassisSpeeds(-0.5, 0, 0));}, chassis).andThen(new WaitCommand(2),
-  new RunCommand(() -> {chassis.setVelocities(new ChassisSpeeds(-0.4  , 0, 0));}, chassis).andThen(new WaitCommand(2)),
-  new RunCommand(() -> {chassis.setVelocities(new ChassisSpeeds(0, 0, 0));}, chassis).andThen(new WaitCommand(2)));
-  double x = 5;
+  pathPoint[] points2 = {
+    new pathPoint(0, 0, Rotation2d.fromDegrees(0), 0, false),
+    new pathPoint(2, 2, Rotation2d.fromDegrees(0), 0, false)
+  };
 
 
 
@@ -76,7 +77,8 @@ public class RobotContainer implements Sendable{
     }
    
   public Command getAutonomousCommand() {
-    return new PathFollow(chassis, points, AUTO_MAX_VELOCITY, AUTO_MAX_ACCEL, false/* DriverStation.getAlliance().get() == Alliance.Red */);
+    return new SequentialCommandGroup(new PathFollow(chassis, points1, 2, 4, 1, DriverStation.getAlliance().get() == Alliance.Red)
+    .andThen(new PathFollow(chassis, points2, 2, 1, 0, DriverStation.getAlliance().get() == Alliance.Red)));
    
   }
 }
