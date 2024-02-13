@@ -31,6 +31,7 @@ public class IntakeConstants {
         public static final double SHOOT_TIME = 0;
 
         public static final double CRITICAL_CURRENT = 100;
+        public static final double CRITICAL_CURRENT_WHEN_SHOOTER = 120;
   
         
         public static final double DISPENSE_POWER = -0.4;

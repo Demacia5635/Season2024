@@ -41,7 +41,7 @@ public class ShooterConstants {
 
         public static final double MAX_DIS = 243;
         public static final double MIN_DIS = 100;
-        public static final double VOLT_NOTE_PRESENT = 4.5;
+        public static final double VOLT_NOTE_PRESENT = 4.6;
 
 
         public static class CommandParams {

@@ -24,6 +24,9 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.shooter.AngleControl;
 import frc.robot.commands.shooter.AngleGoToAngle;
 import frc.robot.commands.shooter.ShooterFeeding;
+import frc.robot.commands.shooter.ShooterPowering;
+import frc.robot.commands.shooter.ShooterSending;
+import frc.robot.commands.shooter.ShooterShoot;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterConstants;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -40,6 +43,7 @@ import frc.robot.commands.chassis.TestSteerVandA;
 import frc.robot.commands.chassis.Paths.PathFollow;
 import frc.robot.commands.intake.DispenseCommand;
 import frc.robot.commands.intake.IntakeCommand;
+import frc.robot.commands.intake.IntakeToShooter;
 import frc.robot.commands.intake.ShootCommand;
 import frc.robot.subsystems.amp.Amp;
 import frc.robot.subsystems.amp.AmpConstants;
@@ -143,6 +147,9 @@ public class RobotContainer implements Sendable{
 
   @Override
   public void initSendable(SendableBuilder builder) {
+    // cmd still wasn't tested
+    double wantedAngle = SmartDashboard.getNumber("wanted angle", 45);
+    SmartDashboard.putData("go to angle", new AngleGoToAngle(shooter, wantedAngle, 1000, 500));
 
     // builder.addDoubleProperty("chassis angle",() -> chassis.getAngle().getDegrees(), null);
     // builder.addStringProperty("Alliance",() -> alliance.toString(), null);

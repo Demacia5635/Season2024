@@ -17,8 +17,10 @@ public class ShooterSending extends Command {
     double feedingPow;
     /**the pow giving to the shooting motor */
     double shootingPow;
-    /**var that will count to check the note has really been shot */
-    int count;
+
+    int noteCount;
+
+    boolean last;
 
     /**
      * creates a new command that will send from the feeding motor to the shooting motor the note
@@ -40,7 +42,8 @@ public class ShooterSending extends Command {
      */
     @Override
     public void initialize() {
-        count = 0;
+        noteCount = 0;
+        last = false;
         shooter.brake(SHOOTER_MOTOR.UP, SHOOTER_MOTOR.DOWN, SHOOTER_MOTOR.FEEDING);
     }
     // Called every time the scheduler runs while the command is scheduled.
@@ -49,13 +52,13 @@ public class ShooterSending extends Command {
     public void execute() {
         shooter.setPow(shootingPow);
         shooter.feedingSetPow(feedingPow);
-
-        /*reset the count if there is a note */
-        if (shooter.isNote()){
-            count = 0;
+        if (shooter.isNote() && !last){
+            noteCount++;
+            last = true;        
         } else {
-            count++;
+            last = false;
         }
+
     }
 
     // Called once the command ends or is interrupted.
@@ -70,6 +73,6 @@ public class ShooterSending extends Command {
     /**check if the count is bigger than 5 */
     @Override
     public boolean isFinished() {
-        return count >= 5;
+        return noteCount >= 2;
     }
 }
