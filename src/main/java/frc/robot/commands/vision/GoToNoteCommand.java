@@ -1,18 +1,19 @@
 package frc.robot.commands.vision;
 
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.chassis.Chassis;
 
 public class GoToNoteCommand extends Command {
  private final Chassis chassis;
- private double angle;
- private double startAngle;
- private double[] x;
- PIDController pid = new PIDController(0.31, 0.006,0.0000025);
+ private double Dist;
+ private double Angle;
+ private double Note_X;
+ private double Note_Y;
+ private double[] llpython;
 
+ // Constructor initializes the chassis and adds it as a requirement
  public GoToNoteCommand(Chassis chassis) {
     this.chassis = chassis;
     addRequirements(chassis);
@@ -20,21 +21,26 @@ public class GoToNoteCommand extends Command {
 
  @Override
  public void initialize() {
-    startAngle = chassis.getAngle().getDegrees();
+    // Stop the chassis at the start of the command
     chassis.stop();
  }
 
  @Override
  public void execute() {
-    x = SmartDashboard.getNumberArray("llpython", new double[8]);
-    angle = x[1];
-    System.out.println(angle);
-    ChassisSpeeds speeds = new ChassisSpeeds(0, 0, pid.calculate(chassis.getAngle().getDegrees() - startAngle, angle));
-    chassis.setVelocities(speeds);
+    // Get the distance and angle from the GetDistAndAngle method
+    llpython = NetworkTableInstance.getDefault().getTable("limelight").getEntry("llpython").getDoubleArray(new double[8]);
+    Dist = llpython[0];
+    Angle = llpython[1];
+    Note_X = llpython[2];
+    Note_Y = llpython[3];
  }
-
  @Override
  public boolean isFinished() {
-    return Math.abs(chassis.getAngle().getDegrees() - startAngle) - angle <= 0.5;
+   return false;
  }
+ @Override
+ public void end(boolean interrupted) {
+   chassis.stop();
+ }
+
 }
