@@ -19,6 +19,12 @@ public class ShootCommand extends CommandBase {
                 () -> new ShootCommand(intake).schedule()).withTimeout(3));
     }
 
+    /**resets the count */
+    @Override
+    public void initialize() {
+        count = 0;
+    }
+
     @Override
     public void execute() {
         count+=0.02;
