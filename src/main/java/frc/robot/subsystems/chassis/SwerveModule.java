@@ -419,6 +419,11 @@ public class SwerveModule implements Sendable {
 
 
     }
+
+    public void configFactoryDefault() {
+        steerMotor.configFactoryDefault();
+        moveMotor.configFactoryDefault();
+    }
     
 
 }

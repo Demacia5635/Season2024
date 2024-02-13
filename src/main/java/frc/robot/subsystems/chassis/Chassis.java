@@ -57,6 +57,8 @@ public class Chassis extends SubsystemBase {
         new SwerveModule(BACK_RIGHT, this),
     };
 
+    //configAllFactoryDefaut();
+
     gyro = new Pigeon2(GYRO_ID);
     gyro.setYaw(0);
 
@@ -76,8 +78,10 @@ public class Chassis extends SubsystemBase {
     SmartDashboard.putData("reset wheels", new InstantCommand(() -> resetWheels()).ignoringDisable(true));
         SmartDashboard.putData("reset pose", new InstantCommand(() -> setOdometryToForward()).ignoringDisable(true));
 
+    SmartDashboard.putData("calibrate", new InstantCommand(()->calibrate(), this));
+
     SmartDashboard.putData("Chassis Move Sysid",
-        (new Sysid(this::setModulesPower, this::getMoveVelocity, 0.1, 0.5, this)).getCommand());
+        (new Sysid(this::setModulesPower, this::getMoveVelocity, 0.2, 0.8, this)).getCommand());
     SmartDashboard.putData("Chassis Move Sysid2",
         (new Sysid(new Gains[] { Gains.KS, Gains.KV, Gains.KA, Gains.KV2, Gains.KVsqrt},
         this::setModulesPower,
@@ -93,7 +97,8 @@ public class Chassis extends SubsystemBase {
     SmartDashboard.putData("Test Steer Velocity", (new CheckModulesSteerVelocity(this, 200)));
     SmartDashboard.putData("Set Modules Angle", (new SetModuleAngle(this)));
     new TestVelocity("Chassis", this::setVelocity, this::getMoveVelocity, 0.05, this);
-    SmartDashboard.putData("go to 0", new RunCommand(()->setModulesAngleFromSB(0), this));
+    SmartDashboard.putNumber("angle for chassis", 0);
+    SmartDashboard.putData("go to 0", new RunCommand(()->setModulesAngleFromSB(SmartDashboard.getNumber("angle for chassis", 0)), this));
 
     SmartDashboard.putNumber("ANG", 0);
     SmartDashboard.putData("go to angle position", new RunCommand(()->modules[0].setAngleByPositionPID(Rotation2d.fromDegrees(SmartDashboard.getNumber("ANG", 0))), this));
@@ -103,6 +108,13 @@ public class Chassis extends SubsystemBase {
 
   public SwerveModule[] getModules() {
     return modules;
+  }
+
+  public void calibrate() {
+    SmartDashboard.putNumber("LEFT FRONT", modules[0].getAngleDegrees());
+    SmartDashboard.putNumber("RIGHT FRONT", modules[1].getAngleDegrees());
+    SmartDashboard.putNumber("LEFT BACK", modules[2].getAngleDegrees());
+    SmartDashboard.putNumber("RIGHT BACK", modules[3].getAngleDegrees());
   }
 
   public void setGyroAngle(double angle){
@@ -177,6 +189,13 @@ public class Chassis extends SubsystemBase {
     ChassisSpeeds relativeSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds, getAngle());
     SwerveModuleState[] states = KINEMATICS.toSwerveModuleStates(relativeSpeeds);
     setModuleStates(states);
+  }
+
+
+  public void configAllFactoryDefaut() {
+    for (int i=0; i<modules.length; i++) {
+      modules[i].configFactoryDefault();
+    }
   }
 
 
@@ -311,5 +330,6 @@ public class Chassis extends SubsystemBase {
   public void periodic() {
     poseEstimator.update(getAngle(), getModulePositions());
     field.setRobotPose(getPose());
+    SmartDashboard.putNumber("velocity of chassis", getMoveVelocity());
   }
 }

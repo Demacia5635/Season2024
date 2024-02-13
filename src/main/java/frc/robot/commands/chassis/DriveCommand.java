@@ -45,7 +45,7 @@ public class DriveCommand extends Command {
 
     
 
-    double rot = -(deadband(commandXboxController.getRightTriggerAxis(), 0.1) - deadband(commandXboxController.getLeftTriggerAxis(), 0.1));
+    double rot = -(deadband(commandXboxController.getLeftTriggerAxis(), 0.1) - deadband(commandXboxController.getRightTriggerAxis(), 0.1));
     
     if(rot != 0){
       rotateToApriltag = false;

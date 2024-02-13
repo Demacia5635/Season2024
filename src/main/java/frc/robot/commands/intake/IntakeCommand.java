@@ -26,6 +26,10 @@ public class IntakeCommand extends CommandBase {
     public void initialize() {
         super.initialize();
         initialEncoderCount = 0;
+        hasEntered = false;
+        noteWasDetected = false;
+        initialEncoderCount = 0;
+        intake.setBrake();
     }
 
     @Override

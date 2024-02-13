@@ -69,9 +69,9 @@ public final class ChassisConstants {
   public static final double MAX_STEER_VELOCITY = 600;
   public static final double STEER_ACCELERATION = 6000;
   public static final double MAX_STEER_ERROR = 1;
-    public static final double MAX_OMEGA_VELOCITY = Math.toRadians(650);
+  public static final double MAX_OMEGA_VELOCITY = Math.toRadians(650);
 
-  public static final double MAX_OMEGA_ACCELERATION = Math.toRadians(720);
+  public static final double MAX_OMEGA_ACCELERATION = Math.toRadians(6000);
 
   // Pulse per meter/degrees
   public static final double WHEEL_DIAMETER = 4 * 0.0254; // 4 inch
@@ -96,8 +96,8 @@ public final class ChassisConstants {
   // public static final FF_Constants MOVE_FF = new FF_Constants(0.1496659759518384, 0.405476931680402, 0.02251759948634);
   public static final FF_Constants FRONT_STEER_FF = new FF_Constants(0.069108623637248, 0.00034365326824, 0.000702476229803);
   public static final FF_Constants BACK_STEER_FF = new FF_Constants(0.080821555555163, 0.000529165452406, 0.004994578577863);
-  public static final FF_Constants MOVE_FF_LESS = new FF_Constants(0.05, 0.17, 0.02251759948634);
-  public static final FF_Constants MOVE_FF_MORE = new FF_Constants(0.085, 0.223, 0.03251759948634);
+  public static final FF_Constants MOVE_FF_LESS = new FF_Constants(0.1, 0.2, 0.02251759948634);
+  public static final FF_Constants MOVE_FF_MORE = new FF_Constants(0.1, 0.223, 0.03251759948634);
 
 
 
@@ -111,7 +111,7 @@ public final class ChassisConstants {
   public final static SwerveModuleConstants FRONT_LEFT = new SwerveModuleConstants(
       5, 6, 13,
       new Translation2d(0.332, 0.277),
-      257.607421875,
+      20.91796875,
       MOVE_PID,
       FRONT_STEER_PID,
       FRONT_POSITION_STEER_PID,
@@ -125,7 +125,7 @@ public final class ChassisConstants {
   public final static SwerveModuleConstants FRONT_RIGHT = new SwerveModuleConstants(
       3, 4, 12,
       new Translation2d(0.332, -0.277),
-      290.7,
+      162.158203125,
       MOVE_PID,
       FRONT_STEER_PID,
       FRONT_POSITION_STEER_PID,
@@ -140,7 +140,7 @@ public final class ChassisConstants {
   public final static SwerveModuleConstants BACK_LEFT = new SwerveModuleConstants(
       2, 1, 11,
       new Translation2d(-0.332, 0.288),
-      230,
+      52.20703125,
       MOVE_PID,
       BACK_STEER_PID,
       BACK_POSITION_STEER_PID,
@@ -155,7 +155,7 @@ public final class ChassisConstants {
   public final static SwerveModuleConstants BACK_RIGHT = new SwerveModuleConstants(
       8, 7, 14,
       new Translation2d(-0.332, -0.288),
-      276.1,
+      95.185546875,
       MOVE_PID,
       BACK_STEER_PID,
       BACK_POSITION_STEER_PID,

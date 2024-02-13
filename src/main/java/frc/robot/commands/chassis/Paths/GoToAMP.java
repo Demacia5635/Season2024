@@ -12,6 +12,6 @@ public class GoToAMP extends SequentialCommandGroup {
   public GoToAMP(Chassis chassis, double maxVel, double maxAccel) {
     this.chassis = chassis;
     pathPoint[] points = (pathPoint[]) Chassis.pointsForPathTeleop.toArray();
-    addCommands(new GetPointsToAMP(chassis), new PathFollow(chassis,points, maxVel, maxVel, false));
+    addCommands(new GetPointsToAMP(chassis), new PathFollow(chassis,points, maxVel, maxVel, 0, false));
   }
 }

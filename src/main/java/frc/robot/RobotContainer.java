@@ -13,6 +13,7 @@ import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PS4Controller;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -49,9 +50,8 @@ import frc.robot.subsystems.intake.Intake;
 public class RobotContainer implements Sendable{
   Boolean isRed = false;
   DriverStation.Alliance alliance;
-  CommandXboxController commandController = new CommandXboxController(0);
+  CommandXboxController commandController;
   PS4Controller controller = new PS4Controller(1);  
-  // Chassis chassis = new Chassis();
 
   // pathPoint[] points = {
   //   new pathPoint(0, 0, Rotation2d.fromDegrees(0), 0, false),
@@ -73,19 +73,28 @@ public class RobotContainer implements Sendable{
   Command amplify;
   Command autonomousRight;
 
+  pathPoint[] points1 = {new pathPoint(0, 0, Rotation2d.fromDegrees(0), 0, false),
+    new pathPoint(3, 0, Rotation2d.fromDegrees(0), 0, false)
+};
+    pathPoint[] points2 = {new pathPoint(0, 0, Rotation2d.fromDegrees(0), 0, false),
+    new pathPoint(3, 2, Rotation2d.fromDegrees(0), 0, false)
+    };
 
 
   public RobotContainer() {
 
-    //chassis = new Chassis();
+    chassis = new Chassis();
 
     // alliance = DriverStation.getAlliance().get();
     // isRed = (alliance == Alliance.Red);
     // DriveCommand drive = new DriveCommand(chassis, controller, commandController, isRed);
     // chassis.setDefaultCommand(drive);
 
+    commandController = new CommandXboxController(0);
     //SmartDashboard.putData("RC", this);
-    // shooter = new Shooter();
+    shooter = new Shooter();
+    //shooter.setDefaultCommand(new AngleControl(shooter, commandController));
+    chassis.setDefaultCommand(new DriveCommand(chassis, controller, commandController, true));
     // amp = new Amp();
     intake = new Intake();
     
@@ -140,6 +149,7 @@ public class RobotContainer implements Sendable{
 
   }
  private void configureBindings() {
+    commandController.a().toggleOnTrue(new IntakeCommand(intake));
       // if(controller.getCrossButton()) new InstantCommand(()->{chassis.setOdometryToForward();});
     // commandController.x().onTrue(new InstantCommand(()->{chassis.setOdometryToForward();}));
     
@@ -148,10 +158,13 @@ public class RobotContainer implements Sendable{
   public Command getAutonomousCommand() {
     //return new PathFollow(chassis, points, 3, 6, DriverStation.getAlliance().get() == Alliance.Red);
    
-    //return new IntakeCommand(intake).andThen(new AmpIntake2(amp));
+    return new IntakeCommand(intake);
     //.alongWith(new AmpIntake(amp, AmpConstants.CommandParams.v1, AmpConstants.CommandParams.v2))
-   return intake2shooter;
-    //return new AmpIntake(amp, AmpConstants.CommandParams.v1, AmpConstants.CommandParams.v2);
+
+    //return new RunCommand(()-> chassis.setVelocities(new ChassisSpeeds(0, -1.5, 0)), chassis);
+
+    // return new PathFollow(chassis, points1, 2, 4, 1, true).andThen
+    // (new PathFollow(chassis, points2, 2, 4, 0, true));
     //return new RunCommand(()->amp.neo1.set(0.5), amp);
 
   }

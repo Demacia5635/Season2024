@@ -24,7 +24,7 @@ public class StartTOP extends SequentialCommandGroup {
 
   /** Creates a new pick2close2mid. */
   public StartTOP(Chassis chassis, Shooter shooter, Intake intake, boolean isRed) {
-    pathPoint[] points1 = {new pathPoint(0, 0, Rotation2d.fromDegrees(0), 0, false), //doesnt matter because it gets fixed in the command
+    /*pathPoint[] points1 = {new pathPoint(0, 0, Rotation2d.fromDegrees(0), 0, false), //doesnt matter because it gets fixed in the command
     new pathPoint(PathFollow.convertAlliance(14.661), PathFollow.fixY(1.370 ), Rotation2d.fromDegrees(180), 0, false)};
     
     pathPoint[] points2 = {new pathPoint(0, 0, Rotation2d.fromDegrees(0), 0, false), //doesnt matter because it gets fixed in the command
@@ -67,5 +67,6 @@ public class StartTOP extends SequentialCommandGroup {
 
 
     );
+    */
   }
 }

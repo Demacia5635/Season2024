@@ -61,6 +61,7 @@ public class PathFollow extends CommandBase {
   pathPoint[] points;
   PIDController rotationPidController = new PIDController(0.31, 0.006, 0.0000025);
 
+  double finishVel;
   /**
    * Creates a new path follower using the given points.
    * 
@@ -70,9 +71,10 @@ public class PathFollow extends CommandBase {
    * @param maxAccel the max accel in m/s2 (squared)
    * 
    */
-  public PathFollow(Chassis chassis, pathPoint[] points, double maxVel, double maxAcc, boolean isRed) {
+  public PathFollow(Chassis chassis, pathPoint[] points, double maxVel, double maxAcc, double finishVel,boolean isRed) {
     SmartDashboard.putData("Traj", trajField);
     this.points = points;
+    this.finishVel = finishVel;
     this.isRed = isRed;
 
     this.chassis = chassis;
@@ -220,7 +222,7 @@ public class PathFollow extends CommandBase {
 
     driveVelocity = driveTrapezoid.calculate(
         totalLeft - segments[segmentIndex].distancePassed(chassisPose.getTranslation()),
-        currentVelocity.getNorm(), 0);
+        currentVelocity.getNorm(), finishVel);
     // System.out.println("APRILTAG MODE: " +
     // segments[segmentIndex].isAprilTagMode());
     if (segments[segmentIndex].isAprilTagMode()) {
