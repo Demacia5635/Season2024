@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.shooter.AngleControl;
 import frc.robot.commands.shooter.AngleGoToAngle;
+import frc.robot.commands.shooter.AngleGoToDis;
 import frc.robot.commands.shooter.AngleQuel;
 import frc.robot.commands.shooter.ShooterFeeding;
 import frc.robot.commands.shooter.ShooterPowering;
@@ -93,18 +94,18 @@ public class RobotContainer implements Sendable{
 
 
     // alliance = DriverStation.getAlliance().get();
-    // isRed = (alliance == Alliance.Red);
+    // isRed = (alliance == Alliance.Red)   ;
     // DriveCommand drive = new DriveCommand(chassis, controller, commandController, isRed);
     // chassis.setDefaultCommand(drive);
 
+    amp = new Amp();
     commandController = new CommandXboxController(0);
-    //SmartDashboard.putData("RC", this);
     shooter = new Shooter();
     //shooter.setDefaultCommand(new AngleControl(shooter, commandController));
     chassis.setDefaultCommand(new DriveCommand(chassis, controller, commandController, true));
-    // amp = new Amp();
     
 
+    SmartDashboard.putData("RC", this);
     configureBindings();
   }
 
@@ -149,27 +150,26 @@ public class RobotContainer implements Sendable{
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    // cmd still wasn't tested
-    double wantedAngle = SmartDashboard.getNumber("wanted angle", 45);
-    SmartDashboard.putData("go to angle", new AngleGoToAngle(shooter, wantedAngle, 1000, 500));
 
     // builder.addDoubleProperty("chassis angle",() -> chassis.getAngle().getDegrees(), null);
     // builder.addStringProperty("Alliance",() -> alliance.toString(), null);
 
   }
  private void configureBindings() {
-    commandController.a().onTrue(new IntakeCommand(intake));
-    commandController.b().onTrue(new IntakeToShooter(intake, shooter));
-    commandController.x().onTrue(new ShooterPowering(shooter, 1, 35000).alongWith(
-      new AngleGoToAngle(shooter, 45, 10000, 10000)
-    ));
-    commandController.y().onTrue(new ShooterSending(shooter, 1, 1));
-    commandController.leftTrigger().onTrue(new InstantCommand(()->{shooter.stopAll(); intake.stop();}, intake, shooter));
-   commandController.rightTrigger().onTrue(new AngleQuel(shooter));
-
+      commandController.a().onTrue(new IntakeCommand(intake));
+      commandController.b().onTrue(new AngleQuel(shooter));
+      commandController.x().onTrue(new IntakeToShooter(intake, shooter));
+      commandController.pov(0).onTrue(new AngleGoToAngle(shooter, 60).alongWith(new ShooterPowering(shooter, 0.5, 2000)));
+      commandController.leftBumper().onTrue(new ShooterSending(shooter, 1, 0.5));
+      commandController.rightBumper().onTrue(new InstantCommand(()-> {shooter.stopAll();intake.stop();}, intake, shooter).ignoringDisable(true));
       // if(controller.getCrossButton()) new InstantCommand(()->{chassis.setOdometryToForward();});
     // commandController.x().onTrue(new InstantCommand(()->{chassis.setOdometryToForward();}));
     
+    }
+
+
+    public void calibrate() {
+        new AngleQuel(shooter).schedule();
     }
    
   public Command getAutonomousCommand() {

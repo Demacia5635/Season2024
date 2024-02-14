@@ -14,17 +14,17 @@ public class IntakeCommand extends CommandBase {
 
     public IntakeCommand(Intake intake) {
         this.intake = intake;
-        intake.setBrake();
         addRequirements(intake);
-
-
+        
+        
         SmartDashboard.putData("Intake Notes", new InstantCommand(
-                () -> new IntakeCommand(intake).schedule()));
+            () -> new IntakeCommand(intake).schedule()));
     }
 
     @Override
     public void initialize() {
         super.initialize();
+        intake.setBrake();
         initialEncoderCount = 0;
         hasEntered = false;
         noteWasDetected = false;

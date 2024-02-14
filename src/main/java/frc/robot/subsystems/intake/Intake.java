@@ -135,7 +135,7 @@ public class Intake extends SubsystemBase{
         // SmartDashboard.putNumber("Motor Current", getMotorCurrent());
         // SmartDashboard.putNumber("Motor Velocity", getRadVelocity());
         // SmartDashboard.putBoolean("Limit switch state", isNotePresent());
-        SmartDashboard.putNumber("Limit switch voltage", getLimitVolt());
+        // SmartDashboard.putNumber("Limit switch voltage", getLimitVolt());
         
     }
  

@@ -21,10 +21,6 @@ public class AngleGoToAngle extends Command {
      * the wanted dis based on the wanted angle
      * being caculate by f(x) in Desmos - {@link https://www.desmos.com/calculator/4ja9zotx82} */
     double wantedDis;
-    /**the max velocity wanted to the trapezoid */
-    double maxVel;
-    /**the acc wanted for the trapezoid */
-    double acc;
     /**the start dis of the angle motor being used in isFinish */
     double startDis;
     
@@ -32,14 +28,10 @@ public class AngleGoToAngle extends Command {
      * creates a new command that goes to a specific angle
      * @param shooter the shooter we want to control angle motor of
      * @param angle the wanted angle in degrees
-     * @param maxVel the max velocity of the trapezoid in pules per 1/10 sec
-     * @param acc the acc of the trapezoid  in pules per 1/10 sec
      */
-    public AngleGoToAngle(Shooter shooter, double angle, double maxVel, double acc) {
+    public AngleGoToAngle(Shooter shooter, double angle) {
         this.shooter = shooter;
         this.wantedAngle = angle;
-        this.maxVel = maxVel;
-        this.acc = acc;
         // addRequirements(shooter);
     }
 
@@ -58,15 +50,15 @@ public class AngleGoToAngle extends Command {
     }
 
     // Called every time the scheduler runs while the command is scheduled.
-    /**using the motion magic control mode to go to the specific dis */
+    /**using constant pow to go to the specific dis */
     @Override
     public void execute() {
-        // shooter.angleMotionMagic(wantedDis, maxVel, acc);
-        if (wantedAngle - startDis > 0){
-            shooter.setPow(0.4);
+        if ((wantedAngle - shooter.getDis()) > 0){
+            shooter.angleSetPow(0.4);
         } else {
-            shooter.setPow(-0.4);
+            shooter.angleSetPow(-0.4);
         }
+        // shooter.angleMotionMagic(wantedDis);
     }
 
     // Called once the command ends or is interrupted.

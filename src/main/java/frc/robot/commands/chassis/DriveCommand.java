@@ -30,8 +30,8 @@ public class DriveCommand extends Command {
     this.controller = controller;
     direction = isRed ? 1 : -1;
     addRequirements(chassis);
-    commandXboxController.b().onTrue(new InstantCommand(() -> precisionDrive = !precisionDrive));
-    commandXboxController.y().onTrue(new InstantCommand((() -> this.wantedAngleApriltag = chassis.getClosetAngleApriltag())).andThen(() -> rotateToApriltag = true));
+    // commandXboxController.b().onTrue(new InstantCommand(() -> precisionDrive = !precisionDrive));
+    // commandXboxController.y().onTrue(new InstantCommand((() -> this.wantedAngleApriltag = chassis.getClosetAngleApriltag())).andThen(() -> rotateToApriltag = true));
   }
 
   @Override

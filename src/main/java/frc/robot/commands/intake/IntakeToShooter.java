@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.shooter.Shooter.SHOOTER_MOTOR;
 
 /**command that get take the note from the intake and giving it to the shooter */
 public class IntakeToShooter extends Command {
@@ -35,7 +36,10 @@ public class IntakeToShooter extends Command {
 
     // Called when the command is initially scheduled.
     @Override
-    public void initialize() {}
+    public void initialize() {
+        shooter.brake(SHOOTER_MOTOR.UP, SHOOTER_MOTOR.DOWN, SHOOTER_MOTOR.FEEDING);
+        intake.setBrake();
+    }
 
     // Called every time the scheduler runs while the command is scheduled.
     /**set pow to the feeding motors and the intake */

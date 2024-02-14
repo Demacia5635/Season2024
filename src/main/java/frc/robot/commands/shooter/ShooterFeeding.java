@@ -15,6 +15,8 @@ public class ShooterFeeding extends Command {
     Shooter shooter;
     /**the wanted pow of the feeding motor */
     double pow;
+    boolean temp;
+    int count;
 
     /**
      * creates a new command that feeding the shooter a note
@@ -30,6 +32,7 @@ public class ShooterFeeding extends Command {
     /**put the feeding motor at brake */
     @Override
     public void initialize() {
+        temp = false;
         shooter.brake(SHOOTER_MOTOR.FEEDING);
     }
 
@@ -38,6 +41,15 @@ public class ShooterFeeding extends Command {
     @Override
     public void execute() {
         shooter.feedingSetPow(pow);
+        if (shooter.isNote()){
+            count++;
+        } else {
+            count=0;
+        }
+
+        if (count>=10){
+            temp = true;
+        }
     }
 
     // Called once the command ends or is interrupted.
@@ -51,6 +63,6 @@ public class ShooterFeeding extends Command {
     /**checks if the note is in the shooter */
     @Override
     public boolean isFinished() {
-        return shooter.isNote();
+        return temp && !shooter.isNote();
     }
 }

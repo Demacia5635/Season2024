@@ -29,8 +29,8 @@ public class ShooterShoot extends SequentialCommandGroup {
         addRequirements(shooter);
         addCommands(
             new InstantCommand(()-> { shooter.brake(SHOOTER_MOTOR.UP, SHOOTER_MOTOR.DOWN, SHOOTER_MOTOR.FEEDING, SHOOTER_MOTOR.ANGLE); }, shooter),
-            new ShooterFeeding(shooter, feedingPow),
-            new AngleGoToAngle(shooter, angle, angleMaxVel, angleAcc),
+            // new ShooterFeeding(shooter, feedingPow),
+            // new AngleGoToAngle(shooter, angle),
             new ShooterPowering(shooter, shootingPow, shootingMaxVel),
             new ShooterSending(shooter, feedingPow, shootingPow)
         );

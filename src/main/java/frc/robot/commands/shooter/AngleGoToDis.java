@@ -15,10 +15,6 @@ public class AngleGoToDis extends Command {
     Shooter shooter;
     /**the wanted angle */
     double wantedDis;
-    /**the max velocity wanted for the trapezoid */
-    double maxVel;
-    /**the acc wanted for the trapezoid */
-    double acc;
     /**the start dis of the angle motor being used in isFinish */
     double startDis;
 
@@ -26,14 +22,10 @@ public class AngleGoToDis extends Command {
      * creates a new command that goes to a specifig distance
      * @param shooter the shooter we want to control angle motor of
      * @param dis the wanted dis in mm
-     * @param maxVel the max velocity of the trapezoid in pules per 1/10 sec
-     * @param acc the acc of the trapezoid in pules per 1/10 sec
      */
-    public AngleGoToDis(Shooter shooter, double dis, double maxVel, double acc) {
+    public AngleGoToDis(Shooter shooter, double dis) {
         this.shooter = shooter;
         this.wantedDis = dis;
-        this.maxVel = maxVel;
-        this.acc = acc;
         addRequirements(shooter);
     }
 
@@ -52,7 +44,11 @@ public class AngleGoToDis extends Command {
     /**using the motion magic control mode to go to the specific dis */
     @Override
     public void execute() {
-        shooter.angleMotionMagic(wantedDis, maxVel, acc);
+        if ((wantedDis - shooter.getDis()) > 0){
+            shooter.setPow(0.4);
+        } else {
+            shooter.setPow(0.4);
+        }
     }
 
     // Called once the command ends or is interrupted.
@@ -74,18 +70,23 @@ public class AngleGoToDis extends Command {
      */
     @Override
     public boolean isFinished() {
-        if (!shooter.isSupplyLimit(SHOOTER_MOTOR.ANGLE)){
-            if (!shooter.isDisLimits(wantedDis - startDis > 0)){
-                if (!((wantedDis - startDis > 0) && (shooter.getDis() >= wantedDis))){
-                    if (!((wantedDis - startDis < 0) && (shooter.getDis() <= wantedDis))){
-                        if (!(Math.abs(wantedDis - shooter.getDis()) < 1)){
-                            return false;
-                        }
-                    }
-                }
-            }
-        }
+        return ((shooter.isSupplyLimit(SHOOTER_MOTOR.ANGLE)) ||
+                (shooter.isDisLimits(wantedDis - startDis > 0)) ||
+                ((wantedDis - startDis > 0) && (shooter.getDis() >= wantedDis)) ||
+                ((wantedDis - startDis < 0) && (shooter.getDis() <= wantedDis)) ||
+                (Math.abs(wantedDis - shooter.getDis())) < 1);
+        // if (!shooter.isSupplyLimit(SHOOTER_MOTOR.ANGLE)){
+        //     if (!shooter.isDisLimits(wantedDis - startDis > 0)){
+        //         if (!((wantedDis - startDis > 0) && (shooter.getDis() >= wantedDis))){
+        //             if (!((wantedDis - startDis < 0) && (shooter.getDis() <= wantedDis))){
+        //                 if (!(Math.abs(wantedDis - shooter.getDis()) < 1)){
+        //                     return false;
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
 
-        return true;
+        // return true;
     }
 }

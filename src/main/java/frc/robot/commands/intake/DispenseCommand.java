@@ -13,11 +13,16 @@ public class DispenseCommand extends CommandBase {
     public DispenseCommand(Intake intake) {
         this.intake = intake;
         addRequirements(intake);
-        intake.setBrake();
-
-
+        
+        
         SmartDashboard.putData("Dispense Note", new InstantCommand(
-                () -> new DispenseCommand(intake).schedule()));
+            () -> new DispenseCommand(intake).schedule()));
+        }
+
+    @Override
+    public void initialize(){
+        intake.setBrake();
+        
     }
 
     @Override

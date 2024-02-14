@@ -43,13 +43,10 @@ public class shootFromAnyPlace {
         newArr[arr.length] = element;
         return newArr;
     }
-        /*checkes if the dis is already in the lookup table */
-        /*checkes if the dis is already in the lookup table */
-        /*checkes if the dis is already in the lookup table */
 
     /**
      * get the wanted angle base on the dis
-     * @param dis the dis the chassis is currently in, in meters
+     * @param dis the dis the chassis is currently in
      * @return the wanted angle to shoot perfect for the speakr
      */
     public double getAngle(double dis){
@@ -88,7 +85,7 @@ public class shootFromAnyPlace {
 
     /**
      * get the wanted pow based on the dis
-     * @param dis the dis the chassis is currently in, in mm
+     * @param dis the dis the chassis is currently in
      * @return the wanted pow to shoot perfect for the speakr
      */
     public double getPow(double dis){
@@ -121,6 +118,6 @@ public class shootFromAnyPlace {
         m = (bottom[2] - top[2]) / (bottom[0] - top[0]);
         b = -1*(m*bottom[0] - bottom[2]);
 
-        return m*dis + b;
+        return m * dis + b;
     }
 }

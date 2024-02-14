@@ -21,6 +21,7 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import frc.robot.commands.shooter.AngleQuel;
 import frc.robot.subsystems.shooter.ShooterConstants;
+import frc.robot.subsystems.shooter.utils.LookUpTable;
 
 /**subsystem shooter and angle changing */
 public class Shooter extends SubsystemBase {
@@ -39,14 +40,14 @@ public class Shooter extends SubsystemBase {
     /**the sensor that detect if there is a note in the shooter */
     AnalogInput analogInput;
 
-    /**a var that calculate the distance of the angle changer*/
-    double baseDis;
-
     /** @deprecated Unused bcz switch to motionMagic from velocity*/
     ArmFeedforward elevationFF;
     
     /**the limit switch on the angle changer machanism */
     DigitalInput limitSwitch;
+
+    /**the lookup table */
+    LookUpTable lookUpTable = new LookUpTable(ShooterConstants.LookUpTable.lookUpTable);
 
     /**
      * <pre>
@@ -81,11 +82,11 @@ public class Shooter extends SubsystemBase {
         motorAngle = new TalonFX(ShooterConstants.MOTOR_ANGLE_ID);
         motorAngle.config_kP(0, ShooterConstants.KP);
         motorAngle.config_kD(0, ShooterConstants.KD);
-
+        motorAngle.configMotionCruiseVelocity(20000);
+        motorAngle.configMotionAcceleration(20000);
+        
         analogInput = new AnalogInput(ShooterConstants.ANALOG_INPUT_ID);
         analogInput.setAccumulatorInitialValue(0);
-
-        baseDis = -ShooterConstants.MAX_DIS;
 
         elevationFF = new ArmFeedforward(ShooterConstants.KS, ShooterConstants.KG, ShooterConstants.KV);
 
@@ -98,13 +99,9 @@ public class Shooter extends SubsystemBase {
     /**
      * creates trapezoid algo 
      * @param dis the wanted dis in mm on the screw (absolute)
-     * @param maxVel the max velocity of the trapezoid in pules per 1/10 sec
-     * @param acc the acc of the trapezoid in pules per 1/10 sec
      */
-    public void angleMotionMagic(double dis, double maxVel, double acc) {
-        motorAngle.configMotionCruiseVelocity(maxVel);
-        motorAngle.configMotionAcceleration(acc);
-        motorAngle.set(ControlMode.MotionMagic, (ShooterConstants.PULES_PER_MM * (dis+baseDis)));
+    public void angleMotionMagic(double dis) {
+        motorAngle.set(ControlMode.MotionMagic, (ShooterConstants.PULES_PER_MM * (dis + ShooterConstants.MAX_DIS)));
     }
 
     /**
@@ -190,7 +187,7 @@ public class Shooter extends SubsystemBase {
                     break;
     
                 case ANGLE:
-                    motorUP.setNeutralMode(NeutralMode.Brake);
+                    motorAngle.setNeutralMode(NeutralMode.Brake);
                     break;
     
                 default:
@@ -221,7 +218,7 @@ public class Shooter extends SubsystemBase {
                     break;
     
                 case ANGLE:
-                    motorUP.setNeutralMode(NeutralMode.Coast);
+                    motorAngle.setNeutralMode(NeutralMode.Coast);
                     break;
     
                 default:
@@ -234,7 +231,6 @@ public class Shooter extends SubsystemBase {
     /**reset the base dis of the angle motor also reset the encoder of the angle motor */
     public void resetDis(){
         motorAngle.setSelectedSensorPosition(0);
-        baseDis = -ShooterConstants.MAX_DIS;
     }
     
     /**
@@ -242,7 +238,7 @@ public class Shooter extends SubsystemBase {
      * @return the dis in mm
      */
     public double getDis(){
-        return motorAngle.getSelectedSensorPosition()/ShooterConstants.PULES_PER_MM - baseDis;
+        return motorAngle.getSelectedSensorPosition()/ShooterConstants.PULES_PER_MM - ShooterConstants.MAX_DIS;
     }
 
     /**
@@ -256,6 +252,42 @@ public class Shooter extends SubsystemBase {
 
     public boolean isSupplyLimit(SHOOTER_MOTOR motor){
         return getSupplyCurrent(motor) >= 25;
+    }
+    
+    /**
+     * check if the not had pass
+     * @return if the limit volt is smaller than 4.55
+     * @author Adar
+     */
+    public boolean isNote(){
+        return getAnalogVolt()<ShooterConstants.VOLT_NOTE_PRESENT;
+    }
+
+    /**
+     * get if the angle is at the end
+     * @return if the limit switch is pressed
+     */
+    public boolean isLimit(){
+        /*can change if see that limit switch return inverted */
+        return !limitSwitch.get();
+    }
+    
+    /**
+     * get the needed angle for a dis
+     * @param dis the current dis
+     * @return the needed angle
+     */
+    public double getNeededAangle(double dis){
+        return lookUpTable.get(dis)[1];
+    }
+    
+    /**
+     * get the needed pow for a dis 
+     * @param dis the current dis
+     * @return the needed pow
+     */
+    public double getNeededPow(double dis){
+        return lookUpTable.get(dis)[2];
     }
 
     /**
@@ -319,25 +351,7 @@ public class Shooter extends SubsystemBase {
                 return 0;
         }
     }
-
-    /**
-     * check if the not had pass
-     * @return if the limit volt is smaller than 4.55
-     * @author Adar
-     */
-    public boolean isNote(){
-        return getAnalogVolt()<ShooterConstants.VOLT_NOTE_PRESENT;
-    }
-
-    /**
-     * get if the angle is at the end
-     * @return if the limit switch is pressed
-     */
-    public boolean isLimit(){
-        /*can change if see that limit switch return inverted */
-        return !limitSwitch.get();
-    }
-
+    
     /**
      * get the angle of the angle changer
      * @return the angle in degrees
@@ -371,30 +385,28 @@ public class Shooter extends SubsystemBase {
         super.initSendable(builder);
 
         /*put on ShuffleBoard all the builders */
-        // builder.addDoubleProperty("motor up speed", ()-> getMotorVel(SHOOTER_MOTOR.UP), null);
-        // builder.addDoubleProperty("motor down speed", ()-> getMotorVel(SHOOTER_MOTOR.DOWN), null);
-        // builder.addDoubleProperty("current amper motor up", ()-> getSupplyCurrent(SHOOTER_MOTOR.UP), null);
-        // builder.addDoubleProperty("current amper motor down", ()-> getSupplyCurrent(SHOOTER_MOTOR.DOWN), null);
-        // builder.addDoubleProperty("angle vel", ()-> getMotorVel(SHOOTER_MOTOR.ANGLE), null);
-        // builder.addDoubleProperty("Distance", this::getDis, null);
-        // builder.addDoubleProperty("base dis", ()-> baseDis, null);
-        // builder.addDoubleProperty("Angle", this::getAngle, null);
-        // builder.addDoubleProperty("encoder", ()->motorAngle.getSelectedSensorPosition(), null);
+        builder.addDoubleProperty("motor up speed", ()-> getMotorVel(SHOOTER_MOTOR.UP), null);
+        builder.addDoubleProperty("motor down speed", ()-> getMotorVel(SHOOTER_MOTOR.DOWN), null);
+        builder.addDoubleProperty("current amper motor up", ()-> getSupplyCurrent(SHOOTER_MOTOR.UP), null);
+        builder.addDoubleProperty("current amper motor down", ()-> getSupplyCurrent(SHOOTER_MOTOR.DOWN), null);
+        builder.addDoubleProperty("angle vel", ()-> getMotorVel(SHOOTER_MOTOR.ANGLE), null);
+        builder.addDoubleProperty("Distance", this::getDis, null);
+        builder.addDoubleProperty("Angle", this::getAngle, null);
+        builder.addDoubleProperty("encoder", ()->motorAngle.getSelectedSensorPosition(), null);
         builder.addBooleanProperty("Limit switch", ()->isLimit(), null);
         builder.addDoubleProperty("Analog get Volt", ()->getAnalogVolt(), null);
         builder.addBooleanProperty("is note", ()-> isNote(), null);
     
         /*put on ShuffleBoard all the cmds */
         // SmartDashboard.putData("Dis reset", new InstantCommand(()-> resetDis()).ignoringDisable(true));
-        // SmartDashboard.putData("reset dis", new AngleQuel(this));
-        // SmartDashboard.putData("motor up Brake", new InstantCommand(()-> brake(SHOOTER_MOTOR.UP)).ignoringDisable(true));
-        // SmartDashboard.putData("motor up Coast", new InstantCommand(()-> coast(SHOOTER_MOTOR.UP)).ignoringDisable(true));
-        // SmartDashboard.putData("motor down Brake", new InstantCommand(()-> brake(SHOOTER_MOTOR.DOWN)).ignoringDisable(true));
-        // SmartDashboard.putData("motor down Coast", new InstantCommand(()-> coast(SHOOTER_MOTOR.DOWN)).ignoringDisable(true));
-        // SmartDashboard.putData("motor feeding Brake", new InstantCommand(()-> brake(SHOOTER_MOTOR.FEEDING)).ignoringDisable(true));
-        // SmartDashboard.putData("motor feeding Coast", new InstantCommand(()-> coast(SHOOTER_MOTOR.FEEDING)).ignoringDisable(true));
-        // SmartDashboard.putData("motor angle Brake", new InstantCommand(()-> brake(SHOOTER_MOTOR.ANGLE)).ignoringDisable(true));
-        // SmartDashboard.putData("motor angle Coast", new InstantCommand(()-> coast(SHOOTER_MOTOR.ANGLE)).ignoringDisable(true));
+        SmartDashboard.putData("motor up Brake", new InstantCommand(()-> brake(SHOOTER_MOTOR.UP)).ignoringDisable(true));
+        SmartDashboard.putData("motor up Coast", new InstantCommand(()-> coast(SHOOTER_MOTOR.UP)).ignoringDisable(true));
+        SmartDashboard.putData("motor down Brake", new InstantCommand(()-> brake(SHOOTER_MOTOR.DOWN)).ignoringDisable(true));
+        SmartDashboard.putData("motor down Coast", new InstantCommand(()-> coast(SHOOTER_MOTOR.DOWN)).ignoringDisable(true));
+        SmartDashboard.putData("motor feeding Brake", new InstantCommand(()-> brake(SHOOTER_MOTOR.FEEDING)).ignoringDisable(true));
+        SmartDashboard.putData("motor feeding Coast", new InstantCommand(()-> coast(SHOOTER_MOTOR.FEEDING)).ignoringDisable(true));
+        SmartDashboard.putData("motor angle Brake", new InstantCommand(()-> brake(SHOOTER_MOTOR.ANGLE)).ignoringDisable(true));
+        SmartDashboard.putData("motor angle Coast", new InstantCommand(()-> coast(SHOOTER_MOTOR.ANGLE)).ignoringDisable(true));
 
     }
 

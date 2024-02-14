@@ -17,12 +17,16 @@ public class CloseAmp extends CommandBase {
     public CloseAmp(Amp amp) {
         this.amp = amp;
         trapezoid = new TrapezoidCalc();
-        amp.setBrake();
         addRequirements(amp);
-
+        
     } 
     
-
+    @Override
+    public void initialize() {
+        
+        amp.setBrake();
+    }
+    
     @Override
     public void execute() {
         vel = trapezoid.trapezoid(amp.getVelRadArm(), AmpConstants.Parameters.MAX_ARM_VEL_CLOSE,

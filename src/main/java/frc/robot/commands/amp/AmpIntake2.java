@@ -17,16 +17,16 @@ public class AmpIntake2 extends CommandBase{
 
     public AmpIntake2(Amp amp) {
         this.amp = amp;
-        amp.setBrake();
         addRequirements(amp);
-        amp.setBrakeArm();
-        amp.neosSetInverted(true);
-
+        
     }
-
+    
     @Override
     public void initialize() {
         super.initialize();
+        amp.setBrakeArm();
+        amp.setBrake();
+        amp.neosSetInverted(true);
         initialEncoderCount = 0;
     }
 

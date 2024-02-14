@@ -347,14 +347,14 @@ public class Amp extends SubsystemBase{
     @Override
     public void periodic() {
         super.periodic();
-        SmartDashboard.putNumber("Motor1 Power", getpower());
-        SmartDashboard.putNumber("Motor1 Velocity", getVelRadArm());
-        //SmartDashboard.putNumber("Arm poseRad", getPoseRad());
-        SmartDashboard.putNumber("Start angle", startDeg);
+        // SmartDashboard.putNumber("Motor1 Power", getpower());
+        // SmartDashboard.putNumber("Motor1 Velocity", getVelRadArm());
+        // //SmartDashboard.putNumber("Arm poseRad", getPoseRad());
+        // SmartDashboard.putNumber("Start angle", startDeg);
 
-        SmartDashboard.putData("snow blow", new RunCommand(()->setPowerSnowblower(0.1)));
-        SmartDashboard.putData("arm power", new RunCommand(()->setPowerArm(0.5)));
-        SmartDashboard.putData("neo power", new RunCommand(()->setNeosPower(0.3)));
+        // SmartDashboard.putData("snow blow", new RunCommand(()->setPowerSnowblower(0.1)));
+        // SmartDashboard.putData("arm power", new RunCommand(()->setPowerArm(0.5)));
+        // SmartDashboard.putData("neo power", new RunCommand(()->setNeosPower(0.3)));
 
 
 

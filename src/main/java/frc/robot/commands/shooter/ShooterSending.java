@@ -73,6 +73,6 @@ public class ShooterSending extends Command {
     /**check if the count is bigger than 5 */
     @Override
     public boolean isFinished() {
-        return noteCount >= 2;
+        return shooter.isNote();
     }
 }
