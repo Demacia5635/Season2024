@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.shooter.AngleControl;
 import frc.robot.commands.shooter.AngleGoToAngle;
+import frc.robot.commands.shooter.AngleQuel;
 import frc.robot.commands.shooter.ShooterFeeding;
 import frc.robot.commands.shooter.ShooterPowering;
 import frc.robot.commands.shooter.ShooterSending;
@@ -88,6 +89,8 @@ public class RobotContainer implements Sendable{
   public RobotContainer() {
 
     chassis = new Chassis();
+    intake = new Intake();
+
 
     // alliance = DriverStation.getAlliance().get();
     // isRed = (alliance == Alliance.Red);
@@ -100,7 +103,6 @@ public class RobotContainer implements Sendable{
     //shooter.setDefaultCommand(new AngleControl(shooter, commandController));
     chassis.setDefaultCommand(new DriveCommand(chassis, controller, commandController, true));
     // amp = new Amp();
-    intake = new Intake();
     
 
     configureBindings();
@@ -156,7 +158,15 @@ public class RobotContainer implements Sendable{
 
   }
  private void configureBindings() {
-    commandController.a().toggleOnTrue(new IntakeCommand(intake));
+    commandController.a().onTrue(new IntakeCommand(intake));
+    commandController.b().onTrue(new IntakeToShooter(intake, shooter));
+    commandController.x().onTrue(new ShooterPowering(shooter, 1, 35000).alongWith(
+      new AngleGoToAngle(shooter, 45, 10000, 10000)
+    ));
+    commandController.y().onTrue(new ShooterSending(shooter, 1, 1));
+    commandController.leftTrigger().onTrue(new InstantCommand(()->{shooter.stopAll(); intake.stop();}, intake, shooter));
+   commandController.rightTrigger().onTrue(new AngleQuel(shooter));
+
       // if(controller.getCrossButton()) new InstantCommand(()->{chassis.setOdometryToForward();});
     // commandController.x().onTrue(new InstantCommand(()->{chassis.setOdometryToForward();}));
     

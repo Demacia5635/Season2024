@@ -371,30 +371,30 @@ public class Shooter extends SubsystemBase {
         super.initSendable(builder);
 
         /*put on ShuffleBoard all the builders */
-        builder.addDoubleProperty("motor up speed", ()-> getMotorVel(SHOOTER_MOTOR.UP), null);
-        builder.addDoubleProperty("motor down speed", ()-> getMotorVel(SHOOTER_MOTOR.DOWN), null);
-        builder.addDoubleProperty("current amper motor up", ()-> getSupplyCurrent(SHOOTER_MOTOR.UP), null);
-        builder.addDoubleProperty("current amper motor down", ()-> getSupplyCurrent(SHOOTER_MOTOR.DOWN), null);
-        builder.addDoubleProperty("angle vel", ()-> getMotorVel(SHOOTER_MOTOR.ANGLE), null);
-        builder.addDoubleProperty("Distance", this::getDis, null);
-        builder.addDoubleProperty("base dis", ()-> baseDis, null);
-        builder.addDoubleProperty("Angle", this::getAngle, null);
-        builder.addDoubleProperty("encoder", ()->motorAngle.getSelectedSensorPosition(), null);
+        // builder.addDoubleProperty("motor up speed", ()-> getMotorVel(SHOOTER_MOTOR.UP), null);
+        // builder.addDoubleProperty("motor down speed", ()-> getMotorVel(SHOOTER_MOTOR.DOWN), null);
+        // builder.addDoubleProperty("current amper motor up", ()-> getSupplyCurrent(SHOOTER_MOTOR.UP), null);
+        // builder.addDoubleProperty("current amper motor down", ()-> getSupplyCurrent(SHOOTER_MOTOR.DOWN), null);
+        // builder.addDoubleProperty("angle vel", ()-> getMotorVel(SHOOTER_MOTOR.ANGLE), null);
+        // builder.addDoubleProperty("Distance", this::getDis, null);
+        // builder.addDoubleProperty("base dis", ()-> baseDis, null);
+        // builder.addDoubleProperty("Angle", this::getAngle, null);
+        // builder.addDoubleProperty("encoder", ()->motorAngle.getSelectedSensorPosition(), null);
         builder.addBooleanProperty("Limit switch", ()->isLimit(), null);
         builder.addDoubleProperty("Analog get Volt", ()->getAnalogVolt(), null);
         builder.addBooleanProperty("is note", ()-> isNote(), null);
     
         /*put on ShuffleBoard all the cmds */
         // SmartDashboard.putData("Dis reset", new InstantCommand(()-> resetDis()).ignoringDisable(true));
-        SmartDashboard.putData("reset dis", new AngleQuel(this));
-        SmartDashboard.putData("motor up Brake", new InstantCommand(()-> brake(SHOOTER_MOTOR.UP)).ignoringDisable(true));
-        SmartDashboard.putData("motor up Coast", new InstantCommand(()-> coast(SHOOTER_MOTOR.UP)).ignoringDisable(true));
-        SmartDashboard.putData("motor down Brake", new InstantCommand(()-> brake(SHOOTER_MOTOR.DOWN)).ignoringDisable(true));
-        SmartDashboard.putData("motor down Coast", new InstantCommand(()-> coast(SHOOTER_MOTOR.DOWN)).ignoringDisable(true));
-        SmartDashboard.putData("motor feeding Brake", new InstantCommand(()-> brake(SHOOTER_MOTOR.FEEDING)).ignoringDisable(true));
-        SmartDashboard.putData("motor feeding Coast", new InstantCommand(()-> coast(SHOOTER_MOTOR.FEEDING)).ignoringDisable(true));
-        SmartDashboard.putData("motor angle Brake", new InstantCommand(()-> brake(SHOOTER_MOTOR.ANGLE)).ignoringDisable(true));
-        SmartDashboard.putData("motor angle Coast", new InstantCommand(()-> coast(SHOOTER_MOTOR.ANGLE)).ignoringDisable(true));
+        // SmartDashboard.putData("reset dis", new AngleQuel(this));
+        // SmartDashboard.putData("motor up Brake", new InstantCommand(()-> brake(SHOOTER_MOTOR.UP)).ignoringDisable(true));
+        // SmartDashboard.putData("motor up Coast", new InstantCommand(()-> coast(SHOOTER_MOTOR.UP)).ignoringDisable(true));
+        // SmartDashboard.putData("motor down Brake", new InstantCommand(()-> brake(SHOOTER_MOTOR.DOWN)).ignoringDisable(true));
+        // SmartDashboard.putData("motor down Coast", new InstantCommand(()-> coast(SHOOTER_MOTOR.DOWN)).ignoringDisable(true));
+        // SmartDashboard.putData("motor feeding Brake", new InstantCommand(()-> brake(SHOOTER_MOTOR.FEEDING)).ignoringDisable(true));
+        // SmartDashboard.putData("motor feeding Coast", new InstantCommand(()-> coast(SHOOTER_MOTOR.FEEDING)).ignoringDisable(true));
+        // SmartDashboard.putData("motor angle Brake", new InstantCommand(()-> brake(SHOOTER_MOTOR.ANGLE)).ignoringDisable(true));
+        // SmartDashboard.putData("motor angle Coast", new InstantCommand(()-> coast(SHOOTER_MOTOR.ANGLE)).ignoringDisable(true));
 
     }
 

@@ -40,7 +40,7 @@ public class AngleGoToAngle extends Command {
         this.wantedAngle = angle;
         this.maxVel = maxVel;
         this.acc = acc;
-        addRequirements(shooter);
+        // addRequirements(shooter);
     }
 
     // Called when the command is initially scheduled.
@@ -61,7 +61,12 @@ public class AngleGoToAngle extends Command {
     /**using the motion magic control mode to go to the specific dis */
     @Override
     public void execute() {
-        shooter.angleMotionMagic(wantedDis, maxVel, acc);
+        // shooter.angleMotionMagic(wantedDis, maxVel, acc);
+        if (wantedAngle - startDis > 0){
+            shooter.setPow(0.4);
+        } else {
+            shooter.setPow(-0.4);
+        }
     }
 
     // Called once the command ends or is interrupted.

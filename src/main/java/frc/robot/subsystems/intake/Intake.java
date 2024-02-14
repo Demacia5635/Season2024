@@ -131,10 +131,10 @@ public class Intake extends SubsystemBase{
     @Override
     public void periodic() {
         super.periodic();
-        SmartDashboard.putNumber("Motor Power", getpower());
-        SmartDashboard.putNumber("Motor Current", getMotorCurrent());
-        SmartDashboard.putNumber("Motor Velocity", getRadVelocity());
-        SmartDashboard.putBoolean("Limit switch state", isNotePresent());
+        // SmartDashboard.putNumber("Motor Power", getpower());
+        // SmartDashboard.putNumber("Motor Current", getMotorCurrent());
+        // SmartDashboard.putNumber("Motor Velocity", getRadVelocity());
+        // SmartDashboard.putBoolean("Limit switch state", isNotePresent());
         SmartDashboard.putNumber("Limit switch voltage", getLimitVolt());
         
     }
@@ -143,8 +143,8 @@ public class Intake extends SubsystemBase{
     @Override
     public void initSendable(SendableBuilder builder) {
     super.initSendable(builder);
-    SmartDashboard.putNumber("power", 0);
-    SmartDashboard.putData("set power", new RunCommand(()-> setPower(SmartDashboard.getNumber("power", 0)), this));
+    // SmartDashboard.putNumber("power", 0);
+    // SmartDashboard.putData("set power", new RunCommand(()-> setPower(SmartDashboard.getNumber("power", 0)), this));
     }
 
 }
