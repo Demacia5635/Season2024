@@ -2,6 +2,7 @@ package frc.robot;
 
 import org.opencv.core.Point;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.util.sendable.Sendable;
@@ -77,18 +78,17 @@ public class RobotContainer implements Sendable{
     //return new RunCommand(()->{chassis.getModule(2).setAngularPower(0.049 + 300*0.0003);},chassis).withTimeout(3)
     //  .andThen(new InstantCommand(()->{SmartDashboard.putNumber("FF TEST",  chassis.getModule(2).getAngularVelocity());
     //chassis.stop();}));
-    pathPoint[] pointArrUp = {new pathPoint(3, 2.5, Rotation2d.fromDegrees(0), 0, false), new pathPoint(3, 3.25, Rotation2d.fromDegrees(0), 0, false), new pathPoint(3, 4, Rotation2d.fromDegrees(0), 0, false)};
-    pathPoint[] pointArrDown = {new pathPoint(3, 3, Rotation2d.fromDegrees(0), 0, false), new pathPoint(3, 2.5, Rotation2d.fromDegrees(0), 0, false), new pathPoint(3, 1.75, Rotation2d.fromDegrees(0), 0, false), new pathPoint(3, 0.5, Rotation2d.fromDegrees(0), 0, false)};
+    Pose2d pose = chassis.getPose();
+    pathPoint[] pointArrForX = {new pathPoint(0, 0, Rotation2d.fromDegrees(0), 0, false), new pathPoint(pose.getX() + 2, pose.getY(), Rotation2d.fromDegrees(0), 0, false),new pathPoint(pose.getX() - 2, pose.getY(), Rotation2d.fromDegrees(0), 0, false)};
 
-    pathPoint[] pointArrBack = {new pathPoint(2.5, 2.2, Rotation2d.fromDegrees(0), 0, false), new pathPoint(3, 2.2, Rotation2d.fromDegrees(0), 0, false), new pathPoint(3.5, 2.2, Rotation2d.fromDegrees(0), 0, false), new pathPoint(4, 2.2, Rotation2d.fromDegrees(0), 0, false)};
-    pathPoint[] pointArrForward = {new pathPoint(3.5, 2.2, Rotation2d.fromDegrees(0), 0, false), new pathPoint(3, 2.2, Rotation2d.fromDegrees(0), 0, false), new pathPoint(2.5, 2.2, Rotation2d.fromDegrees(0), 0, false), new pathPoint(2, 2.2, Rotation2d.fromDegrees(0), 0, false)};
+    pathPoint[] pointArrForY = {new pathPoint(0, 0, Rotation2d.fromDegrees(0), 0, false), new pathPoint(pose.getX(), pose.getY() + 2, Rotation2d.fromDegrees(0), 0, false), new pathPoint(pose.getX(), pose.getY() - 2, Rotation2d.fromDegrees(0), 0, false)};
 
-    return new PathFollow(chassis,pointArrUp , 1, 1).andThen(new PathFollow(chassis,pointArrDown , 2, 1.5).
-    andThen(new PathFollow(chassis,pointArrUp , 2.5, 1.75).andThen(new PathFollow(chassis,pointArrDown , 3, 2).
-    andThen(new PathFollow(chassis,pointArrUp , 3.5, 2).andThen(new PathFollow(chassis,pointArrDown , 4, 2.5))))));
+    // return new PathFollow(chassis,pointArrForX , 1, 1).andThen(new PathFollow(chassis,pointArrForX , 2, 1.5).
+    // andThen(new PathFollow(chassis,pointArrForX , 2.5, 1.75).andThen(new PathFollow(chassis,pointArrForX , 3, 2).
+    // andThen(new PathFollow(chassis,pointArrForX , 3.5, 2).andThen(new PathFollow(chassis,pointArrForX , 4, 2.5))))));
 
-    // return new PathFollow(chassis,pointArrBack , 1, 1).andThen(new PathFollow(chassis,pointArrForward , 2, 1.5).
-    // andThen(new PathFollow(chassis,pointArrBack , 2.5, 1.75).andThen(new PathFollow(chassis,pointArrForward , 3, 2).
-    // andThen(new PathFollow(chassis,pointArrBack , 3.5, 2).andThen(new PathFollow(chassis,pointArrForward , 4, 2.5))))));
+    return new PathFollow(chassis,pointArrForY , 1, 1).andThen(new PathFollow(chassis,pointArrForY , 2, 1.5).
+    andThen(new PathFollow(chassis,pointArrForY , 2.5, 1.75).andThen(new PathFollow(chassis,pointArrForY , 3, 2).
+    andThen(new PathFollow(chassis,pointArrForY , 3.5, 2).andThen(new PathFollow(chassis,pointArrForY , 4, 2.5))))));
   }
 }
