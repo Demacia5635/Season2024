@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.chassis.Chassis;
+import frc.robot.utils.LedControll;
 
 import static frc.robot.subsystems.chassis.ChassisConstants.*;
 
@@ -15,6 +16,7 @@ public class DriveCommand extends Command {
   private final Chassis chassis;
   private final PS4Controller controller;
   private final CommandXboxController commandXboxController;
+  private LedControll led;
 
   private double direction;
 
@@ -29,6 +31,7 @@ public class DriveCommand extends Command {
     this.commandXboxController = commandXboxController;
     this.controller = controller;
     direction = isRed ? 1 : -1;
+    led = new LedControll(9, 100);
     addRequirements(chassis);
     // commandXboxController.b().onTrue(new InstantCommand(() -> precisionDrive = !precisionDrive));
     // commandXboxController.y().onTrue(new InstantCommand((() -> this.wantedAngleApriltag = chassis.getClosetAngleApriltag())).andThen(() -> rotateToApriltag = true));
@@ -76,6 +79,18 @@ public class DriveCommand extends Command {
     }
 
     //System.out.println("target velocity= " + velRot);
+
+    llpython = NetworkTableInstance.getDefault().getTable("limelight").getEntry("llpython").getDoubleArray(new double[8]);
+    Dist = llpython[0];
+    if(Dist != 0){
+      if(Dist <= 150){
+        led.blink(0, 255, 0);
+      }
+      else{
+        led.setColor(0, 255, 0);
+      }
+    }
+
 
 
     ChassisSpeeds speeds = new ChassisSpeeds(velX, velY, velRot);

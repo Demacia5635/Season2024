@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 public class LedControll {
     private AddressableLED led;
     private AddressableLEDBuffer buffer;
+    private boolean isOn = true;
 
     public LedControll(int port, int count) {
         led = new AddressableLED(port);
@@ -20,8 +21,17 @@ public class LedControll {
     public void stop() {
         led.stop();
     }
-
-    public void changeColor(int r, int g, int b) {
+    public void blink(int r, int g, int b) {
+        if (isOn) {
+            setColor(0, 0, 0);
+            
+        } else {
+            setColor(r, g, b);
+        }
+        isOn = !isOn;
+    };
+    
+    public void setColor(int r, int g, int b) {
         for (int i = 0; i < buffer.getLength(); i++) {
             buffer.setRGB(i, r, g, b);
         }
