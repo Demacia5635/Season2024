@@ -16,22 +16,23 @@ public class ShooterSending extends Command {
     /**the pow giving to the feeding motor */
     double feedingPow;
     /**the pow giving to the shooting motor */
-    double shootingPow;
+    double shootingVel;
 
     int noteCount;
 
     boolean last;
 
+
     /**
      * creates a new command that will send from the feeding motor to the shooting motor the note
      * @param shooter the wanted shooter
      * @param feedingPow the wanted pow for the feeding motor -1 to 1
-     * @param shootingPow the wanted pow for the shooting motor -1 to 1
+     * @param shootingVel the wanted pow for the shooting motor -1 to 1
      */
-    public ShooterSending(Shooter shooter, double feedingPow, double shootingPow) {
+    public ShooterSending(Shooter shooter, double feedingPow, double shootingVel) {
         this.shooter = shooter;
         this.feedingPow = feedingPow;
-        this.shootingPow = shootingPow;
+        this.shootingVel = shootingVel;
         addRequirements(shooter);
     }
 
@@ -50,7 +51,8 @@ public class ShooterSending extends Command {
     /**setting pow to every motor */
     @Override
     public void execute() {
-        shooter.setPow(shootingPow);
+        shooter.setVel(shootingVel);
+        // shooter.setPow(shootingPow);
         shooter.feedingSetPow(feedingPow);
         if (shooter.isNote() && !last){
             noteCount++;
@@ -73,6 +75,6 @@ public class ShooterSending extends Command {
     /**check if the count is bigger than 5 */
     @Override
     public boolean isFinished() {
-        return shooter.isNote();
+        return false;
     }
 }

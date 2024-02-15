@@ -22,27 +22,41 @@ public class ShooterConstants {
 
     /*motor falcon stats */
     public static final int PULES_PER_REV = 2048;
-    public static final int GEAR_RATIO = 2;
-    public static final int REV_PER_MM = 8;
-    public static final int PULES_PER_MM = PULES_PER_REV * GEAR_RATIO / REV_PER_MM;
     
-    /*the length of profiles in the angle changer */
-    public static final double KA = 136;
-    public static final double KB = 128;
     
-    /*set up the feedForward var of the angle changer */
-    public static final double KS = 0.056673856189171;
-    public static final double KG = 0;
-    public static final double KV = 0.000091655292302;
+    public static class AngleChanger {
+        public static final int GEAR_RATIO = 2;
+        public static final int REV_PER_MM = 8;
+        public static final int PULES_PER_MM = PULES_PER_REV * GEAR_RATIO / REV_PER_MM;
+        
+        /*the length of profiles in the angle changer */
+        public static final double KA = 136;
+        public static final double KB = 128;
+        
+        /*set up the feedForward var of the angle changer */
+        public static final double KS = 0.056673856189171;
+        public static final double KG = 0;
+        public static final double KV = 0.000091655292302;
+        
+        /*set up the PID of the angle motor */
+        public static final double KP = 0.3;
+        public static final double KD = KP / 100;
     
-    /*set up the PID of the angle motor */
-    public static final double KP = 0.3;
-    public static final double KD = KP / 100;
-
-    public static final double MAX_DIS = -246;
-    public static final double MIN_DIS = 100;
+        public static final double MAX_DIS = -246;
+        public static final double MIN_DIS = 100;
+    }
+    
     public static final double VOLT_NOTE_PRESENT = 4.7;
 
+    public static class Shooting {
+        public static final double KS = 0.053395329232339;
+        public static final double KV = 0.034360975093757;
+        public static final double KV2 = 0.000234209075695;
+
+        public static final double KP = 0.117977489346903;
+    }
+
+    public static final double PEREMITER_OF_WHEEL = 0.075 * Math.PI;
 
     /**set up var for pow */
     public static class CommandParams {

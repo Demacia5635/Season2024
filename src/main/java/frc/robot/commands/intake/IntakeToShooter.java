@@ -21,24 +21,31 @@ public class IntakeToShooter extends Command {
     Shooter shooter;
     // boolean hasEntered;
 
+    int noteCount;
+
+    boolean last;
+
+    double shootingVel;
+
     /**
      * creates a new command thats takes from the intake and giving it to the shooter
      * @param intake the wanted intake
      * @param shooter the wanted shooter
      */
-    public IntakeToShooter(Intake intake, Shooter shooter) {
+    public IntakeToShooter(Intake intake, Shooter shooter, double shootingVel) {
         // Use addRequirements() here to declare subsystem dependencies.
         this.intake = intake;
         this.shooter = shooter;
-        addRequirements(intake, shooter);
+        this.shootingVel = shootingVel;
+        // addRequirements(intake, shooter);
         SmartDashboard.putData(this);
     }
 
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-        shooter.brake(SHOOTER_MOTOR.UP, SHOOTER_MOTOR.DOWN, SHOOTER_MOTOR.FEEDING);
-        intake.setBrake();
+        noteCount = 0;
+        last = false;
     }
 
     // Called every time the scheduler runs while the command is scheduled.
@@ -55,7 +62,14 @@ public class IntakeToShooter extends Command {
 
         intake.setPower(1);
         shooter.feedingSetPow(1);
+        shooter.setVel(shootingVel);
         // shooter.setPow(1);
+        if (shooter.isNote() && !last){
+            noteCount++;
+            last = true;        
+        } else {
+            last = false;
+        }
     }
 
     // Called once the command ends or is interrupted.
@@ -64,13 +78,13 @@ public class IntakeToShooter extends Command {
     public void end(boolean interrupted) {
         intake.stop();
         shooter.feedingStop();
-        // shooter.stop();
+        shooter.stop();
     }
 
     // Returns true when the command should end.
     /**checks if there is note on the shooter */
     @Override
     public boolean isFinished() {
-        return shooter.isNote();
+        return noteCount >= 2;
     }
 }

@@ -46,7 +46,7 @@ public class AngleGoToAngle extends Command {
         shooter.brake(SHOOTER_MOTOR.ANGLE);
         startDis = shooter.getDis();
 
-        wantedDis = KA * Math.cos(wantedAngle * Math.PI / 180) + Math.sqrt(Math.pow(KA, 2) * Math.pow(Math.cos(wantedAngle * Math.PI / 180), 2) - Math.pow(KA, 2) + Math.pow(KB, 2));
+        wantedDis = AngleChanger.KA * Math.cos(wantedAngle * Math.PI / 180) + Math.sqrt(Math.pow(AngleChanger.KA, 2) * Math.pow(Math.cos(wantedAngle * Math.PI / 180), 2) - Math.pow(AngleChanger.KA, 2) + Math.pow(AngleChanger.KB, 2));
     }
 
     // Called every time the scheduler runs while the command is scheduled.

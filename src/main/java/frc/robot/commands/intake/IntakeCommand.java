@@ -69,6 +69,7 @@ public class IntakeCommand extends CommandBase {
         }
 
         System.out.println("current= "+ intake.getMotorCurrent());
+        System.out.println("volt= "+ intake.motor.getBusVoltage());
     }
 
     @Override
