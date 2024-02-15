@@ -14,7 +14,6 @@ import static frc.robot.subsystems.chassis.ChassisConstants.*;
 
 public class DriveCommand extends Command {
   private final Chassis chassis;
-  private final PS4Controller controller;
   private final CommandXboxController commandXboxController;
   private LedControll led;
 
@@ -26,14 +25,13 @@ public class DriveCommand extends Command {
   PIDController rotationPidController = new PIDController(0.03, 0,0.0008);
 
 
-  public DriveCommand(Chassis chassis, PS4Controller controller, CommandXboxController commandXboxController, boolean isRed) {
+  public DriveCommand(Chassis chassis, CommandXboxController commandXboxController, boolean isRed) {
     this.chassis = chassis;
     this.commandXboxController = commandXboxController;
-    this.controller = controller;
     direction = isRed ? 1 : -1;
     led = new LedControll(9, 100);
     addRequirements(chassis);
-    // commandXboxController.b().onTrue(new InstantCommand(() -> precisionDrive = !precisionDrive));
+    commandXboxController.b().onTrue(new InstantCommand(() -> precisionDrive = !precisionDrive));
     // commandXboxController.y().onTrue(new InstantCommand((() -> this.wantedAngleApriltag = chassis.getClosetAngleApriltag())).andThen(() -> rotateToApriltag = true));
   }
 
@@ -68,7 +66,7 @@ public class DriveCommand extends Command {
         rotateToApriltag = false;
       }
       else{
-        velRot = rotationPidController.calculate(chassis.getAngle().getDegrees(),wantedAngleApriltag.getDegrees())*Math.toRadians(180);
+        velRot = rotationPidController.calculate(chassis.getAngle().getDegrees(),wantedAngleApriltag.getDegrees())*Math.toRadians(90);
       }
      
     }

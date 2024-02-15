@@ -5,6 +5,7 @@
 package frc.robot.subsystems.shooter;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -12,6 +13,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+import static frc.robot.subsystems.shooter.ShooterConstants.PULES_PER_REV;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
@@ -19,8 +23,10 @@ import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
+import frc.robot.Sysid.Sysid;
 import frc.robot.commands.shooter.AngleQuel;
 import frc.robot.subsystems.shooter.ShooterConstants;
+import frc.robot.subsystems.shooter.ShooterConstants.Shooting;
 import frc.robot.subsystems.shooter.utils.LookUpTable;
 
 /**subsystem shooter and angle changing */
@@ -70,30 +76,37 @@ public class Shooter extends SubsystemBase {
         /*set up vars */
 
         motorUP = new TalonFX(ShooterConstants.MOTOR_UP_ID);
+        motorUP.configFactoryDefault();
         motorUP.setInverted(true);
+        motorUP.config_kP(0, ShooterConstants.Shooting.KP);
 
         motorDown = new TalonFX(ShooterConstants.MOTOR_DOWN_ID);
+        motorDown.config_kP(0, ShooterConstants.Shooting.KP);
 
         motorFeeding = new TalonSRX(ShooterConstants.MOTOR_FEEDING_ID);
+        motorDown.configFactoryDefault();
         motorFeeding.setInverted(true);
         motorFeeding.enableCurrentLimit(true);
         motorFeeding.configContinuousCurrentLimit(20);
         
         motorAngle = new TalonFX(ShooterConstants.MOTOR_ANGLE_ID);
-        motorAngle.config_kP(0, ShooterConstants.KP);
-        motorAngle.config_kD(0, ShooterConstants.KD);
+        motorDown.configFactoryDefault();
+        motorAngle.config_kP(0, ShooterConstants.AngleChanger.KP);
+        motorAngle.config_kD(0, ShooterConstants.AngleChanger.KD);
         motorAngle.configMotionCruiseVelocity(20000);
         motorAngle.configMotionAcceleration(20000);
         
         analogInput = new AnalogInput(ShooterConstants.ANALOG_INPUT_ID);
         analogInput.setAccumulatorInitialValue(0);
 
-        elevationFF = new ArmFeedforward(ShooterConstants.KS, ShooterConstants.KG, ShooterConstants.KV);
+        elevationFF = new ArmFeedforward(ShooterConstants.AngleChanger.KS, ShooterConstants.AngleChanger.KG, ShooterConstants.AngleChanger.KV);
 
         limitSwitch = new DigitalInput(ShooterConstants.LIMIT_SWITCH_ID);
 
         SmartDashboard.putData(this);
         SmartDashboard.putData(null);
+
+        SmartDashboard.putData("SysId Shooter",new Sysid(this::setPow, ()->getMotorVel(SHOOTER_MOTOR.UP), 0.2, 0.8, this).getCommand());
     }
     
     /**
@@ -101,7 +114,7 @@ public class Shooter extends SubsystemBase {
      * @param dis the wanted dis in mm on the screw (absolute)
      */
     public void angleMotionMagic(double dis) {
-        motorAngle.set(ControlMode.MotionMagic, (ShooterConstants.PULES_PER_MM * (dis + ShooterConstants.MAX_DIS)));
+        motorAngle.set(ControlMode.MotionMagic, (ShooterConstants.AngleChanger.PULES_PER_MM * (dis + ShooterConstants.AngleChanger.MAX_DIS)));
     }
 
     /**
@@ -138,6 +151,20 @@ public class Shooter extends SubsystemBase {
         motorDown.set(ControlMode.PercentOutput, pow);
     }
     
+    public double getFF(double vel){
+        return (ShooterConstants.Shooting.KS * Math.signum(vel)+
+                ShooterConstants.Shooting.KV * vel +
+                ShooterConstants.Shooting.KV2 * Math.pow(vel, 2));
+    }
+
+    public void setVel(double vel){
+        double ff = getFF(vel);
+        vel = (vel / 10) / ShooterConstants.PEREMITER_OF_WHEEL * PULES_PER_REV;
+        System.out.println("FF ="+ ff + "\nVel =" + vel);
+        motorUP.set(ControlMode.Velocity, vel, DemandType.ArbitraryFeedForward, ff);
+        motorDown.set(ControlMode.Velocity, vel, DemandType.ArbitraryFeedForward, ff);
+    }
+
     public void stop(){
         motorUP.set(ControlMode.PercentOutput, 0);
         motorDown.set(ControlMode.PercentOutput, 0);
@@ -238,7 +265,7 @@ public class Shooter extends SubsystemBase {
      * @return the dis in mm
      */
     public double getDis(){
-        return motorAngle.getSelectedSensorPosition()/ShooterConstants.PULES_PER_MM - ShooterConstants.MAX_DIS;
+        return motorAngle.getSelectedSensorPosition()/ShooterConstants.AngleChanger.PULES_PER_MM - ShooterConstants.AngleChanger.MAX_DIS;
     }
 
     /**
@@ -247,7 +274,7 @@ public class Shooter extends SubsystemBase {
      * @return if the limits have passed (false means you are fine)
      */
     public boolean isDisLimits(boolean isUpDirection){
-        return isUpDirection ? getDis() >= ShooterConstants.MAX_DIS : getDis() <= ShooterConstants.MIN_DIS;
+        return isUpDirection ? getDis() >= ShooterConstants.AngleChanger.MAX_DIS : getDis() <= ShooterConstants.AngleChanger.MIN_DIS;
     }
 
     public boolean isSupplyLimit(SHOOTER_MOTOR motor){
@@ -302,7 +329,7 @@ public class Shooter extends SubsystemBase {
     /**
      * get the vel of every motor
      * @param motor the wanted motor 
-     * @return the wanted motor velocity in degree per sec
+     * @return the wanted motor velocity
      * @exception FEEDING - that is a snowblower so return in pules per sec
      * @exception default - if the param motor is not listed above the function will return 0
      */
@@ -310,16 +337,16 @@ public class Shooter extends SubsystemBase {
         switch (motor) {
 
             case UP:
-                return motorUP.getSelectedSensorVelocity()*10/(ShooterConstants.PULES_PER_REV/360);
+                return motorUP.getSelectedSensorVelocity()*10/(ShooterConstants.PULES_PER_REV)* ShooterConstants.PEREMITER_OF_WHEEL;
 
             case DOWN:
-                return motorDown.getSelectedSensorVelocity()*10/(ShooterConstants.PULES_PER_REV/360);
+                return motorDown.getSelectedSensorVelocity()*10/(ShooterConstants.PULES_PER_REV) * ShooterConstants.PEREMITER_OF_WHEEL;
 
             case FEEDING:
                 return motorFeeding.getSelectedSensorVelocity()*10;
 
             case ANGLE:
-                return motorAngle.getSelectedSensorVelocity()*10/(ShooterConstants.PULES_PER_REV/360);
+                return motorAngle.getSelectedSensorVelocity()*10/((ShooterConstants.PULES_PER_REV * ShooterConstants.AngleChanger.GEAR_RATIO));
             
             default:
                 return 0;
@@ -359,10 +386,10 @@ public class Shooter extends SubsystemBase {
      */
     public double getAngle(){
         double angle = (
-        Math.acos(-1 * ((Math.pow(ShooterConstants.KB, 2) - 
-        Math.pow(ShooterConstants.KA, 2) - 
+        Math.acos(-1 * ((Math.pow(ShooterConstants.AngleChanger.KB, 2) - 
+        Math.pow(ShooterConstants.AngleChanger.KA, 2) - 
         Math.pow(getDis(), 2)) / 
-        (2 * ShooterConstants.KA * getDis()))) * 
+        (2 * ShooterConstants.AngleChanger.KA * getDis()))) * 
         180 / Math.PI
         );
         

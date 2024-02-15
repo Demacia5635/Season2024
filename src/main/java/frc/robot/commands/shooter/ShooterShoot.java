@@ -19,20 +19,19 @@ public class ShooterShoot extends SequentialCommandGroup {
      * creates a new command that will make the shooter shoot
      * @param shooter the wanted shooter
      * @param feedingPow the wanted pow for the feeding motor -1 to 1
-     * @param shootingPow the wanted pow for the shooting motor -1 to 1
+     * @param shootingVel the wanted pow for the shooting motor -1 to 1
      * @param shootingMaxVel the wanted vel for the shooting motor in pules per 1/10 sec
      * @param angle the wanted angle to shoot at in degrees
      * @param angleMaxVel the max vel for the angle trapezoid
      * @param angleAcc the acc for the angle trapezoid
      */
-    public ShooterShoot(Shooter shooter, double feedingPow, double shootingPow, double shootingMaxVel, double angle, double angleMaxVel, double angleAcc) {
+    public ShooterShoot(Shooter shooter, double feedingPow, double shootingVel, double angle, double angleMaxVel, double angleAcc) {
         addRequirements(shooter);
         addCommands(
-            new InstantCommand(()-> { shooter.brake(SHOOTER_MOTOR.UP, SHOOTER_MOTOR.DOWN, SHOOTER_MOTOR.FEEDING, SHOOTER_MOTOR.ANGLE); }, shooter),
             // new ShooterFeeding(shooter, feedingPow),
             // new AngleGoToAngle(shooter, angle),
-            new ShooterPowering(shooter, shootingPow, shootingMaxVel),
-            new ShooterSending(shooter, feedingPow, shootingPow)
+            new ShooterPowering(shooter, shootingVel),
+            new ShooterSending(shooter, feedingPow, shootingVel)
         );
     }
 }
