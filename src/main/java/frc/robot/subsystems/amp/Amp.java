@@ -48,9 +48,8 @@ public class Amp extends SubsystemBase{
     //SimpleMotorFeedforward ff2 = new SimpleMotorFeedforward(Parameters.ks2, Parameters.kv2, Parameters.ka2);
     public Amp(){
         
-        //gyro = new Pigeon2(AmpDeviceID.GYRO);
-        
         m1 = new TalonFX(AmpDeviceID.M1);
+        m1.configFactoryDefault();
         m1.setInverted(true);
 
         magneticSensor = new DigitalInput(AmpConstants.AmpDeviceID.MAGNETIC_SENSOR_ID);       
@@ -78,9 +77,9 @@ public class Amp extends SubsystemBase{
         opticCount = 0;
         SmartDashboard.putData(this);
 
-        SmartDashboard.putData("BrakeDiff", new InstantCommand(
+        SmartDashboard.putData("BrakeArm", new InstantCommand(
             ()->this.setBrake(),this).ignoringDisable(true));
-        SmartDashboard.putData("CoastDiff", new InstantCommand(
+        SmartDashboard.putData("CoastArm", new InstantCommand(
             ()->this.setCoast(),this).ignoringDisable(true));
 
 
@@ -357,7 +356,6 @@ public class Amp extends SubsystemBase{
         // SmartDashboard.putData("neo power", new RunCommand(()->setNeosPower(0.3)));
 
 
-
         SmartDashboard.putNumber("SnowBlower ampere", getSnowblowerA());
 
         SmartDashboard.putNumber("neo1 encoder",getNeosRev()[0]);
@@ -368,7 +366,6 @@ public class Amp extends SubsystemBase{
 
         SmartDashboard.putBoolean("Lower Limit switch state", isClose());
         SmartDashboard.putBoolean("Upper Limit switch state", isOpen());
-
     }
 
     public boolean isCriticalCurrent() {
@@ -418,6 +415,7 @@ public class Amp extends SubsystemBase{
         Command cmd = new Sysid(new Gains[] { Gains.KS, Gains.KV, Gains.KA, Gains.KCos}, this::setPowerArm,
          this::getVelRadArm, this::getPoseByPulses, null, 0.12, 0.2 ,3, 0.5,0.5, this).getCommand();
         SmartDashboard.putData("Amp SYSID", cmd);
+        builder.addDoubleProperty("encoder", ()->m1.getSelectedSensorPosition(), null);
     }
     
     

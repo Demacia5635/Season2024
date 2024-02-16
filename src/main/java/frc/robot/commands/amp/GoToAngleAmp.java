@@ -35,7 +35,6 @@ public class GoToAngleAmp extends Command {
     if(amp.isOpen()){
       amp.setPowerSnowblower(-0.2);
     }
-    amp.neoEncoderReset();
     amp.startRad(amp.getPoseByPulses());
   }
 
@@ -47,7 +46,7 @@ public class GoToAngleAmp extends Command {
     }
 
     double currentAngleRad = amp.getPoseByPulses();
-    double velRad = trap.trapezoid(amp.getVelRadArm(), maxVelRad, 0.5, Math.abs(acceleRad), angleRad-currentAngleRad);
+    double velRad = trap.trapezoid(amp.getVelRadArm(), maxVelRad, 0.17, Math.abs(acceleRad), angleRad-currentAngleRad);
     amp.setVel(velRad);
     if((amp.isClose()||amp.isOpen())&&(Timer.getFPGATimestamp()-startTime > 0.5)){
       amp.stop();
