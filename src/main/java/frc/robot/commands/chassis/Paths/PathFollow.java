@@ -95,12 +95,12 @@ public class PathFollow extends CommandBase {
 
   }
 
-  public String currentSegmentInfo() {
+  /*public String currentSegmentInfo() {
 
     if (segments == null)
       return "";
     return segments[segmentIndex].toString();
-  }
+  }*/
 
   @Override
   public void initialize() {
@@ -259,7 +259,7 @@ public class PathFollow extends CommandBase {
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    builder.addStringProperty("Current Segment", () -> currentSegmentInfo(), null);
+    //builder.addStringProperty("Current Segment", () -> currentSegmentInfo(), null);
     builder.addDoubleProperty("Distance Passed", () -> {
       return distancePassed;
     }, null);

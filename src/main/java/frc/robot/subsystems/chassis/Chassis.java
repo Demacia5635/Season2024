@@ -38,6 +38,7 @@ import java.util.List;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.sensors.Pigeon2;
+import com.fasterxml.jackson.core.StreamReadConstraints.Builder;
 
 public class Chassis extends SubsystemBase {
   private final SwerveModule[] modules;
@@ -299,6 +300,8 @@ public class Chassis extends SubsystemBase {
     builder.addDoubleProperty("Angle", () -> Utils.degrees(getAngle()), null);
     builder.addDoubleProperty("Pitch", () -> gyro.getPitch(), null);
     builder.addDoubleProperty("Roll", () -> gyro.getRoll(), null);
+    builder.addDoubleProperty("Pose X", () -> getPose().getX(), null);
+    builder.addDoubleProperty("Pose Y", () -> getPose().getY(), null);
     SmartDashboard.putData("Set Modules Angle", new RunCommand(() -> setModulesAngleFromSB(0)));
   }
 

@@ -3,6 +3,7 @@ package frc.robot.commands.chassis;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -23,6 +24,9 @@ public class DriveCommand extends Command {
   Rotation2d wantedAngleApriltag = new Rotation2d();
   boolean rotateToApriltag = false;
   PIDController rotationPidController = new PIDController(0.03, 0,0.0008);
+
+  private double[]llpython;
+  private double Dist;
 
 
   public DriveCommand(Chassis chassis, CommandXboxController commandXboxController, boolean isRed) {
@@ -80,6 +84,7 @@ public class DriveCommand extends Command {
 
     llpython = NetworkTableInstance.getDefault().getTable("limelight").getEntry("llpython").getDoubleArray(new double[8]);
     Dist = llpython[0];
+    System.out.println("Dist is : " + Dist);
     if(Dist != 0){
       if(Dist <= 150){
         led.blink(0, 255, 0);

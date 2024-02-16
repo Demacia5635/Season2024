@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -38,6 +39,7 @@ import frc.robot.commands.amp.AmpIntake2;
 import frc.robot.commands.amp.GoToAngleAmp;
 import frc.robot.commands.amp.JoyStickAmp;
 import frc.robot.commands.amp.GoToAngleAmp;
+import frc.robot.commands.chassis.DriveAndPickNote;
 import frc.robot.commands.chassis.DriveCommand;
 import frc.robot.commands.chassis.DriveToNote;
 import frc.robot.commands.chassis.SetModuleAngle;
@@ -82,12 +84,12 @@ public class RobotContainer implements Sendable{
   double wantedAngle;
   double wantedShootingVel;
 
-  pathPoint[] points1 = {new pathPoint(0, 0, Rotation2d.fromDegrees(0), 0, false),
-    new pathPoint(3, 0, Rotation2d.fromDegrees(0), 0, false)
-};
-    pathPoint[] points2 = {new pathPoint(0, 0, Rotation2d.fromDegrees(0), 0, false),
-    new pathPoint(3, 2, Rotation2d.fromDegrees(0), 0, false)
-    };
+  pathPoint[] points = {new pathPoint(0, 0, Rotation2d.fromDegrees(0), 0, false),
+    new pathPoint(1.35, -0.6, Rotation2d.fromDegrees(180), 0, false)
+  };
+  /*pathPoint[] points2 = {new pathPoint(0, 0, Rotation2d.fromDegrees(0), 0, false),
+  new pathPoint(1.77, -0.6, Rotation2d.fromDegrees(180), 0, false)};*/
+
 
 
   public RobotContainer() {
@@ -105,7 +107,7 @@ public class RobotContainer implements Sendable{
     commandController = new CommandXboxController(0);
     shooter = new Shooter();
     //shooter.setDefaultCommand(new AngleControl(shooter, commandController));
-    chassis.setDefaultCommand(new DriveCommand(chassis, commandController, true));
+    chassis.setDefaultCommand(new DriveCommand(chassis, commandController, DriverStation.getAlliance().get() == Alliance.Red));
     
 
     SmartDashboard.putData("RC", this);
@@ -159,7 +161,9 @@ public class RobotContainer implements Sendable{
 
   }
     private void configureBindings() {
-        wantedAngle = 54.0838069121;
+
+      //wanted angle = 54 angle for close to speaker
+        wantedAngle = 34;
     //   SmartDashboard.putNumber("wanted angle", 60);
     //   SmartDashboard.putNumber("wanted shooting vel for noga", 0);
     //   wantedAngle = SmartDashboard.getNumber("wanted angle", 60);
@@ -167,10 +171,12 @@ public class RobotContainer implements Sendable{
     //   wantedShootingVel = SmartDashboard.getNumber("wanted shooting vel for noga", 0);
     //   commandController.b().onTrue(new AngleQuel(shooter));
         commandController.a().onTrue(new IntakeCommand(intake));
+        
         commandController.pov(0).onTrue(new AngleGoToAngle(shooter, wantedAngle).alongWith( new ShooterPowering(shooter, wantedShootingVel)));
         commandController.x().whileTrue(new IntakeToShooter(intake, shooter, wantedShootingVel));
         commandController.rightBumper().onTrue(new InstantCommand(()-> {shooter.stopAll();intake.stop();}, intake, shooter).ignoringDisable(true));
-      // if(controller.getCrossButton()) new InstantCommand(()->{chassis.setOdometryToForward();});
+        commandController.y().onTrue(new DriveAndPickNote(chassis, intake));
+        // if(controller.getCrossButton()) new InstantCommand(()->{chassis.setOdometryToForward();});
     // commandController.x().onTrue(new InstantCommand(()->{chassis.setOdometryToForward();}));
     
     }
@@ -189,7 +195,9 @@ public class RobotContainer implements Sendable{
   public Command getAutonomousCommand() {
     //return new PathFollow(chassis, points, 3, 6, DriverStation.getAlliance().get() == Alliance.Red);
    
-    return new IntakeCommand(intake);
+    return new PathFollow(chassis, points, 1, 2, 0.5, DriverStation.getAlliance().get() == Alliance.Red);
+    /*.andThen(new PathFollow(chassis, points2, 1, 2, 0, DriverStation.getAlliance().get() == Alliance.Red)
+    .alongWith(new IntakeCommand(intake)));*/
     //.alongWith(new AmpIntake(amp, AmpConstants.CommandParams.v1, AmpConstants.CommandParams.v2))
 
     //return new RunCommand(()-> chassis.setVelocities(new ChassisSpeeds(0, -1.5, 0)), chassis);
