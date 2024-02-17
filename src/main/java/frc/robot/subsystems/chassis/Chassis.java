@@ -24,6 +24,8 @@ import frc.robot.commands.chassis.CheckModulesSteerVelocity;
 import frc.robot.commands.chassis.SetModuleAngle;
 import frc.robot.commands.chassis.utils.TestVelocity;
 import frc.robot.commands.intake.IntakeCommand;
+import frc.robot.subsystems.LedControll;
+import frc.robot.subsystems.LedControll.ledState;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.utils.Utils;
 import frc.robot.PathFollow.Util.pathPoint;
@@ -49,15 +51,16 @@ public class Chassis extends SubsystemBase {
 
   private final SwerveDrivePoseEstimator poseEstimator;
   private final Field2d field;
+  private LedControll ledControll;
 
-  public Chassis() {
+  public Chassis(LedControll ledControll) {
     modules = new SwerveModule[] {
         new SwerveModule(FRONT_LEFT, this),
         new SwerveModule(FRONT_RIGHT, this),
         new SwerveModule(BACK_LEFT, this),
         new SwerveModule(BACK_RIGHT, this),
     };
-
+    this.ledControll = ledControll;
     //configAllFactoryDefaut();
 
     gyro = new Pigeon2(GYRO_ID);
@@ -334,6 +337,13 @@ public class Chassis extends SubsystemBase {
   public void periodic() {
     poseEstimator.update(getAngle(), getModulePositions());
     field.setRobotPose(getPose());
+  /*x  double[] llpython = NetworkTableInstance.getDefault().getTable("limelight").getEntry("llpython")
+      .getDoubleArray(new double[8]);
+    double distance = llpython[0];
+    if(distance != 0){
+      ledControll.state = ledState.SEE_NOTE;
+    }
+     */
     SmartDashboard.putNumber("velocity of chassis", getMoveVelocity());
   }
 }

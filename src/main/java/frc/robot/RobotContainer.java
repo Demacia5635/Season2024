@@ -49,6 +49,7 @@ import frc.robot.commands.intake.DispenseCommand;
 import frc.robot.commands.intake.IntakeCommand;
 import frc.robot.commands.intake.IntakeToShooter;
 import frc.robot.commands.intake.ShootCommand;
+import frc.robot.subsystems.LedControll;
 import frc.robot.subsystems.amp.Amp;
 import frc.robot.subsystems.amp.AmpConstants;
 import frc.robot.subsystems.chassis.Chassis;
@@ -74,6 +75,7 @@ public class RobotContainer implements Sendable{
   Amp amp;
   Intake intake;
   Chassis chassis;
+  LedControll ledControll;
 
   Command intake2shooter;
   Command intake2amp;
@@ -96,10 +98,10 @@ public class RobotContainer implements Sendable{
 
   public RobotContainer() {
 
-    chassis = new Chassis();
+    chassis = new Chassis(ledControll);
     intake = new Intake();
 
-
+    //ledControll = new LedControll(0, 60);
     // alliance = DriverStation.getAlliance().get();
     // isRed = (alliance == Alliance.Red)   ;
     // DriveCommand drive = new DriveCommand(chassis, controller, commandController, isRed);
@@ -181,8 +183,9 @@ public class RobotContainer implements Sendable{
         commandController.x().whileTrue(new IntakeToShooter(intake, shooter, wantedShootingVel));
         commandController.rightBumper().onTrue(new InstantCommand(()-> {shooter.stopAll();intake.stop();}, intake, shooter).ignoringDisable(true));
         commandController.y().onTrue(new DriveToNote(chassis).alongWith(new InstantCommand(()->intake.setPower(1), intake)));
+        commandController.povUpRight().onTrue(new InstantCommand((()->chassis.setOdometryToForward()), chassis));
         //commandController.b().whileTrue(new AmpIntake2(amp));
-        commandController.rightTrigger().onTrue(new GoToAngleAmp(amp, wantedAngle, wantedAmpVel, wantedAmpAngle));
+        //commandController.rightTrigger().onTrue(new GoToAngleAmp(amp, wantedAngle, wantedAmpVel, wantedAmpAngle));
         // if(controller.getCrossButton()) new InstantCommand(()->{chassis.setOdometryToForward();});
     // commandController.x().onTrue(new InstantCommand(()->{chassis.setOdometryToForward();}));
     

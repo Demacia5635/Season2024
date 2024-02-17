@@ -8,8 +8,8 @@ import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.subsystems.LedControll;
 import frc.robot.subsystems.chassis.Chassis;
-import frc.robot.utils.LedControll;
 
 import static frc.robot.subsystems.chassis.ChassisConstants.*;
 
@@ -50,7 +50,7 @@ public class DriveCommand extends Command {
 
     
 
-    double rot = -(deadband(commandXboxController.getLeftTriggerAxis(), 0.1) - deadband(commandXboxController.getRightTriggerAxis(), 0.1));
+    double rot = -(deadband(commandXboxController.getRightTriggerAxis(), 0.1) - deadband(commandXboxController.getLeftTriggerAxis(), 0.1));
     
     if(rot != 0){
       rotateToApriltag = false;
@@ -82,17 +82,7 @@ public class DriveCommand extends Command {
 
     //System.out.println("target velocity= " + velRot);
 
-    llpython = NetworkTableInstance.getDefault().getTable("limelight").getEntry("llpython").getDoubleArray(new double[8]);
-    Dist = llpython[0];
-    System.out.println("Dist is : " + Dist);
-    if(Dist != 0){
-      if(Dist <= 150){
-        led.blink(0, 255, 0);
-      }
-      else{
-        led.setColor(0, 255, 0);
-      }
-    }
+    
 
 
 
