@@ -6,12 +6,16 @@ public class IntakeConstants {
         public static final int MOTOR = 41;
         public static final int LIGHT_LIMIT = 0;
         public static final int MECHANICAL_LIMIT = 0;
+        public static final int COUNTER_ID = 3;
       }
       public static class ConvertionParams {
         public static final double MOTOR_GEAR_RATIO = 1/3.0; // (1/number)
         public static final double MOTOR_PULSES_PER_SPIN = 2048;
       }
       public static class Parameters{
+        public static final double COUNTER_M_PERA = 3790.938994;
+        public static final double COUNTER_B_PERA = 65.13290974;
+
         public static final double DEADBAND = 0.2;
         public static final boolean IS_INVERTED = true;
         public static final double NOT_PRESENCE_VOLTAGE = 3.3;
