@@ -30,7 +30,8 @@ public class DriveToNote extends Command {
   NetworkTableEntry llentry;
   ChassisSpeeds speed;
 
-  PIDController rotationPidController = new PIDController(0.4, 0.00, 0.000025);
+//  PIDController rotationPidController = new PIDController(0.4, 0.00, 0.000025);
+  double kp = 0.4;
 
   public DriveToNote(Chassis chassis) {
     this.chassis = chassis;
@@ -61,7 +62,7 @@ public class DriveToNote extends Command {
       }
 
     } else {
-      double rotateVel = (Math.abs(angle) <= 4) ? 0 : rotationPidController.calculate(-angle,4);
+      double rotateVel = (Math.abs(angle) <= 4) ? 0 : (4 + angle) * kp;
       SmartDashboard.putBoolean("isalligned", Math.abs(angle) <= 5); 
       SmartDashboard.putNumber("rotvel", -Math.toRadians(rotateVel));
 
