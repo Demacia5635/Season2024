@@ -365,7 +365,7 @@ public class Amp extends SubsystemBase{
         SmartDashboard.putNumber("SnowBlower ampere", getSnowblowerA());
 
         SmartDashboard.putNumber("neo1 encoder",getNeosRev()[0]);
-        SmartDashboard.putNumber("neo2 encoder",getNeosRev()[0]);
+        SmartDashboard.putNumber("neo2 encoder",getNeosRev()[1]);
 
         SmartDashboard.putBoolean("Optic Limit switch state", didNotePass());
         SmartDashboard.putNumber("Optic Limit switch Voltage", getLimitVolt());

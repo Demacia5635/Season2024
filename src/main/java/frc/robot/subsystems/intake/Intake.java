@@ -5,6 +5,8 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.fasterxml.jackson.annotation.JsonCreator.Mode;
+
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
  
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
@@ -12,6 +14,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.AnalogTrigger;
+import edu.wpi.first.wpilibj.Counter;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -28,6 +31,7 @@ import frc.robot.subsystems.intake.IntakeConstants.*;
 public class Intake extends SubsystemBase{
     public final TalonFX motor;
     public AnalogInput limitInput;
+    Counter counter;
  
     //SimpleMotorFeedforward ff2 = new SimpleMotorFeedforward(Parameters.ks2, Parameters.kv2, Parameters.ka2);
     public Intake(){
@@ -36,6 +40,14 @@ public class Intake extends SubsystemBase{
  
         limitInput = new AnalogInput(IntakeDeviceID.LIGHT_LIMIT);
         limitInput.setAccumulatorInitialValue(0);
+
+        counter = new Counter();
+        // setting up the sensor id
+        counter.setUpSource(IntakeConstants.IntakeDeviceID.COUNTER_ID);
+        // setting up the coutner to count pulse duration from rising edge to falling edge
+        counter.setSemiPeriodMode(true);
+        // make the counter do in samples
+        counter.setSamplesToAverage(5);
 
         SmartDashboard.putData(this);
 
@@ -127,6 +139,18 @@ public class Intake extends SubsystemBase{
     public double getRadVelocity(){
         return (motor.getSelectedSensorVelocity()*ConvertionParams.MOTOR_GEAR_RATIO/ConvertionParams.MOTOR_PULSES_PER_SPIN)*2*Math.PI;
     }
+
+    public boolean isNote2(){
+        double t = counter.getPeriod();
+        t *= 1000;
+        t -= 1;
+        if (t > 0.8 || t <= 0){
+            return false;
+        }
+        t *= IntakeConstants.Parameters.COUNTER_M_PERA;    
+        t += IntakeConstants.Parameters.COUNTER_B_PERA;
+        return t < 300;
+    }       
  
     @Override
     public void periodic() {
@@ -142,9 +166,10 @@ public class Intake extends SubsystemBase{
  
     @Override
     public void initSendable(SendableBuilder builder) {
-    super.initSendable(builder);
-    // SmartDashboard.putNumber("power", 0);
-    // SmartDashboard.putData("set power", new RunCommand(()-> setPower(SmartDashboard.getNumber("power", 0)), this));
+        super.initSendable(builder);
+        builder.addBooleanProperty("is note - counter", this::isNote2, null);
+        // SmartDashboard.putNumber("power", 0);
+        // SmartDashboard.putData("set power", new RunCommand(()-> setPower(SmartDashboard.getNumber("power", 0)), this));
     }
 
 }
