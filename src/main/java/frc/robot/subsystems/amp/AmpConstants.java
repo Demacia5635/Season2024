@@ -12,7 +12,7 @@ public class AmpConstants{
       public static final int MAGNETIC_SENSOR_ID = 0;
     }
     public static class ConvertionParams {
-      public static final double M1GearRatio = 1/96.0;
+      public static final double M1GearRatio = 1/128.0;
       public static final double NEO1GearRatio = 1/8.0;
       public static final double NEO2GearRatio = 1/8.0;
 

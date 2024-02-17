@@ -182,7 +182,10 @@ public class Amp extends SubsystemBase{
      * @return true if the arm is fully closed
      */
     public boolean isClose() {
-        return getMagneticSensor();
+        if(getMagneticSensor()){
+            return false;
+        }
+        return true;
     }
     
     /**
@@ -417,7 +420,7 @@ public class Amp extends SubsystemBase{
     public void initSendable(SendableBuilder builder) {
         super.initSendable(builder);
         Command cmd = new Sysid(new Gains[] { Gains.KS, Gains.KV, Gains.KA, Gains.KCos}, this::setPowerArm,
-         this::getVelRadArm, this::getPoseByPulses, null, 0.12, 0.2 ,3, 0.5,0.5, this).getCommand();
+         this::getVelRadArm, this::getPoseByPulses, null, 0.12, 0.3 ,3, 0.5,0.5, this).getCommand();
         SmartDashboard.putData("Amp SYSID", cmd);
     }
     
