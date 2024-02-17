@@ -179,7 +179,7 @@ public class RobotContainer implements Sendable{
         commandController.pov(0).onTrue(new AngleGoToAngle(shooter, wantedAngle).alongWith( new ShooterPowering(shooter, wantedShootingVel)));
         commandController.x().whileTrue(new IntakeToShooter(intake, shooter, wantedShootingVel));
         commandController.rightBumper().onTrue(new InstantCommand(()-> {shooter.stopAll();intake.stop();}, intake, shooter).ignoringDisable(true));
-        commandController.y().onTrue(new DriveAndPickNote(chassis, intake));
+        commandController.y().onTrue(new DriveToNote(chassis).alongWith(new InstantCommand(()->intake.setPower(1), intake)));
         //commandController.b().whileTrue(new AmpIntake2(amp));
         commandController.rightTrigger().onTrue(new GoToAngleAmp(amp, wantedAngle, wantedAmpVel, wantedAmpAngle));
         // if(controller.getCrossButton()) new InstantCommand(()->{chassis.setOdometryToForward();});

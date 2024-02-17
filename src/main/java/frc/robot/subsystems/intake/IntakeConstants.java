@@ -8,7 +8,7 @@ public class IntakeConstants {
         public static final int MECHANICAL_LIMIT = 0;
       }
       public static class ConvertionParams {
-        public static final double MOTOR_GEAR_RATIO = 1/1.9; // (1/number)
+        public static final double MOTOR_GEAR_RATIO = 1/3.0; // (1/number)
         public static final double MOTOR_PULSES_PER_SPIN = 2048;
       }
       public static class Parameters{

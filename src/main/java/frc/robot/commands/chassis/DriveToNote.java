@@ -8,6 +8,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.PathFollow.Util.pathPoint;
@@ -19,13 +20,13 @@ import frc.robot.utils.TrapezoidNoam;
 public class DriveToNote extends Command {
   Intake intake;
   Chassis chassis;
-  double velocity = 2;
+  double velocity = 1;
   
   double[] llpython;
   double distance;
   double angle;
   NetworkTableEntry llentry;
-  PIDController rotationPidController = new PIDController(0.4, 0.00, 0.0000);
+  PIDController rotationPidController = new PIDController(0.4, 0.00, 0.000025);
 
   public DriveToNote(Chassis chassis) {
     this.chassis = chassis;
@@ -42,24 +43,38 @@ public class DriveToNote extends Command {
   @Override
   public void execute() {
     llpython = llentry.getDoubleArray(new double[8]);
-    distance = llpython[0];
+    distance = llpython[0] + 50;
     angle = llpython[1];
-    System.out.println("Angle: " + angle);
+    System.out.println("Angle Note: " + angle);
+
+    SmartDashboard.putNumber("ANGLE NOTE", angle);
+    SmartDashboard.putNumber("DISTANCE NOTE", distance);
+
     
-    double rotateVel = (Math.abs(angle) <= 2) ? 0 : Math.PI / 2 * Math.signum(angle); //rotationPidController.calculate(-angle,0); 
+    double rotateVel = (Math.abs(angle) <= 4) ? 0 : rotationPidController.calculate(-angle,4);
+    SmartDashboard.putBoolean("isalligned", Math.abs(angle) <= 5); 
+    SmartDashboard.putNumber("rotvel", -Math.toRadians(rotateVel));
+
     /*double Note_X = llpython[2];
     double Note_Y = llpython[3];*/
-    angle += chassis.getAngle().getDegrees();
-    angle = Math.toRadians(angle);
-    double v = 0; //distance == 0? 0 : velocity;
-    ChassisSpeeds speed = new ChassisSpeeds(-v*Math.cos(angle), -v*Math.sin(angle), -rotateVel);
+    double angle2 = angle + chassis.getAngle().getDegrees();
+    angle2 = Math.toRadians(angle2);
+    double v = distance == 0? 0 : velocity;
+    ChassisSpeeds speed;
+    if(rotateVel == 0) {
+      speed = new ChassisSpeeds(-v*Math.cos(angle2), -v*Math.sin(angle2), 0);  
+    }
+    else{
+      speed = new ChassisSpeeds(0,0, -Math.toRadians(rotateVel));
+    }
+
+    
     chassis.setVelocities(speed);
     
   }
 @Override
   public void initSendable(SendableBuilder builder) {
-    builder.addDoubleProperty("anglsgkhdhu", ()-> angle, null);    
-    builder.addDoubleProperty("dist", ()-> distance, null);    
+       
 
   }
 
