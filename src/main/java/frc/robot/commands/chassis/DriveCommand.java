@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.LedControll;
 import frc.robot.subsystems.chassis.Chassis;
-
+import static frc.robot.utils.Utils.*;
 import static frc.robot.subsystems.chassis.ChassisConstants.*;
 
 public class DriveCommand extends Command {
@@ -90,7 +90,5 @@ public class DriveCommand extends Command {
     chassis.setVelocities(speeds);
   }
 
-  private double deadband(double x, double threshold) {
-    return (Math.abs(x) < threshold)?0:x;
-  }
+
 }

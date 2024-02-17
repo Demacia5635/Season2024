@@ -31,7 +31,7 @@ public class DriveToNote extends Command {
   NetworkTableEntry llentry;
   ChassisSpeeds speed;
 
-  PIDController rotationPidController = new PIDController(0.03, 0.00, 0.006);
+  PIDController rotationPidController = new PIDController(0.045, 0.00, 0.006);
 
   public DriveToNote(Chassis chassis) {
     this.chassis = chassis;

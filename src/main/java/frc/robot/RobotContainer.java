@@ -32,6 +32,7 @@ import frc.robot.commands.shooter.ShooterSending;
 import frc.robot.commands.shooter.ShooterShoot;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterConstants;
+import frc.robot.utils.Utils;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.PathFollow.Util.pathPoint;
 import frc.robot.commands.amp.AmpIntake;
@@ -98,10 +99,10 @@ public class RobotContainer implements Sendable{
 
   public RobotContainer() {
 
-    chassis = new Chassis(ledControll);
+    chassis = new Chassis();
     intake = new Intake();
 
-    ledControll = new LedControll(0, 60);
+//    ledControll = new LedControll(0, 60);
     // alliance = DriverStation.getAlliance().get();
     // isRed = (alliance == Alliance.Red)   ;
     // DriveCommand drive = new DriveCommand(chassis, controller, commandController, isRed);
@@ -166,27 +167,28 @@ public class RobotContainer implements Sendable{
   }
     private void configureBindings() {
 
-      //wanted angle = 54 angle for close to speaker
-        wantedAngle = 36
-        ;
+      //wanted angle = 56 angle for close to speaker
+        wantedAngle = 56;
         wantedAmpAngle = 110/360*2*Math.PI;
     //   SmartDashboard.putNumber("wanted angle", 60);
     //   SmartDashboard.putNumber("wanted shooting vel for noga", 0);
     //   wantedAngle = SmartDashboard.getNumber("wanted angle", 60);
-        wantedShootingVel = 12;
+        wantedShootingVel = 14;
         wantedAmpVel = Math.PI/2;
     //   wantedShootingVel = SmartDashboard.getNumber("wanted shooting vel for noga", 0);
     //   commandController.b().onTrue(new AngleQuel(shooter));
         commandController.a().onTrue(new IntakeCommand(intake));
         
-        commandController.pov(0).onTrue(new AngleGoToAngle(shooter, wantedAngle).alongWith( new ShooterPowering(shooter, wantedShootingVel)));
-        commandController.x().whileTrue(new IntakeToShooter(intake, shooter, wantedShootingVel));
-        commandController.rightBumper().onTrue(new InstantCommand(()-> {shooter.stopAll();intake.stop();}, intake, shooter).ignoringDisable(true));
-        commandController.y().onTrue(new DriveToNote(chassis).raceWith(new IntakeCommand(intake)));
+        commandController.pov(0).whileTrue(new IntakeToShooter(intake, shooter, wantedShootingVel));
+        commandController.x().onTrue(new AngleGoToAngle(shooter, wantedAngle).alongWith( new ShooterPowering(shooter, wantedShootingVel)));
+        commandController.rightBumper().onTrue(new InstantCommand(()-> {shooter.stopAll();intake.stop();}, intake, shooter).andThen(new AngleQuel(shooter)));
+        commandController.y().onTrue((new DriveToNote(chassis).raceWith(new IntakeCommand(intake))));
         //commandController.b().whileTrue(new AmpIntake2(amp));
+        Trigger trigger = new Trigger(()-> Utils.joystickOutOfDeadband(commandController));
+        trigger.onTrue(chassis.getDefaultCommand());
         //commandController.rightTrigger().onTrue(new GoToAngleAmp(amp, wantedAngle, wantedAmpVel, wantedAmpAngle));
         // if(controller.getCrossButton()) new InstantCommand(()->{chassis.setOdometryToForward();});
-    // commandController.x().onTrue(new InstantCommand(()->{chassis.setOdometryToForward();}));
+        commandController.pov(180).onTrue(new InstantCommand(()->{chassis.setOdometryToForward();}));
     
     }
 
@@ -204,7 +206,7 @@ public class RobotContainer implements Sendable{
   public Command getAutonomousCommand() {
     //return new PathFollow(chassis, points, 3, 6, DriverStation.getAlliance().get() == Alliance.Red);
    
-    return new InstantCommand(() -> ledControll.setColor(55, 55, 0));
+   // return new InstantCommand(() -> ledControll.setColor(55, 55, 0));
     /*.andThen(new PathFollow(chassis, points2, 1, 2, 0, DriverStation.getAlliance().get() == Alliance.Red)
     .alongWith(new IntakeCommand(intake)));*/
     //.alongWith(new AmpIntake(amp, AmpConstants.CommandParams.v1, AmpConstants.CommandParams.v2))
@@ -214,6 +216,7 @@ public class RobotContainer implements Sendable{
     // return new PathFollow(chassis, points1, 2, 4, 1, true).andThen
     // (new PathFollow(chassis, points2, 2, 4, 0, true));
     //return new RunCommand(()->amp.neo1.set(0.5), amp);
+    return null;
 
   }
 }
