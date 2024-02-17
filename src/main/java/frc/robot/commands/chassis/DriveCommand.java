@@ -45,7 +45,7 @@ public class DriveCommand extends Command {
 
   @Override
   public void execute() {
-    double joyX = deadband(-commandXboxController.getLeftY(), 0.1) * direction;
+    double joyX = deadband(commandXboxController.getLeftY(), 0.1) * direction;
     double joyY = deadband(commandXboxController.getLeftX(), 0.1) * direction;
 
     

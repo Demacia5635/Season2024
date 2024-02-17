@@ -30,7 +30,7 @@ public class DriveToNote extends Command {
   NetworkTableEntry llentry;
   ChassisSpeeds speed;
 
-  PIDController rotationPidController = new PIDController(0.4, 0.00, 0.000025);
+  PIDController rotationPidController = new PIDController(0.03, 0.00, 0.006);
 
   public DriveToNote(Chassis chassis) {
     this.chassis = chassis;
@@ -49,20 +49,15 @@ public class DriveToNote extends Command {
   @Override
   public void execute() {
     llpython = llentry.getDoubleArray(new double[8]);
-    distance = llpython[0] + 50;
+    distance = llpython[0];
     angle = llpython[1];
     System.out.println("Angle Note: " + angle);
     SmartDashboard.putNumber("ANGLE NOTE", angle);
     SmartDashboard.putNumber("DISTANCE NOTE", distance);
 
-    if(distance == 0) {
-      if(lastDistance < 0.75) {
-              speed = new ChassisSpeeds(velocity*Math.cos(lastAngle), velocity*Math.sin(lastAngle), 0); 
-      }
-
-    } else {
-      double rotateVel = (Math.abs(angle) <= 4) ? 0 : rotationPidController.calculate(-angle,4);
-      SmartDashboard.putBoolean("isalligned", Math.abs(angle) <= 5); 
+   
+      double rotateVel = (Math.abs(angle-3) <= 3) ? 0 : rotationPidController.calculate(-angle,3);
+      SmartDashboard.putBoolean("isalligned", Math.abs(angle) <= 4); 
       SmartDashboard.putNumber("rotvel", -Math.toRadians(rotateVel));
 
       double angle2 = angle + chassis.getAngle().getDegrees();
@@ -73,7 +68,6 @@ public class DriveToNote extends Command {
       lastAngle = angle2;
   
       
-    }
     
     chassis.setVelocities(speed);
     
@@ -86,7 +80,7 @@ public class DriveToNote extends Command {
 
   @Override
   public boolean isFinished() {
-    return (distance==0)&&(lastDistance>0.75);
+    return false;
   }
 
   // Called once the command ends or is interrupted.

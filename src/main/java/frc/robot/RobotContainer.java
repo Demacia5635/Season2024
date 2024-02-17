@@ -173,7 +173,7 @@ public class RobotContainer implements Sendable{
     //   SmartDashboard.putNumber("wanted angle", 60);
     //   SmartDashboard.putNumber("wanted shooting vel for noga", 0);
     //   wantedAngle = SmartDashboard.getNumber("wanted angle", 60);
-        wantedShootingVel = 17;
+        wantedShootingVel = 12;
         wantedAmpVel = Math.PI/2;
     //   wantedShootingVel = SmartDashboard.getNumber("wanted shooting vel for noga", 0);
     //   commandController.b().onTrue(new AngleQuel(shooter));
@@ -182,8 +182,7 @@ public class RobotContainer implements Sendable{
         commandController.pov(0).onTrue(new AngleGoToAngle(shooter, wantedAngle).alongWith( new ShooterPowering(shooter, wantedShootingVel)));
         commandController.x().whileTrue(new IntakeToShooter(intake, shooter, wantedShootingVel));
         commandController.rightBumper().onTrue(new InstantCommand(()-> {shooter.stopAll();intake.stop();}, intake, shooter).ignoringDisable(true));
-        commandController.y().onTrue(new DriveToNote(chassis).alongWith(new InstantCommand(()->intake.setPower(1), intake)));
-        commandController.povUpRight().onTrue(new InstantCommand((()->chassis.setOdometryToForward()), chassis));
+        commandController.y().onTrue(new DriveToNote(chassis).raceWith(new IntakeCommand(intake)));
         //commandController.b().whileTrue(new AmpIntake2(amp));
         //commandController.rightTrigger().onTrue(new GoToAngleAmp(amp, wantedAngle, wantedAmpVel, wantedAmpAngle));
         // if(controller.getCrossButton()) new InstantCommand(()->{chassis.setOdometryToForward();});
