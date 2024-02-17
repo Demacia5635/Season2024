@@ -8,7 +8,6 @@ import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.subsystems.LedControll;
 import frc.robot.subsystems.chassis.Chassis;
 import static frc.robot.utils.Utils.*;
 import static frc.robot.subsystems.chassis.ChassisConstants.*;
@@ -16,7 +15,7 @@ import static frc.robot.subsystems.chassis.ChassisConstants.*;
 public class DriveCommand extends Command {
   private final Chassis chassis;
   private final CommandXboxController commandXboxController;
-  private LedControll led;
+  // private LedControll led;
 
   private double direction;
 
@@ -33,7 +32,7 @@ public class DriveCommand extends Command {
     this.chassis = chassis;
     this.commandXboxController = commandXboxController;
     direction = isRed ? 1 : -1;
-    led = new LedControll(9, 100);
+    // led = new LedControll(9, 100);
     addRequirements(chassis);
     commandXboxController.b().onTrue(new InstantCommand(() -> precisionDrive = !precisionDrive));
     // commandXboxController.y().onTrue(new InstantCommand((() -> this.wantedAngleApriltag = chassis.getClosetAngleApriltag())).andThen(() -> rotateToApriltag = true));
