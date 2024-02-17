@@ -37,7 +37,7 @@ public class IntakeToShooter extends Command {
         this.intake = intake;
         this.shooter = shooter;
         this.shootingVel = shootingVel;
-        // addRequirements(intake, shooter);
+        addRequirements(intake, shooter);
         SmartDashboard.putData(this);
     }
 
@@ -85,6 +85,7 @@ public class IntakeToShooter extends Command {
     /**checks if there is note on the shooter */
     @Override
     public boolean isFinished() {
-        return noteCount >= 2;
+        //return noteCount >= 2;
+        return false;
     }
 }

@@ -95,7 +95,7 @@ public class SwerveModule implements Sendable {
         // set motors paramters
         moveMotor.setNeutralMode(NeutralMode.Brake);
         steerMotor.setNeutralMode(NeutralMode.Brake);
-        moveMotor.setInverted(true);
+        moveMotor.setInverted(false);
         steerMotor.setInverted(constants.inverted);
         moveMotor.setSelectedSensorPosition(0);
         steerMotor.setSelectedSensorPosition(getAngleDegrees()*pulsePerDegree);

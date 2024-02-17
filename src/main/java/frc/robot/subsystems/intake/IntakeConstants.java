@@ -14,7 +14,7 @@ public class IntakeConstants {
       public static class Parameters{
         public static final double DEADBAND = 0.2;
         public static final boolean IS_INVERTED = true;
-        public static final double NOT_PRESENCE_VOLTAGE = 3.3;
+        public static final double NOT_PRESENCE_VOLTAGE = 4;
 
         public static final double MIN_CURRENT_TO_AMP = 50;
         public static final double MIN_CURRENT_TO_SHOOTER = 10;

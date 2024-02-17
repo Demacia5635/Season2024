@@ -21,11 +21,15 @@ public class DriveToNote extends Command {
   Intake intake;
   Chassis chassis;
   double velocity = 1;
+  double lastDistance;
   
   double[] llpython;
   double distance;
   double angle;
+  double lastAngle;
   NetworkTableEntry llentry;
+  ChassisSpeeds speed;
+
   PIDController rotationPidController = new PIDController(0.4, 0.00, 0.000025);
 
   public DriveToNote(Chassis chassis) {
@@ -34,6 +38,8 @@ public class DriveToNote extends Command {
   }
   @Override
   public void initialize() {
+    lastDistance = 0;
+    distance = 0;
     llentry = NetworkTableInstance.getDefault().getTable("limelight").getEntry("llpython");    
   }
 
@@ -46,28 +52,28 @@ public class DriveToNote extends Command {
     distance = llpython[0] + 50;
     angle = llpython[1];
     System.out.println("Angle Note: " + angle);
-
     SmartDashboard.putNumber("ANGLE NOTE", angle);
     SmartDashboard.putNumber("DISTANCE NOTE", distance);
 
-    
-    double rotateVel = (Math.abs(angle) <= 4) ? 0 : rotationPidController.calculate(-angle,4);
-    SmartDashboard.putBoolean("isalligned", Math.abs(angle) <= 5); 
-    SmartDashboard.putNumber("rotvel", -Math.toRadians(rotateVel));
+    if(distance == 0) {
+      if(lastDistance < 0.75) {
+              speed = new ChassisSpeeds(velocity*Math.cos(lastAngle), velocity*Math.sin(lastAngle), 0); 
+      }
 
-    /*double Note_X = llpython[2];
-    double Note_Y = llpython[3];*/
-    double angle2 = angle + chassis.getAngle().getDegrees();
-    angle2 = Math.toRadians(angle2);
-    double v = distance == 0? 0 : velocity;
-    ChassisSpeeds speed;
-    if(rotateVel == 0) {
-      speed = new ChassisSpeeds(-v*Math.cos(angle2), -v*Math.sin(angle2), 0);  
-    }
-    else{
-      speed = new ChassisSpeeds(0,0, -Math.toRadians(rotateVel));
-    }
+    } else {
+      double rotateVel = (Math.abs(angle) <= 4) ? 0 : rotationPidController.calculate(-angle,4);
+      SmartDashboard.putBoolean("isalligned", Math.abs(angle) <= 5); 
+      SmartDashboard.putNumber("rotvel", -Math.toRadians(rotateVel));
 
+      double angle2 = angle + chassis.getAngle().getDegrees();
+      angle2 = Math.toRadians(angle2);
+      speed = new ChassisSpeeds(velocity*Math.cos(angle2), velocity*Math.sin(angle2), rotateVel); 
+      
+      lastDistance = distance;
+      lastAngle = angle2;
+  
+      
+    }
     
     chassis.setVelocities(speed);
     
@@ -76,6 +82,11 @@ public class DriveToNote extends Command {
   public void initSendable(SendableBuilder builder) {
        
 
+  }
+
+  @Override
+  public boolean isFinished() {
+    return (distance==0)&&(lastDistance>0.75);
   }
 
   // Called once the command ends or is interrupted.

@@ -165,7 +165,8 @@ public class RobotContainer implements Sendable{
     private void configureBindings() {
 
       //wanted angle = 54 angle for close to speaker
-        wantedAngle = 34;
+        wantedAngle = 36
+        ;
         wantedAmpAngle = 110/360*2*Math.PI;
     //   SmartDashboard.putNumber("wanted angle", 60);
     //   SmartDashboard.putNumber("wanted shooting vel for noga", 0);

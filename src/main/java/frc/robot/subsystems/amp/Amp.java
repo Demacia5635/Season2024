@@ -52,7 +52,7 @@ public class Amp extends SubsystemBase{
         
         m1 = new TalonFX(AmpDeviceID.M1);
         m1.setInverted(true);
-        m1.setNeutralMode(NeutralMode.Brake);
+        m1.setNeutralMode(NeutralMode.Coast);
 
         magneticSensor = new DigitalInput(AmpConstants.AmpDeviceID.MAGNETIC_SENSOR_ID);       
         m2 = new TalonSRX(AmpDeviceID.M2);
