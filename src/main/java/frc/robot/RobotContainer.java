@@ -101,7 +101,7 @@ public class RobotContainer implements Sendable{
     chassis = new Chassis(ledControll);
     intake = new Intake();
 
-    //ledControll = new LedControll(0, 60);
+    ledControll = new LedControll(0, 60);
     // alliance = DriverStation.getAlliance().get();
     // isRed = (alliance == Alliance.Red)   ;
     // DriveCommand drive = new DriveCommand(chassis, controller, commandController, isRed);
@@ -204,7 +204,7 @@ public class RobotContainer implements Sendable{
   public Command getAutonomousCommand() {
     //return new PathFollow(chassis, points, 3, 6, DriverStation.getAlliance().get() == Alliance.Red);
    
-    return new PathFollow(chassis, points, 1, 2, 0.5, DriverStation.getAlliance().get() == Alliance.Red);
+    return new InstantCommand(() -> ledControll.setColor(55, 55, 0));
     /*.andThen(new PathFollow(chassis, points2, 1, 2, 0, DriverStation.getAlliance().get() == Alliance.Red)
     .alongWith(new IntakeCommand(intake)));*/
     //.alongWith(new AmpIntake(amp, AmpConstants.CommandParams.v1, AmpConstants.CommandParams.v2))
