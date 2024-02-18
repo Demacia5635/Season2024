@@ -18,7 +18,6 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.chassis.Chassis;
 import frc.robot.subsystems.vision.utils.SwerveDrivePoseEstimator;
@@ -35,11 +34,11 @@ public class Vision extends SubsystemBase {
     Field2d visionFieldavg5;
 
     //declaring limelights
-    PhotonCamera Limelight2;
-    PhotonPoseEstimator photonPoseEstimatorForLimelight2;
-    PhotonCamera Limelight3;
-    PhotonPoseEstimator photonPoseEstimatorForLimelight3;
-    
+    PhotonCamera AmpSideRaspberry;
+    PhotonPoseEstimator photonPoseEstimatorForAmpSideRaspberry;
+    PhotonCamera ShooterSideRaspberry;
+    PhotonPoseEstimator photonPoseEstimatorForShooterSideRaspberry;
+
     // declaring poseEstimator chassis and buffers 
     SwerveDrivePoseEstimator poseEstimator;
     Chassis chassis;
@@ -81,20 +80,21 @@ public class Vision extends SubsystemBase {
         this.buf5Avg = new VisionData[5];
         this.buf3Med  = new VisionData[3];
         this.buf5Med = new VisionData[5];
-        this.Limelight2 = new PhotonCamera(Limelight2Name);
-        this.Limelight3 = new PhotonCamera(Pi5CameraName);
+        this.AmpSideRaspberry = new PhotonCamera(AmpSideRaspberryName);
+        this.ShooterSideRaspberry = new PhotonCamera(ShooterSideRaspberryName);
         
         countCycles = 0;
         this.firstRun = true;
 
         //initializing photons pose estimators
         try {
-             this.photonPoseEstimatorForLimelight2 = new PhotonPoseEstimator(AprilTagFieldLayout.loadFromResource(AprilTagFields.k2024Crescendo.m_resourceFile),
-             PoseStrategy.AVERAGE_BEST_TARGETS, Limelight2, robotCenterToLimelight2Transform);
+            this.photonPoseEstimatorForAmpSideRaspberry = new PhotonPoseEstimator(AprilTagFieldLayout.loadFromResource(AprilTagFields.k2024Crescendo.m_resourceFile),
+            PoseStrategy.AVERAGE_BEST_TARGETS, AmpSideRaspberry, robotCenterToAmpSideRaspberry);
 
-             this.photonPoseEstimatorForLimelight3 = new PhotonPoseEstimator(AprilTagFieldLayout.loadFromResource(AprilTagFields.k2024Crescendo.m_resourceFile),
-             PoseStrategy.AVERAGE_BEST_TARGETS, Limelight3, robotCenterToLimelight3Transform);
-        } catch (IOException e) {
+            this.photonPoseEstimatorForShooterSideRaspberry = new PhotonPoseEstimator(AprilTagFieldLayout.loadFromResource(AprilTagFields.k2024Crescendo.m_resourceFile),
+            PoseStrategy.AVERAGE_BEST_TARGETS, ShooterSideRaspberry, robotCenterToShooterSideRaspberry);
+        } 
+        catch (IOException e) {
             System.out.println("problem with photon pose estimators");
             e.printStackTrace();
         } 
@@ -192,13 +192,13 @@ public class Vision extends SubsystemBase {
     }
 
     // calls the limelights to get updates and put the data in the buffer 
-    private void getNewDataFromLimelightX(Limelight x) {
+    private void getNewDataFromLimelightX(RaspberryPi raspberryPi) {
         //determines camera
         PhotonPoseEstimator photonPoseEstimator;
-        if(x.equals(Limelight.Limelight2))
-            photonPoseEstimator = photonPoseEstimatorForLimelight2;
+        if(raspberryPi.equals(RaspberryPi.ShooterSideRaspberry))
+            photonPoseEstimator = photonPoseEstimatorForShooterSideRaspberry;
         else
-            photonPoseEstimator = photonPoseEstimatorForLimelight3;
+            photonPoseEstimator = photonPoseEstimatorForAmpSideRaspberry;
         if (chassis.getVelocity().getNorm() <= maxValidVelcity) {
             var PhotonUpdate = photonPoseEstimator.update();
             if(PhotonUpdate != null){
@@ -250,8 +250,8 @@ public class Vision extends SubsystemBase {
         super.periodic();
         countCycles++;
 
-        getNewDataFromLimelightX(Limelight.Limelight2);
-        getNewDataFromLimelightX(Limelight.Limelight3);
+        getNewDataFromLimelightX(RaspberryPi.AmpSideRaspberry);
+        getNewDataFromLimelightX(RaspberryPi.ShooterSideRaspberry);
         updateRobotPose();
         updateRobotPose5();
         SmartDashboard.putNumber("angle", visionField.getRobotPose().getRotation().getDegrees());
@@ -473,8 +473,8 @@ public class Vision extends SubsystemBase {
     }
 
     //enum for choosing which limelight to use
-    enum Limelight{
-        Limelight2,
-        Limelight3
+    enum RaspberryPi{
+        ShooterSideRaspberry,
+        AmpSideRaspberry
     }
 }

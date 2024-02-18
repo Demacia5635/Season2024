@@ -1,6 +1,8 @@
 package frc.robot;
 
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
@@ -11,7 +13,9 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.PathFollow.Util.pathPoint;
 import frc.robot.commands.chassis.DriveCommand;
+import frc.robot.commands.chassis.PathFollow;
 import frc.robot.commands.chassis.RotateToAngleShooter;
 import frc.robot.commands.chassis.SetModuleAngle;
 import frc.robot.commands.chassis.TestSteerVandA;
@@ -65,23 +69,17 @@ public class RobotContainer implements Sendable{
    */
   public Command getAutonomousCommand() {
   
-    // return new RunCommand(()-> chassis.setVelocities(new ChassisSpeeds(0.5, 0, 0)), chassis).withTimeout(4).
-    // andThen(new RunCommand(()-> chassis.setVelocities(new ChassisSpeeds(-1, 0, 0)), chassis).withTimeout(3.5)).
-    // andThen(new RunCommand(()-> chassis.setVelocities(new ChassisSpeeds(1.5, 0, 0)), chassis).withTimeout(3)).
-    // andThen(new RunCommand(()-> chassis.setVelocities(new ChassisSpeeds(-2, 0, 0)), chassis).withTimeout(3)).
-    // andThen(new RunCommand(()-> chassis.setVelocities(new ChassisSpeeds(2.5, 0, 0)), chassis).withTimeout(2.5)).
-    // andThen(new RunCommand(()-> chassis.setVelocities(new ChassisSpeeds(-3, 0, 0)), chassis).withTimeout(2)).
-    // andThen(new RunCommand(()-> chassis.setVelocities(new ChassisSpeeds(3.5, 0, 0)), chassis).withTimeout(1.5)).
-    // andThen(new RunCommand(()-> chassis.setVelocities(new ChassisSpeeds(-4, 0, 0)), chassis).withTimeout(1));
-  
+    Pose2d pose = chassis.getPose();
+    pathPoint[] pointArrForX = {new pathPoint(0, 0, Rotation2d.fromDegrees(0), 0, false), new pathPoint(pose.getX() + 2, pose.getY(), Rotation2d.fromDegrees(0), 0, false),new pathPoint(pose.getX() - 2, pose.getY(), Rotation2d.fromDegrees(0), 0, false)};
 
-    return new RunCommand(()-> chassis.setVelocities(new ChassisSpeeds(0, 0.5, 0)), chassis).withTimeout(4).
-    andThen(new RunCommand(()-> chassis.setVelocities(new ChassisSpeeds(0, -1, 0)), chassis).withTimeout(3)).
-    andThen(new RunCommand(()-> chassis.setVelocities(new ChassisSpeeds(0, 1.5, 0)), chassis).withTimeout(2)).
-    andThen(new RunCommand(()-> chassis.setVelocities(new ChassisSpeeds(0, -2, 0)), chassis).withTimeout(2)).
-    andThen(new RunCommand(()-> chassis.setVelocities(new ChassisSpeeds(0, 2.5, 0)), chassis).withTimeout(1)).
-    andThen(new RunCommand(()-> chassis.setVelocities(new ChassisSpeeds(0, -3, 0)), chassis).withTimeout(1)).
-    andThen(new RunCommand(()-> chassis.setVelocities(new ChassisSpeeds(0, 3.5, 0)), chassis).withTimeout(1)).
-    andThen(new RunCommand(()-> chassis.setVelocities(new ChassisSpeeds(0, -4, 0)), chassis).withTimeout(1));
+    pathPoint[] pointArrForY = {new pathPoint(0, 0, Rotation2d.fromDegrees(0), 0, false), new pathPoint(pose.getX(), pose.getY() + 2, Rotation2d.fromDegrees(0), 0, false), new pathPoint(pose.getX(), pose.getY() - 2, Rotation2d.fromDegrees(0), 0, false)};
+
+    // return new PathFollow(chassis,pointArrForX , 1, 1).andThen(new PathFollow(chassis,pointArrForX , 2, 1.5).
+    // andThen(new PathFollow(chassis,pointArrForX , 2.5, 1.75).andThen(new PathFollow(chassis,pointArrForX , 3, 2).
+    // andThen(new PathFollow(chassis,pointArrForX , 3.5, 2).andThen(new PathFollow(chassis,pointArrForX , 4, 2.5))))));
+
+    return new PathFollow(chassis,pointArrForY , 1, 1).andThen(new PathFollow(chassis,pointArrForY , 2, 1.5).
+    andThen(new PathFollow(chassis,pointArrForY , 2.5, 1.75).andThen(new PathFollow(chassis,pointArrForY , 3, 2).
+    andThen(new PathFollow(chassis,pointArrForY , 3.5, 2).andThen(new PathFollow(chassis,pointArrForY , 4, 2.5))))));
   }
 }
