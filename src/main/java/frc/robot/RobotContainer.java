@@ -32,6 +32,7 @@ import frc.robot.commands.shooter.ShooterSending;
 import frc.robot.commands.shooter.ShooterShoot;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterConstants;
+import frc.robot.utils.Utils;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.PathFollow.Util.pathPoint;
 import frc.robot.commands.amp.AmpIntake;
@@ -86,6 +87,8 @@ public class RobotContainer implements Sendable{
   double wantedAmpVel;
   double wantedAmpAngle;
 
+  
+
   pathPoint[] points = {new pathPoint(0, 0, Rotation2d.fromDegrees(0), 0, false),
     new pathPoint(1.35, -0.6, Rotation2d.fromDegrees(180), 0, false)
   };
@@ -112,6 +115,7 @@ public class RobotContainer implements Sendable{
     chassis.setDefaultCommand(new DriveCommand(chassis, commandController, DriverStation.getAlliance().get() == Alliance.Red));
     
 
+    
     SmartDashboard.putData("RC", this);
     configureBindings();
   }
@@ -164,6 +168,8 @@ public class RobotContainer implements Sendable{
   }
     private void configureBindings() {
 
+      Trigger overrideAuto = new Trigger(()->Utils.joystickOutOfDeadband(commandController));
+
       //wanted angle = 56 angle for close to speaker
         wantedAngle = 56
         ;
@@ -180,12 +186,14 @@ public class RobotContainer implements Sendable{
         commandController.pov(0).whileTrue(new IntakeToShooter(intake, shooter, wantedShootingVel));
         commandController.x().onTrue(new AngleGoToAngle(shooter, wantedAngle).alongWith( new ShooterPowering(shooter, wantedShootingVel)));
   
-        commandController.rightBumper().onTrue(new InstantCommand(()-> {shooter.stopAll();intake.stop();}, intake, shooter).alongWith(new AngleQuel(shooter)));
+        commandController.rightBumper().onTrue(new InstantCommand(()-> {shooter.stopAll();intake.stop();}, intake, shooter).andThen(new AngleQuel(shooter)));
         commandController.y().onTrue(new DriveToNote(chassis).raceWith(new IntakeCommand(intake)));
         //commandController.b().whileTrue(new AmpIntake2(amp));
         //commandController.rightTrigger().onTrue(new GoToAngleAmp(amp, wantedAngle, wantedAmpVel, wantedAmpAngle));
         // if(controller.getCrossButton()) new InstantCommand(()->{chassis.setOdometryToForward();});
         commandController.pov(180).onTrue(new InstantCommand(()->{chassis.setOdometryToForward();}));
+        overrideAuto.onTrue(chassis.getDefaultCommand());
+        
     
     }
 
