@@ -164,27 +164,28 @@ public class RobotContainer implements Sendable{
   }
     private void configureBindings() {
 
-      //wanted angle = 54 angle for close to speaker
-        wantedAngle = 36
+      //wanted angle = 56 angle for close to speaker
+        wantedAngle = 56
         ;
         wantedAmpAngle = 110/360*2*Math.PI;
     //   SmartDashboard.putNumber("wanted angle", 60);
     //   SmartDashboard.putNumber("wanted shooting vel for noga", 0);
     //   wantedAngle = SmartDashboard.getNumber("wanted angle", 60);
-        wantedShootingVel = 12;
+        wantedShootingVel = 14;
         wantedAmpVel = Math.PI/2;
     //   wantedShootingVel = SmartDashboard.getNumber("wanted shooting vel for noga", 0);
     //   commandController.b().onTrue(new AngleQuel(shooter));
         commandController.a().onTrue(new IntakeCommand(intake));
         
-        commandController.pov(0).onTrue(new AngleGoToAngle(shooter, wantedAngle).alongWith( new ShooterPowering(shooter, wantedShootingVel)));
-        commandController.x().whileTrue(new IntakeToShooter(intake, shooter, wantedShootingVel));
-        commandController.rightBumper().onTrue(new InstantCommand(()-> {shooter.stopAll();intake.stop();}, intake, shooter).ignoringDisable(true));
+        commandController.pov(0).whileTrue(new IntakeToShooter(intake, shooter, wantedShootingVel));
+        commandController.x().onTrue(new AngleGoToAngle(shooter, wantedAngle).alongWith( new ShooterPowering(shooter, wantedShootingVel)));
+  
+        commandController.rightBumper().onTrue(new InstantCommand(()-> {shooter.stopAll();intake.stop();}, intake, shooter).alongWith(new AngleQuel(shooter)));
         commandController.y().onTrue(new DriveToNote(chassis).raceWith(new IntakeCommand(intake)));
         //commandController.b().whileTrue(new AmpIntake2(amp));
         //commandController.rightTrigger().onTrue(new GoToAngleAmp(amp, wantedAngle, wantedAmpVel, wantedAmpAngle));
         // if(controller.getCrossButton()) new InstantCommand(()->{chassis.setOdometryToForward();});
-    // commandController.x().onTrue(new InstantCommand(()->{chassis.setOdometryToForward();}));
+        commandController.pov(180).onTrue(new InstantCommand(()->{chassis.setOdometryToForward();}));
     
     }
 
