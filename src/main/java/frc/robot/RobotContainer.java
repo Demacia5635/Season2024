@@ -9,6 +9,8 @@ import com.fasterxml.jackson.core.StreamReadConstraints.Builder;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -91,6 +93,9 @@ public class RobotContainer implements Sendable{
   double wantedAmpVel;
   double wantedAmpAngle;
 
+  double[] llpython;
+  double distance;
+  NetworkTableEntry llentry;
   pathPoint[] points = {new pathPoint(0, 0, Rotation2d.fromDegrees(0), 0, false),
     new pathPoint(1.35, -0.6, Rotation2d.fromDegrees(180), 0, false)
   };
@@ -173,6 +178,10 @@ public class RobotContainer implements Sendable{
   }
     private void configureBindings() {
 
+      llentry = NetworkTableInstance.getDefault().getTable("limelight").getEntry("llpython"); 
+      llpython = llentry.getDoubleArray(new double[8]);
+      distance = llpython[0];
+
       //wanted angle = 54 angle for close to speaker
         wantedAngle = 36;
         wantedAmpAngle = 110/360*2*Math.PI;
@@ -188,13 +197,25 @@ public class RobotContainer implements Sendable{
         commandController.pov(0).onTrue(new AngleGoToAngle(shooter, wantedAngle).alongWith( new ShooterPowering(shooter, wantedShootingVel)));
         commandController.x().whileTrue(new IntakeToShooter(intake, shooter, wantedShootingVel));
         commandController.rightBumper().onTrue(new InstantCommand(()-> {shooter.stopAll();intake.stop();}, intake, shooter).ignoringDisable(true));
-        commandController.y().onTrue(new DriveToNote(chassis).raceWith(new IntakeCommand(intake)).alongWith(new InstantCommand(()-> leds.setBlink(Color.kOrange))));
+        commandController.y().onTrue(new DriveToNote(chassis).raceWith(new IntakeCommand(intake)));
         //commandController.b().whileTrue(new AmpIntake2(amp));
         //commandController.rightTrigger().onTrue(new GoToAngleAmp(amp, wantedAngle, wantedAmpVel, wantedAmpAngle));
         // if(controller.getCrossButton()) new InstantCommand(()->{chassis.setOdometryToForward();});
     // commandController.x().onTrue(new InstantCommand(()->{chassis.setOdometryToForward();}));
+
+      if(distance !=0){
+        if (distance >=150){
+          leds.setBlink(new Color(0,255,0));
+        }
+        else{
+          leds.setColor(new Color(0,255,0));
+        }
+      }
+      else{
+        leds.setColor(new Color("#8524bd"));
+      }
     
-    }
+      }
 
 
     public void calibrate() {

@@ -28,6 +28,7 @@ public class DriveToNote extends Command {
   double distance;
   double angle;
   double lastAngle;
+  int caunt;
   NetworkTableEntry llentry;
   ChassisSpeeds speed;
 
@@ -57,18 +58,17 @@ public class DriveToNote extends Command {
     SmartDashboard.putNumber("DISTANCE NOTE", distance);
 
    
-      double rotateVel = (Math.abs(angle-3) <= 3) ? 0 : rotationPidController.calculate(-angle,3);
-      SmartDashboard.putBoolean("isalligned", Math.abs(angle) <= 4); 
-      SmartDashboard.putNumber("rotvel", -Math.toRadians(rotateVel));
+    double rotateVel = (Math.abs(angle-3) <= 3) ? 0 : rotationPidController.calculate(-angle,3);
+    SmartDashboard.putBoolean("isalligned", Math.abs(angle) <= 4); 
+    SmartDashboard.putNumber("rotvel", -Math.toRadians(rotateVel));
 
-      double angle2 = angle + chassis.getAngle().getDegrees();
-      angle2 = Math.toRadians(angle2);
-      speed = new ChassisSpeeds(velocity*Math.cos(angle2), velocity*Math.sin(angle2), rotateVel); 
-      
-      lastDistance = distance;
-      lastAngle = angle2;
-  
-      
+    double angle2 = angle + chassis.getAngle().getDegrees();
+    angle2 = Math.toRadians(angle2);
+    speed = new ChassisSpeeds(velocity*Math.cos(angle2), velocity*Math.sin(angle2), rotateVel); 
+    
+    lastDistance = distance;
+    lastAngle = angle2;
+    caunt = llpython[0] == 0 ? caunt++ : 0;
     
     chassis.setVelocities(speed);
     
@@ -81,7 +81,7 @@ public class DriveToNote extends Command {
 
   @Override
   public boolean isFinished() {
-    return false;
+    return caunt >=100;
   }
 
   // Called once the command ends or is interrupted.
