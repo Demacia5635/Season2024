@@ -5,7 +5,6 @@
 package frc.robot.commands.led;
 
 import edu.wpi.first.wpilibj.util.Color;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.led.LedConstants;
@@ -21,40 +20,40 @@ public class LedBlink extends SequentialCommandGroup {
         // Add your commands in the addCommands() call, e.g.
         // addCommands(new FooCommand(), new BarCommand());
         addCommands(
-            new InstantCommand(led::turnOff),
+            led.turnOff(),
             new WaitCommand(LedConstants.BLINK_WAIT_TIME / 1000),
-            new InstantCommand(()-> led.setColor(color)),
+            led.setColor(color),
             new WaitCommand(LedConstants.BLINK_WAIT_TIME / 1000)
             );
             
-            addRequirements(led);
+        addRequirements(led);
     }
         
     /** Creates a new Blink. */
     public LedBlink(SubStrip led, Color color) {
-      // Add your commands in the addCommands() call, e.g.
-      // addCommands(new FooCommand(), new BarCommand());
+        // Add your commands in the addCommands() call, e.g.
+        // addCommands(new FooCommand(), new BarCommand());
       
-      addCommands(
-            new InstantCommand(led::turnOff),
+        addCommands(
+            led.turnOff(),
             new WaitCommand(LedConstants.BLINK_WAIT_TIME / 1000),
-            new InstantCommand(()-> led.setColor(color)),
+            led.setColor(color),
             new WaitCommand(LedConstants.BLINK_WAIT_TIME / 1000)
-      );
+        );
 
-      addRequirements(led);
+        addRequirements(led);
     }
 
     public LedBlink(SubStrip led, Color[] color) {
-      // Add your commands in the addCommands() call, e.g.
-      // addCommands(new FooCommand(), new BarCommand());
-      addCommands(
-            new InstantCommand(led::turnOff),
+        // Add your commands in the addCommands() call, e.g.
+        // addCommands(new FooCommand(), new BarCommand());
+        addCommands(
+            led.turnOff(),
             new WaitCommand(LedConstants.BLINK_WAIT_TIME / 1000),
-            new InstantCommand(()-> led.setColor(color)),
+            led.setColor(color),
             new WaitCommand(LedConstants.BLINK_WAIT_TIME / 1000)
-      );
+        );
 
-      addRequirements(led);
+        addRequirements(led);
     }
 }
