@@ -54,6 +54,7 @@ import frc.robot.subsystems.amp.Amp;
 import frc.robot.subsystems.amp.AmpConstants;
 import frc.robot.subsystems.chassis.Chassis;
 import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.leds.SubStrip;
 
 
 public class RobotContainer implements Sendable{
@@ -75,6 +76,7 @@ public class RobotContainer implements Sendable{
   Amp amp;
   Intake intake;
   Chassis chassis;
+  SubStrip leds;
 
   Command intake2shooter;
   Command intake2amp;
@@ -101,6 +103,7 @@ public class RobotContainer implements Sendable{
 
     chassis = new Chassis();
     intake = new Intake();
+    leds = new SubStrip(60);
 
 
     // alliance = DriverStation.getAlliance().get();
@@ -112,7 +115,7 @@ public class RobotContainer implements Sendable{
     commandController = new CommandXboxController(0);
     shooter = new Shooter();
     //shooter.setDefaultCommand(new AngleControl(shooter, commandController));
-    chassis.setDefaultCommand(new DriveCommand(chassis, commandController, DriverStation.getAlliance().get() == Alliance.Red));
+    chassis.setDefaultCommand(new DriveCommand(chassis, commandController, DriverStation.getAlliance().get() == Alliance.Red).alongWith(Utils.setLed(leds)));
     
 
     
@@ -204,8 +207,11 @@ public class RobotContainer implements Sendable{
 
     public void disable(){
         new InstantCommand(()-> {
-            shooter.stopAll();intake.stop();
-        }, intake, shooter).ignoringDisable(true).schedule();
+            shooter.stopAll();
+            intake.stop();
+        }, intake, shooter
+        ).ignoringDisable(true).schedule();
+        leds.turnOff().schedule();
     }
    
   public Command getAutonomousCommand() {

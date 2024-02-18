@@ -2,7 +2,11 @@ package frc.robot.utils;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.subsystems.leds.SubStrip;
 
 public class Utils {
     
@@ -21,5 +25,21 @@ public class Utils {
     
   public static double deadband(double x, double threshold) {
     return (Math.abs(x) < threshold)?0:x;
+  }
+
+  public static Command setLed(SubStrip led){
+    double[] llpython = NetworkTableInstance.getDefault().getTable("limelight").getEntry("llpython").getDoubleArray(new double[8]);
+    double Dist = llpython[0];
+    System.out.println("Dist is : " + Dist);
+    if(Dist != 0){
+      if(Dist <= 150){
+        return led.setBlink(Color.kGreen);
+      }
+      else{
+        return led.setColor(Color.kGreen);
+      }
+    } else {
+      return led.turnOff();
+    }
   }
 }
