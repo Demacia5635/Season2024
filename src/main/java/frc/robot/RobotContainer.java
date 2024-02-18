@@ -104,7 +104,7 @@ public class RobotContainer implements Sendable{
     intake = new Intake();
 
     // ledControll = new LedControll(0, 5);
-    leds = new SubStrip(0,60);
+    leds = new SubStrip(60);
     // alliance = DriverStation.getAlliance().get();
     // isRed = (alliance == Alliance.Red)   ;
     // DriveCommand drive = new DriveCommand(chassis, controller, commandController, isRed);
@@ -174,8 +174,7 @@ public class RobotContainer implements Sendable{
     private void configureBindings() {
 
       //wanted angle = 54 angle for close to speaker
-        wantedAngle = 36
-        ;
+        wantedAngle = 36;
         wantedAmpAngle = 110/360*2*Math.PI;
     //   SmartDashboard.putNumber("wanted angle", 60);
     //   SmartDashboard.putNumber("wanted shooting vel for noga", 0);

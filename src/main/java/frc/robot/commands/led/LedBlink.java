@@ -16,14 +16,15 @@ import frc.robot.subsystems.led.utils.IndividualLed;
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class LedBlink extends SequentialCommandGroup {
+
     public LedBlink(SubStrip led, IndividualLed... color) {
         // Add your commands in the addCommands() call, e.g.
         // addCommands(new FooCommand(), new BarCommand());
         addCommands(
             new InstantCommand(led::turnOff),
-            new WaitCommand(0.5),
+            new WaitCommand(LedConstants.BLINK_WAIT_TIME / 1000),
             new InstantCommand(()-> led.setColor(color)),
-            new WaitCommand(0.5)
+            new WaitCommand(LedConstants.BLINK_WAIT_TIME / 1000)
             );
             
             addRequirements(led);
@@ -49,9 +50,9 @@ public class LedBlink extends SequentialCommandGroup {
       // addCommands(new FooCommand(), new BarCommand());
       addCommands(
             new InstantCommand(led::turnOff),
-            new WaitCommand(0.5),
+            new WaitCommand(LedConstants.BLINK_WAIT_TIME / 1000),
             new InstantCommand(()-> led.setColor(color)),
-            new WaitCommand(0.5)
+            new WaitCommand(LedConstants.BLINK_WAIT_TIME / 1000)
       );
 
       addRequirements(led);

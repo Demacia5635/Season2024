@@ -6,7 +6,6 @@ package frc.robot.commands.shooter;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.shooter.Shooter;
-import frc.robot.subsystems.shooter.Shooter.SHOOTER_MOTOR;
 
 /**command that will power up the shooter */
 public class ShooterPowering extends Command {
@@ -34,7 +33,6 @@ public class ShooterPowering extends Command {
     /**put the shooting motor at brake */
     @Override
     public void initialize() {
-        shooter.brake(SHOOTER_MOTOR.UP, SHOOTER_MOTOR.DOWN);
     }
 
     // Called every time the scheduler runs while the command is scheduled.

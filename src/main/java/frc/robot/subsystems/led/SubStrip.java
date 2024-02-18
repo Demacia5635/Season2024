@@ -19,9 +19,14 @@ public class SubStrip extends SubsystemBase {
         this.size = size;
     }
 
+    public SubStrip(int size){
+        this.offset = 0;
+        this.size = size;
+    }
+
     public Command setColor(IndividualLed... leds) {
         return new InstantCommand(()-> LedsManager.getInstance().update(Arrays.stream(leds)
-                .map((led) -> new IndividualLed(offset + led.index, led.color)).toArray(IndividualLed[]::new)), this);
+                .map((led) -> new IndividualLed(offset + led.index, led.color)).toArray(IndividualLed[]::new)), this).repeatedly();
     }
 
     public Command setColor(Color color) {
@@ -43,7 +48,7 @@ public class SubStrip extends SubsystemBase {
                 .toArray(IndividualLed[]::new));
     }
     
-    public Command setBlink(double miliSeconds, IndividualLed... leds) {
+    public Command setBlink(IndividualLed... leds) {
         return new LedBlink(this, leds).repeatedly();
     }
 

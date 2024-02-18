@@ -6,7 +6,6 @@ package frc.robot.commands.shooter;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.shooter.Shooter;
-import frc.robot.subsystems.shooter.Shooter.SHOOTER_MOTOR;
 
 /**command that moving the feeding motor until the note is in the shotooter */
 public class ShooterFeeding extends Command {
@@ -33,7 +32,6 @@ public class ShooterFeeding extends Command {
     @Override
     public void initialize() {
         temp = false;
-        shooter.brake(SHOOTER_MOTOR.FEEDING);
     }
 
     // Called every time the scheduler runs while the command is scheduled.
