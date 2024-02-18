@@ -1,6 +1,7 @@
 package frc.robot.subsystems.led.utils;
 
 import java.util.Arrays;
+import java.util.List;
 
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
@@ -46,12 +47,12 @@ public class LedsGeometry {
         hasLMsChanged = new boolean[buffers.length];
     }
 
-    public void setColor(Color[] colors) {
-        for (int i = 0; i < totalLength; i++) {
-            IntPair indexes = deFlattenedCoords[i];
+    public void setColor(List<IndividualLed> leds) {
+        for (IndividualLed led : leds) {
+            IntPair indexes = deFlattenedCoords[led.index];
             hasLMsChanged[indexes.first] = hasLMsChanged[indexes.first]
-                    || !buffers[indexes.first].getLED(indexes.second).equals(colors[i]);
-            buffers[indexes.first].setLED(indexes.second, colors[i]);
+                    || !buffers[indexes.first].getLED(indexes.second).equals(led.color);
+            buffers[indexes.first].setLED(indexes.second, led.color);
         }
 
         for (int i = 0; i < lengths.length; i++) {
@@ -61,5 +62,10 @@ public class LedsGeometry {
             
             hasLMsChanged[i] = false;
         }
+    }
+
+    public Color getColor(int index) {
+        IntPair indexes = deFlattenedCoords[index];
+        return buffers[indexes.first].getLED(indexes.second);
     }
 }
