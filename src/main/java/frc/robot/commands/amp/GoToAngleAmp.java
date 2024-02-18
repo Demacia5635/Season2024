@@ -16,6 +16,8 @@ public class GoToAngleAmp extends Command {
   double acceleRad;
   TrapezoidCalc trap;
   double startTime;
+  boolean last;
+  boolean check = false;
 
   /** Creates a new GoToAngleAmp. */
   public GoToAngleAmp( Amp amp, double angleRad, double maxVelRad, double acceleRad) {
@@ -41,19 +43,19 @@ public class GoToAngleAmp extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if(Timer.getFPGATimestamp()-startTime >= 0.5){
-      amp.setPowerSnowblower(0);
-    }
-
-    double currentAngleRad = amp.getPoseByPulses();
-    double velRad = trap.trapezoid(amp.getVelRadArm(), maxVelRad, 0.17, Math.abs(acceleRad), angleRad-currentAngleRad);
-    amp.setVel(velRad);
-    if((amp.isClose()||amp.isOpen())&&(Timer.getFPGATimestamp()-startTime > 0.5)){
-      amp.stop();
-      if(amp.isOpen()){
+    if(amp.isClose()&&!last){
+      check = true;
+    }else{
+      double currentAngleRad = amp.getPoseByPulses();
+      double velRad = trap.trapezoid(amp.getVelRadArm(), maxVelRad, 0.17, Math.abs(acceleRad), angleRad-currentAngleRad);
+      amp.setVel(velRad);
+      if((amp.isOpen())){
+        amp.stop();
         amp.runSnowblower(0.3, 350);
       }
     }
+    
+    last = amp.isClose();
   }
 
   // Called once the command ends or is interrupted.
@@ -67,6 +69,6 @@ public class GoToAngleAmp extends Command {
   @Override
   public boolean isFinished() {
     //return ((amp.getPoseRad()>=angleRad-10/360*2*Math.PI)&&(amp.getPoseRad()<=angleRad+10/360*2*Math.PI));
-    return (amp.getSnowblowerA()>=350)&&(Timer.getFPGATimestamp()-startTime >1);
+    return ((amp.getSnowblowerA()>=350)&&(Timer.getFPGATimestamp()-startTime >1)||(check));
   }
 }

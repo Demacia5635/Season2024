@@ -75,15 +75,12 @@ public class AmpIntake2 extends CommandBase{
 
         System.out.println("current= "+ amp.getMotorCurrent());
 
-        if((amp.isOpen())&&(!amp.didNotePass())){
-            amp.setNeosPower(-Parameters.INTAKE_POWER); // Run motors at intake speed until note is out;
-        }
     }
 
     @Override
     public boolean isFinished() {
         // Command ends when note is detected and reaches resting spot
-        return amp.isOpen()&&amp.didNotePass();
+        return initialEncoderCount > 0 && amp.getNeoPoseByPulses() >= initialEncoderCount + Parameters.SENSOR_TO_REST_DIST;
     }
 
     @Override
