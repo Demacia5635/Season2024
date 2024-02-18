@@ -225,6 +225,7 @@ public class Vision extends SubsystemBase {
                          newVisionData3Avg.getPose() != null && newVisionData5Med != null && 
                          newVisionData5Med.getPose() != null&& newVisionData3Med != null && 
                          newVisionData3Med.getPose() != null) {
+                            SmartDashboard.putNumber("runningOrNot", 3);
                             lastData = next();
                             lastData5 = next5(); 
                             buf3Avg[lastData] = newVisionData3Avg;
@@ -429,9 +430,10 @@ public class Vision extends SubsystemBase {
             if (poseSample != null
                     && Math.abs(poseSample.getRotation().minus(pose.getRotation()).getDegrees()) < maxValidAngleDiff) {
                 diffrence = poseSample.getTranslation().getDistance(pose.getTranslation());
-            } else {
+            } 
+            else {
                 if(poseSample != null){
-                    System.out.println("cleared on setDifference() func pose sample isnt null, " + poseSample.getRotation().getDegrees() + " " + pose.getRotation().getDegrees());
+                    System.out.println("cleared on setDifference() func pose sample isnt null, " + poseSample.getX() + " " +poseSample.getRotation().getDegrees() + " " + pose.getRotation().getDegrees());
                 }
                 System.out.println("cleared on setDifference() func");
                 clear();
