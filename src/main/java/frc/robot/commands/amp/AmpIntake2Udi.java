@@ -1,11 +1,8 @@
 package frc.robot.commands.amp;
 
-
-import static frc.robot.subsystems.amp.AmpConstantsUdi.Parameters.SENSEOR_ANGLE;
-
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.amp.AmpUdi;
-import frc.robot.subsystems.amp.AmpConstants.Parameters;
+import static frc.robot.subsystems.amp.AmpConstantsUdi.Parameters.*;
 
 public class AmpIntake2Udi extends Command {
 
@@ -14,7 +11,7 @@ public class AmpIntake2Udi extends Command {
     private double initialEncoderCount = 0;
     private boolean hasEntered = false;
 
-    private boolean debug = true;
+    private boolean debug = false;
 
     public AmpIntake2Udi(AmpUdi amp) {
         this.amp = amp;
@@ -30,67 +27,49 @@ public class AmpIntake2Udi extends Command {
         amp.wheelsEncoderReset();
         amp.setArmTargetAngle(SENSEOR_ANGLE);
         initialEncoderCount = 0;
+        noteWasDetected = false;
+        hasEntered = false;
     }
 
     private void debug(String msg) {
-        if(debug) System.out.println(msg);
+        if (debug)
+            System.out.println(msg);
     }
 
     @Override
     public void execute() {
 
-        debug("en 1" + (initialEncoderCount > 0
-                && amp.getSmallWheelsPosition() >= initialEncoderCount + Parameters.SENSOR_TO_REST_DIST));
-        debug("en 2" + noteWasDetected);
-        debug("en lol " +  !hasEntered);
-        if (amp.isSensingNote())
+        if (!noteWasDetected && amp.isSensingNote()) {
             noteWasDetected = true;
-        if (amp.isCriticalCurrent())
+            initialEncoderCount = amp.getSmallWheelsPosition();
+        }
+        if (amp.isIntakePushingNote()) {
             hasEntered = true;
+        }
 
-        // Check for note reaching resting spot based on encoder counts, but only after
-        // initialization
-        if (amp.isAtSensor()) {
-            if (initialEncoderCount > 0
-                    && amp.getSmallWheelsPosition() >= initialEncoderCount + Parameters.SENSOR_TO_REST_DIST) {
-                amp.setWheelsPower(0, 0);
-
-            } else if (noteWasDetected) { // Note detected, use transfer speed
-                amp.setWheelsPower(Parameters.INTAKE_TRANSFER_POWER); // Run motors at transfer speed
-            } else if (!hasEntered) {
-                amp.setWheelsPower(Parameters.INTAKE_POWER); // Run motors at intake speed until note is detected
-
+        // set power based on note position - at target, after sensor, between wheels
+        // and sensor or before wheels
+        if (noteWasDetected) {
+            if (atPosition()) {
+                amp.setWheelsPower(0); // in place
             } else {
-                if (initialEncoderCount > 0
-                        && amp.getSmallWheelsPosition() >= initialEncoderCount + Parameters.SENSOR_TO_REST_DIST) {
-                    amp.setWheelsPower(Parameters.INTAKE_PRE_LIMIT_POWER); // Run motors at intake speed until note is
-                                                                           // detected
-                    debug("en 3 true");
-                }
+                amp.setWheelsPower(INTAKE_POST_SENSOR_POWER); // Run motors after sensor to target based on encoder
             }
-
-            if (noteWasDetected) { // Placeholder for sensor detection
-                debug("detected " +true);
-                if (initialEncoderCount == 0) { // Initialize only when note is first detected
-                    debug("limit amp =" + amp.getNoteSensorVolt());
-
-                    initialEncoderCount = amp.getSmallWheelsPosition();
-                    debug("en 6 true");
-                }
-            }
+        } else if (!hasEntered) { // didn't reach the small wheels yet
+            amp.setWheelsPower(INTAKE_INITIAL_POWER);
+        } else { // reached small wheels but not the sensor
+            amp.setWheelsPower(INTAKE_PRE_SENSOR_POWER);
         }
+    }
 
-        debug("current= " + amp.getSmallWheelsMotorCurrent());
-
-        if ((amp.isOpen()) && (!amp.isSensingNote())) {
-            amp.setWheelsPower(-Parameters.INTAKE_POWER); // Run motors at intake speed until note is out;
-        }
+    private boolean atPosition() {
+        return noteWasDetected && amp.getSmallWheelsPosition() >= initialEncoderCount + SENSOR_TO_REST_DIST;
     }
 
     @Override
     public boolean isFinished() {
         // Command ends when note is detected and reaches resting spot
-        return amp.isAtSensor() && amp.isSensingNote();
+        return atPosition();
     }
 
     @Override

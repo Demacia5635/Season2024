@@ -1,12 +1,6 @@
 package frc.robot.subsystems.amp;
 
-import static frc.robot.subsystems.amp.AmpConstantsUdi.Parameters.ARM_DOWN_POWER;
-import static frc.robot.subsystems.amp.AmpConstantsUdi.Parameters.HOME_ANGLE;
-import static frc.robot.subsystems.amp.AmpConstantsUdi.Parameters.INTAKE_RELEASE_POWER;
-import static frc.robot.subsystems.amp.AmpConstantsUdi.Parameters.MAX_ARM_ACCEL_UP;
-import static frc.robot.subsystems.amp.AmpConstantsUdi.Parameters.MAX_ARM_VEL_UP;
-import static frc.robot.subsystems.amp.AmpConstantsUdi.Parameters.SENSEOR_ANGLE;
-import static frc.robot.subsystems.amp.AmpConstantsUdi.Parameters.UP_ANGLE;
+import static frc.robot.subsystems.amp.AmpConstantsUdi.Parameters.*;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
@@ -60,7 +54,7 @@ public class AmpUdi extends SubsystemBase {
     // SimpleMotorFeedforward ff2 = new SimpleMotorFeedforward(Parameters.ks2,
     // Parameters.kv2, Parameters.ka2);
     public AmpUdi() {
-        armMotor = new TalonFX(AmpDeviceID.ArmMotorID);
+        armMotor = new TalonFX(AmpDeviceID.ARM_MOTOR_ID);
         armMotor.configFactoryDefault();
         armMotor.setInverted(true);
         armMotor.setNeutralMode(NeutralMode.Coast); // to let it rest at the buttom
@@ -69,14 +63,14 @@ public class AmpUdi extends SubsystemBase {
         setArmAngle(Parameters.HOME_ANGLE);
         configArmPIDF();
 
-        armSensor = new DigitalInput(AmpDeviceID.ArmPositionSensorID);
-        lockMotor = new TalonSRX(AmpDeviceID.LockMotorID);
+        armSensor = new DigitalInput(AmpDeviceID.ARM_POSITION_SENSOR_ID);
+        lockMotor = new TalonSRX(AmpDeviceID.LOCK_MOTOR_ID);
         lockMotor.configFactoryDefault();
         lockMotor.setInverted(false);
         lockMotor.setNeutralMode(NeutralMode.Brake);
 
-        smallWheelMotor = new CANSparkMax(AmpDeviceID.SmallWheelMotorID, MotorType.kBrushless);
-        bigWheelMotor = new CANSparkMax(AmpDeviceID.BigWheelMotorID, MotorType.kBrushless);
+        smallWheelMotor = new CANSparkMax(AmpDeviceID.SMALL_WHEEL_MOTOR_ID, MotorType.kBrushless);
+        bigWheelMotor = new CANSparkMax(AmpDeviceID.BIG_WHEEL_MOTOR_ID, MotorType.kBrushless);
         setWheelsBrake();
         wheelsEncoderReset();
         wheelsSetInverted(true);
@@ -203,7 +197,7 @@ public class AmpUdi extends SubsystemBase {
     }
 
     public static double deadband(double value) {
-        return Math.abs(value) < Parameters.Deadband ? 0 : value;
+        return Math.abs(value) < Parameters.DEADBAND ? 0 : value;
     }
 
     public double getArmRadPerSec() {
@@ -218,7 +212,7 @@ public class AmpUdi extends SubsystemBase {
         return (ArmFFParamaters.ARM_UP_KS +
                 tgtVelocity * ArmFFParamaters.ARM_UP_KV +
                 (tgtVelocity - getArmRadPerSec()) * ArmFFParamaters.ARM_UP_KA +
-                ArmFFParamaters.ARM_Kcos * Math.cos(getArmAngle()));
+                ArmFFParamaters.ARM_KCOS * Math.cos(getArmAngle()));
     }
 
     public void setArmVel(double tgtVelocity) {
@@ -226,7 +220,7 @@ public class AmpUdi extends SubsystemBase {
                 DemandType.ArbitraryFeedForward, armFeedForward(tgtVelocity));
     }
 
-    public boolean isCriticalCurrent() {
+    public boolean isIntakePushingNote() {
         return smallWheelMotor.getOutputCurrent() >= Parameters.CRITICAL_CURRENT;
     }
 
@@ -379,8 +373,9 @@ public class AmpUdi extends SubsystemBase {
     }
 
     private Command getDoReleaseCommand() {
-        return new InstantCommand(() -> setWheelsPower(INTAKE_RELEASE_POWER), this).andThen(new WaitCommand(0.7),
-                new InstantCommand(() -> setWheelsPower(0), this));
+        return new InstantCommand(() -> setWheelsPower(INTAKE_RELEASE_SMALL_POWER, INTAKE_RELEASE_BIG_POWER), this)
+                .andThen(new WaitCommand(INTAKE_RELEASE_DURATION),
+                        new InstantCommand(() -> setWheelsPower(0), this));
     }
 
     // command to return to home position
