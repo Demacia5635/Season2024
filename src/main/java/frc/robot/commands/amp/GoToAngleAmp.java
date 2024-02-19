@@ -52,11 +52,13 @@ public class GoToAngleAmp extends Command {
     
     
   
+    
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    amp.setVel(0);
+    //amp.setVel(0);
+    amp.setPowerArm(0);
   }
 
   // Returns true when the command should end.
