@@ -65,13 +65,10 @@ public class AmpConstants{
         * 3 = the arm is going down and more then angle 55
         * 4 = the arm is going down from 55 to 0 
         */
-        public static final double[] KS = {0.1802966, 0};
-        public static final double[] KV = {0.13205069, 0};
-        public static final double[] KA = {0.1531499, 0};
-        public static final double[] Kalpha = {0, 0};
-        public static final double[] Ksin = {0, 0};
-        public static final double[] Kcos = {-0.073106, 0};
-        public static final double[] Kcossin = {0, 0};
+        public static final double KS = 0.1802966;
+        public static final double KV = 0.13205069;
+        public static final double KA = 0.1531499;
+        public static final double Kcos = -0.073106;
 
 
         public static final double[] openFF = {0, 0, 0};

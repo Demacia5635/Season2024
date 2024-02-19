@@ -134,13 +134,13 @@ public class RobotContainer implements Sendable{
 
   public void createCommands() {
      intake2amp = (new DispenseCommand(intake)
-     .alongWith(new AmpIntake2(amp)));
+     .raceWith(new AmpIntake2(amp)));
     
-    amp2Angle = (new RunBrakeArm(amp,Parameters.ARM_RELEASE_POW).andThen(new GoToAngleAmp(amp, Math.toRadians(55), wantedAmpVel,Math.PI*2)).andThen(new RunBrakeArm(amp, Parameters.ARM_BRAKE_POW)));
+    amp2Angle = (new RunBrakeArm(amp,false).andThen(new GoToAngleAmp(amp, Math.toRadians(55), Math.PI,Math.PI*6)).andThen(new RunBrakeArm(amp, true)));
 
     shootAmp = (new AmpIntakeShoot(amp));
 
-    closeAmp = (new RunBrakeArm(amp,Parameters.ARM_RELEASE_POW).andThen((new GoToAngleAmp(amp, Math.toRadians(-55), wantedAmpVel/2,Math.PI*2)).andThen(new RunBrakeArm(amp, Parameters.ARM_BRAKE_POW))));
+    closeAmp = ((new RunBrakeArm(amp,false)).andThen((new GoToAngleAmp(amp, Math.toRadians(-55), Math.PI/2,Math.PI*2)).andThen(new RunBrakeArm(amp, true))));
 
 
     //for check, can add wait command between and then
@@ -192,16 +192,14 @@ public class RobotContainer implements Sendable{
       //wanted angle = 56 angle for close to speaker
         wantedAngle = 56
         ;
-        wantedAmpAngle = 110/360*2*Math.PI;
     //   SmartDashboard.putNumber("wanted angle", 60);
     //   SmartDashboard.putNumber("wanted shooting vel for noga", 0);
     //   wantedAngle = SmartDashboard.getNumber("wanted angle", 60);
         wantedShootingVel = 14;
-        wantedAmpVel = Math.PI/2;
+        
     //   wantedShootingVel = SmartDashboard.getNumber("wanted shooting vel for noga", 0);
     //   commandController.b().onTrue(new AngleQuel(shooter));
         commandController.a().onTrue(new IntakeCommand(intake));
-        
         commandController.pov(0).whileTrue(new IntakeToShooter(intake, shooter, wantedShootingVel));
         commandController.x().onTrue(new AngleGoToAngle(shooter, wantedAngle).alongWith( new ShooterPowering(shooter, wantedShootingVel)));
   
@@ -214,10 +212,9 @@ public class RobotContainer implements Sendable{
         overrideAuto.onTrue(chassis.getDefaultCommand());
         
         //Amp commands Buttons
-        commandController2.pov(90).onTrue(intake2amp);
-        commandController2.pov(270).onTrue(amp2Angle);
-        commandController2.leftBumper().onTrue(shootAmp);
-        commandController2.a().onTrue(closeAmp);
+        commandController.b().onTrue(intake2amp.andThen(amp2Angle));
+        commandController.pov(90).onTrue(shootAmp);
+        commandController.pov(270).onTrue(closeAmp);
 
     
     }
@@ -226,7 +223,7 @@ public class RobotContainer implements Sendable{
    
     public void calibrate() {
         new AngleQuel(shooter).schedule();
-        (new CalibrateArm(amp).andThen(new RunBrakeArm(amp, Parameters.ARM_BRAKE_POW))).schedule();
+        //(new CalibrateArm(amp).andThen(new RunBrakeArm(amp, Parameters.ARM_BRAKE_POW))).schedule();
     }
 
     public void disable(){

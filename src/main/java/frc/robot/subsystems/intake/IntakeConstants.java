@@ -39,7 +39,7 @@ public class IntakeConstants {
   
         
         public static final double DISPENSE_POWER = -0.4;
-        public static final double DISPENSE_TIME = 1;
+        public static final double DISPENSE_TIME = 60;
   
   
         public static final double KP = 0.0;

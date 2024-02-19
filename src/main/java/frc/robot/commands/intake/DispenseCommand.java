@@ -22,6 +22,7 @@ public class DispenseCommand extends CommandBase {
     @Override
     public void initialize(){
         intake.setBrake();
+        count = 0;
         
     }
 

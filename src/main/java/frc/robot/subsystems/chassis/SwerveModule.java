@@ -348,6 +348,7 @@ public class SwerveModule implements Sendable {
      * @param s
      */
     private void debug(String s) {
+        debug = false;
         if(debug){
           System.out.println(name + ": " + s);
         } 
