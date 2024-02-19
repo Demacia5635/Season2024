@@ -1,10 +1,10 @@
-package frc.robot.subsystems.vision.utils;
-
 // Copyright (c) FIRST and other WPILib contributors.
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-import edu.wpi.first.math.MathUtil;
+package frc.robot.subsystems.vision.utils.UpdatedPoseEstimatorClasses;
+
+import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
@@ -13,73 +13,45 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
-import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.math.kinematics.Kinematics;
+import edu.wpi.first.math.kinematics.Odometry;
+import edu.wpi.first.math.kinematics.WheelPositions;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.util.WPIUtilJNI;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
 /**
- * This class wraps {@link SwerveDriveOdometry Swerve Drive Odometry} to fuse latency-compensated
- * vision measurements with swerve drive encoder distance measurements. It is intended to be a
- * drop-in replacement for {@link edu.wpi.first.math.kinematics.SwerveDriveOdometry}.
+ * This class wraps {@link Odometry} to fuse latency-compensated vision measurements with encoder
+ * measurements. Robot code should not use this directly- Instead, use the particular type for your
+ * drivetrain (e.g., {@link DifferentialDrivePoseEstimator}). It is intended to be a drop-in
+ * replacement for {@link Odometry}; in fact, if you never call {@link
+ * PoseEstimator#addVisionMeasurement} and only call {@link PoseEstimator#update} then this will
+ * behave exactly the same as Odometry.
  *
- * <p>{@link SwerveDrivePoseEstimatorOld#update} should be called every robot loop.
+ * <p>{@link PoseEstimator#update} should be called every robot loop.
  *
- * <p>{@link SwerveDrivePoseEstimatorOld#addVisionMeasurement} can be called as infrequently as you
- * want; if you never call it, then this class will behave as regular encoder odometry.
+ * <p>{@link PoseEstimator#addVisionMeasurement} can be called as infrequently as you want; if you
+ * never call it then this class will behave exactly like regular encoder odometry.
+ *
+ * @param <T> Wheel positions type.
  */
-public class SwerveDrivePoseEstimatorOld {
-  private final SwerveDriveKinematics m_kinematics;
-  private final SwerveDriveOdometry m_odometry;
+public class PoseEstimator<T extends WheelPositions<T>> {
+  private final Kinematics<?, T> m_kinematics;
+  private final Odometry<T> m_odometry;
   private final Matrix<N3, N1> m_q = new Matrix<>(Nat.N3(), Nat.N1());
-  private final int m_numModules;
-  private Matrix<N3, N3> m_visionK = new Matrix<>(Nat.N3(), Nat.N3());
+  private final Matrix<N3, N3> m_visionK = new Matrix<>(Nat.N3(), Nat.N3());
 
-  private static final double kBufferDuration = 1.5;
-
-  private final TimeInterpolatableBuffer<InterpolationRecord> m_poseBuffer =
+  protected static final double kBufferDuration = 1.5;
+  protected final TimeInterpolatableBuffer<InterpolationRecord> m_poseBuffer =
       TimeInterpolatableBuffer.createBuffer(kBufferDuration);
 
   /**
-   * Constructs a SwerveDrivePoseEstimator with default standard deviations for the model and vision
-   * measurements.
-   *
-   * <p>The default standard deviations of the model states are 0.1 meters for x, 0.1 meters for y,
-   * and 0.1 radians for heading. The default standard deviations of the vision measurements are 0.9
-   * meters for x, 0.9 meters for y, and 0.9 radians for heading.
+   * Constructs a PoseEstimator.
    *
    * @param kinematics A correctly-configured kinematics object for your drivetrain.
-   * @param gyroAngle The current gyro angle.
-   * @param modulePositions The current distance measurements and rotations of the swerve modules.
-   * @param initialPoseMeters The starting pose estimate.
-   */
-  public SwerveDrivePoseEstimatorOld(
-      SwerveDriveKinematics kinematics,
-      Rotation2d gyroAngle,
-      SwerveModulePosition[] modulePositions,
-      Pose2d initialPoseMeters) {
-    this(
-        kinematics,
-        gyroAngle,
-        modulePositions,
-        initialPoseMeters,
-        VecBuilder.fill(0.1, 0.1, 0.1),
-        VecBuilder.fill(0.9, 0.9, 0.9));
-  }
-
-  /**
-   * Constructs a SwerveDrivePoseEstimator.
-   *
-   * @param kinematics A correctly-configured kinematics object for your drivetrain.
-   * @param gyroAngle The current gyro angle.
-   * @param modulePositions The current distance and rotation measurements of the swerve modules.
-   * @param initialPoseMeters The starting pose estimate.
+   * @param odometry A correctly-configured odometry object for your drivetrain.
    * @param stateStdDevs Standard deviations of the pose estimate (x position in meters, y position
    *     in meters, and heading in radians). Increase these numbers to trust your state estimate
    *     less.
@@ -87,22 +59,17 @@ public class SwerveDrivePoseEstimatorOld {
    *     in meters, y position in meters, and heading in radians). Increase these numbers to trust
    *     the vision pose measurement less.
    */
-  public SwerveDrivePoseEstimatorOld(
-      SwerveDriveKinematics kinematics,
-      Rotation2d gyroAngle,
-      SwerveModulePosition[] modulePositions,
-      Pose2d initialPoseMeters,
+  public PoseEstimator(
+      Kinematics<?, T> kinematics,
+      Odometry<T> odometry,
       Matrix<N3, N1> stateStdDevs,
       Matrix<N3, N1> visionMeasurementStdDevs) {
     m_kinematics = kinematics;
-    m_odometry = new SwerveDriveOdometry(kinematics, gyroAngle, modulePositions, initialPoseMeters);
+    m_odometry = odometry;
 
     for (int i = 0; i < 3; ++i) {
       m_q.set(i, 0, stateStdDevs.get(i, 0) * stateStdDevs.get(i, 0));
     }
-
-    m_numModules = modulePositions.length;
-
     setVisionMeasurementStdDevs(visionMeasurementStdDevs);
   }
 
@@ -115,7 +82,7 @@ public class SwerveDrivePoseEstimatorOld {
    *     numbers to trust global measurements from vision less. This matrix is in the form [x, y,
    *     theta]ᵀ, with units in meters and radians.
    */
-  public void setVisionMeasurementStdDevs(Matrix<N3, N1> visionMeasurementStdDevs) {
+  public final void setVisionMeasurementStdDevs(Matrix<N3, N1> visionMeasurementStdDevs) {
     var r = new double[3];
     for (int i = 0; i < 3; ++i) {
       r[i] = visionMeasurementStdDevs.get(i, 0) * visionMeasurementStdDevs.get(i, 0);
@@ -136,17 +103,16 @@ public class SwerveDrivePoseEstimatorOld {
   /**
    * Resets the robot's position on the field.
    *
-   * <p>The gyroscope angle does not need to be reset in the user's robot code. The library
+   * <p>The gyroscope angle does not need to be reset here on the user's robot code. The library
    * automatically takes care of offsetting the gyro angle.
    *
    * @param gyroAngle The angle reported by the gyroscope.
-   * @param modulePositions The current distance measurements and rotations of the swerve modules.
+   * @param wheelPositions The current encoder readings.
    * @param poseMeters The position on the field that your robot is at.
    */
-  public void resetPosition(
-      Rotation2d gyroAngle, SwerveModulePosition[] modulePositions, Pose2d poseMeters) {
+  public void resetPosition(Rotation2d gyroAngle, T wheelPositions, Pose2d poseMeters) {
     // Reset state estimate and error covariance
-    m_odometry.resetPosition(gyroAngle, modulePositions, poseMeters);
+    m_odometry.resetPosition(gyroAngle, wheelPositions, poseMeters);
     m_poseBuffer.clear();
   }
 
@@ -164,7 +130,7 @@ public class SwerveDrivePoseEstimatorOld {
    * while still accounting for measurement noise.
    *
    * <p>This method can be called as infrequently as you want, as long as you are calling {@link
-   * SwerveDrivePoseEstimatorOld#update} every loop.
+   * PoseEstimator#update} every loop.
    *
    * <p>To promote stability of the pose estimate and make it robust to bad vision data, we
    * recommend only adding vision measurements that are already within one meter or so of the
@@ -173,15 +139,19 @@ public class SwerveDrivePoseEstimatorOld {
    * @param visionRobotPoseMeters The pose of the robot as measured by the vision camera.
    * @param timestampSeconds The timestamp of the vision measurement in seconds. Note that if you
    *     don't use your own time source by calling {@link
-   *     SwerveDrivePoseEstimatorOld#updateWithTime(double,Rotation2d,SwerveModulePosition[])} then you
-   *     must use a timestamp with an epoch since FPGA startup (i.e., the epoch of this timestamp is
-   *     the same epoch as {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()}.) This means that
-   *     you should use {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()} as your time source
-   *     or sync the epochs.
+   *     PoseEstimator#updateWithTime(double,Rotation2d,WheelPositions)} then you must use a
+   *     timestamp with an epoch since FPGA startup (i.e., the epoch of this timestamp is the same
+   *     epoch as {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()}.) This means that you
+   *     should use {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()} as your time source or
+   *     sync the epochs.
    */
   public void addVisionMeasurement(Pose2d visionRobotPoseMeters, double timestampSeconds) {
     // Step 0: If this measurement is old enough to be outside the pose buffer's timespan, skip.
-    if (m_poseBuffer.getInternalBuffer().lastKey() - kBufferDuration > timestampSeconds) {
+    try {
+      if (m_poseBuffer.getInternalBuffer().lastKey() - kBufferDuration > timestampSeconds) {
+        return;
+      }
+    } catch (NoSuchElementException ex) {
       return;
     }
 
@@ -206,20 +176,20 @@ public class SwerveDrivePoseEstimatorOld {
     // Step 5: Reset Odometry to state at sample with vision adjustment.
     m_odometry.resetPosition(
         sample.get().gyroAngle,
-        sample.get().modulePositions,
+        sample.get().wheelPositions,
         sample.get().poseMeters.exp(scaledTwist));
 
     // Step 6: Record the current pose to allow multiple measurements from the same timestamp
     m_poseBuffer.addSample(
         timestampSeconds,
         new InterpolationRecord(
-            getEstimatedPosition(), sample.get().gyroAngle, sample.get().modulePositions));
+            getEstimatedPosition(), sample.get().gyroAngle, sample.get().wheelPositions));
 
     // Step 7: Replay odometry inputs between sample time and latest recorded sample to update the
     // pose buffer and correct odometry.
     for (Map.Entry<Double, InterpolationRecord> entry :
         m_poseBuffer.getInternalBuffer().tailMap(timestampSeconds).entrySet()) {
-      updateWithTime(entry.getKey(), entry.getValue().gyroAngle, entry.getValue().modulePositions);
+      updateWithTime(entry.getKey(), entry.getValue().gyroAngle, entry.getValue().wheelPositions);
     }
   }
 
@@ -228,7 +198,7 @@ public class SwerveDrivePoseEstimatorOld {
    * while still accounting for measurement noise.
    *
    * <p>This method can be called as infrequently as you want, as long as you are calling {@link
-   * SwerveDrivePoseEstimatorOld#update} every loop.
+   * PoseEstimator#update} every loop.
    *
    * <p>To promote stability of the pose estimate and make it robust to bad vision data, we
    * recommend only adding vision measurements that are already within one meter or so of the
@@ -236,16 +206,15 @@ public class SwerveDrivePoseEstimatorOld {
    *
    * <p>Note that the vision measurement standard deviations passed into this method will continue
    * to apply to future measurements until a subsequent call to {@link
-   * SwerveDrivePoseEstimatorOld#setVisionMeasurementStdDevs(Matrix)} or this method.
+   * PoseEstimator#setVisionMeasurementStdDevs(Matrix)} or this method.
    *
    * @param visionRobotPoseMeters The pose of the robot as measured by the vision camera.
    * @param timestampSeconds The timestamp of the vision measurement in seconds. Note that if you
-   *     don't use your own time source by calling {@link
-   *     SwerveDrivePoseEstimatorOld#updateWithTime(double,Rotation2d,SwerveModulePosition[])}, then
-   *     you must use a timestamp with an epoch since FPGA startup (i.e., the epoch of this
-   *     timestamp is the same epoch as {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()}).
-   *     This means that you should use {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()} as
-   *     your time source in this case.
+   *     don't use your own time source by calling {@link #updateWithTime}, then you must use a
+   *     timestamp with an epoch since FPGA startup (i.e., the epoch of this timestamp is the same
+   *     epoch as {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()}). This means that you
+   *     should use {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()} as your time source in
+   *     this case.
    * @param visionMeasurementStdDevs Standard deviations of the vision pose measurement (x position
    *     in meters, y position in meters, and heading in radians). Increase these numbers to trust
    *     the vision pose measurement less.
@@ -263,11 +232,11 @@ public class SwerveDrivePoseEstimatorOld {
    * loop.
    *
    * @param gyroAngle The current gyro angle.
-   * @param modulePositions The current distance measurements and rotations of the swerve modules.
+   * @param wheelPositions The current encoder readings.
    * @return The estimated pose of the robot in meters.
    */
-  public Pose2d update(Rotation2d gyroAngle, SwerveModulePosition[] modulePositions) {
-    return updateWithTime(WPIUtilJNI.now() * 1.0e-6, gyroAngle, modulePositions);
+  public Pose2d update(Rotation2d gyroAngle, T wheelPositions) {
+    return updateWithTime(MathSharedStore.getTimestamp(), gyroAngle, wheelPositions);
   }
 
   /**
@@ -275,30 +244,15 @@ public class SwerveDrivePoseEstimatorOld {
    * loop.
    *
    * @param currentTimeSeconds Time at which this method was called, in seconds.
-   * @param gyroAngle The current gyroscope angle.
-   * @param modulePositions The current distance measurements and rotations of the swerve modules.
+   * @param gyroAngle The current gyro angle.
+   * @param wheelPositions The current encoder readings.
    * @return The estimated pose of the robot in meters.
    */
-  public Pose2d updateWithTime(
-      double currentTimeSeconds, Rotation2d gyroAngle, SwerveModulePosition[] modulePositions) {
-    if (modulePositions.length != m_numModules) {
-      throw new IllegalArgumentException(
-          "Number of modules is not consistent with number of wheel locations provided in "
-              + "constructor");
-    }
-
-    var internalModulePositions = new SwerveModulePosition[m_numModules];
-
-    for (int i = 0; i < m_numModules; i++) {
-      internalModulePositions[i] =
-          new SwerveModulePosition(modulePositions[i].distanceMeters, modulePositions[i].angle);
-    }
-
-    m_odometry.update(gyroAngle, internalModulePositions);
-
+  public Pose2d updateWithTime(double currentTimeSeconds, Rotation2d gyroAngle, T wheelPositions) {
+    m_odometry.update(gyroAngle, wheelPositions);
     m_poseBuffer.addSample(
         currentTimeSeconds,
-        new InterpolationRecord(getEstimatedPosition(), gyroAngle, internalModulePositions));
+        new InterpolationRecord(getEstimatedPosition(), gyroAngle, wheelPositions.copy()));
 
     return getEstimatedPosition();
   }
@@ -307,28 +261,27 @@ public class SwerveDrivePoseEstimatorOld {
    * Represents an odometry record. The record contains the inputs provided as well as the pose that
    * was observed based on these inputs, as well as the previous record and its inputs.
    */
-  private class InterpolationRecord implements Interpolatable<InterpolationRecord> {
+  protected class InterpolationRecord implements Interpolatable<InterpolationRecord> {
     // The pose observed given the current sensor inputs and the previous pose.
-    private final Pose2d poseMeters;
+    protected final Pose2d poseMeters;
 
     // The current gyro angle.
     private final Rotation2d gyroAngle;
 
-    // The distances and rotations measured at each module.
-    private final SwerveModulePosition[] modulePositions;
+    // The current encoder readings.
+    private final T wheelPositions;
 
     /**
      * Constructs an Interpolation Record with the specified parameters.
      *
-     * @param pose The pose observed given the current sensor inputs and the previous pose.
+     * @param poseMeters The pose observed given the current sensor inputs and the previous pose.
      * @param gyro The current gyro angle.
-     * @param wheelPositions The distances and rotations measured at each wheel.
+     * @param wheelPositions The current encoder readings.
      */
-    private InterpolationRecord(
-        Pose2d poseMeters, Rotation2d gyro, SwerveModulePosition[] modulePositions) {
+    private InterpolationRecord(Pose2d poseMeters, Rotation2d gyro, T wheelPositions) {
       this.poseMeters = poseMeters;
       this.gyroAngle = gyro;
-      this.modulePositions = modulePositions;
+      this.wheelPositions = wheelPositions;
     }
 
     /**
@@ -347,32 +300,16 @@ public class SwerveDrivePoseEstimatorOld {
         return endValue;
       } else {
         // Find the new wheel distances.
-        var modulePositions = new SwerveModulePosition[m_numModules];
-
-        // Find the distance travelled between this measurement and the interpolated measurement.
-        var moduleDeltas = new SwerveModulePosition[m_numModules];
-
-        for (int i = 0; i < m_numModules; i++) {
-          double ds =
-              MathUtil.interpolate(
-                  this.modulePositions[i].distanceMeters,
-                  endValue.modulePositions[i].distanceMeters,
-                  t);
-          Rotation2d theta =
-              this.modulePositions[i].angle.interpolate(endValue.modulePositions[i].angle, t);
-          modulePositions[i] = new SwerveModulePosition(ds, theta);
-          moduleDeltas[i] =
-              new SwerveModulePosition(ds - this.modulePositions[i].distanceMeters, theta);
-        }
+        var wheelLerp = wheelPositions.interpolate(endValue.wheelPositions, t);
 
         // Find the new gyro angle.
-        var gyro_lerp = gyroAngle.interpolate(endValue.gyroAngle, t);
+        var gyroLerp = gyroAngle.interpolate(endValue.gyroAngle, t);
 
-        // Create a twist to represent this change based on the interpolated sensor inputs.
-        Twist2d twist = m_kinematics.toTwist2d(moduleDeltas);
-        twist.dtheta = gyro_lerp.minus(gyroAngle).getRadians();
+        // Create a twist to represent the change based on the interpolated sensor inputs.
+        Twist2d twist = m_kinematics.toTwist2d(wheelPositions, wheelLerp);
+        twist.dtheta = gyroLerp.minus(gyroAngle).getRadians();
 
-        return new InterpolationRecord(poseMeters.exp(twist), gyro_lerp, modulePositions);
+        return new InterpolationRecord(poseMeters.exp(twist), gyroLerp, wheelLerp);
       }
     }
 
@@ -381,41 +318,18 @@ public class SwerveDrivePoseEstimatorOld {
       if (this == obj) {
         return true;
       }
-      if (!(obj instanceof InterpolationRecord)) {
+      if (!(obj instanceof PoseEstimator.InterpolationRecord)) {
         return false;
       }
-      InterpolationRecord record = (InterpolationRecord) obj;
+      var record = (PoseEstimator<?>.InterpolationRecord) obj;
       return Objects.equals(gyroAngle, record.gyroAngle)
-          && Arrays.equals(modulePositions, record.modulePositions)
+          && Objects.equals(wheelPositions, record.wheelPositions)
           && Objects.equals(poseMeters, record.poseMeters);
     }
 
     @Override
     public int hashCode() {
-      return Objects.hash(gyroAngle, Arrays.hashCode(modulePositions), poseMeters);
+      return Objects.hash(gyroAngle, wheelPositions, poseMeters);
     }
-  }
-
-
-  public Pose2d getSample(double time) {
-    try {
-      if (m_poseBuffer.getInternalBuffer().lastKey() - kBufferDuration > time) {
-        System.out.println("got into the if");
-        return null;
-      }
-    } catch (NoSuchElementException ex) {
-      System.out.println("catched the exception");
-      ex.printStackTrace();
-      return null;
-    }
-
-    var sample = m_poseBuffer.getSample(time);
-
-    if (sample.isEmpty()) {
-      return null;
-    }
-
-    return sample.get().poseMeters;    
   }
 }
-

@@ -1,5 +1,6 @@
 package frc.robot.subsystems.vision;
 
+//#region imports
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -8,6 +9,7 @@ import java.util.NoSuchElementException;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
@@ -20,25 +22,31 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.chassis.Chassis;
-import frc.robot.subsystems.vision.utils.SwerveDrivePoseEstimator;
-import static frc.robot.Constants.VisionConstants.*;
+import frc.robot.subsystems.vision.utils.RaspberryPi;
+import frc.robot.subsystems.vision.utils.VisionData;
+import frc.robot.subsystems.vision.utils.UpdatedPoseEstimatorClasses.SwerveDrivePoseEstimator;
+
+import static frc.robot.subsystems.vision.VisionConstants.*;
+//#endregion
 
 public class Vision extends SubsystemBase {
-    //declaring fields for testing
+    //#region declaring fields for testing
     Field2d poseEstimatorField;
     Field2d visionField;
     Field2d visionField3;
     Field2d visionField5;
     Field2d visionFieldavg3;
     Field2d visionFieldavg5;
+    //#endregion
 
-    //declaring limelights
+    //#region declaring limelights
     PhotonCamera AmpSideRaspberry;
     PhotonPoseEstimator photonPoseEstimatorForAmpSideRaspberry;
     PhotonCamera ShooterSideRaspberry;
     PhotonPoseEstimator photonPoseEstimatorForShooterSideRaspberry;
+    //#endregion
 
-    // declaring poseEstimator chassis and buffers 
+    //#region declaring poseEstimator chassis and buffers 
     SwerveDrivePoseEstimator poseEstimator;
     Chassis chassis;
     VisionData[] buf3Avg;
@@ -53,23 +61,21 @@ public class Vision extends SubsystemBase {
     double lastUpdateTime;
     double lastUpdateTime5;
     boolean firstRun;
-    int countCycles;
+    int VisionCountCycles;
 
     SwerveDrivePoseEstimator testPoseEstimatorBuf3Avg;
     SwerveDrivePoseEstimator testPoseEstimatorBuf3Med;
     SwerveDrivePoseEstimator testPoseEstimatorBuf5Avg;
     SwerveDrivePoseEstimator testPoseEstimatorBuf5Med;
-
+    //#endregion
+    
+    //#region C'tor
     public Vision(Chassis chassis, SwerveDrivePoseEstimator estimator, SwerveDrivePoseEstimator testPoseEstimatorBuf3Avg, SwerveDrivePoseEstimator testPoseEstimatorBuf3Med, SwerveDrivePoseEstimator testPoseEstimatorBuf5Avg, SwerveDrivePoseEstimator testPoseEstimatorBuf5Med) {
         
         this.testPoseEstimatorBuf3Avg = testPoseEstimatorBuf3Avg;
         this.testPoseEstimatorBuf3Med = testPoseEstimatorBuf3Med;
         this.testPoseEstimatorBuf5Avg = testPoseEstimatorBuf5Avg;
         this.testPoseEstimatorBuf5Med = testPoseEstimatorBuf5Med;
-        
-        
-        
-        
         
         this.chassis = chassis;
         this.poseEstimator = estimator;
@@ -82,10 +88,10 @@ public class Vision extends SubsystemBase {
         this.AmpSideRaspberry = new PhotonCamera(AmpSideRaspberryName);
         this.ShooterSideRaspberry = new PhotonCamera(ShooterSideRaspberryName);
         
-        countCycles = 0;
+        VisionCountCycles = 0;
         this.firstRun = true;
 
-        //initializing photons pose estimators
+        //#region initializing photons pose estimators
         try {
             this.photonPoseEstimatorForAmpSideRaspberry = new PhotonPoseEstimator(AprilTagFieldLayout.loadFromResource(AprilTagFields.k2024Crescendo.m_resourceFile),
             PoseStrategy.AVERAGE_BEST_TARGETS, AmpSideRaspberry, robotCenterToAmpSideRaspberry);
@@ -97,8 +103,9 @@ public class Vision extends SubsystemBase {
             System.out.println("problem with photon pose estimators");
             e.printStackTrace();
         } 
-        
-        //initializing buffers
+        //#endregion
+
+        //#region initializing buffers
         for (int i = 0; i < buf3Avg.length; i++) {
             this.buf3Avg[i] = new VisionData(null, 0, testPoseEstimatorBuf3Avg);
         }
@@ -111,16 +118,18 @@ public class Vision extends SubsystemBase {
         for (int i = 0; i < buf5Med.length; i++) {
             this.buf5Med[i] = new VisionData(null, 0, testPoseEstimatorBuf5Med);
         }
+        //#endregion
 
-        //initializing fields for testing
+        //#region initializing fields for testing
         this.visionField= new Field2d();   
         this.visionField3 = new Field2d();
         this.visionField5 = new Field2d();
         this.visionFieldavg3 = new Field2d();
         this.visionFieldavg5 = new Field2d();
         this.poseEstimatorField = new Field2d();
-        
-        //putting testing fields on shuffleboard
+        //#endregion
+
+        //#regionputting testing fields on shuffleboard
         SmartDashboard.putData("no Filter vision", visionField);
         SmartDashboard.putData("field check pose estimator", poseEstimatorField);
         
@@ -128,14 +137,17 @@ public class Vision extends SubsystemBase {
         SmartDashboard.putData("vision5", visionField5);
         SmartDashboard.putData("visionavg3", visionFieldavg3);
         SmartDashboard.putData("visionavg5", visionFieldavg5);
+        //#endregion
 
-        SmartDashboard.putData("resetVisionCycles", new InstantCommand(()->resetVisionResetCycles()).ignoringDisable(true));
+        SmartDashboard.putData("resetVisionCycles", new InstantCommand(() -> resetVisionResetCycles()).ignoringDisable(true));
 
     }
-    public void resetVisionResetCycles(){
-        countCycles = 0;
-        SmartDashboard.putNumber("run bill", 1);
-    }
+
+    //#endregion
+    
+    //#region Vision Main Methods
+
+    //#region update pose methods
     //takes the visions snapshots from the buffer and medians or avg it and add vision mesurements to pose estimator
     public void updateRobotPose() {
         double time = getTime();
@@ -145,8 +157,8 @@ public class Vision extends SubsystemBase {
             Pair<Pose2d, Double> vData3AvgPair = avg(buf5Avg);
             VisionData vDataAvg = new VisionData(vData3AvgPair.getFirst(), vData3AvgPair.getSecond(), testPoseEstimatorBuf3Avg)  ;
             if (vDataMed != null && vDataMed.getPose() != null && vDataAvg.getPose() != null && vDataAvg != null) {
-                testPoseEstimatorBuf3Med.addVisionMeasurement(vDataMed.pose, vDataMed.timeStamp);
-                testPoseEstimatorBuf3Avg.addVisionMeasurement(vDataAvg.pose, vDataAvg.timeStamp);
+                testPoseEstimatorBuf3Med.addVisionMeasurement(vDataMed.getPose(), vDataMed.getTimeStamp());
+                testPoseEstimatorBuf3Avg.addVisionMeasurement(vDataAvg.getPose(), vDataAvg.getTimeStamp());
                 poseEstimatorField.setRobotPose(poseEstimator.getEstimatedPosition());
                 visionField3.setRobotPose(vDataMed.getPose());
                 visionFieldavg3.setRobotPose(vDataAvg.getPose());
@@ -172,8 +184,8 @@ public class Vision extends SubsystemBase {
             SmartDashboard.putBoolean("updates", vData5Med != null && vData5Med.getPose() != null && vDataAvg5.getPose() != null && vDataAvg5 != null);
             if (vData5Med != null && vData5Med.getPose() != null && vDataAvg5.getPose() != null && vDataAvg5 != null) {
            
-                testPoseEstimatorBuf5Med.addVisionMeasurement(vData5Med.pose, vData5Med.timeStamp);
-                testPoseEstimatorBuf5Avg.addVisionMeasurement(vDataAvg5.pose, vDataAvg5.timeStamp);
+                testPoseEstimatorBuf5Med.addVisionMeasurement(vData5Med.getPose(), vData5Med.getTimeStamp());
+                testPoseEstimatorBuf5Avg.addVisionMeasurement(vDataAvg5.getPose(), vDataAvg5.getTimeStamp());
                 
                 visionField5.setRobotPose(vData5Med.getPose());
                 visionFieldavg5.setRobotPose(vDataAvg5.getPose());
@@ -190,6 +202,7 @@ public class Vision extends SubsystemBase {
             }
         } 
     }
+    //#endregion
 
     // calls the limelights to get updates and put the data in the buffer 
     private void getNewDataFromLimelightX(RaspberryPi raspberryPi) {
@@ -210,14 +223,14 @@ public class Vision extends SubsystemBase {
                         VisionData newVisionData5Avg = new VisionData(estimatedPose.toPose2d(), estimatedRobotPose.timestampSeconds,testPoseEstimatorBuf5Avg);
                         VisionData newVisionData3Med = new VisionData(estimatedPose.toPose2d(), estimatedRobotPose.timestampSeconds,testPoseEstimatorBuf3Med);
                         VisionData newVisionData5Med = new VisionData(estimatedPose.toPose2d(), estimatedRobotPose.timestampSeconds,testPoseEstimatorBuf5Med);
-                        if(countCycles < 100){
+                        if(VisionCountCycles < 100){
                             SmartDashboard.putNumber("cyclelesstan100", 1);
-                            poseEstimator.resetPosition(chassis.getAngle(), chassis.getModulePositions(), newVisionData3Avg.getFalsePose());
+                            poseEstimator.resetPosition(chassis.getAngle(), chassis.getModulePositions(), newVisionData3Avg.getNotFilteredPose());
                             
-                            testPoseEstimatorBuf3Avg.resetPosition(chassis.getAngle(), chassis.getModulePositions(), newVisionData3Avg.getFalsePose());
-                            testPoseEstimatorBuf3Med.resetPosition(chassis.getAngle(), chassis.getModulePositions(), newVisionData3Avg.getFalsePose());
-                            testPoseEstimatorBuf5Avg.resetPosition(chassis.getAngle(), chassis.getModulePositions(), newVisionData3Avg.getFalsePose());
-                            testPoseEstimatorBuf5Med.resetPosition(chassis.getAngle(), chassis.getModulePositions(), newVisionData3Avg.getFalsePose());
+                            testPoseEstimatorBuf3Avg.resetPosition(chassis.getAngle(), chassis.getModulePositions(), newVisionData3Avg.getNotFilteredPose());
+                            testPoseEstimatorBuf3Med.resetPosition(chassis.getAngle(), chassis.getModulePositions(), newVisionData3Avg.getNotFilteredPose());
+                            testPoseEstimatorBuf5Avg.resetPosition(chassis.getAngle(), chassis.getModulePositions(), newVisionData3Avg.getNotFilteredPose());
+                            testPoseEstimatorBuf5Med.resetPosition(chassis.getAngle(), chassis.getModulePositions(), newVisionData3Avg.getNotFilteredPose());
 
                             
                             // firstRun = false;
@@ -243,12 +256,14 @@ public class Vision extends SubsystemBase {
             }
         }
     }
+    
+    //#endregion
 
 
     @Override
     public void periodic() {
         super.periodic();
-        countCycles++;
+        VisionCountCycles++;
 
         getNewDataFromLimelightX(RaspberryPi.AmpSideRaspberry);
         getNewDataFromLimelightX(RaspberryPi.ShooterSideRaspberry);
@@ -282,7 +297,12 @@ public class Vision extends SubsystemBase {
 
 
     }
-    //util
+
+    //#region util methods
+
+    public void resetVisionResetCycles(){
+        VisionCountCycles = 0;
+    }
 
     public double getTime() {
         return Timer.getFPGATimestamp();
@@ -296,12 +316,12 @@ public class Vision extends SubsystemBase {
         double avarageTimeStamp = 0.0;
 
         for (VisionData vData : visionDataArr) {
-            if(vData != null && vData.pose != null){
-                Pose2d pose = vData.pose;
+            if(vData != null && vData.getPose() != null){
+                Pose2d pose = vData.getPose();
                 averageX += pose.getTranslation().getX();
                 averageY += pose.getTranslation().getY();
                 averageRotation += pose.getRotation().getRadians();
-                avarageTimeStamp += vData.timeStamp;
+                avarageTimeStamp += vData.getTimeStamp();
             }
         }
 
@@ -324,24 +344,19 @@ public class Vision extends SubsystemBase {
         Arrays.sort(visionDataArr, comperator);
         return visionDataArr[visionDataArr.length / 2];
     }
-
+    //#endregion
     
 
-    // BUF 3
+    //#region BUF 3 methods
     int next() {
         return (lastData + 1) % buf3Avg.length;
     }
 
-    /*
-     * @param bla
-     * @return bal2
-     */
     private boolean validBuf(double time) {
         
         double minTime = time - 1.2;
         for (VisionData vData : buf3Avg) {
             if (vData.getTimeStamp() < minTime) {
-                //System.out.println(vData.getTimeStamp() + ", " + minTime + ", " + (vData.getTimeStamp() < minTime));
                 return false;
             }
         }
@@ -355,7 +370,9 @@ public class Vision extends SubsystemBase {
     public boolean validVisionPosition() {
         return lastUpdateLatency() < 1;
     }
-    // BUF 5
+    //#endregion
+
+    //#region BUF 5 methods
     int next5() {
         return (lastData5 + 1) % buf5Avg.length;
     }
@@ -385,99 +402,9 @@ public class Vision extends SubsystemBase {
     public boolean validVisionPosition5() {
         return lastUpdateLatency5() < 1;
     }
+    //#endregion
     
-    //object to save vision data that includes a pose a timestamp and the difference at that moment from the odometrey
-    class VisionData {
     
-        private Pose2d pose;
-        private double timeStamp;
-        private double diffrence; // difference than odometry
-        private Pose2d falsePose;
-        private double falsetimeStamp;
-        private SwerveDrivePoseEstimator bufPoseEstimator;
-    
-        VisionData(Pose2d pose, double timeStamp, SwerveDrivePoseEstimator bufPoseEstimator) {
-            this.pose = pose;
-            this.timeStamp = timeStamp;
-            this.falsePose = pose;
-            this.falsetimeStamp = timeStamp;
-            this.bufPoseEstimator = bufPoseEstimator;
-            if (timeStamp < 0) {
-                System.out.println("cleared at constructor, " + timeStamp);
-                clear();
-                
-            } else {
-                
-                setDiffrence();
-            }
-        }
-    
-        //utils
-    
-        public void recalc(double time) {
-            // for newer data - recalc the twsit
-            if (timeStamp < time) {
-                //setDiffrence();
-            } else {
-                System.out.println("cleared at recalc");
-                clear();
-            }
-        }
-    
-        protected void setDiffrence() {
 
-            Pose2d poseSample = this.bufPoseEstimator.getSample(timeStamp);
-            if (poseSample != null
-                    && Math.abs(poseSample.getRotation().minus(pose.getRotation()).getDegrees()) < maxValidAngleDiff) {
-                diffrence = poseSample.getTranslation().getDistance(pose.getTranslation());
-            } 
-            else {
-                if(poseSample != null){
-                    System.out.println("cleared on setDifference() func pose sample isnt null, " + poseSample.getRotation().getDegrees() + " " + pose.getRotation().getDegrees());
-                }
-                else{
-                    //System.out.println("cleared on setDifference() func pose sample is null estimator pose = " + bufPoseEstimator.getEstimatedPosition());
-                    clear();
-                }
-            }
-        }
     
-        private void clear() {
-            diffrence = -1;
-            pose = null;
-            timeStamp = 0;
-            //System.out.println("Cleared.");
-        }    
-            
-        //getters
-    
-        public Pose2d getPose() {
-            return pose;
-        }
-    
-        public double getTimeStamp() {
-            return timeStamp;
-        }
-    
-        public double getDiffrence() {
-            return diffrence;
-        }
-    
-        public Pose2d getFalsePose() {
-            return falsePose;
-        }
-    
-        public double getFalsetimeStamp() {
-            return falsetimeStamp;
-        }
-    
-    
-        
-    }
-
-    //enum for choosing which limelight to use
-    enum RaspberryPi{
-        ShooterSideRaspberry,
-        AmpSideRaspberry
-    }
 }
