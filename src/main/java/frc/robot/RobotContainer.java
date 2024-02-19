@@ -48,6 +48,7 @@ import frc.robot.commands.chassis.DriveCommand;
 import frc.robot.commands.chassis.DriveToNote;
 import frc.robot.commands.chassis.SetModuleAngle;
 import frc.robot.commands.chassis.TestSteerVandA;
+import frc.robot.commands.chassis.Auto.StartTOP;
 import frc.robot.commands.chassis.Paths.PathFollow;
 import frc.robot.commands.intake.DispenseCommand;
 import frc.robot.commands.intake.IntakeCommand;
@@ -190,8 +191,7 @@ public class RobotContainer implements Sendable{
       Trigger overrideAuto = new Trigger(()->Utils.joystickOutOfDeadband(commandController));
 
       //wanted angle = 56 angle for close to speaker
-        wantedAngle = 56
-        ;
+        wantedAngle = 56;
     //   SmartDashboard.putNumber("wanted angle", 60);
     //   SmartDashboard.putNumber("wanted shooting vel for noga", 0);
     //   wantedAngle = SmartDashboard.getNumber("wanted angle", 60);
@@ -205,16 +205,13 @@ public class RobotContainer implements Sendable{
   
         commandController.rightBumper().onTrue(new InstantCommand(()-> {shooter.stopAll();intake.stop();}, intake, shooter).andThen(new AngleQuel(shooter)));
         commandController.y().onTrue(new DriveToNote(chassis).raceWith(new IntakeCommand(intake)));
-        //commandController.b().whileTrue(new AmpIntake2(amp));
-        //commandController.rightTrigger().onTrue(new GoToAngleAmp(amp, wantedAngle, wantedAmpVel, wantedAmpAngle));
-        // if(controller.getCrossButton()) new InstantCommand(()->{chassis.setOdometryToForward();});
         commandController.pov(180).onTrue(new InstantCommand(()->{chassis.setOdometryToForward();}));
         overrideAuto.onTrue(chassis.getDefaultCommand());
         
         //Amp commands Buttons
-        commandController.b().onTrue(intake2amp.andThen(amp2Angle));
+        /*commandController.b().onTrue(intake2amp.andThen(amp2Angle));
         commandController.pov(90).onTrue(shootAmp);
-        commandController.pov(270).onTrue(closeAmp);
+        commandController.pov(270).onTrue(closeAmp);*/
 
     
     }
@@ -238,18 +235,7 @@ public class RobotContainer implements Sendable{
    
    
   public Command getAutonomousCommand() {
-    //return new PathFollow(chassis, points, 3, 6, DriverStation.getAlliance().get() == Alliance.Red);
-   
-    return new PathFollow(chassis, points, 1, 2, 0.5, DriverStation.getAlliance().get() == Alliance.Red);
-    /*.andThen(new PathFollow(chassis, points2, 1, 2, 0, DriverStation.getAlliance().get() == Alliance.Red)
-    .alongWith(new IntakeCommand(intake)));*/
-    //.alongWith(new AmpIntake(amp, AmpConstants.CommandParams.v1, AmpConstants.CommandParams.v2))
-
-    //return new RunCommand(()-> chassis.setVelocities(new ChassisSpeeds(0, -1.5, 0)), chassis);
-
-    // return new PathFollow(chassis, points1, 2, 4, 1, true).andThen
-    // (new PathFollow(chassis, points2, 2, 4, 0, true));
-    //return new RunCommand(()->amp.neo1.set(0.5), amp);
+    return new StartTOP(chassis, shooter, intake, DriverStation.getAlliance().get() == alliance.Red);
 
   }
 }

@@ -85,7 +85,7 @@ public class IntakeToShooter extends Command {
     /**checks if there is note on the shooter */
     @Override
     public boolean isFinished() {
-        //return noteCount >= 2;
-        return false;
+        return noteCount > 2;
+        
     }
 }

@@ -277,6 +277,12 @@ public class Chassis extends SubsystemBase {
   }
 
   
+  public double getPoseX(){
+    return getPose().getX();
+  }
+  public double getPoseY(){
+    return getPose().getY();
+  }
 
   /**
    * Sets the state of every module
@@ -301,8 +307,8 @@ public class Chassis extends SubsystemBase {
     builder.addDoubleProperty("Angle", () -> Utils.degrees(getAngle()), null);
     builder.addDoubleProperty("Pitch", () -> gyro.getPitch(), null);
     builder.addDoubleProperty("Roll", () -> gyro.getRoll(), null);
-    builder.addDoubleProperty("Pose X", () -> getPose().getX(), null);
-    builder.addDoubleProperty("Pose Y", () -> getPose().getY(), null);
+    builder.addDoubleProperty("Pose X", this::getPoseX, null);
+    builder.addDoubleProperty("Pose Y", this::getPoseY, null);
     SmartDashboard.putData("Set Modules Angle", new RunCommand(() -> setModulesAngleFromSB(0)));
   }
 

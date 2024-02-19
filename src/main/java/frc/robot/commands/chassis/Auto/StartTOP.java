@@ -23,15 +23,16 @@ import static frc.robot.subsystems.shooter.ShooterConstants.*;
 public class StartTOP extends SequentialCommandGroup {
   //shootFromAnyPlace shootFromAnyPlace = new shootFromAnyPlace();
   double wantedAngleClose = 56;
-  double wantedVelClose = 14;
+  double wantedVelClose = 15;
   double wantedAngleNoteT = -1;
   double wantedVelNoteT = -1;
   Translation2d NoteT = new Translation2d(-1, -1);
+  
 
   pathPoint[] points1 = {new pathPoint(0, 0, Rotation2d.fromDegrees(0), 0, false), //doesnt matter because it gets fixed in the command
-    new pathPoint(PathFollow.convertAlliance(14.661), PathFollow.fixY(1.370 ), Rotation2d.fromDegrees(180), 0, false)};
+    new pathPoint(-1.13, 0.55, Rotation2d.fromDegrees(180), 0, false)};
     
- 
+  
   
 
   
@@ -39,16 +40,18 @@ public class StartTOP extends SequentialCommandGroup {
 
   /** Creates a new StartTOP auto. */
   public StartTOP(Chassis chassis, Shooter shooter, Intake intake, boolean isRed) {
-    Command ShooterAngleAndShootClose = new AngleGoToAngle(shooter, wantedAngleClose).alongWith(new ShooterPowering(shooter, wantedVelClose));
+
+
     Command ShooterAngleAndShootNoteT = new AngleGoToAngle(shooter, wantedAngleNoteT).alongWith( new ShooterPowering(shooter, wantedVelNoteT));
-    Command IntakeToShooterClose = new IntakeToShooter(intake, shooter, wantedVelClose);
     Command IntakeToShooterNoteT = new IntakeToShooter(intake, shooter, wantedVelNoteT);
     
 
     
-    addCommands(IntakeToShooterClose.andThen(ShooterAngleAndShootClose).andThen((new PathFollow(chassis, points1, 3, 6, 3, isRed))
-    .alongWith(ShooterAngleAndShootNoteT)).andThen(new DriveAndPickNote(chassis, intake)));
-    
+    addCommands((new AngleGoToAngle(shooter, wantedAngleClose).alongWith(new ShooterPowering(shooter, wantedVelClose)))
+    .andThen(new IntakeToShooter(intake, shooter, wantedVelClose)).withTimeout(3).andThen(new ShooterPowering(shooter, 0)).andThen(new DriveAndPickNote(chassis, intake)));
+      /* .andThen((new PathFollow(chassis, points1, 3, 6, 3, isRed))
+    .alongWith(ShooterAngleAndShootNoteT)).andThen(new DriveAndPickNote(chassis, intake))*/
+     
   }
 }
 
