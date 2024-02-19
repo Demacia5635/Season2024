@@ -6,32 +6,52 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.PathFollow.Util.pathPoint;
 import frc.robot.Sysid.Sysid;
 import frc.robot.Sysid.Sysid.Gains;
 import frc.robot.commands.chassis.CheckModulesSteerVelocity;
 import frc.robot.commands.chassis.SetModuleAngle;
+import frc.robot.commands.intake.IntakeCommand;
+import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.vision.Vision;
+import frc.robot.subsystems.vision.utils.SwerveDrivePoseEstimator;
 import frc.robot.utils.Utils;
 import frc.robot.subsystems.chassis.SwerveModule;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.utils.SwerveDrivePoseEstimator;
+import frc.robot.PathFollow.Util.pathPoint;
+import frc.robot.commands.chassis.utils.ResetWheelCommand;
+import frc.robot.commands.chassis.utils.TestVelocity;
 
 import static frc.robot.subsystems.chassis.ChassisConstants.*;
 
+import java.util.ArrayList;
+import static frc.robot.subsystems.chassis.ChassisConstants.*;
+
 import java.util.Arrays;
+import java.util.List;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.sensors.Pigeon2;
+import com.fasterxml.jackson.core.StreamReadConstraints.Builder;
 
 public class Chassis extends SubsystemBase {
   private final SwerveModule[] modules;
   private final Pigeon2 gyro;
+
+  public static List<pathPoint> pointsForPathTeleop = new ArrayList<pathPoint>();
+  public static List<pathPoint> pointsForAuto = new ArrayList<pathPoint>();
 
   private SwerveDrivePoseEstimator poseEstimator;
 
@@ -51,6 +71,8 @@ public class Chassis extends SubsystemBase {
         new SwerveModule(BACK_LEFT, this),
         new SwerveModule(BACK_RIGHT, this),
     };
+
+    //configAllFactoryDefaut();
 
     gyro = new Pigeon2(GYRO_ID);
     gyro.setYaw(0);
@@ -78,9 +100,10 @@ public class Chassis extends SubsystemBase {
     SmartDashboard.putData("reset wheels", new InstantCommand(() -> resetWheels()).ignoringDisable(true));
         SmartDashboard.putData("reset pose", new InstantCommand(() -> setOdometryToForward()).ignoringDisable(true));
 
-    
+    SmartDashboard.putData("calibrate", new InstantCommand(()->calibrate(), this));
+
     SmartDashboard.putData("Chassis Move Sysid",
-        (new Sysid(this::setModulesPower, this::getMoveVelocity, 0.1, 0.5, this)).getCommand());
+        (new Sysid(this::setModulesPower, this::getMoveVelocity, 0.2, 0.8, this)).getCommand());
     SmartDashboard.putData("Chassis Move Sysid2",
         (new Sysid(new Gains[] { Gains.KS, Gains.KV, Gains.KA, Gains.KV2, Gains.KVsqrt},
         this::setModulesPower,
@@ -95,7 +118,9 @@ public class Chassis extends SubsystemBase {
         this)).getCommand());
     SmartDashboard.putData("Test Steer Velocity", (new CheckModulesSteerVelocity(this, 200)));
     SmartDashboard.putData("Set Modules Angle", (new SetModuleAngle(this)));
-    SmartDashboard.putData("go to 0", new RunCommand(()->setModulesAngleFromSB(0), this));
+    new TestVelocity("Chassis", this::setVelocity, this::getMoveVelocity, 0.05, this);
+    SmartDashboard.putNumber("angle for chassis", 0);
+    SmartDashboard.putData("go to 0", new RunCommand(()->setModulesAngleFromSB(SmartDashboard.getNumber("angle for chassis", 0)), this));
 
     SmartDashboard.putNumber("ANG", 0);
     SmartDashboard.putData("go to angle position", new RunCommand(()->modules[0].setAngleByPositionPID(Rotation2d.fromDegrees(SmartDashboard.getNumber("ANG", 0))), this));
@@ -105,6 +130,13 @@ public class Chassis extends SubsystemBase {
 
   public SwerveModule[] getModules() {
     return modules;
+  }
+
+  public void calibrate() {
+    SmartDashboard.putNumber("LEFT FRONT", modules[0].getAngleDegrees());
+    SmartDashboard.putNumber("RIGHT FRONT", modules[1].getAngleDegrees());
+    SmartDashboard.putNumber("LEFT BACK", modules[2].getAngleDegrees());
+    SmartDashboard.putNumber("RIGHT BACK", modules[3].getAngleDegrees());
   }
 
   public void setGyroAngle(double angle){
@@ -181,11 +213,14 @@ public class Chassis extends SubsystemBase {
     setModuleStates(states);
   }
 
-  public void resetOdometry(){
-    gyro.setYaw(0);
-    poseEstimator.resetPosition(getAngle(), getModulePositions(), getPose());
 
+  public void configAllFactoryDefaut() {
+    for (int i=0; i<modules.length; i++) {
+      modules[i].configFactoryDefault();
+    }
   }
+
+
 
   /**
    * Returns the velocity vector
@@ -214,6 +249,7 @@ public class Chassis extends SubsystemBase {
     Arrays.stream(modules).forEach((module) -> module.setNeutralMode(mode));
   }
 
+
   /**
    * Returns the angle of the gyro
    */
@@ -222,6 +258,7 @@ public class Chassis extends SubsystemBase {
   }
 
   public void setOdometryToForward() {
+    gyro.setYaw(0);
     poseEstimator.resetPosition(Rotation2d.fromDegrees(0), getModulePositions(),
         new Pose2d(poseEstimator.getEstimatedPosition().getTranslation(), getAngle()));
   }
@@ -260,6 +297,8 @@ public class Chassis extends SubsystemBase {
     return angles;
   }
 
+  
+
   /**
    * Sets the state of every module
    * 
@@ -270,6 +309,7 @@ public class Chassis extends SubsystemBase {
       modules[i].setState(states[i]);
     }
   }
+
 
   public Pose2d getPose() {
     return poseEstimator.getEstimatedPosition();
@@ -282,6 +322,8 @@ public class Chassis extends SubsystemBase {
     builder.addDoubleProperty("Angle", () -> Utils.degrees(getAngle()), null);
     builder.addDoubleProperty("Pitch", () -> gyro.getPitch(), null);
     builder.addDoubleProperty("Roll", () -> gyro.getRoll(), null);
+    builder.addDoubleProperty("Pose X", () -> getPose().getX(), null);
+    builder.addDoubleProperty("Pose Y", () -> getPose().getY(), null);
     SmartDashboard.putData("Set Modules Angle", new RunCommand(() -> setModulesAngleFromSB(0)));
   }
 
@@ -290,6 +332,23 @@ public class Chassis extends SubsystemBase {
     for (SwerveModule module : modules) {
       module.setAngleByPositionPID(a);
     }
+  }
+
+  
+  public Rotation2d getClosetAngleApriltag(){
+    Translation2d finalVector = new Translation2d(Integer.MAX_VALUE, Integer.MAX_VALUE);
+    //checks the distance from each april tag and finds
+    for(int i = 0; i < aprilTagsPositions.length; i++){
+      Translation2d currentAprilTagVector = getPose().minus(aprilTagsPositions[i]).getTranslation();
+
+     if(currentAprilTagVector.getNorm() < finalVector.getNorm()){
+      finalVector = currentAprilTagVector;
+     }
+      
+    }
+
+    return finalVector.getAngle();
+
   }
 
   @Override
@@ -320,5 +379,6 @@ public class Chassis extends SubsystemBase {
     SmartDashboard.putNumber("Pose X 5 Med Test", testPoseEstimatorBuf5Med.getEstimatedPosition().getX());
     SmartDashboard.putNumber("Pose Y 5 Med Test", testPoseEstimatorBuf5Med.getEstimatedPosition().getY());
 
+    SmartDashboard.putNumber("velocity of chassis", getMoveVelocity());
   }
 }

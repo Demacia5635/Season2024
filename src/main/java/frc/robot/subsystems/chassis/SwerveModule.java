@@ -22,8 +22,8 @@ import frc.robot.Sysid.Sysid;
 import frc.robot.subsystems.chassis.ChassisConstants.SwerveModuleConstants;
 import frc.robot.utils.Trapezoid;
 import frc.robot.utils.Utils;
+import static frc.robot.subsystems.chassis.ChassisConstants.*;
 
-import static frc.robot.Constants.ChassisConstants.SwerveModuleConstants.MAX_STEER_ERROR;
 import static frc.robot.subsystems.chassis.ChassisConstants.*;
 
 /**
@@ -38,8 +38,8 @@ public class SwerveModule implements Sendable {
     private double pulsePerDegree;
     private double pulsePerMeter;
 
-    private FeedForward_SVA moveFFLEss;
-    private FeedForward_SVA moveFFMore;
+    private FeedForward_SVA MoveFFSlow;
+    private FeedForward_SVA moveFFFast;
     private FeedForward_SVA steerFF;
     private Trapezoid steerTrapezoid;
 
@@ -77,8 +77,8 @@ public class SwerveModule implements Sendable {
         // set the controls
         // moveFF = new FeedForward_SVA_V2_VSQRT(constants.moveFF.KS, constants.moveFF.KV, constants.moveFF.KA,
         //     MOVE_KV2, MOVE_KVSQRT);
-        moveFFLEss = new FeedForward_SVA(constants.moveFFLess.KS, constants.moveFFLess.KV, constants.moveFFLess.KA);
-        moveFFMore = new FeedForward_SVA(constants.moveFFMore.KS, constants.moveFFMore.KV, constants.moveFFMore.KA);
+        MoveFFSlow = new FeedForward_SVA(constants.moveFFSlow.KS, constants.moveFFSlow.KV, constants.moveFFSlow.KA);
+        moveFFFast = new FeedForward_SVA(constants.moveFFFast.KS, constants.moveFFFast.KV, constants.moveFFFast.KA);
         steerFF = new FeedForward_SVA(constants.steerFF.KS, constants.steerFF.KV, constants.steerFF.KA);
         setMovePID(0,constants.movePID.KP, constants.movePID.KI, constants.movePID.KD);
         setSteerPID(SteerVelocitySlot,constants.steerPID.KP, constants.steerPID.KI, constants.steerPID.KD);
@@ -95,7 +95,7 @@ public class SwerveModule implements Sendable {
         // set motors paramters
         moveMotor.setNeutralMode(NeutralMode.Brake);
         steerMotor.setNeutralMode(NeutralMode.Brake);
-        moveMotor.setInverted(true);
+        moveMotor.setInverted(false);
         steerMotor.setInverted(constants.inverted);
         moveMotor.setSelectedSensorPosition(0);
         steerMotor.setSelectedSensorPosition(getAngleDegrees()*pulsePerDegree);
@@ -240,10 +240,10 @@ public class SwerveModule implements Sendable {
             currentVelocity = lastMoveV;
         }
         */
-        double ff;
         double tgtV = MathUtil.clamp(v, currentVelocity-maxVelocityChange, currentVelocity+maxVelocityChange);
-        if(tgtV > 2.5) ff = moveFFMore.calculate(tgtV, currentVelocity);
-        else ff = moveFFLEss.calculate(tgtV, currentVelocity);
+        double ff = Math.abs(tgtV) > 2.5 ? moveFFFast.calculate(tgtV, currentVelocity):
+                        MoveFFSlow.calculate(tgtV, currentVelocity);
+    
         debug(" tgtV=" + tgtV + " cur V=" + currentVelocity + " ff=" + ff);
         moveMotor.set(ControlMode.Velocity, talonVelocity(tgtV), DemandType.ArbitraryFeedForward, ff);
         lastMoveA = tgtV - currentVelocity;
@@ -298,7 +298,6 @@ public class SwerveModule implements Sendable {
         double currentVelocity = getSteerVelocity();
         double tgtV = withAcceleration?MathUtil.clamp(v, currentVelocity-maxSteerVelocityChange, currentVelocity+maxSteerVelocityChange):v;
         double ff = steerFF.calculate(tgtV,currentVelocity);
-        debug(" set v to " + tgtV + " ff=" + ff);
         steerMotor.set(ControlMode.Velocity, talonSteerVelocity(tgtV), DemandType.ArbitraryFeedForward, ff);
     }
 
@@ -349,9 +348,11 @@ public class SwerveModule implements Sendable {
      * @param s
      */
     private void debug(String s) {
-        if(debug) 
-            System.out.println(name + ": " + s);
+        if(debug){
+          System.out.println(name + ": " + s);
+        } 
     }
+
 
     /**
      * Returns the state of the module
@@ -417,6 +418,11 @@ public class SwerveModule implements Sendable {
         builder.addDoubleProperty("Steer Acum", ()->steerMotor.getIntegralAccumulator()/pulsePerDegree, null);
 
 
+    }
+
+    public void configFactoryDefault() {
+        steerMotor.configFactoryDefault();
+        moveMotor.configFactoryDefault();
     }
     
 

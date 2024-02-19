@@ -22,7 +22,7 @@ public class CheckModulesSteerVelocity extends Command {
 
     @Override
     public void execute() {
-        System.out.println("Setting velocity to " + velocity);
+       // System.out.println("Setting velocity to " + velocity);
         for(int i = 0; i < 4; i++) {
             chassis.getModule(i).setSteerVelocity(velocity, true);
         }

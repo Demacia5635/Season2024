@@ -14,11 +14,14 @@ public class RoundedPoint{
     Rotation2d cornerDir;
     Rotation2d cornerAngle;
 
-    public RoundedPoint(pathPoint aPoint, pathPoint bPoint, pathPoint cPoint){
+    boolean aprilTagMode;
+
+    public RoundedPoint(pathPoint aPoint, pathPoint bPoint, pathPoint cPoint, boolean aprilTagMode){
         this.radius = bPoint.getRadius();
         this.aPoint = aPoint.getTranslation();
         this.bPoint = bPoint.getTranslation();
         this.cPoint = cPoint.getTranslation();
+        this.aprilTagMode = aprilTagMode;
         
         vectorAtoB = this.bPoint.minus(this.aPoint);
         vectorBtoC = this.cPoint.minus(this.bPoint);
@@ -26,12 +29,14 @@ public class RoundedPoint{
 
 
         this.cornerAngle = vectorAtoB.times(-1).getAngle().minus(vectorBtoC.getAngle());
+        //case for angle of the corner is close to 0 so only leg
         if(Math.abs(cornerAngle.getDegrees()) >= 175 && Math.abs(cornerAngle.getDegrees()) <= 180)
             this.radius = 0;
         else{
+            //case for radius bigger then max possible radius
             if(radius > getMaxRadius()){
                 radius = getMaxRadius();
-                System.out.println("radius is bigger then possible, new radius is: " + radius);
+                // System.out.println("radius is bigger then possible, new radius is: " + radius);
             }
     
         }
@@ -149,16 +154,16 @@ public class RoundedPoint{
 
     public Leg getAtoCurveLeg()
     {
-        return new Leg(aPoint, startRange().plus(getCenterCircle()), false);
+        return new Leg(aPoint, startRange().plus(getCenterCircle()), aprilTagMode);
     }
     public Leg getCtoCurveLeg()
     {
-        return new Leg(endRange().plus(getCenterCircle()), cPoint, false);
+        return new Leg(endRange().plus(getCenterCircle()), cPoint, aprilTagMode);
     }
 
     public Arc getArc()
     {
         Rotation2d diffAngle = endRange().getAngle().minus(startRange().getAngle());
-        return new Arc(startRange().plus(getCenterCircle()), getCenterCircle(), diffAngle, false);
+        return new Arc(startRange().plus(getCenterCircle()), getCenterCircle(), diffAngle, aprilTagMode);
     }
 }

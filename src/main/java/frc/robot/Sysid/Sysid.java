@@ -51,8 +51,8 @@ public class Sysid {
     double powerCycleDuration;      // how long each power cycle
     double powerCycleDelay;         // delay between power cycles
     Subsystem[] subsystems;         // for add requirements
-    static double defaultDuration = 1;
-    static double defaultDelay = 1;
+    static double defaultDuration = 2.5;
+    static double defaultDelay = 10;
     Gains[] gains;                  // the gains we are looking for
     double[] result=null;           // the result, after analyze
 
@@ -69,7 +69,7 @@ public class Sysid {
             double minPower,
             double maxPower,
             Subsystem... subsystems) {
-        this(new Gains[] { Gains.KS, Gains.KV, Gains.KA },
+        this(new Gains[] { Gains.KS, Gains.KV, Gains.KA, Gains.KV2},
                 setPower,
                 getVelocity,
                 null,
@@ -180,6 +180,18 @@ public class Sysid {
         return cmd.andThen(new InstantCommand(() -> analyze()));
     }
 
+    public Command getCommandOneWay() {
+        boolean resetDataCollector = true;
+        Command cmd = new WaitCommand(powerCycleDelay);
+        for (int c = 0; c < nPowerCycles; c++) {
+            double power = minPower + c * deltaPower;
+            cmd = cmd.andThen(getPowerCommand(power, resetDataCollector));
+            resetDataCollector = false;
+//            cmd = cmd.andThen(getPowerCommand(-power, resetDataCollector));
+        }
+        return cmd.andThen(new InstantCommand(() -> analyze()));
+    }
+
     /**
      * Get the command for a power - with the duration and delay
      */
@@ -199,7 +211,7 @@ public class Sysid {
         for (int i = 0; i < gains.length; i++) {
             result[i] = coef.get(i, 0);
             SmartDashboard.putNumber("SysID/" + gains[i], result[i]);
-            System.out.println("Sysid: " + gains[i] + " = " + result[i]);
+           // System.out.println("Sysid: " + gains[i] + " = " + result[i]);
         }
         SimpleMatrix p = dataCollector.data().mult(coef);
         SimpleMatrix e = dataCollector.power().minus(p);
@@ -208,7 +220,7 @@ public class Sysid {
         double avg = ee.elementSum() / ee.getNumRows();
         SmartDashboard.putNumber("Sysid/Max Error", max);
         SmartDashboard.putNumber("Sysid/Avg Error Sqr", avg);
-        System.out.println("Sysid: max error=" + max + " avg error squared=" + avg);
+       // System.out.println("Sysid: max error=" + max + " avg error squared=" + avg);
         double kp = (valueOf(Gains.KV, gains, result) + valueOf(Gains.KA, gains, result))/5.0;
         SmartDashboard.putNumber("Sysid/KP (Roborio)", kp);
         SmartDashboard.putNumber("Sysid/KP (Roborio)", kp);

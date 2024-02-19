@@ -49,7 +49,7 @@ public class PowerCycleCommand extends Command {
 
     @Override
     public void initialize() {
-        System.out.println(" sysid-powercycle-starting " + power);
+        // System.out.println(" sysid-powercycle-starting " + power);
         if(resetDataCollector) {
             dataCollector.resetData();
         }
@@ -69,7 +69,7 @@ public class PowerCycleCommand extends Command {
 
     @Override
     public void end(boolean interrupted) {
-        System.out.println(" sysid-powercycle-end " + power);
+       // System.out.println(" sysid-powercycle-end " + power);
         setPower.accept(0.0);
     }
     

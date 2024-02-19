@@ -84,7 +84,7 @@ public class TestVelocity extends Command {
         targetVelocity = velocity;
         minV = velocity*(1-treshHold);
         maxV = velocity*(1+treshHold);
-        System.out.println(name + " target velocity=" + targetVelocity);
+        // System.out.println(name + " target velocity=" + targetVelocity);
     }
 
     private int goodPercent() {

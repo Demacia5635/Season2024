@@ -6,7 +6,7 @@ package frc.robot.PathFollow.Util;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import frc.robot.Constants;
+import static frc.robot.subsystems.chassis.ChassisConstants.*;
 
 /** Add your docs here. */
 public class Arc extends Segment{
@@ -36,22 +36,34 @@ public class Arc extends Segment{
     }
 
     @Override
-    public Translation2d calc(Translation2d pos,double velocity)
+    public Translation2d[] getPoints()
     {
-        if(Math.abs(velocity) > 1 && isAprilTagMode())
-        {
-          velocity = 1;
+      Translation2d arrow = p1.minus(p2);
+      Translation2d[] points = new Translation2d[4];
+      double diffAngle = angle.getRadians();
+      int place = 0;
+      if(radius == 0){
+        return new Translation2d[] {p1, p2};
+      }
+        for (double i = 0;Math.abs(i) < Math.abs(diffAngle); i = i + (diffAngle / 4)) {
+            points[place] = p2.plus(arrow.rotateBy(new Rotation2d(i)));
+          
+            place++;
         }
 
+        return points;
+    }
 
-          
+    @Override
+    public Translation2d calc(Translation2d pos,double velocity)
+    {
+
+        if(isAprilTagMode()) velocity = Math.min(velocity, 1);
         Translation2d relativePos = pos.minus(p2);
         double dFromCenter = relativePos.getNorm();
 
-        Rotation2d tAngle = new Rotation2d(((velocity * Constants.CYCLE_DT) / radius) * Math.signum(angle.getDegrees()));
-     
+        Rotation2d tAngle = new Rotation2d(((velocity * CYCLE_DT) / radius) * Math.signum(angle.getDegrees()));
 
-        //Translation2d fixVector = relativePos.times(-1).div(relativePos.getNorm()).times(relativePos.getNorm() - radius).times(0.5/*kP*/);
 
         //tangent angle to arc, determined by the robot's position
         Rotation2d tanAngle = relativePos.getAngle().plus(new Rotation2d(Math.toRadians(90 * Math.signum(angle.getDegrees()))));
@@ -62,7 +74,7 @@ public class Arc extends Segment{
 
 
 
-        
+      
       return new Translation2d(velocity, tanAngle.plus(fixAngle));
     }
 

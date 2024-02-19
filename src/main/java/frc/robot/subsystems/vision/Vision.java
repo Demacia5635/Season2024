@@ -141,6 +141,7 @@ public class Vision extends SubsystemBase {
         double time = getTime();
         if (validBuf(time)) {
             VisionData vDataMed = median(buf3Med);
+            
             Pair<Pose2d, Double> vData3AvgPair = avg(buf5Avg);
             VisionData vDataAvg = new VisionData(vData3AvgPair.getFirst(), vData3AvgPair.getSecond(), testPoseEstimatorBuf3Avg)  ;
             if (vDataMed != null && vDataMed.getPose() != null && vDataAvg.getPose() != null && vDataAvg != null) {
