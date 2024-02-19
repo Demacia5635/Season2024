@@ -27,7 +27,6 @@ public class AmpIntake2Udi extends Command {
         super.initialize();
         amp.setArmBrake();
         amp.setWheelsBrake();
-        amp.wheelsSetInverted(true);
         amp.wheelsEncoderReset();
         amp.setArmTargetAngle(SENSEOR_ANGLE);
         initialEncoderCount = 0;

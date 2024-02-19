@@ -26,9 +26,9 @@ public class AmpConstantsUdi {
   public static class Parameters {
     public static final double Deadband = 0.2;
 
-    public static final double KP1 = 0.1;
-    public static final double KI1 = 0.005;
-    public static final double KD1 = 0;
+    public static final double ARM_KP = 0.1;
+    public static final double ARM_KI = 0.0;
+    public static final double ARM_KD = 0.0;
 
     public static final double MAX_ARM_VEL_UP = Math.toRadians(180);
     public static final double MAX_ARM_ACCEL_UP = Math.toRadians(600);
@@ -36,7 +36,7 @@ public class AmpConstantsUdi {
     public static final double ARM_RAD_ERROR = Math.toRadians(3);
 
     public static final double UP_ANGLE = Math.toRadians(55);
-    public static final double CLOSE_ANGLE = Math.toRadians(-60);
+    public static final double HOME_ANGLE = Math.toRadians(-60);
     public static final double SENSEOR_ANGLE = Math.toRadians(-55);
 
     // intake data
@@ -57,7 +57,7 @@ public class AmpConstantsUdi {
 
   }
 
-  public static class armStatesParameters {
+  public static class ArmFFParamaters {
     /*
      * the three numbers in each array is for every state of the arm
      * 
@@ -67,17 +67,10 @@ public class AmpConstantsUdi {
      * 3 = the arm is going down and more then angle 55
      * 4 = the arm is going down from 55 to 0
      */
-    public static final double[] KS = { 1.287228076, 0.004391115, 0.009169107, -0.901637521, 0 };
-    public static final double[] KV = { 0.005323938, -0.003403798, 0.005036478, 0.005099339, 0 };
-    public static final double[] KA = { -0.004043448, 0.000252797, 0.003954434, -0.002012317, 0 };
-    public static final double[] Kalpha = { 0.180088628, 0.005150217, 0.004382342, -0.220649252, 0 };
-    public static final double[] Ksin = { -15.69829677, 0, 0, 18.36092613, 0 };
-    public static final double[] Kcos = { -1.202533577, 0, 0, 0.870858412, 0 };
-    public static final double[] Kcossin = { 5.16955116, 0, 0, -5.614001788, 0 };
-
-    public static final double[] openFF = { 0, 0, 0 };
-    public static final double[] closeFF = { 0, 0, 0 };
-
+    public static final double ARM_UP_KS = 1.287228076;
+    public static final double ARM_UP_KV = 0.005323938;
+    public static final double ARM_UP_KA = -0.004043448;
+    public static final double ARM_Kcos = -1.202533577;
   }
 
   public static class CommandParams {
