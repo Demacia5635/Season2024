@@ -90,7 +90,7 @@ public class SwerveModule implements Sendable {
         // name
         name = (constants.moduleTranslationOffset.getX()>0?"Front":"Back") + 
                (constants.moduleTranslationOffset.getY()>0?"Left":"Right");
-        debug = constants.moduleTranslationOffset.getX() < 0 && constants.moduleTranslationOffset.getY() >0;
+        debug = false; // constants.moduleTranslationOffset.getX() < 0 && constants.moduleTranslationOffset.getY() >0;
 
         // set motors paramters
         moveMotor.setNeutralMode(NeutralMode.Brake);
@@ -348,6 +348,7 @@ public class SwerveModule implements Sendable {
      * @param s
      */
     private void debug(String s) {
+        debug = false;
         if(debug){
           System.out.println(name + ": " + s);
         } 

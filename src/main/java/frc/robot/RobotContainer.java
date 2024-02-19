@@ -37,8 +37,11 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.PathFollow.Util.pathPoint;
 import frc.robot.commands.amp.AmpIntake;
 import frc.robot.commands.amp.AmpIntake2;
+import frc.robot.commands.amp.AmpIntakeShoot;
+import frc.robot.commands.amp.CloseAmp;
 import frc.robot.commands.amp.GoToAngleAmp;
 import frc.robot.commands.amp.JoyStickAmp;
+import frc.robot.commands.amp.SnowBlowerRun;
 import frc.robot.commands.amp.GoToAngleAmp;
 import frc.robot.commands.chassis.DriveAndPickNote;
 import frc.robot.commands.chassis.DriveCommand;
@@ -62,6 +65,7 @@ public class RobotContainer implements Sendable{
   Boolean isRed = false;
   DriverStation.Alliance alliance;
   CommandXboxController commandController;
+  CommandXboxController commandController2;
   PS4Controller controller = new PS4Controller(1);  
 
   // pathPoint[] points = {
@@ -102,7 +106,7 @@ public class RobotContainer implements Sendable{
   public RobotContainer() {
 
     intake = new Intake();
-
+    chassis = new Chassis();
     // ledControll = new LedControll(0, 5);
     leds = new SubStrip(60);
     // alliance = DriverStation.getAlliance().get();
@@ -112,6 +116,7 @@ public class RobotContainer implements Sendable{
 
     amp = new Amp();
     commandController = new CommandXboxController(0);
+    commandController2 = new CommandXboxController(1);
     shooter = new Shooter();
     //shooter.setDefaultCommand(new AngleControl(shooter, commandController));
     chassis.setDefaultCommand(new DriveCommand(chassis, commandController, DriverStation.getAlliance().get() == Alliance.Red));
@@ -189,9 +194,11 @@ public class RobotContainer implements Sendable{
         commandController.x().whileTrue(new IntakeToShooter(intake, shooter, wantedShootingVel));
         commandController.rightBumper().onTrue(new InstantCommand(()-> {shooter.stopAll();intake.stop();}, intake, shooter).ignoringDisable(true));
         commandController.y().onTrue(new DriveToNote(chassis).raceWith(new IntakeCommand(intake)).alongWith(new InstantCommand(()-> leds.setBlink(Color.kOrange))));
-        commandController.b().whileTrue((new AmpIntake2(amp)).andThen(new GoToAngleAmp(amp, wantedAngle, wantedAmpVel, Math.PI/2)));
-        
-        //commandController.rightTrigger().onTrue(new GoToAngleAmp(amp, wantedAngle, wantedAmpVel, wantedAmpAngle));
+        //commandController.pov(90).whileTrue((new AmpIntake2(amp)).andThen(new GoToAngleAmp(amp, wantedAngle, wantedAmpVel, Math.PI/2)));
+        commandController.pov(90).onTrue(new GoToAngleAmp(amp, Math.toRadians(55), wantedAmpVel,Math.PI*2*0.75).andThen(new AmpIntakeShoot(amp)));
+        commandController.pov(270).onTrue(new GoToAngleAmp(amp, Math.toRadians(-55), wantedAmpVel/2,Math.PI*2*0.75));
+
+        //commandController2.rightTrigger().onTrue(new AmpIntakeShoot(amp).andThen(new GoToAngleAmp(amp, wantedAngle, -wantedAmpVel/2, -wantedAmpAngle/2)));
         // if(controller.getCrossButton()) new InstantCommand(()->{chassis.setOdometryToForward();});
     // commandController.x().onTrue(new InstantCommand(()->{chassis.setOdometryToForward();}));
     
@@ -200,7 +207,7 @@ public class RobotContainer implements Sendable{
 
     public void calibrate() {
         new AngleQuel(shooter).schedule();
-        new GoToAngleAmp(amp, wantedAngle, wantedAmpVel, wantedAmpAngle);
+        //new GoToAngleAmp(amp, wantedAngle, wantedAmpVel, wantedAmpAngle);
     }
 
     public void disable(){

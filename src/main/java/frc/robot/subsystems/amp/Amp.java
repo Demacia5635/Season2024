@@ -36,12 +36,12 @@ public class Amp extends SubsystemBase{
     public final TalonSRX m2;
     public final CANSparkMax neo1;//small wheel
     public final CANSparkMax neo2;//big wheel
-    public double startDeg;
     public SparkMaxAnalogSensor limitInput;
     public int opticCount;
     public SimpleMotorFeedforward openFF;
     public SimpleMotorFeedforward closeFF;
     public DigitalInput magneticSensor;
+    private double armPulseOffset;
 
     
     //ArmFeedforward ff = new ArmFeedforward(Parameters.ks1, Parameters.kg1, Parameters.kv1, Parameters.ka1);
@@ -53,10 +53,11 @@ public class Amp extends SubsystemBase{
         m1 = new TalonFX(AmpDeviceID.M1);
         m1.setInverted(true);
         m1.setNeutralMode(NeutralMode.Coast);
+        m1.configFactoryDefault();
 
         magneticSensor = new DigitalInput(AmpConstants.AmpDeviceID.MAGNETIC_SENSOR_ID);       
         m2 = new TalonSRX(AmpDeviceID.M2);
-        m2.setInverted(false);
+        m2.setInverted(true);
 
         neo1 = new CANSparkMax(AmpDeviceID.NEO1, MotorType.kBrushless);
         neo1.getEncoder().setPosition(0);
@@ -68,6 +69,8 @@ public class Amp extends SubsystemBase{
 
         resetStartPulses();
         setNeosBrake();
+
+        armPulseOffset = m1.getSelectedSensorPosition() - Math.toRadians(-50)*ConvertionParams.PULSE_PER_RAD;
 
         SmartDashboard.putData("intake amp", new AmpIntake2(this));
         SmartDashboard.putNumber("amp power", 0);
@@ -87,6 +90,10 @@ public class Amp extends SubsystemBase{
 
             SmartDashboard.putData("Amp Move Sysid",
         (new Sysid(this::setPowerArm, this::getVelRadArm, 0.3, 0.7, this)).getCommand());
+        SmartDashboard.putData("run snowBlower F",new InstantCommand(()->setPowerSnowblower(0.5)));
+        SmartDashboard.putData("run snowBlower B",new InstantCommand(()->setPowerSnowblower(-0.2)));
+
+
     }
 
     public void resetStartPulses() {
@@ -99,9 +106,6 @@ public class Amp extends SubsystemBase{
         m1.config_kD(0, Parameters.KD1);
     }
 
-    public void startRad(double startDeg){
-        this.startDeg = startDeg;
-    }
     public void neosSetVel(double vel1, double vel2){
         neo1.set(vel1);
         neo2.set(vel2);
@@ -154,10 +158,10 @@ public class Amp extends SubsystemBase{
         m2.set(TalonSRXControlMode.PercentOutput, power);
     }
     public double getSnowblowerA(){
-        return m2.getSupplyCurrent();
+        return m2.getStatorCurrent();
     }
-    public void runSnowblower(double pow, double maxA){
-        if (getSnowblowerA()>maxA){
+    public void runSnowblower(double pow){
+        if (getSnowblowerA()>Parameters.SnowBlowerMaxA){
             setPowerSnowblower(0);
         } else{
             setPowerSnowblower(pow);
@@ -193,7 +197,7 @@ public class Amp extends SubsystemBase{
      * @return true if the arm is fully open
      */
     public boolean isOpen() {
-        if(getPoseByPulses()>= Math.PI/2 ){
+        if(getPoseByPulses()>= Math.toRadians(55) ){
             return true;
         }
         return false;
@@ -278,7 +282,7 @@ public class Amp extends SubsystemBase{
         return fixedDeg()/360*Math.PI*2;
     }**/
     public double getPoseByPulses(){
-        return (m1.getSelectedSensorPosition())/ConvertionParams.PULSE_PER_RAD;
+        return (m1.getSelectedSensorPosition()-armPulseOffset)/ConvertionParams.PULSE_PER_RAD;
     }
 
 
@@ -313,39 +317,27 @@ public class Amp extends SubsystemBase{
 
     public int state;
     public double FF(double wantedAnglerVel){
-        double angle = getPoseByPulses();
-        double rad = Math.toRadians(angle);
+        double rad = getPoseByPulses();
         
         if (wantedAnglerVel > 0){
-            if (angle <= 36){
-                state = 0;
-            } else {
-                if(angle>=72){
-                    state = 2;
-                }
-                state = 1;
-            }
+            state = 0;
         } else {
-            if (angle >= 55){
-                state = 3;
-            } else {
-                state = 4;
-            }
+           state = 1;
         }
 
         return (
             armStatesParameters.KS[state] + 
             wantedAnglerVel * armStatesParameters.KV[state] + 
             (wantedAnglerVel-getVelRadArm()) * armStatesParameters.KA[state] + 
-            armStatesParameters.Kalpha[state] * angle + 
-            armStatesParameters.Ksin[state] * Math.sin(rad) +   
-            armStatesParameters.Kcos[state] * Math.cos(rad) + 
-            armStatesParameters.Kcossin[state] * Math.cos(rad) * Math.sin(rad)
+            armStatesParameters.Kcos[state] * Math.cos(rad)
         );
     }
 
     public void setVel(double wantedAnglerVel){
-        m1.set(ControlMode.Velocity, wantedAnglerVel*ConvertionParams.MOTOR_PULSES_PER_ANGLE/10, DemandType.ArbitraryFeedForward, FF(wantedAnglerVel));
+        double ff = FF(wantedAnglerVel);
+        System.out.println(" ff = " + ff);
+        m1.set(ControlMode.Velocity, wantedAnglerVel*ConvertionParams.PULSE_PER_RAD/10, 
+        DemandType.ArbitraryFeedForward, ff);
     }
 
     @Override
@@ -362,13 +354,16 @@ public class Amp extends SubsystemBase{
 
 
 
-        SmartDashboard.putNumber("SnowBlower ampere", getSnowblowerA());
 
         SmartDashboard.putNumber("neo1 encoder",getNeosRev()[0]);
         SmartDashboard.putNumber("neo2 encoder",getNeosRev()[1]);
 
         SmartDashboard.putBoolean("Optic Limit switch state", didNotePass());
         SmartDashboard.putNumber("Optic Limit switch Voltage", getLimitVolt());
+        SmartDashboard.putNumber("Get SnowBlower a",getSnowblowerA());
+        double a = getSnowblowerA();
+        if(a != 0)
+            System.out.println(" current = " + a);
 
         SmartDashboard.putBoolean("Lower Limit switch state", isClose());
         SmartDashboard.putBoolean("Upper Limit switch state", isOpen());
@@ -420,8 +415,9 @@ public class Amp extends SubsystemBase{
     public void initSendable(SendableBuilder builder) {
         super.initSendable(builder);
         Command cmd = new Sysid(new Gains[] { Gains.KS, Gains.KV, Gains.KA, Gains.KCos}, this::setPowerArm,
-         this::getVelRadArm, this::getPoseByPulses, null, 0.12, 0.3 ,3, 0.5,0.5, this).getCommand();
+         this::getVelRadArm, this::getPoseByPulses, null, 0.2, 0.35 ,3, 0.7,5, this).getCommandOneWay();
         SmartDashboard.putData("Amp SYSID", cmd);
+        builder.addDoubleProperty("Arm Angle", this::getPoseByPulses, null);
     }
     
     

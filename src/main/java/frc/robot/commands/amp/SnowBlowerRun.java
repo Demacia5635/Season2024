@@ -4,17 +4,14 @@
 
 package frc.robot.commands.amp;
 
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.amp.Amp;
-import frc.robot.subsystems.amp.AmpConstants.Parameters;
 
-public class AmpIntakeShoot extends Command {
+public class SnowBlowerRun extends Command {
   Amp amp;
-  double initialEncoderCount;
-  double startTime;
-  /** Creates a new AmpIntakeShoot. */
-  public AmpIntakeShoot(Amp amp) {
+  /** Creates a new SnowBlowerRun. */
+  public SnowBlowerRun(Amp amp) {
     this.amp = amp;
     addRequirements(amp);
     // Use addRequirements() here to declare subsystem dependencies.
@@ -22,34 +19,21 @@ public class AmpIntakeShoot extends Command {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {
-    super.initialize();
-    amp.setBrakeArm();
-    amp.setBrake();
-    amp.neosSetInverted(true);
-    amp.resetStartPulses();
-    initialEncoderCount = amp.getNeoPoseByPulses();
-    startTime = Timer.getFPGATimestamp();
-  }
+  public void initialize() {}
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    amp.setNeosPower(-Parameters.INTAKE_TRANSFER_POWER); // Run motors at transfer speed
+    amp.setPowerSnowblower(-0.2);
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {
-    amp.setNeosPower(0);
-  }
+  public void end(boolean interrupted) {}
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    if(Timer.getFPGATimestamp()+startTime>0.5){
-      return true;
-    }
     return false;
   }
 }

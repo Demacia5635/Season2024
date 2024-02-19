@@ -15,8 +15,6 @@ public class GoToAngleAmp extends Command {
   double maxVelRad;
   double acceleRad;
   TrapezoidCalc trap;
-  double startTime;
-  boolean last;
   boolean check = false;
 
   /** Creates a new GoToAngleAmp. */
@@ -33,42 +31,42 @@ public class GoToAngleAmp extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    startTime = Timer.getFPGATimestamp();
-    if(amp.isOpen()){
-      amp.setPowerSnowblower(-0.2);
-    }
-    amp.startRad(amp.getPoseByPulses());
+    amp.setBrake();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if(amp.isClose()&&!last){
-      check = true;
-    }else{
+      double velRad = 0;
       double currentAngleRad = amp.getPoseByPulses();
-      double velRad = trap.trapezoid(amp.getVelRadArm(), maxVelRad, 0.17, Math.abs(acceleRad), angleRad-currentAngleRad);
-      amp.setVel(velRad);
-      if((amp.isOpen())){
-        amp.stop();
-        amp.runSnowblower(0.3, 350);
-      }
+      if(currentAngleRad < angleRad) {
+        velRad = trap.trapezoid(amp.getVelRadArm(), maxVelRad, 0, 
+        Math.abs(acceleRad), angleRad-currentAngleRad);
+        System.out.println(" cur ang=" + currentAngleRad + " tgt=" + angleRad + " v=" + velRad);
+        amp.setVel(velRad);
+      } else {
+        if(amp.isClose()) {
+          check = true;
+        } else {
+          velRad = -0.2;
+          amp.setPowerArm(velRad);
+        }
     }
     
-    last = amp.isClose();
+    
+    
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    amp.setPowerSnowblower(0.1);
+    amp.setPowerSnowblower(0);
     amp.stop();
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    //return ((amp.getPoseRad()>=angleRad-10/360*2*Math.PI)&&(amp.getPoseRad()<=angleRad+10/360*2*Math.PI));
-    return ((amp.getSnowblowerA()>=350)&&(Timer.getFPGATimestamp()-startTime >1)||(check));
+    return ((amp.getPoseByPulses()>= angleRad)&& (angleRad >0))||((amp.isClose())&&(angleRad<0));
   }
 }

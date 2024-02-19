@@ -1,5 +1,6 @@
 package frc.robot.commands.amp;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.amp.AmpConstants;
 import frc.robot.subsystems.amp.Amp;
@@ -9,30 +10,25 @@ import frc.robot.utils.TrapezoidCalc;
 public class CloseAmp extends CommandBase {
 
     private Amp amp;
-    private TrapezoidCalc trapezoid;
-    private double target = AmpConstants.Parameters.CLOSE_ANGLE;
-    private double vel;
+    private double velRad;
 
 
-    public CloseAmp(Amp amp) {
+
+    public CloseAmp(Amp amp, double velRad) {
         this.amp = amp;
-        trapezoid = new TrapezoidCalc();
+        this.velRad = velRad;
         addRequirements(amp);
         
     } 
     
     @Override
     public void initialize() {
-        
         amp.setBrake();
     }
     
     @Override
     public void execute() {
-        vel = trapezoid.trapezoid(amp.getVelRadArm(), AmpConstants.Parameters.MAX_ARM_VEL_CLOSE,
-         0, AmpConstants.Parameters.MAX_ARM_ACCEL_CLOSE, target - amp.getArmAngle());
-
-        amp.setArmVelocityClose(vel);
+        amp.setVel(velRad);
     }
 
     @Override
