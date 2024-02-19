@@ -191,11 +191,11 @@ public class RobotContainer implements Sendable{
       Trigger overrideAuto = new Trigger(()->Utils.joystickOutOfDeadband(commandController));
 
       //wanted angle = 56 angle for close to speaker
-        wantedAngle = 56;
+        wantedAngle = 40;
     //   SmartDashboard.putNumber("wanted angle", 60);
     //   SmartDashboard.putNumber("wanted shooting vel for noga", 0);
     //   wantedAngle = SmartDashboard.getNumber("wanted angle", 60);
-        wantedShootingVel = 14;
+        wantedShootingVel = 16.5;
         
     //   wantedShootingVel = SmartDashboard.getNumber("wanted shooting vel for noga", 0);
     //   commandController.b().onTrue(new AngleQuel(shooter));
