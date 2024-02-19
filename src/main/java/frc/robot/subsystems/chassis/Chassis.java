@@ -295,6 +295,7 @@ public class Chassis extends SubsystemBase {
   @Override
   public void periodic() {
     poseEstimator.update(getAngle(), getModulePositions());
+
     testPoseEstimatorBuf3Avg.update(getAngle(), getModulePositions());
     testPoseEstimatorBuf3Med.update(getAngle(), getModulePositions());
     testPoseEstimatorBuf5Avg.update(getAngle(), getModulePositions());
@@ -302,6 +303,7 @@ public class Chassis extends SubsystemBase {
 
     field.setRobotPose(getPose());
 
+    SmartDashboard.putNumber("Gyro Angle",getAngle().getDegrees());
 
     SmartDashboard.putNumber("Velocity X Test", getChassisSpeeds().vxMetersPerSecond);
     SmartDashboard.putNumber("Velocity Y Test", getChassisSpeeds().vyMetersPerSecond);

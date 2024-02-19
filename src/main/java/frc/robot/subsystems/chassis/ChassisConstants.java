@@ -5,7 +5,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 
 public final class ChassisConstants {
 
-  public static final int GYRO_ID = 15;
+  public static final int GYRO_ID = 19;
 
   public static final double CYCLE_DT = 0.02;
 
@@ -56,7 +56,7 @@ public final class ChassisConstants {
   public final static SwerveModuleConstants FRONT_LEFT = new SwerveModuleConstants(
       3, 4, 12,
       new Translation2d(0.332, 0.277),
-      257.607421875,
+      20.917,
       MOVE_PID,
       FRONT_STEER_PID,
       FRONT_POSITION_STEER_PID,
@@ -70,7 +70,7 @@ public final class ChassisConstants {
   public final static SwerveModuleConstants FRONT_RIGHT = new SwerveModuleConstants(
       5, 6, 13,
       new Translation2d(0.332, -0.277),
-      290.7,
+      162.158,
       MOVE_PID,
       FRONT_STEER_PID,
       FRONT_POSITION_STEER_PID,
@@ -85,7 +85,7 @@ public final class ChassisConstants {
   public final static SwerveModuleConstants BACK_LEFT = new SwerveModuleConstants(
       2, 1, 11,
       new Translation2d(-0.332, 0.288),
-      230,
+      52.207,
       MOVE_PID,
       BACK_STEER_PID,
       BACK_POSITION_STEER_PID,
@@ -100,7 +100,7 @@ public final class ChassisConstants {
   public final static SwerveModuleConstants BACK_RIGHT = new SwerveModuleConstants(
       8, 7, 14,
       new Translation2d(-0.332, -0.288),
-      276.1,
+      95.185,
       MOVE_PID,
       BACK_STEER_PID,
       BACK_POSITION_STEER_PID,

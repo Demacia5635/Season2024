@@ -21,7 +21,6 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.chassis.Chassis;
 import frc.robot.subsystems.vision.utils.SwerveDrivePoseEstimator;
-
 import static frc.robot.Constants.VisionConstants.*;
 
 public class Vision extends SubsystemBase {
@@ -430,12 +429,15 @@ public class Vision extends SubsystemBase {
             if (poseSample != null
                     && Math.abs(poseSample.getRotation().minus(pose.getRotation()).getDegrees()) < maxValidAngleDiff) {
                 diffrence = poseSample.getTranslation().getDistance(pose.getTranslation());
-            } else {
+            } 
+            else {
                 if(poseSample != null){
                     System.out.println("cleared on setDifference() func pose sample isnt null, " + poseSample.getRotation().getDegrees() + " " + pose.getRotation().getDegrees());
                 }
-                System.out.println("cleared on setDifference() func");
-                clear();
+                else{
+                    //System.out.println("cleared on setDifference() func pose sample is null estimator pose = " + bufPoseEstimator.getEstimatedPosition());
+                    clear();
+                }
             }
         }
     
