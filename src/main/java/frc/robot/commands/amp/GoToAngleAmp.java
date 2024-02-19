@@ -67,6 +67,6 @@ public class GoToAngleAmp extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return ((amp.getPoseByPulses()>= angleRad)&& (angleRad >0))||((amp.isClose())&&(angleRad<0));
+    return ((amp.getPoseByPulses()>= angleRad)&&(angleRad >0))||((amp.isClose())&&(angleRad<0));
   }
 }

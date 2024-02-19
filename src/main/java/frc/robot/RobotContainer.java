@@ -38,10 +38,9 @@ import frc.robot.PathFollow.Util.pathPoint;
 import frc.robot.commands.amp.AmpIntake;
 import frc.robot.commands.amp.AmpIntake2;
 import frc.robot.commands.amp.AmpIntakeShoot;
-import frc.robot.commands.amp.CloseAmp;
+import frc.robot.commands.amp.CalibrateArm;
 import frc.robot.commands.amp.GoToAngleAmp;
-import frc.robot.commands.amp.JoyStickAmp;
-import frc.robot.commands.amp.SnowBlowerRun;
+import frc.robot.commands.amp.RunBrakeArm;
 import frc.robot.commands.amp.GoToAngleAmp;
 import frc.robot.commands.chassis.DriveAndPickNote;
 import frc.robot.commands.chassis.DriveCommand;
@@ -55,6 +54,7 @@ import frc.robot.commands.intake.IntakeToShooter;
 import frc.robot.commands.intake.ShootCommand;
 import frc.robot.subsystems.amp.Amp;
 import frc.robot.subsystems.amp.AmpConstants;
+import frc.robot.subsystems.amp.AmpConstants.Parameters;
 import frc.robot.subsystems.chassis.Chassis;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.led.LedControll;
@@ -86,6 +86,9 @@ public class RobotContainer implements Sendable{
 
   Command intake2shooter;
   Command intake2amp;
+  Command amp2Angle;
+  Command shootAmp;
+  Command closeAmp;
   Command shoot;
   Command amplify;
   Command autonomousRight;
@@ -138,9 +141,14 @@ public class RobotContainer implements Sendable{
     //  new AngleGoToAngle(shooter, ShooterConstants.CommandParams.ANGLE_DEFAULT,
     //  ShooterConstants.CommandParams.MAX_VEL, ShooterConstants.CommandParams.MAX_ACCCEL));
 
-    // intake2amp = (new IntakeCommand(intake).raceWith(new GoToNote(chassis)))
-    // .andThen(new DispenseCommand(intake)
-    // .alongWith(new AmpIntake(amp, AmpConstants.CommandParams.v1, AmpConstants.CommandParams.v2)));
+    intake2amp = (new DispenseCommand(intake)
+     .alongWith(new AmpIntake2(amp)));
+    
+    amp2Angle = (new RunBrakeArm(amp,Parameters.ARM_RELEASE_POW).andThen(new GoToAngleAmp(amp, Math.toRadians(55), wantedAmpVel,Math.PI*2)).andThen(new RunBrakeArm(amp, Parameters.ARM_BRAKE_POW)));
+
+    shootAmp = (new AmpIntakeShoot(amp));
+
+    closeAmp = (new RunBrakeArm(amp,Parameters.ARM_RELEASE_POW).andThen((new GoToAngleAmp(amp, Math.toRadians(-55), wantedAmpVel/2,Math.PI*2)).andThen(new RunBrakeArm(amp, Parameters.ARM_BRAKE_POW))));
 
     //  amplify = new GoToAngleAmp(amp, AmpConstants.CommandParams.ANGLE_RADIANS_AMP,
     //  AmpConstants.CommandParams.MAX_VEL_RAD, AmpConstants.CommandParams.MAX_ACCEL_RAD).andThen(
@@ -195,10 +203,13 @@ public class RobotContainer implements Sendable{
         commandController.rightBumper().onTrue(new InstantCommand(()-> {shooter.stopAll();intake.stop();}, intake, shooter).ignoringDisable(true));
         commandController.y().onTrue(new DriveToNote(chassis).raceWith(new IntakeCommand(intake)).alongWith(new InstantCommand(()-> leds.setBlink(Color.kOrange))));
         //commandController.pov(90).whileTrue((new AmpIntake2(amp)).andThen(new GoToAngleAmp(amp, wantedAngle, wantedAmpVel, Math.PI/2)));
-        commandController.pov(90).onTrue(new GoToAngleAmp(amp, Math.toRadians(55), wantedAmpVel,Math.PI*2*0.75).andThen(new AmpIntakeShoot(amp)));
-        commandController.pov(270).onTrue(new GoToAngleAmp(amp, Math.toRadians(-55), wantedAmpVel/2,Math.PI*2*0.75));
+        
+        //Amp commands Buttons
+        commandController2.pov(90).onTrue(intake2amp);
+        commandController2.pov(270).onTrue(amp2Angle);
+        commandController2.leftBumper().onTrue(shootAmp);
+        commandController2.a().onTrue(closeAmp);
 
-        //commandController2.rightTrigger().onTrue(new AmpIntakeShoot(amp).andThen(new GoToAngleAmp(amp, wantedAngle, -wantedAmpVel/2, -wantedAmpAngle/2)));
         // if(controller.getCrossButton()) new InstantCommand(()->{chassis.setOdometryToForward();});
     // commandController.x().onTrue(new InstantCommand(()->{chassis.setOdometryToForward();}));
     
@@ -207,7 +218,7 @@ public class RobotContainer implements Sendable{
 
     public void calibrate() {
         new AngleQuel(shooter).schedule();
-        //new GoToAngleAmp(amp, wantedAngle, wantedAmpVel, wantedAmpAngle);
+        (new CalibrateArm(amp).andThen(new RunBrakeArm(amp, Parameters.ARM_BRAKE_POW))).schedule();
     }
 
     public void disable(){

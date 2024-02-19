@@ -161,7 +161,7 @@ public class Amp extends SubsystemBase{
         return m2.getStatorCurrent();
     }
     public void runSnowblower(double pow){
-        if (getSnowblowerA()>Parameters.SnowBlowerMaxA){
+        if (getSnowblowerA()>Parameters.ARM_BRAKE_MAX_A){
             setPowerSnowblower(0);
         } else{
             setPowerSnowblower(pow);

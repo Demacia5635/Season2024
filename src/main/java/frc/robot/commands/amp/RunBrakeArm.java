@@ -4,27 +4,34 @@
 
 package frc.robot.commands.amp;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.amp.Amp;
+import frc.robot.subsystems.amp.AmpConstants.Parameters;
 
-public class SnowBlowerRun extends Command {
+public class RunBrakeArm extends Command {
   Amp amp;
+  double p;
+  double startTime;
   /** Creates a new SnowBlowerRun. */
-  public SnowBlowerRun(Amp amp) {
+  public RunBrakeArm(Amp amp, double p) {
     this.amp = amp;
+    this.p = p;
     addRequirements(amp);
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    startTime = Timer.getFPGATimestamp();
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    amp.setPowerSnowblower(-0.2);
+    amp.setPowerSnowblower(p);
   }
 
   // Called once the command ends or is interrupted.
@@ -34,6 +41,6 @@ public class SnowBlowerRun extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return ((amp.getSnowblowerA()>Parameters.ARM_BRAKE_MAX_A)||((p<0)&&(Timer.getFPGATimestamp()-startTime >0.7)));
   }
 }
