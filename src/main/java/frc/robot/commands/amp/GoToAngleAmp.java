@@ -4,7 +4,6 @@
 
 package frc.robot.commands.amp;
 
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.amp.AmpUdi;
 import frc.robot.utils.TrapezoidCalc;
@@ -45,11 +44,11 @@ public class GoToAngleAmp extends Command {
     if (amp.isUnlocked()) {
       if (angle > currentAngle) { // going up
         double velRad = trap.trapezoid(currentAngle, maxVel, 0, Math.abs(accel), angle - currentAngle);
-        amp.setVel(velRad);
+        amp.setArmVel(velRad);
       } else if (!atPosition) { // going down
         amp.setArmPower(ARM_DOWN_POWER);
       } else {
-        amp.setVel(0);
+        amp.setArmVel(0);
       }
     }
     if (atPosition) {

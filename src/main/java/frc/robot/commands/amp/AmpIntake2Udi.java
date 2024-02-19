@@ -1,23 +1,20 @@
 package frc.robot.commands.amp;
 
-import java.lang.reflect.Parameter;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import frc.robot.commands.intake.IntakeCommand;
-import frc.robot.subsystems.amp.AmpConstantsUdi;
+import static frc.robot.subsystems.amp.AmpConstantsUdi.Parameters.SENSEOR_ANGLE;
+
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.amp.AmpUdi;
-import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.amp.AmpConstants.Parameters;
 
-public class AmpIntake2Udi
-        extends CommandBase {
+public class AmpIntake2Udi extends Command {
 
     private final AmpUdi amp;
     private boolean noteWasDetected = false;
     private double initialEncoderCount = 0;
     private boolean hasEntered = false;
+
+    private boolean debug = true;
 
     public AmpIntake2Udi(AmpUdi amp) {
         this.amp = amp;
@@ -32,19 +29,21 @@ public class AmpIntake2Udi
         amp.setWheelsBrake();
         amp.wheelsSetInverted(true);
         amp.wheelsEncoderReset();
+        amp.setArmTargetAngle(SENSEOR_ANGLE);
         initialEncoderCount = 0;
+    }
+
+    private void debug(String msg) {
+        if(debug) System.out.println(msg);
     }
 
     @Override
     public void execute() {
 
-        SmartDashboard.putBoolean("en 1", initialEncoderCount > 0
-                && amp.getSmallWheelsPosition() >= initialEncoderCount + Parameters.SENSOR_TO_REST_DIST);// Stop motors
-                                                                                                         // if resting
-                                                                                                         // position
-                                                                                                         // reached
-        SmartDashboard.putBoolean("en 2", noteWasDetected);
-        SmartDashboard.putBoolean("en lol", !hasEntered);
+        debug("en 1" + (initialEncoderCount > 0
+                && amp.getSmallWheelsPosition() >= initialEncoderCount + Parameters.SENSOR_TO_REST_DIST));
+        debug("en 2" + noteWasDetected);
+        debug("en lol " +  !hasEntered);
         if (amp.isSensingNote())
             noteWasDetected = true;
         if (amp.isCriticalCurrent())
@@ -67,22 +66,22 @@ public class AmpIntake2Udi
                         && amp.getSmallWheelsPosition() >= initialEncoderCount + Parameters.SENSOR_TO_REST_DIST) {
                     amp.setWheelsPower(Parameters.INTAKE_PRE_LIMIT_POWER); // Run motors at intake speed until note is
                                                                            // detected
-                    SmartDashboard.putBoolean("en 3", true);
+                    debug("en 3 true");
                 }
             }
 
             if (noteWasDetected) { // Placeholder for sensor detection
-                SmartDashboard.putBoolean("detected ", true);
+                debug("detected " +true);
                 if (initialEncoderCount == 0) { // Initialize only when note is first detected
-                    SmartDashboard.putNumber("limit amp", amp.getNoteSensorVolt());
+                    debug("limit amp =" + amp.getNoteSensorVolt());
 
                     initialEncoderCount = amp.getSmallWheelsPosition();
-                    SmartDashboard.putBoolean("en 6", true);
+                    debug("en 6 true");
                 }
             }
         }
 
-        System.out.println("current= " + amp.getSmallWheelsMotorCurrent());
+        debug("current= " + amp.getSmallWheelsMotorCurrent());
 
         if ((amp.isOpen()) && (!amp.isSensingNote())) {
             amp.setWheelsPower(-Parameters.INTAKE_POWER); // Run motors at intake speed until note is out;
@@ -92,7 +91,7 @@ public class AmpIntake2Udi
     @Override
     public boolean isFinished() {
         // Command ends when note is detected and reaches resting spot
-        return amp.isOpen() && amp.isSensingNote();
+        return amp.isAtSensor() && amp.isSensingNote();
     }
 
     @Override

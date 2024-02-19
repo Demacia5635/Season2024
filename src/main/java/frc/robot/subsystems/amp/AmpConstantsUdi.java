@@ -46,6 +46,7 @@ public class AmpConstantsUdi {
     public static final double CRITICAL_CURRENT = 0;
     public static final double INTAKE_TRANSFER_POWER = 0.4;
     public static final double INTAKE_POWER = 0.4;
+    public static final double INTAKE_RELEASE_POWER = -0.4;
     public static final double INTAKE_PRE_LIMIT_POWER = 0.4;
 
     // lock data
