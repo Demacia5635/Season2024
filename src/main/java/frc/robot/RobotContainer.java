@@ -37,8 +37,11 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.PathFollow.Util.pathPoint;
 import frc.robot.commands.amp.AmpIntake;
 import frc.robot.commands.amp.AmpIntake2;
+import frc.robot.commands.amp.AmpIntakeShoot;
+import frc.robot.commands.amp.CalibrateArm;
 import frc.robot.commands.amp.GoToAngleAmp;
 import frc.robot.commands.amp.JoyStickAmp;
+import frc.robot.commands.amp.RunBrakeArm;
 import frc.robot.commands.amp.GoToAngleAmp;
 import frc.robot.commands.chassis.DriveAndPickNote;
 import frc.robot.commands.chassis.DriveCommand;
@@ -52,6 +55,7 @@ import frc.robot.commands.intake.IntakeToShooter;
 import frc.robot.commands.intake.ShootCommand;
 import frc.robot.subsystems.amp.Amp;
 import frc.robot.subsystems.amp.AmpConstants;
+import frc.robot.subsystems.amp.AmpConstants.Parameters;
 import frc.robot.subsystems.chassis.Chassis;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.leds.SubStrip;
@@ -61,6 +65,7 @@ public class RobotContainer implements Sendable{
   Boolean isRed = false;
   DriverStation.Alliance alliance;
   CommandXboxController commandController;
+  CommandXboxController commandController2;
   PS4Controller controller = new PS4Controller(1);  
 
   // pathPoint[] points = {
@@ -84,6 +89,10 @@ public class RobotContainer implements Sendable{
   Command amplify;
   Command autonomousRight;
 
+  Command amp2Angle;
+  Command shootAmp;
+  Command closeAmp;
+
   double wantedAngle;
   double wantedShootingVel;
   double wantedAmpVel;
@@ -104,7 +113,7 @@ public class RobotContainer implements Sendable{
     chassis = new Chassis();
     intake = new Intake();
     leds = new SubStrip(60);
-
+    commandController2 = new CommandXboxController(1);
 
     // alliance = DriverStation.getAlliance().get();
     // isRed = (alliance == Alliance.Red)   ;
@@ -117,14 +126,21 @@ public class RobotContainer implements Sendable{
     //shooter.setDefaultCommand(new AngleControl(shooter, commandController));
     chassis.setDefaultCommand(new DriveCommand(chassis, commandController, DriverStation.getAlliance().get() == Alliance.Red).alongWith(Utils.setLed(leds)));
     
-
+    createCommands();
     
     SmartDashboard.putData("RC", this);
     configureBindings();
   }
 
   public void createCommands() {
+     intake2amp = (new DispenseCommand(intake)
+     .alongWith(new AmpIntake2(amp)));
+    
+    amp2Angle = (new RunBrakeArm(amp,Parameters.ARM_RELEASE_POW).andThen(new GoToAngleAmp(amp, Math.toRadians(55), wantedAmpVel,Math.PI*2)).andThen(new RunBrakeArm(amp, Parameters.ARM_BRAKE_POW)));
 
+    shootAmp = (new AmpIntakeShoot(amp));
+
+    closeAmp = (new RunBrakeArm(amp,Parameters.ARM_RELEASE_POW).andThen((new GoToAngleAmp(amp, Math.toRadians(-55), wantedAmpVel/2,Math.PI*2)).andThen(new RunBrakeArm(amp, Parameters.ARM_BRAKE_POW))));
 
 
     //for check, can add wait command between and then
@@ -197,22 +213,32 @@ public class RobotContainer implements Sendable{
         commandController.pov(180).onTrue(new InstantCommand(()->{chassis.setOdometryToForward();}));
         overrideAuto.onTrue(chassis.getDefaultCommand());
         
+        //Amp commands Buttons
+        commandController2.pov(90).onTrue(intake2amp);
+        commandController2.pov(270).onTrue(amp2Angle);
+        commandController2.leftBumper().onTrue(shootAmp);
+        commandController2.a().onTrue(closeAmp);
+
     
     }
 
 
+   
     public void calibrate() {
         new AngleQuel(shooter).schedule();
+        (new CalibrateArm(amp).andThen(new RunBrakeArm(amp, Parameters.ARM_BRAKE_POW))).schedule();
     }
 
     public void disable(){
         new InstantCommand(()-> {
             shooter.stopAll();
             intake.stop();
-        }, intake, shooter
+        }, 
+        intake, shooter
         ).ignoringDisable(true).schedule();
         leds.turnOff().schedule();
     }
+   
    
   public Command getAutonomousCommand() {
     //return new PathFollow(chassis, points, 3, 6, DriverStation.getAlliance().get() == Alliance.Red);

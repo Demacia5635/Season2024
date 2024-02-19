@@ -4,25 +4,25 @@
 
 package frc.robot.commands.amp;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.amp.AmpUdi;
+import frc.robot.subsystems.amp.Amp;
 import frc.robot.utils.TrapezoidCalc;
-import static frc.robot.subsystems.amp.AmpConstantsUdi.Parameters.*;
 
 public class GoToAngleAmp extends Command {
-  AmpUdi amp;
-  double angle;
-  double maxVel;
-  double accel;
-  double currentAngle;
+  Amp amp;
+  double angleRad;
+  double maxVelRad;
+  double acceleRad;
   TrapezoidCalc trap;
+  boolean check = false;
 
   /** Creates a new GoToAngleAmp. */
-  public GoToAngleAmp(AmpUdi amp, double angleRad, double maxVelRad, double acceleRad) {
+  public GoToAngleAmp( Amp amp, double angleRad, double maxVelRad, double acceleRad) {
     this.amp = amp;
-    this.angle = angleRad;
-    this.maxVel = maxVelRad;
-    this.accel = acceleRad;
+    this.angleRad = angleRad;
+    this.maxVelRad = maxVelRad;
+    this.acceleRad = acceleRad;
     this.trap = new TrapezoidCalc();
     addRequirements(amp);
     // Use addRequirements() here to declare subsystem dependencies.
@@ -31,45 +31,42 @@ public class GoToAngleAmp extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    amp.setArmBrake();
-    amp.unlock();
-
+    amp.setBrake();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    currentAngle = amp.getArmAngle();
-    boolean atPosition = atPosition();
-    if (amp.isUnlocked()) {
-      if (angle > currentAngle) { // going up
-        double velRad = trap.trapezoid(currentAngle, maxVel, 0, Math.abs(accel), angle - currentAngle);
-        amp.setArmVel(velRad);
-      } else if (!atPosition) { // going down
-        amp.setArmPower(ARM_DOWN_POWER);
+      double velRad = 0;
+      double currentAngleRad = amp.getPoseByPulses();
+      if(currentAngleRad < angleRad) {
+        velRad = trap.trapezoid(amp.getVelRadArm(), maxVelRad, 0, 
+        Math.abs(acceleRad), angleRad-currentAngleRad);
+        System.out.println(" cur ang=" + currentAngleRad + " tgt=" + angleRad + " v=" + velRad);
+        amp.setVel(velRad);
       } else {
-        amp.setArmVel(0);
-      }
+        if(amp.isClose()) {
+          check = true;
+        } else {
+          velRad = -0.2;
+          amp.setPowerArm(velRad);
+        }
     }
-    if (atPosition) {
-      amp.lock();
-    }
-  }
-
-  private boolean atPosition() {
-    return Math.abs(angle - currentAngle) < ARM_RAD_ERROR;
+    
+    
+    
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    amp.setLockPower(0);
-    amp.setArmPower(0);
+    amp.setPowerSnowblower(0);
+    amp.stop();
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return atPosition() && amp.isLocked();
+    return ((amp.getPoseByPulses()>= angleRad)&&(angleRad >0))||((amp.isClose())&&(angleRad<0));
   }
 }
