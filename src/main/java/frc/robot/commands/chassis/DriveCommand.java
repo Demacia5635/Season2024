@@ -21,6 +21,7 @@ public class DriveCommand extends Command {
 
   private double direction;
 
+  private boolean isRed;
   private boolean precisionDrive = false;
   Rotation2d wantedAngleApriltag = new Rotation2d();
   boolean rotateToApriltag = false;
@@ -33,7 +34,7 @@ public class DriveCommand extends Command {
   public DriveCommand(Chassis chassis, CommandXboxController commandXboxController, boolean isRed) {
     this.chassis = chassis;
     this.commandXboxController = commandXboxController;
-    direction = isRed ? 1 : -1;
+    this.isRed = isRed;
     addRequirements(chassis);
     commandXboxController.b().onTrue(new InstantCommand(() -> precisionDrive = !precisionDrive));
     // commandXboxController.y().onTrue(new InstantCommand((() -> this.wantedAngleApriltag = chassis.getClosetAngleApriltag())).andThen(() -> rotateToApriltag = true));
@@ -41,6 +42,7 @@ public class DriveCommand extends Command {
 
   @Override
   public void initialize() {
+    direction = isRed ? 1 : -1;
   }
 
   @Override
