@@ -112,7 +112,7 @@ public class RobotContainer implements Sendable{
 
     chassis = new Chassis();
     intake = new Intake();
-    leds = new SubStrip(60);
+    //leds = new SubStrip(60);
     commandController2 = new CommandXboxController(1);
 
     // alliance = DriverStation.getAlliance().get();
@@ -124,7 +124,7 @@ public class RobotContainer implements Sendable{
     commandController = new CommandXboxController(0);
     shooter = new Shooter();
     //shooter.setDefaultCommand(new AngleControl(shooter, commandController));
-    chassis.setDefaultCommand(new DriveCommand(chassis, commandController, DriverStation.getAlliance().get() == Alliance.Red).alongWith(Utils.setLed(leds)));
+    chassis.setDefaultCommand(new DriveCommand(chassis, commandController, DriverStation.getAlliance().get() == Alliance.Red));
     
     createCommands();
     
@@ -236,7 +236,7 @@ public class RobotContainer implements Sendable{
         }, 
         intake, shooter
         ).ignoringDisable(true).schedule();
-        leds.turnOff().schedule();
+        //leds.turnOff().schedule();
     }
    
    
