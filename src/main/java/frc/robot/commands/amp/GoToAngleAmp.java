@@ -38,35 +38,30 @@ public class GoToAngleAmp extends Command {
   @Override
   public void execute() {
       double velRad = 0;
-      double currentAngleRad = amp.getPoseByPulses();
-      if(currentAngleRad < angleRad) {
+      double currentAngleRad = amp.getArmAngle();
+      if( angleRad > currentAngleRad) {
         velRad = trap.trapezoid(amp.getVelRadArm(), maxVelRad, 0, 
         Math.abs(acceleRad), angleRad-currentAngleRad);
-        System.out.println(" cur ang=" + currentAngleRad + " tgt=" + angleRad + " v=" + velRad);
+        //System.out.println(" cur ang=" + currentAngleRad + " tgt=" + angleRad + " v=" + velRad);
         amp.setVel(velRad);
       } else {
-        if(amp.isClose()) {
-          check = true;
-        } else {
-          velRad = -0.2;
-          amp.setPowerArm(velRad);
+          amp.setPowerArm(-0.2);
         }
     }
     
     
     
-  }
+  
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    amp.setPowerSnowblower(0);
-    amp.stop();
+    amp.setVel(0);
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return ((amp.getPoseByPulses()>= angleRad)&&(angleRad >0))||((amp.isClose())&&(angleRad<0));
+    return Math.abs(angleRad - amp.getArmAngle()) < Math.toRadians(3);
   }
 }

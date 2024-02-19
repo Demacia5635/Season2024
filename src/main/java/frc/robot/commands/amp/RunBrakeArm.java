@@ -12,12 +12,13 @@ import frc.robot.subsystems.amp.AmpConstants.Parameters;
 
 public class RunBrakeArm extends Command {
   Amp amp;
-  double p;
+  boolean lock;
   double startTime;
   /** Creates a new SnowBlowerRun. */
-  public RunBrakeArm(Amp amp, double p) {
+  public RunBrakeArm(Amp amp, boolean lock) {
     this.amp = amp;
-    this.p = p;
+
+    this.lock = lock;
     addRequirements(amp);
     // Use addRequirements() here to declare subsystem dependencies.
   }
@@ -26,21 +27,39 @@ public class RunBrakeArm extends Command {
   @Override
   public void initialize() {
     startTime = Timer.getFPGATimestamp();
+    //amp.setVel(0);
+    if(lock && !amp.isLocked) { 
+      amp.setPowerSnowblower(Parameters.ARM_BRAKE_POW);
+    } else if(!lock && amp.isLocked) {
+      amp.setPowerSnowblower(Parameters.ARM_BRAKE_POW);
+    }
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    amp.setPowerSnowblower(p);
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    amp.setPowerSnowblower(0);
+    if(lock) { 
+      amp.setPowerArm(0);
+      amp.isLocked = true;
+    } else {
+      amp.isLocked = false;
+    }
+  }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return ((amp.getSnowblowerA()>Parameters.ARM_BRAKE_MAX_A)||((p<0)&&(Timer.getFPGATimestamp()-startTime >0.7)));
+    if(lock) {
+      System.out.println(" brake current = " + amp.getSnowblowerA());
+      return amp.isLocked || amp.getSnowblowerA()>Parameters.ARM_BRAKE_MAX_A;
+    } else {
+      return !amp.isLocked || Timer.getFPGATimestamp()-startTime >0.7;
+    }
   }
 }
