@@ -237,7 +237,7 @@ public class PathFollow extends CommandBase {
     }
 
     rotationVelocity = rotationPidController.calculate(
-        chassis.getAngle().getRadians(), wantedAngle.getRadians()) * MAX_OMEGA_VELOCITY;
+        chassis.getAngle().getRadians(), wantedAngle.getRadians()) * Math.toRadians(300);
 
     if (totalLeft <= 0.01)
       velVector = new Translation2d(0, 0);
