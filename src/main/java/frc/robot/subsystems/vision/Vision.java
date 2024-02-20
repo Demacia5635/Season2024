@@ -237,13 +237,14 @@ public class Vision extends SubsystemBase {
                         VisionData newVisionData3Med = new VisionData(estimatedPose.toPose2d(), estimatedRobotPose.timestampSeconds,testPoseEstimatorBuf3Med);
                         VisionData newVisionData5Med = new VisionData(estimatedPose.toPose2d(), estimatedRobotPose.timestampSeconds,testPoseEstimatorBuf5Med);
                         if(VisionCountCycles < 100){
-                            SmartDashboard.putNumber("cyclelesstan100", 1);
-                            poseEstimator.resetPosition(chassis.getAngle(), chassis.getModulePositions(), newVisionData3Avg.getNotFilteredPose());
+                            Pose2d poseFromVisionWithGyroAngle = new Pose2d(newVisionData3Avg.getPose().getTranslation(), chassis.getAngle()); 
                             
-                            testPoseEstimatorBuf3Avg.resetPosition(chassis.getAngle(), chassis.getModulePositions(), newVisionData3Avg.getNotFilteredPose());
-                            testPoseEstimatorBuf3Med.resetPosition(chassis.getAngle(), chassis.getModulePositions(), newVisionData3Avg.getNotFilteredPose());
-                            testPoseEstimatorBuf5Avg.resetPosition(chassis.getAngle(), chassis.getModulePositions(), newVisionData3Avg.getNotFilteredPose());
-                            testPoseEstimatorBuf5Med.resetPosition(chassis.getAngle(), chassis.getModulePositions(), newVisionData3Avg.getNotFilteredPose());
+                            poseEstimator.resetPosition(chassis.getAngle(), chassis.getModulePositions(), poseFromVisionWithGyroAngle);
+
+                            testPoseEstimatorBuf3Avg.resetPosition(chassis.getAngle(), chassis.getModulePositions(), poseFromVisionWithGyroAngle);
+                            testPoseEstimatorBuf3Med.resetPosition(chassis.getAngle(), chassis.getModulePositions(), poseFromVisionWithGyroAngle);
+                            testPoseEstimatorBuf5Avg.resetPosition(chassis.getAngle(), chassis.getModulePositions(), poseFromVisionWithGyroAngle);
+                            testPoseEstimatorBuf5Med.resetPosition(chassis.getAngle(), chassis.getModulePositions(), poseFromVisionWithGyroAngle);
 
                             
                         }
@@ -276,6 +277,7 @@ public class Vision extends SubsystemBase {
     public void periodic() {
         super.periodic();
         VisionCountCycles++;
+        SmartDashboard.putNumber("VisionCycleCount", VisionCountCycles);
 
         getNewDataFromLimelightX(RaspberryPi.AmpSideRaspberry);
         getNewDataFromLimelightX(RaspberryPi.ShooterSideRaspberry);
