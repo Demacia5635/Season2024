@@ -148,6 +148,7 @@ public class Vision extends SubsystemBase {
     //#region Vision Main Methods
 
     //#region update pose methods
+
     //takes the visions snapshots from the buffer and medians or avg it and add vision mesurements to pose estimator
     public void updateRobotPose() {
         double time = getTime();
@@ -157,9 +158,18 @@ public class Vision extends SubsystemBase {
             Pair<Pose2d, Double> vData3AvgPair = avg(buf5Avg);
             VisionData vDataAvg = new VisionData(vData3AvgPair.getFirst(), vData3AvgPair.getSecond(), testPoseEstimatorBuf3Avg)  ;
             if (vDataMed != null && vDataMed.getPose() != null && vDataAvg.getPose() != null && vDataAvg != null) {
-                testPoseEstimatorBuf3Med.addVisionMeasurement(vDataMed.getPose(), vDataMed.getTimeStamp());
-                testPoseEstimatorBuf3Avg.addVisionMeasurement(vDataAvg.getPose(), vDataAvg.getTimeStamp());
+                testPoseEstimatorBuf3Med.addVisionMeasurement(new Pose2d (vDataMed.getPose().getTranslation(),
+                 chassis.getAngle()), vDataMed.getTimeStamp());
+
+                testPoseEstimatorBuf3Avg.addVisionMeasurement(new Pose2d (vDataAvg.getPose().getTranslation(),
+                 chassis.getAngle()), vDataAvg.getTimeStamp());
+
+                poseEstimator.addVisionMeasurement(new Pose2d (vDataMed.getPose().getTranslation(),
+                 chassis.getAngle()), vDataMed.getTimeStamp());
+
                 poseEstimatorField.setRobotPose(poseEstimator.getEstimatedPosition());
+
+
                 visionField3.setRobotPose(vDataMed.getPose());
                 visionFieldavg3.setRobotPose(vDataAvg.getPose());
                 lastUpdateTime = time;
@@ -184,8 +194,11 @@ public class Vision extends SubsystemBase {
             SmartDashboard.putBoolean("updates", vData5Med != null && vData5Med.getPose() != null && vDataAvg5.getPose() != null && vDataAvg5 != null);
             if (vData5Med != null && vData5Med.getPose() != null && vDataAvg5.getPose() != null && vDataAvg5 != null) {
            
-                testPoseEstimatorBuf5Med.addVisionMeasurement(vData5Med.getPose(), vData5Med.getTimeStamp());
-                testPoseEstimatorBuf5Avg.addVisionMeasurement(vDataAvg5.getPose(), vDataAvg5.getTimeStamp());
+                testPoseEstimatorBuf5Med.addVisionMeasurement(new Pose2d(vData5Med.getPose().getTranslation(),
+                 chassis.getAngle()), vData5Med.getTimeStamp());
+
+                testPoseEstimatorBuf5Avg.addVisionMeasurement(new Pose2d(vDataAvg5.getPose().getTranslation(),
+                 chassis.getAngle()), vDataAvg5.getTimeStamp());
                 
                 visionField5.setRobotPose(vData5Med.getPose());
                 visionFieldavg5.setRobotPose(vDataAvg5.getPose());
@@ -233,7 +246,6 @@ public class Vision extends SubsystemBase {
                             testPoseEstimatorBuf5Med.resetPosition(chassis.getAngle(), chassis.getModulePositions(), newVisionData3Avg.getNotFilteredPose());
 
                             
-                            // firstRun = false;
                         }
                         if (newVisionData5Avg != null && newVisionData5Avg.getPose() != null && newVisionData3Avg != null &&
                          newVisionData3Avg.getPose() != null && newVisionData5Med != null && 
