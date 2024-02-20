@@ -55,7 +55,7 @@ public class ShooterPowering extends Command {
     /**checks if the shooter have come to the wanted vel */
     @Override
     public boolean isFinished() {
-        return Math.abs(vel - shooter.getMotorVel(SHOOTER_MOTOR.UP) ) <= 0.3;
+   return Math.abs(vel - shooter.getMotorVel(SHOOTER_MOTOR.UP) ) <= 0.3;
       //  return vel == shooter.getMotorVel();
         // return shooter.getMotorVel(SHOOTER_MOTOR.UP) >= maxVel && shooter.getMotorVel(SHOOTER_MOTOR.DOWN) >= maxVel;
     }

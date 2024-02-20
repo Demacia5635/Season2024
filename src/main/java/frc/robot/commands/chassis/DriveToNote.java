@@ -66,7 +66,7 @@ public class DriveToNote extends Command {
     
     chassis.setVelocities(speed);
 
-    if(distance == 0){
+    if(distance != 0){
       timer.reset();
     }
     
@@ -77,10 +77,6 @@ public class DriveToNote extends Command {
 
   }
 
-  @Override
-  public boolean isFinished() {
-    return timer.get() >= 1;
-  }
 
   // Called once the command ends or is interrupted.
   @Override

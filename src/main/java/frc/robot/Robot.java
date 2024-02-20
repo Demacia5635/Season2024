@@ -31,6 +31,7 @@ public class Robot extends TimedRobot {
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
     robot = this;
+    
   }
 
   /**
@@ -83,7 +84,8 @@ public class Robot extends TimedRobot {
       m_autonomousCommand.cancel();
     
     }
-    
+   
+    m_robotContainer.resetOd();
     SmartDashboard.putBoolean("robot init", isAutonomous());
     m_robotContainer.calibrate();
   }

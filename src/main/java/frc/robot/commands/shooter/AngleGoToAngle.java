@@ -4,6 +4,7 @@
 
 package frc.robot.commands.shooter;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.Shooter.SHOOTER_MOTOR;
@@ -32,7 +33,6 @@ public class AngleGoToAngle extends Command {
     public AngleGoToAngle(Shooter shooter, double angle) {
         this.shooter = shooter;
         this.wantedAngle = angle;
-        // addRequirements(shooter);
     }
 
     // Called when the command is initially scheduled.
@@ -53,11 +53,13 @@ public class AngleGoToAngle extends Command {
     /**using constant pow to go to the specific dis */
     @Override
     public void execute() {
-        if ((wantedAngle - shooter.getDis()) > 0){
+        if ((wantedDis - shooter.getDis()) > 0){
             shooter.angleSetPow(0.4);
         } else {
             shooter.angleSetPow(-0.4);
         }
+
+        SmartDashboard.putNumber("power sign", (wantedAngle - shooter.getDis()));
         // shooter.angleMotionMagic(wantedDis);
     }
 
@@ -80,6 +82,16 @@ public class AngleGoToAngle extends Command {
      */
     @Override
     public boolean isFinished() {
+
+        SmartDashboard.putBoolean("1", !shooter.isSupplyLimit(SHOOTER_MOTOR.ANGLE));
+        SmartDashboard.putBoolean("2", !shooter.isDisLimits(wantedDis - startDis > 0));
+
+        SmartDashboard.putBoolean("3", !((wantedDis - startDis > 0) && (shooter.getDis() >= wantedDis)));
+        SmartDashboard.putBoolean("4", !((wantedDis - startDis < 0) && (shooter.getDis() <= wantedDis)));
+        SmartDashboard.putBoolean("5", !(Math.abs(wantedDis - shooter.getDis()) < 1));
+
+
+
         if (!shooter.isSupplyLimit(SHOOTER_MOTOR.ANGLE)){
             if (!shooter.isDisLimits(wantedDis - startDis > 0)){
                 if (!((wantedDis - startDis > 0) && (shooter.getDis() >= wantedDis))){
@@ -91,6 +103,12 @@ public class AngleGoToAngle extends Command {
                 }
             }
         }
+
+
+       
+
+
+
 
         return true;
     }

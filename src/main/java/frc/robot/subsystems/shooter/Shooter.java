@@ -274,7 +274,7 @@ public class Shooter extends SubsystemBase {
      * @return if the limits have passed (false means you are fine)
      */
     public boolean isDisLimits(boolean isUpDirection){
-        return isUpDirection ? getDis() >= ShooterConstants.AngleChanger.MAX_DIS : getDis() <= ShooterConstants.AngleChanger.MIN_DIS;
+        return isUpDirection ? getDis() >= -1*ShooterConstants.AngleChanger.MAX_DIS : getDis() <= ShooterConstants.AngleChanger.MIN_DIS;
     }
 
     public boolean isSupplyLimit(SHOOTER_MOTOR motor){

@@ -181,6 +181,10 @@ public class Chassis extends SubsystemBase {
     return angularVelocities;
   }
 
+  public void setPose(Pose2d pose){
+    poseEstimator.resetPosition(getAngle(), getModulePositions(), pose);
+  }
+
   /**
    * Sets the velocity of the chassis
    * 

@@ -105,7 +105,7 @@ public class PathFollow extends CommandBase {
   @Override
   public void initialize() {
     //sets first point to chassis pose to prevent bugs with red and blue alliance
-    points[0] = new pathPoint(chassis.getPose().getX(), chassis.getPose().getY(), chassis.getAngle(), points[0].getRadius(), false);
+    points[0] = new pathPoint(chassis.getPose().getX(), chassis.getPose().getY(), points[1].getRotation(), points[0].getRadius(), false);
 
     //case for red alliance (blue is the default)
     if (isRed) {
@@ -205,6 +205,7 @@ public class PathFollow extends CommandBase {
     trajField.setRobotPose(chassis.getPose());
 
     chassisPose = chassis.getPose();
+    SmartDashboard.putNumber("Angle traj", points[segmentIndex].getRotation().getDegrees());
 
     // current velocity vector
     Translation2d currentVelocity = new Translation2d(chassis.getChassisSpeeds().vxMetersPerSecond,
@@ -254,7 +255,7 @@ public class PathFollow extends CommandBase {
 
   @Override
   public boolean isFinished() {
-    return totalLeft <= 0.01 && Math.abs(chassis.getAngle().getDegrees() - wantedAngle.getDegrees()) <= 0.5;
+    return totalLeft <= 0.01 && Math.abs(chassis.getAngle().getDegrees() - wantedAngle.getDegrees()) <= 3;
   }
 
   @Override

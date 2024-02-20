@@ -75,4 +75,7 @@ public class ShooterConstants {
         public static final double[][] lookUpTable = new double[3][3];
     }
 
+    public static double WANTED_ANGLE_CLOSE = 54;
+    public static double WANTED_VEL_CLOSE = 14;
+
 }

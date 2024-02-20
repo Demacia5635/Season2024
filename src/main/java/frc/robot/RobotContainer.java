@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import com.fasterxml.jackson.core.StreamReadConstraints.Builder;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.util.sendable.Sendable;
@@ -46,6 +47,7 @@ import frc.robot.commands.amp.GoToAngleAmp;
 import frc.robot.commands.chassis.DriveAndPickNote;
 import frc.robot.commands.chassis.DriveCommand;
 import frc.robot.commands.chassis.DriveToNote;
+import frc.robot.commands.chassis.GoToAngleChassis;
 import frc.robot.commands.chassis.SetModuleAngle;
 import frc.robot.commands.chassis.TestSteerVandA;
 import frc.robot.commands.chassis.Auto.StartTOP;
@@ -191,11 +193,11 @@ public class RobotContainer implements Sendable{
       Trigger overrideAuto = new Trigger(()->Utils.joystickOutOfDeadband(commandController));
 
       //wanted angle = 56 angle for close to speaker
-        wantedAngle = 40;
+        wantedAngle = 36.3;
     //   SmartDashboard.putNumber("wanted angle", 60);
     //   SmartDashboard.putNumber("wanted shooting vel for noga", 0);
     //   wantedAngle = SmartDashboard.getNumber("wanted angle", 60);
-        wantedShootingVel = 16.5;
+        wantedShootingVel = 16.75;
         
     //   wantedShootingVel = SmartDashboard.getNumber("wanted shooting vel for noga", 0);
     //   commandController.b().onTrue(new AngleQuel(shooter));
@@ -223,6 +225,10 @@ public class RobotContainer implements Sendable{
         //(new CalibrateArm(amp).andThen(new RunBrakeArm(amp, Parameters.ARM_BRAKE_POW))).schedule();
     }
 
+    public void resetOd() {
+      new InstantCommand(() ->chassis.setPose(new Pose2d(2.896, 8.54 - 1.21, Rotation2d.fromDegrees(0)))).schedule();;
+    }
+
     public void disable(){
         new InstantCommand(()-> {
             shooter.stopAll();
@@ -236,6 +242,7 @@ public class RobotContainer implements Sendable{
    
   public Command getAutonomousCommand() {
     return new StartTOP(chassis, shooter, intake, DriverStation.getAlliance().get() == alliance.Red);
+    // return new AngleGoToAngle(shooter, 30);
 
   }
 }
