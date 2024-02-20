@@ -125,7 +125,7 @@ public class RobotContainer implements Sendable{
     commandController = new CommandXboxController(0);
     shooter = new Shooter();
     //shooter.setDefaultCommand(new AngleControl(shooter, commandController));
-    chassis.setDefaultCommand(new DriveCommand(chassis, commandController, DriverStation.getAlliance().get() == Alliance.Red));
+    chassis.setDefaultCommand(new JoyStickAmp(commandController, amp));
     
     createCommands();
     
@@ -199,16 +199,20 @@ public class RobotContainer implements Sendable{
         
     //   wantedShootingVel = SmartDashboard.getNumber("wanted shooting vel for noga", 0);
     //   commandController.b().onTrue(new AngleQuel(shooter));
-        commandController.a().onTrue(new IntakeCommand(intake));
-        commandController.pov(0).whileTrue(new IntakeToShooter(intake, shooter, wantedShootingVel));
-        commandController.x().onTrue(new AngleGoToAngle(shooter, wantedAngle).alongWith( new ShooterPowering(shooter, wantedShootingVel)));
+
+    //relise later because dumbdumb
+    
+        // commandController.a().onTrue(new IntakeCommand(intake));
+        // commandController.pov(0).whileTrue(new IntakeToShooter(intake, shooter, wantedShootingVel));
+        // commandController.x().onTrue(new AngleGoToAngle(shooter, wantedAngle).alongWith( new ShooterPowering(shooter, wantedShootingVel)));
   
-        commandController.rightBumper().onTrue(new InstantCommand(()-> {shooter.stopAll();intake.stop();}, intake, shooter).andThen(new AngleQuel(shooter)));
-        commandController.y().onTrue(new DriveToNote(chassis).raceWith(new IntakeCommand(intake)));
-        commandController.pov(180).onTrue(new InstantCommand(()->{chassis.setOdometryToForward();}));
-        overrideAuto.onTrue(chassis.getDefaultCommand());
+        // commandController.rightBumper().onTrue(new InstantCommand(()-> {shooter.stopAll();intake.stop();}, intake, shooter).andThen(new AngleQuel(shooter)));
+        // commandController.y().onTrue(new DriveToNote(chassis).raceWith(new IntakeCommand(intake)));
+        // commandController.pov(180).onTrue(new InstantCommand(()->{chassis.setOdometryToForward();}));
+        // overrideAuto.onTrue(chassis.getDefaultCommand());
         
         //Amp commands Buttons
+        commandController.x().onTrue(new RunBrakeArm(amp, true));
         /*commandController.b().onTrue(intake2amp.andThen(amp2Angle));
         commandController.pov(90).onTrue(shootAmp);
         commandController.pov(270).onTrue(closeAmp);*/
