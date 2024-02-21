@@ -33,7 +33,9 @@ public class JoyStickAmp extends Command {
   public void execute() {
     translation2d1 = Amp.getStickRight(xboxController);
     translation2d2 = Amp.getStickLeft(xboxController);
-    amp.setPowerArm(translation2d1.getY());
+    System.out.println("amp: "+translation2d1.getY());
+    amp.setPowerArm(xboxController.getRightX());
+    // amp.setPowerArm(xboxController.getRightX());
   }
 
   @Override

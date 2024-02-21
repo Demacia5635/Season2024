@@ -29,7 +29,7 @@ public class AmpIntake2 extends CommandBase {
         super.initialize();
         amp.setBrakeArm();
         amp.setBrake();
-        amp.neosSetInverted(true);
+        // amp.neosSetInverted(true);
         amp.resetStartPulses();
         initialEncoderCount = 0;
         noteWasDetected = false;

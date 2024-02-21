@@ -24,14 +24,13 @@ public class AmpIntakeShoot extends Command {
   public void initialize() {
     super.initialize();
     amp.setBrake();
-    amp.neosSetInverted(true);
     startTime = Timer.getFPGATimestamp();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    amp.setNeosPower(-Parameters.INTAKE_TRANSFER_POWER); // Run motors at transfer speed
+    amp.setNeosPower(Parameters.INTAKE_TRANSFER_POWER); // Run motors at transfer speed
   }
 
   // Called once the command ends or is interrupted.

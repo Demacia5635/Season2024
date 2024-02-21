@@ -66,13 +66,15 @@ public class Amp extends SubsystemBase {
         setArmAngle(Math.toRadians(-55));
 
         magneticSensor = new DigitalInput(AmpConstants.AmpDeviceID.MAGNETIC_SENSOR_ID);
-        m2 = new TalonSRX(AmpDeviceID.M2);
+        m2 = new TalonSRX(AmpConstants.AmpDeviceID.M2);
+        m2.configFactoryDefault();
         m2.setInverted(true);
 
         neo1 = new CANSparkMax(AmpDeviceID.NEO1, MotorType.kBrushless);
         neo1.getEncoder().setPosition(0);
         neo2 = new CANSparkMax(AmpDeviceID.NEO2, MotorType.kBrushless);
         neo2.getEncoder().setPosition(0);
+        neo2.setInverted(true);
 
         openFF = new SimpleMotorFeedforward(AmpConstants.armStatesParameters.openFF[0],
                 AmpConstants.armStatesParameters.openFF[1], AmpConstants.armStatesParameters.openFF[2]);
@@ -135,8 +137,8 @@ public class Amp extends SubsystemBase {
 
     public void neosSetInverted(boolean isInvert) {
 
-        neo1.setInverted(isInvert);
-        neo2.setInverted(isInvert);
+        // neo1.setInverted(isInvert);
+        // neo2.setInverted(isInvert);
 
     }
 
@@ -164,7 +166,7 @@ public class Amp extends SubsystemBase {
     }
 
     public void setPowerSnowblower(double power) {
-        m2.set(TalonSRXControlMode.PercentOutput, power);
+        m2.set(ControlMode.PercentOutput, power);
     }
 
     public double getSnowblowerA() {
