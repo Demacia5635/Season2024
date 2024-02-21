@@ -23,8 +23,6 @@ public class AmpIntakeShoot extends Command {
   @Override
   public void initialize() {
     super.initialize();
-    amp.setArmBrake();
-    amp.neosSetInverted(true);
     startTime = Timer.getFPGATimestamp();
   }
 

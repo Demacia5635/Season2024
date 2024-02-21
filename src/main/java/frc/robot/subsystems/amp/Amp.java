@@ -22,200 +22,128 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.amp.AmpConstants.*;
+import frc.robot.utils.TrapezoidCalc;
 import frc.robot.Robot;
 import frc.robot.Sysid.Sysid;
 import frc.robot.Sysid.Sysid.Gains;
 import frc.robot.commands.amp.AmpIntake2;
-import frc.robot.commands.amp.RunBrakeArm;
+import frc.robot.commands.amp.AmpIntakeShoot;
 
 public class Amp extends SubsystemBase {
-    // public final Pigeon2 gyro;
-    public final TalonFX m1;
-    public final TalonSRX m2;
-    public final CANSparkMax neo1;// small wheel
-    public final CANSparkMax neo2;// big wheel
-    public double startDeg;
-    public SparkMaxAnalogSensor limitInput;
-    public int opticCount;
-    public SimpleMotorFeedforward openFF;
-    public SimpleMotorFeedforward closeFF;
-    public DigitalInput magneticSensor;
+    public final TalonFX armMotor;
+    public final TalonSRX lockMotor;
+    public final CANSparkMax intakeMotor;
+    public SparkMaxAnalogSensor nodeSensor;
+    public int noteCount;
+    public DigitalInput positionSensor;
     public boolean isLocked = false;
     public boolean enable = false;
 
-    // ArmFeedforward ff = new ArmFeedforward(Parameters.ks1, Parameters.kg1,
-    // Parameters.kv1, Parameters.ka1);
-    // SimpleMotorFeedforward ff2 = new SimpleMotorFeedforward(Parameters.ks2,
-    // Parameters.kv2, Parameters.ka2);
+    // periodic concept
+    double targteAngle = Parameters.ARM_HONE_POSITION_ANGLE;
+    boolean isLocking = true;
+    boolean isUnlocking = false;
+    double lockStartTime;
+    TrapezoidCalc trap = new TrapezoidCalc();
+  
+    
     public Amp() {
-
-        // gyro = new Pigeon2(AmpDeviceID.GYRO);
-
-        m1 = new TalonFX(AmpDeviceID.M1);
-        m1.configFactoryDefault();
-        m1.setInverted(true);
-        m1.setNeutralMode(NeutralMode.Coast);
-        m1.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 40, 40, 0.2));
+        armMotor = new TalonFX(AmpDeviceID.ARM_MOTOR_ID);
+        armMotor.configFactoryDefault();
+        armMotor.setInverted(true);
+        armMotor.setNeutralMode(NeutralMode.Coast);
+        armMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 40, 40, 0.2));
         setArmAngle(Math.toRadians(-55));
+        configArmPID();
 
-        magneticSensor = new DigitalInput(AmpConstants.AmpDeviceID.MAGNETIC_SENSOR_ID);
-        m2 = new TalonSRX(AmpDeviceID.M2);
-        m2.setInverted(true);
+        positionSensor = new DigitalInput(AmpConstants.AmpDeviceID.MAGNETIC_SENSOR_ID);
+        lockMotor = new TalonSRX(AmpConstants.AmpDeviceID.LOCK_MOTOR_ID);
+        lockMotor.configFactoryDefault();
+        lockMotor.setInverted(true);
 
-        neo1 = new CANSparkMax(AmpDeviceID.NEO1, MotorType.kBrushless);
-        neo1.getEncoder().setPosition(0);
-        neo2 = new CANSparkMax(AmpDeviceID.NEO2, MotorType.kBrushless);
-        neo2.getEncoder().setPosition(0);
+        intakeMotor = new CANSparkMax(AmpDeviceID.INTAKE_MOTOR_ID, MotorType.kBrushless);
+        intakeMotor.getEncoder().setPosition(0);
+        intakeMotor.setInverted(true);
 
-        openFF = new SimpleMotorFeedforward(AmpConstants.armStatesParameters.openFF[0],
-                AmpConstants.armStatesParameters.openFF[1], AmpConstants.armStatesParameters.openFF[2]);
-        closeFF = new SimpleMotorFeedforward(AmpConstants.armStatesParameters.closeFF[0],
-                AmpConstants.armStatesParameters.closeFF[1], AmpConstants.armStatesParameters.closeFF[2]);
+        setIntakeBrake();
 
-        resetStartPulses();
-        setNeosBrake();
+        nodeSensor = intakeMotor.getAnalog(AnalogMode.kAbsolute);
 
-        SmartDashboard.putData("intake amp", new AmpIntake2(this));
-        SmartDashboard.putNumber("amp power", 0);
-        SmartDashboard.putData("set power amp", new RunCommand(() -> setNeosPower(0.5), this));
-
-        limitInput = neo2.getAnalog(AnalogMode.kAbsolute);
-
-        opticCount = 0;
+        noteCount = 0;
         SmartDashboard.putData(this);
 
-        SmartDashboard.putData("BrakeDiff", new InstantCommand(
-                () -> this.setBrake(), this).ignoringDisable(true));
-        SmartDashboard.putData("CoastDiff", new InstantCommand(
-                () -> this.setCoast(), this).ignoringDisable(true));
-
-        SmartDashboard.putData("Amp Move Sysid",
-                (new Sysid(this::setPowerArm, this::getVelRadArm, 0.3, 0.7, this)).getCommand());
-        SmartDashboard.putData("release brake", new InstantCommand(
-                () -> setPowerSnowblower(-0.2), this));
     }
 
-    public void resetStartPulses() {
-        m1.setSelectedSensorPosition(0);
+    
+
+    public void configArmPID() {
+        armMotor.config_kP(0, Parameters.ARM_KP);
+        armMotor.config_kI(0, Parameters.ARM_KI);
+        armMotor.config_kD(0, Parameters.ARM_KD);
     }
 
-    public void configDevices() {
-        m1.config_kP(0, Parameters.KP1);
-        m1.config_kI(0, Parameters.KI1);
-        m1.config_kD(0, Parameters.KD1);
+
+    public double getIntakeRev() {
+        return intakeMotor.getEncoder().getPosition() / ConvertionParams.NEO_PULES_PER_REV * ConvertionParams.INTAKE_GEAR_RATIO;
+    }
+      
+
+    public void setLockPower(double power) {
+        lockMotor.set(ControlMode.PercentOutput, power);
     }
 
-    public void startRad(double startDeg) {
-        this.startDeg = startDeg;
+    public double getLockCurrent() {
+        return lockMotor.getSupplyCurrent();
     }
 
-    public void neosSetVel(double vel1, double vel2) {
-        neo1.set(vel1);
-        neo2.set(vel2);
+    public boolean getPositionSensor() {
+        return positionSensor.get();
     }
 
-    public void neoEncoderSet(double postion1, double postion2) {
-        neo1.getEncoder().setPosition(postion1);
-        neo2.getEncoder().setPosition(postion2);
-
+    public void setArmPower(double p) {
+        armMotor.set(ControlMode.PercentOutput, p);
     }
 
-    public void neoEncoderReset() {
-        neoEncoderSet(0, 0);
-        neo1.setSmartCurrentLimit(25);
-        neo2.setSmartCurrentLimit(25);
-    }
-
-    public void neosSetInverted(boolean isInvert) {
-
-        neo1.setInverted(isInvert);
-        neo2.setInverted(isInvert);
-
-    }
-
-    public double[] getNeosRev() {
-        double[] neos = new double[2];
-        neos[0] = neo1.getEncoder().getPosition() / ConvertionParams.NEO_PULES_PER_REV * ConvertionParams.NEO1GearRatio;
-        neos[1] = neo2.getEncoder().getPosition() / ConvertionParams.NEO_PULES_PER_REV * ConvertionParams.NEO2GearRatio;
-        return neos;
-    }
-
-    public void neoMoveByRev(double vel1, double vel2, double rev1, double rev2) {
-        double startPos1 = getNeosRev()[0];
-        double startPos2 = getNeosRev()[1];
-
-        while ((vel1 != 0) && (vel2 != 0)) {
-            if (Math.abs(getNeosRev()[0] - startPos1 + rev1) <= 0.05)
-                vel1 = 0;
-            if (Math.abs(getNeosRev()[1] - startPos2 + rev2) <= 0.05)
-                vel2 = 0;
-            neosSetVel(vel1, vel2);
-
-            System.out.println("another neo1" + (Math.abs(getNeosRev()[0] - startPos1 + rev1)) + "rev");
-            System.out.println("another neo2" + (Math.abs(getNeosRev()[1] - startPos2 + rev2)) + "rev");
-        }
-    }
-
-    public void setPowerSnowblower(double power) {
-        m2.set(TalonSRXControlMode.PercentOutput, power);
-    }
-
-    public double getSnowblowerA() {
-        return m2.getSupplyCurrent();
-    }
-
-    public boolean getMagneticSensor() {
-        return magneticSensor.get();
-    }
-
-    public void setPowerArm(double p1) {
-        m1.set(ControlMode.PercentOutput, p1);
-    }
-
-    public double getpower() {
-        double pMotor = m1.getMotorOutputPercent();
-        return pMotor;
+    public double getArmPower() {
+        return armMotor.getMotorOutputPercent();
     }
 
     /**
      * 
      * @return true if the arm is fully closed
      */
-    public boolean isClose() {
-        if (getMagneticSensor()) {
-            return false;
-        }
-        return true;
+    public boolean isAtPositionSensor() {
+        return (!getPositionSensor());
     }
 
     /**
      * 
      * @return true if the arm is fully open
      */
-    public boolean isOpen() {
-        if (getPoseByPulses() >= 110/360*2*Math.PI) {
-            return true;
-        }
-        return false;
+    public boolean isAtUpperPosition() {
+        return Math.abs(getArmAngle() - Parameters.ARM_UPPER_POSITION_ANGLE) < 
+            Parameters.ARM_POSITION_ERROR;
     }
 
-    public double getLimitVolt() {
-        return limitInput.getPosition();
+    public double getNoteSensorVolt() {
+        return nodeSensor.getVoltage();
     }
 
-    public boolean didNotePass() {
-        return getLimitVolt() < 1;
+    public boolean isSensingNote() {
+        return getNoteSensorVolt() < Parameters.NOTE_VOLTAGE;
     }
 
-    public void resetOpticCounts() {
-        opticCount = 0;
+    public void resetNoteCounts() {
+        noteCount = 0;
     }
 
     /**
@@ -224,123 +152,54 @@ public class Amp extends SubsystemBase {
      * @return true if the note is inside and false if not
      */
     public boolean isNoteThere(boolean last) {
-        if ((didNotePass() == true) && (last == false)) {
-            opticCount += 1;
+        if ((isSensingNote() == true) && (last == false)) {
+            noteCount++;
         }
-        if (opticCount % 2 == 0) {
-            return false;
-        }
-        return true;
+        return noteCount%2 !=0;
     }
 
-    public boolean isNote() {
-        return limitInput.getVoltage() <= Parameters.NOTE_VOLTAGE;
+    public void setArmBrake() {
+        armMotor.setNeutralMode(NeutralMode.Brake);
     }
 
-    public void setBrake() {
-        System.out.println("brake Diff");
-        m1.setNeutralMode(NeutralMode.Brake);
+    public void setArmCoast() {
+        armMotor.setNeutralMode(NeutralMode.Coast);
     }
 
-    public void setCoast() {
-        System.out.println("coast Diff");
-        m1.setNeutralMode(NeutralMode.Coast);
-    }
-
-    public void stop() {
-        m1.set(ControlMode.PercentOutput, 0);
+    public void ArmStop() {
+        armMotor.set(ControlMode.PercentOutput, 0);
     }
 
     public static double deadband(double value) {
-        if (Math.abs(value) < Parameters.Deadband) {
-            return 0;
-        }
-        return value;
+        return Math.abs(value) < Parameters.Deadband? 0 : value; 
     }
+   
 
-    public static Translation2d getStickLeft(CommandXboxController controller) {
-        return new Translation2d(deadband(controller.getLeftX()), deadband(controller.getLeftY()));
-    }
-
-    public static Translation2d getStickRight(CommandXboxController controller) {
-        return new Translation2d(deadband(controller.getRightX()), deadband(controller.getRightY()));
-    }
-
-    /**
-     * public double deg(){
-     * double fixedDeg = gyro.getYaw();
-     * if(fixedDeg>0){
-     * while (fixedDeg >=360){
-     * fixedDeg -= 360;
-     * }
-     * }else{
-     * while (fixedDeg <0){
-     * fixedDeg += 360;
-     * }
-     * }
-     * return fixedDeg;
-     * }
-     * public double fixedDeg(){
-     * return startDeg - deg() + 23.556;
-     * }
-     * public double getPoseRad(){
-     * return fixedDeg()/360*Math.PI*2;
-     * }
-     **/
-    public double getPoseByPulses() {
-        return (m1.getSelectedSensorPosition()) / ConvertionParams.PULSE_PER_RAD;
-    }
-
-    public double getNeoPoseByPulses() {
-        return (neo1.getEncoder().getPosition());
-    }
-
-    /**
-     * public void velFFArm(double posRad, double velRad, double acceleRad) {
-     * double ff = acceleRad*Parameters.KA1 + velRad*Parameters.KV1 +
-     * Parameters.KG1*Math.sin(posRad) + Math.signum(velRad)*Parameters.KS1;
-     * double velMotor = (velRad/ConvertionParams.M1GearRatio)/100;
-     * m1.set(ControlMode.Velocity, velMotor, DemandType.ArbitraryFeedForward, ff);
-     * }
-     **/
-
-    public double getVelRadArm() {
-        return (m1.getSelectedSensorVelocity() * 10) / ConvertionParams.PULSE_PER_RAD;
+    public double getArmVel() {
+        return (armMotor.getSelectedSensorVelocity() * 10) / ConvertionParams.PULSE_PER_RAD;
     }
 
     public double getArmAngle() {
-        return (m1.getSelectedSensorPosition()) / ConvertionParams.PULSE_PER_RAD;
+        return (armMotor.getSelectedSensorPosition()) / ConvertionParams.PULSE_PER_RAD;
     }
 
     public void setArmAngle(double radians) {
-        m1.setSelectedSensorPosition(radians*ConvertionParams.PULSE_PER_RAD);
+        armMotor.setSelectedSensorPosition(radians*ConvertionParams.PULSE_PER_RAD);
     }
 
-    public void setArmVelocityOpen(double velRad) {
-        m1.set(ControlMode.Velocity, velRad / 10 * AmpConstants.ConvertionParams.PULSE_PER_RAD,
-                DemandType.ArbitraryFeedForward, openFF.calculate(velRad));
-    }
-
-    public void setArmVelocityClose(double velRad) {
-        m1.set(ControlMode.Velocity, velRad / 10 * AmpConstants.ConvertionParams.PULSE_PER_RAD,
-                DemandType.ArbitraryFeedForward, closeFF.calculate(velRad));
-    }
-
-    public int state;
-
-    public double FF(double wantedAnglerVel) {
+    public double ArmFF(double wantedAnglerVel) {
         double rad = getArmAngle();
 
         return (armStatesParameters.KS +
                 wantedAnglerVel * armStatesParameters.KV +
-                (wantedAnglerVel - getVelRadArm()) * armStatesParameters.KA +
+                (wantedAnglerVel - getArmVel()) * armStatesParameters.KA +
                 armStatesParameters.Kcos * Math.cos(rad));
 
     }
 
     public void setVel(double wantedAnglerVel) {
-        m1.set(ControlMode.Velocity, wantedAnglerVel * ConvertionParams.MOTOR_PULSES_PER_ANGLE / 10,
-                DemandType.ArbitraryFeedForward, FF(wantedAnglerVel));
+        armMotor.set(ControlMode.Velocity, wantedAnglerVel * ConvertionParams.MOTOR_PULSES_PER_ANGLE / 10,
+                DemandType.ArbitraryFeedForward, ArmFF(wantedAnglerVel));
     }
 
     @Override
@@ -348,81 +207,162 @@ public class Amp extends SubsystemBase {
         super.periodic();
         if(!enable && Robot.robot.isEnabled()) {
             enable = true;
-            new RunBrakeArm(this, true).schedule();
         }
-        // SmartDashboard.putNumber("Motor1 Power", getpower());
-        // SmartDashboard.putNumber("Motor1 Velocity", getVelRadArm());
-        // //SmartDashboard.putNumber("Arm poseRad", getPoseRad());
-        // SmartDashboard.putNumber("Start angle", startDeg);
-
-        // SmartDashboard.putData("snow blow", new
-        // RunCommand(()->setPowerSnowblower(0.1)));
-        // SmartDashboard.putData("arm power", new RunCommand(()->setPowerArm(0.5)));
-        // SmartDashboard.putData("neo power", new RunCommand(()->setNeosPower(0.3)));
-
-        SmartDashboard.putNumber("SnowBlower ampere", getSnowblowerA());
-
-        SmartDashboard.putNumber("neo1 encoder", getNeosRev()[0]);
-        SmartDashboard.putNumber("neo2 encoder", getNeosRev()[1]);
-
-        SmartDashboard.putBoolean("Optic Limit switch state", didNotePass());
-        SmartDashboard.putNumber("Optic Limit switch Voltage", getLimitVolt());
-
-        SmartDashboard.putBoolean("Lower Limit switch state", isClose());
-        SmartDashboard.putBoolean("Upper Limit switch state", isOpen());
-        if(isClose()) {
-            setArmAngle(Math.toRadians(-52));
+        if(isAtPositionSensor()) {
+            setArmAngle(Math.toRadians(Parameters.ARM_SENSOR_POSITION_ANGLE));
         }
+        lockPeriodic();
+        armPeriodic();
 
     }
 
-    public boolean isCriticalCurrent() {
-        // TODO Auto-generated method stub
-        return neo1.getOutputCurrent() >= Parameters.CRITICAL_CURRENT;
+    public boolean isIntakePushingNote() {
+        return intakeMotor.getOutputCurrent() >= Parameters.CRITICAL_CURRENT;
+    }    
+
+    public void setIntakePower(double p) {
+        intakeMotor.set(p);
     }
 
-    public void setNeosPower(double p1, double p2) {
-        neo1.set(p1);
-        neo2.set(p2);
+    public double getIntakeMotorCurrent() {
+        return intakeMotor.getOutputCurrent();
     }
 
-    public void setNeosPower(double p) {
-        neo1.set(p);
-        neo2.set(p);
+    public void setIntakeBrake() {
+        intakeMotor.setIdleMode(IdleMode.kBrake);
     }
 
-    public double getMotorCurrent() {
-        // TODO Auto-generated method stub
-        return neo1.getOutputCurrent();
-    }
-
-    public void setCoastArm() {
-        m1.setNeutralMode(NeutralMode.Coast);
-    }
-
-    public void setBrakeArm() {
-        // TODO Auto-generated method stub
-        m1.setNeutralMode(NeutralMode.Brake);
-    }
-
-    public void setNeosBrake() {
-        neo1.setIdleMode(IdleMode.kBrake);
-        neo2.setIdleMode(IdleMode.kBrake);
-    }
-
-    public void setNeosCoast() {
-        neo1.setIdleMode(IdleMode.kCoast);
-        neo2.setIdleMode(IdleMode.kCoast);
+    public void setIntakeCoast() {
+        intakeMotor.setIdleMode(IdleMode.kCoast);
     }
 
     @Override
     public void initSendable(SendableBuilder builder) {
         super.initSendable(builder);
-        Command cmd = new Sysid(new Gains[] { Gains.KS, Gains.KV, Gains.KA, Gains.KCos }, this::setPowerArm,
-                this::getVelRadArm, this::getPoseByPulses, null, 0.12, 0.3, 3, 0.5, 0.5, this).getCommand();
+        Command cmd = new Sysid(new Gains[] { Gains.KS, Gains.KV, Gains.KA, Gains.KCos }, this::setArmPower,
+                this::getArmVel, this::getArmAngle, null, 0.12, 0.3, 3, 0.5, 0.5, this).getCommand();
         SmartDashboard.putData("Amp SYSID", cmd);
         builder.addDoubleProperty("Arm Angle", this::getArmAngle, null);
+        builder.addDoubleProperty("Lock Current", this::getLockCurrent, null);
+        builder.addBooleanProperty("Sensing Note", this::isSensingNote, null);
+        builder.addDoubleProperty("Note Sensor Volt", this::getNoteSensorVolt, null);
+        builder.addBooleanProperty("Position Sensor", this::isAtPositionSensor, null);
+        builder.addBooleanProperty("Upper Position", this::isAtUpperPosition, null);
+        
+        SmartDashboard.putData("Brake Arm", new InstantCommand(
+                () -> this.setArmBrake(), this).ignoringDisable(true));
+        SmartDashboard.putData("Coast Arm", new InstantCommand(
+                () -> this.setArmCoast(), this).ignoringDisable(true));
+        SmartDashboard.putData("release brake", new InstantCommand(
+                () -> setLockPower(Parameters.UNLOCK_POWER), this));
+
+        
     }
+
+    // lock as periodic
+    public void lock() {
+        if(!isLocked || isUnlocking) {
+            isUnlocking = false;
+            isLocking = true;
+            isLocked = false;
+            lockStartTime = Timer.getFPGATimestamp();        }
+    }
+    public void unlock() {
+        if(isLocked || isLocking) {
+            isLocking = false;
+            isLocked = true;
+            isUnlocking = true;
+            lockStartTime = Timer.getFPGATimestamp();
+        }
+    }
+
+    public boolean isLocked() {
+        return isLocked;
+    }
+
+    public void lockPeriodic() {
+        if(Robot.robot.isEnabled()) {
+            if(isLocking) {
+                if(getLockCurrent() > Parameters.LOCK_MAX_AMPER) {
+                    isLocked = true;
+                    isLocking = false;
+                    isUnlocking = false;
+                    setLockPower(0);
+                } else {
+                    setLockPower(Parameters.LOCK_POWER);
+                }
+            } else if(isUnlocking) {
+                if(Timer.getFPGATimestamp() > lockStartTime + Parameters.UNLOCK_TIME) {
+                    isUnlocking = false;
+                    isLocked = false;
+                    isLocking = false;
+                    setLockPower(0);
+                } else {
+                    setLockPower(Parameters.UNLOCK_POWER);
+                }
+
+            }
+        }
+    }
+
+    private boolean isArmInPosition() {
+        return Math.abs(getArmAngle()-targteAngle) < Parameters.ARM_POSITION_ERROR;
+    }
+
+    public void goToSensor() {
+        targteAngle = Parameters.ARM_SENSOR_POSITION_ANGLE;
+    }
+    public void goToUpperPosition() {
+        targteAngle = Parameters.ARM_UPPER_POSITION_ANGLE;
+    }
+
+    private void armPeriodic() {
+        if(Robot.robot.isEnabled()) {
+            if(isArmInPosition()) {
+                if(!isLocked) {
+                    setVel(0);
+                    lock();
+                } else {
+                    setArmPower(0);
+                }
+            } else {
+                double currentAngle = getArmAngle();
+                if(isLocked) {
+                    setVel(0);
+                    unlock();
+                } else if(targteAngle > currentAngle) {
+                    double v = trap.trapezoid(getArmVel(), 
+                        Parameters.MAX_ARM_VEL_OPEN, 0, 
+                        Parameters.MAX_ARM_ACCEL_OPEN, targteAngle-currentAngle);
+                    setVel(v);
+                } else {
+                    setArmPower(Parameters.ARM_DOWN_POWER);
+                }
+            } 
+        }
+    }
+
+    // commands
+    public Command getReadyCommand() {
+        return new InstantCommand(()->goToSensor(), this).andThen(
+            new WaitUntilCommand(()->isArmInPosition()),
+            new AmpIntake2(this),
+            new InstantCommand(()->goToUpperPosition(), this),
+            new WaitUntilCommand(()->isArmInPosition()));
+
+
+    }
+
+    public Command getCancelCommand() {
+        return new InstantCommand(()->goToSensor());
+
+    }
+
+    public Command getShootCommand() {
+        return new AmpIntakeShoot(this);
+
+    }
+
 
 
 }
