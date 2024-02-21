@@ -37,7 +37,7 @@ public class AmpConstants{
 
       public static final double ARM_UPPER_POSITION_ANGLE = Math.toRadians(55);
       public static final double ARM_SENSOR_POSITION_ANGLE = Math.toRadians(-52);
-      public static final double ARM_HONE_POSITION_ANGLE = Math.toRadians(-55);
+      public static final double ARM_HOME_POSITION_ANGLE = Math.toRadians(-55);
       public static final double ARM_POSITION_ERROR = Math.toRadians(3);
       public static final double ARM_DOWN_POWER = -0.2;
 
@@ -70,14 +70,10 @@ public class AmpConstants{
         * 3 = the arm is going down and more then angle 55
         * 4 = the arm is going down from 55 to 0 
         */
-        public static final double KS = 0.1802966;
+        public static final double KS = 0.1102966;
         public static final double KV = 0.13205069;
         public static final double KA = 0.1531499;
         public static final double Kcos = -0.073106;
-
-
-        public static final double[] openFF = {0, 0, 0};
-        public static final double[] closeFF = {0, 0, 0};
 
     }
 

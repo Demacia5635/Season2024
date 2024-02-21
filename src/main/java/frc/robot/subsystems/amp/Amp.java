@@ -49,7 +49,7 @@ public class Amp extends SubsystemBase {
     public boolean enable = false;
 
     // periodic concept
-    double targteAngle = Parameters.ARM_HONE_POSITION_ANGLE;
+    double targteAngle = Parameters.ARM_SENSOR_POSITION_ANGLE;
     boolean isLocking = true;
     boolean isUnlocking = false;
     double lockStartTime;
@@ -62,7 +62,7 @@ public class Amp extends SubsystemBase {
         armMotor.setInverted(true);
         armMotor.setNeutralMode(NeutralMode.Coast);
         armMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 40, 40, 0.2));
-        setArmAngle(Math.toRadians(-55));
+        setArmAngle(Math.toRadians(Parameters.ARM_HOME_POSITION_ANGLE));
         configArmPID();
 
         positionSensor = new DigitalInput(AmpConstants.AmpDeviceID.MAGNETIC_SENSOR_ID);
@@ -206,13 +206,21 @@ public class Amp extends SubsystemBase {
     public void periodic() {
         super.periodic();
         if(!enable && Robot.robot.isEnabled()) {
+            unlock();
+            isLocked = true;
+            setArmBrake();
+            setArmAngle(Parameters.ARM_HOME_POSITION_ANGLE);
+        goToSensor();
             enable = true;
+        } else if(!Robot.robot.isEnabled()) {
+            enable = false;
+            setArmCoast();
         }
         if(isAtPositionSensor()) {
             setArmAngle(Math.toRadians(Parameters.ARM_SENSOR_POSITION_ANGLE));
         }
         lockPeriodic();
-        armPeriodic();
+        //armPeriodic();
 
     }
 
