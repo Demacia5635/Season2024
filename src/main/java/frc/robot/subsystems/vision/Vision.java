@@ -30,12 +30,8 @@ import static frc.robot.subsystems.vision.VisionConstants.*;
 //#endregion
 
 public class Vision extends SubsystemBase {
-    //#region declaring fields for testing
-    Field2d poseEstimatorField;
-    Field2d visionField;
-    Field2d visionField3;
-    Field2d visionField5;
-    Field2d visionFieldavg3;
+    //#region declaring fields    
+    Field2d noFilterVisionField;
     Field2d visionFieldavg5;
     //#endregion
 
@@ -49,47 +45,26 @@ public class Vision extends SubsystemBase {
     //#region declaring poseEstimator chassis and buffers 
     SwerveDrivePoseEstimator poseEstimator;
     Chassis chassis;
-    VisionData[] buf3Avg;
-    VisionData[] buf3Med;
 
     VisionData[] buf5Avg;
-    VisionData[] buf5Med;
-
-
-    int lastData;
     int lastData5;
-    double lastUpdateTime;
     double lastUpdateTime5;
-    boolean firstRun;
     int VisionCountCycles;
 
-    SwerveDrivePoseEstimator testPoseEstimatorBuf3Avg;
-    SwerveDrivePoseEstimator testPoseEstimatorBuf3Med;
-    SwerveDrivePoseEstimator testPoseEstimatorBuf5Avg;
-    SwerveDrivePoseEstimator testPoseEstimatorBuf5Med;
     //#endregion
     
     //#region C'tor
-    public Vision(Chassis chassis, SwerveDrivePoseEstimator estimator, SwerveDrivePoseEstimator testPoseEstimatorBuf3Avg, SwerveDrivePoseEstimator testPoseEstimatorBuf3Med, SwerveDrivePoseEstimator testPoseEstimatorBuf5Avg, SwerveDrivePoseEstimator testPoseEstimatorBuf5Med) {
-        
-        this.testPoseEstimatorBuf3Avg = testPoseEstimatorBuf3Avg;
-        this.testPoseEstimatorBuf3Med = testPoseEstimatorBuf3Med;
-        this.testPoseEstimatorBuf5Avg = testPoseEstimatorBuf5Avg;
-        this.testPoseEstimatorBuf5Med = testPoseEstimatorBuf5Med;
+    public Vision(Chassis chassis, SwerveDrivePoseEstimator estimator) {
         
         this.chassis = chassis;
         this.poseEstimator = estimator;
-        this.lastData = -1;
         this.lastData5 = -1;
-        this.buf3Avg  = new VisionData[3];
         this.buf5Avg = new VisionData[5];
-        this.buf3Med  = new VisionData[3];
-        this.buf5Med = new VisionData[5];
+
         this.AmpSideRaspberry = new PhotonCamera(AmpSideRaspberryName);
         this.ShooterSideRaspberry = new PhotonCamera(ShooterSideRaspberryName);
         
         VisionCountCycles = 0;
-        this.firstRun = true;
 
         //#region initializing photons pose estimators
         try {
@@ -106,37 +81,21 @@ public class Vision extends SubsystemBase {
         //#endregion
 
         //#region initializing buffers
-        for (int i = 0; i < buf3Avg.length; i++) {
-            this.buf3Avg[i] = new VisionData(null, 0, testPoseEstimatorBuf3Avg);
-        }
+      
         for (int i = 0; i < buf5Avg.length; i++) {
-            this.buf5Avg[i] = new VisionData(null, 0, testPoseEstimatorBuf5Avg);
+            this.buf5Avg[i] = new VisionData(null, 0, poseEstimator);
         }
-        for (int i = 0; i < buf3Med.length; i++) {
-            this.buf3Med[i] = new VisionData(null, 0, testPoseEstimatorBuf3Med);
-        }
-        for (int i = 0; i < buf5Med.length; i++) {
-            this.buf5Med[i] = new VisionData(null, 0, testPoseEstimatorBuf5Med);
-        }
+        
         //#endregion
 
         //#region initializing fields for testing
-        this.visionField= new Field2d();   
-        this.visionField3 = new Field2d();
-        this.visionField5 = new Field2d();
-        this.visionFieldavg3 = new Field2d();
+        this.noFilterVisionField= new Field2d();   
         this.visionFieldavg5 = new Field2d();
-        this.poseEstimatorField = new Field2d();
         //#endregion
 
-        //#regionputting testing fields on shuffleboard
-        SmartDashboard.putData("no Filter vision", visionField);
-        SmartDashboard.putData("field check pose estimator", poseEstimatorField);
-        
-        SmartDashboard.putData("vision3", visionField3);
-        SmartDashboard.putData("vision5", visionField5);
-        SmartDashboard.putData("visionavg3", visionFieldavg3);
-        SmartDashboard.putData("visionavg5", visionFieldavg5);
+        //#region putting fields on shuffleboard
+        SmartDashboard.putData("no Filter vision field", noFilterVisionField);
+        SmartDashboard.putData("vision Avg 5 field", visionFieldavg5);
         //#endregion
 
         SmartDashboard.putData("resetVisionCycles", new InstantCommand(() -> resetVisionResetCycles()).ignoringDisable(true));
@@ -147,75 +106,6 @@ public class Vision extends SubsystemBase {
     
     //#region Vision Main Methods
 
-    //#region update pose methods
-
-    //takes the visions snapshots from the buffer and medians or avg it and add vision mesurements to pose estimator
-    public void updateRobotPose() {
-        double time = getTime();
-        if (validBuf(time)) {
-            VisionData vDataMed = median(buf3Med);
-            
-            Pair<Pose2d, Double> vData3AvgPair = avg(buf5Avg);
-            VisionData vDataAvg = new VisionData(vData3AvgPair.getFirst(), vData3AvgPair.getSecond(), testPoseEstimatorBuf3Avg)  ;
-            if (vDataMed != null && vDataMed.getPose() != null && vDataAvg.getPose() != null && vDataAvg != null) {
-                testPoseEstimatorBuf3Med.addVisionMeasurement(new Pose2d (vDataMed.getPose().getTranslation(),
-                 chassis.getAngle()), vDataMed.getTimeStamp());
-
-                testPoseEstimatorBuf3Avg.addVisionMeasurement(new Pose2d (vDataAvg.getPose().getTranslation(),
-                 chassis.getAngle()), vDataAvg.getTimeStamp());
-
-                poseEstimator.addVisionMeasurement(new Pose2d (vDataMed.getPose().getTranslation(),
-                 chassis.getAngle()), vDataMed.getTimeStamp());
-
-                poseEstimatorField.setRobotPose(poseEstimator.getEstimatedPosition());
-
-
-                visionField3.setRobotPose(vDataMed.getPose());
-                visionFieldavg3.setRobotPose(vDataAvg.getPose());
-                lastUpdateTime = time;
-                time = vDataMed.getTimeStamp();
-
-                for (VisionData vd : buf3Med){
-                    vd.clear();
-                }
-                for (VisionData vd : buf3Avg){
-                    vd.clear();
-                }
-            }
-        } 
-    }
-
-    public void updateRobotPose5() {
-        double time = getTime();
-        if (validBuf5(time)) {
-            VisionData vData5Med = median(buf5Med);
-            Pair<Pose2d, Double> vData5AvgPair = avg(buf5Avg);
-            VisionData vDataAvg5 = new VisionData(vData5AvgPair.getFirst(), vData5AvgPair.getSecond(), testPoseEstimatorBuf5Avg)  ;
-            SmartDashboard.putBoolean("updates", vData5Med != null && vData5Med.getPose() != null && vDataAvg5.getPose() != null && vDataAvg5 != null);
-            if (vData5Med != null && vData5Med.getPose() != null && vDataAvg5.getPose() != null && vDataAvg5 != null) {
-           
-                testPoseEstimatorBuf5Med.addVisionMeasurement(new Pose2d(vData5Med.getPose().getTranslation(),
-                 chassis.getAngle()), vData5Med.getTimeStamp());
-
-                testPoseEstimatorBuf5Avg.addVisionMeasurement(new Pose2d(vDataAvg5.getPose().getTranslation(),
-                 chassis.getAngle()), vDataAvg5.getTimeStamp());
-                
-                visionField5.setRobotPose(vData5Med.getPose());
-                visionFieldavg5.setRobotPose(vDataAvg5.getPose());
-                lastUpdateTime5 = time;
-                time = vData5Med.getTimeStamp();
-
-                for (VisionData vd : buf5Med){
-                    vd.clear();
-                }
-                for (VisionData vd : buf5Avg){
-                    vd.clear();
-                }
-                
-            }
-        } 
-    }
-    //#endregion
 
     // calls the limelights to get updates and put the data in the buffer 
     private void getNewDataFromLimelightX(RaspberryPi raspberryPi) {
@@ -225,6 +115,7 @@ public class Vision extends SubsystemBase {
             photonPoseEstimator = photonPoseEstimatorForShooterSideRaspberry;
         else
             photonPoseEstimator = photonPoseEstimatorForAmpSideRaspberry;
+
         if (chassis.getVelocity().getNorm() <= maxValidVelcity) {
             var PhotonUpdate = photonPoseEstimator.update();
             if(PhotonUpdate != null){
@@ -232,35 +123,22 @@ public class Vision extends SubsystemBase {
                     var estimatedRobotPose = PhotonUpdate.get();
                     var estimatedPose = estimatedRobotPose.estimatedPose;
                     if(estimatedRobotPose != null){
-                        VisionData newVisionData3Avg = new VisionData(estimatedPose.toPose2d(), estimatedRobotPose.timestampSeconds,testPoseEstimatorBuf3Avg);
-                        VisionData newVisionData5Avg = new VisionData(estimatedPose.toPose2d(), estimatedRobotPose.timestampSeconds,testPoseEstimatorBuf5Avg);
-                        VisionData newVisionData3Med = new VisionData(estimatedPose.toPose2d(), estimatedRobotPose.timestampSeconds,testPoseEstimatorBuf3Med);
-                        VisionData newVisionData5Med = new VisionData(estimatedPose.toPose2d(), estimatedRobotPose.timestampSeconds,testPoseEstimatorBuf5Med);
-                        if(VisionCountCycles < 100){
-                            Pose2d poseFromVisionWithGyroAngle = new Pose2d(newVisionData3Avg.getPose().getTranslation(), chassis.getAngle()); 
-                            
-                            poseEstimator.resetPosition(chassis.getAngle(), chassis.getModulePositions(), poseFromVisionWithGyroAngle);
+                        VisionData newVisionData5Avg = new VisionData(estimatedPose.toPose2d(), 
+                        estimatedRobotPose.timestampSeconds, poseEstimator);
+                        
+                        // for reseting pose
+                        if(VisionCountCycles < numOfCyclesToResetPose){
+                            Pose2d poseFromVisionWithGyroAngle = new Pose2d(newVisionData5Avg.getNotFilteredPose().getTranslation(), 
+                            chassis.getAngle()); 
 
-                            testPoseEstimatorBuf3Avg.resetPosition(chassis.getAngle(), chassis.getModulePositions(), poseFromVisionWithGyroAngle);
-                            testPoseEstimatorBuf3Med.resetPosition(chassis.getAngle(), chassis.getModulePositions(), poseFromVisionWithGyroAngle);
-                            testPoseEstimatorBuf5Avg.resetPosition(chassis.getAngle(), chassis.getModulePositions(), poseFromVisionWithGyroAngle);
-                            testPoseEstimatorBuf5Med.resetPosition(chassis.getAngle(), chassis.getModulePositions(), poseFromVisionWithGyroAngle);
-
-                            
+                            poseEstimator.resetPosition(chassis.getAngle(), chassis.getModulePositions(), 
+                            poseFromVisionWithGyroAngle);                            
                         }
-                        if (newVisionData5Avg != null && newVisionData5Avg.getPose() != null && newVisionData3Avg != null &&
-                         newVisionData3Avg.getPose() != null && newVisionData5Med != null && 
-                         newVisionData5Med.getPose() != null&& newVisionData3Med != null && 
-                         newVisionData3Med.getPose() != null) {
-                            lastData = next();
+                        else if(newVisionData5Avg != null && newVisionData5Avg.getPose() != null) {
                             lastData5 = next5(); 
-                            buf3Avg[lastData] = newVisionData3Avg;
                             buf5Avg[lastData5] = newVisionData5Avg;
-                            buf3Med[lastData] = newVisionData3Med;
-                            buf5Med[lastData5] = newVisionData5Med;
-                            
-
-                            visionField.setRobotPose(newVisionData3Avg.getPose());
+                       
+                            noFilterVisionField.setRobotPose(newVisionData5Avg.getPose());
                         }   
                     }
                 } catch (NoSuchElementException e) {
@@ -270,6 +148,30 @@ public class Vision extends SubsystemBase {
         }
     }
     
+    //takes the visions snapshots from the buffer and medians or avg it and add vision mesurements to pose estimator
+    public void updateRobotPose5() {
+        double time = getTime();
+        if (validBuf5(time)) {
+            Pair<Pose2d, Double> vData5AvgPair = avg(buf5Avg);
+            VisionData vDataAvg5 = new VisionData(vData5AvgPair.getFirst(), vData5AvgPair.getSecond(), poseEstimator)  ;
+            SmartDashboard.putBoolean("updates",vDataAvg5.getPose() != null && vDataAvg5 != null);
+            if (vDataAvg5.getPose() != null && vDataAvg5 != null) {
+
+                poseEstimator.addVisionMeasurement(new Pose2d(vDataAvg5.getPose().getTranslation(),
+                 chassis.getAngle()), vDataAvg5.getTimeStamp());
+                visionFieldavg5.setRobotPose(vDataAvg5.getPose());
+
+                lastUpdateTime5 = time;
+
+                for (VisionData vd : buf5Avg){
+                    vd.clear();
+                }
+                
+            }
+        } 
+    }
+
+
     //#endregion
 
 
@@ -281,34 +183,7 @@ public class Vision extends SubsystemBase {
 
         getNewDataFromLimelightX(RaspberryPi.AmpSideRaspberry);
         getNewDataFromLimelightX(RaspberryPi.ShooterSideRaspberry);
-        updateRobotPose();
         updateRobotPose5();
-        SmartDashboard.putNumber("angle", visionField.getRobotPose().getRotation().getDegrees());
-        double x = 15.513;
-        double y = 4.424;
-        Pose2d visionPose = visionField.getRobotPose();
-        SmartDashboard.putNumber("no filter X", visionPose.getX());
-        SmartDashboard.putNumber("no filter Y", visionPose.getY());
-        SmartDashboard.putNumber("no filter dist",Math.sqrt(Math.pow(x-visionPose.getX(), 2) + Math.pow(y-visionPose.getY(),2) ) );
-        Pose2d vision3Pose = visionField3.getRobotPose();
-        SmartDashboard.putNumber("buf 3 med X", vision3Pose.getX());
-        SmartDashboard.putNumber("buf 3 med Y", vision3Pose.getY());
-        SmartDashboard.putNumber("buf 3 med dist",Math.sqrt(Math.pow(vision3Pose.getX()-x, 2) + Math.pow(vision3Pose.getY()-y,2) ) );
-        Pose2d vision5Pose = visionField5.getRobotPose();
-        SmartDashboard.putNumber("buf 5 med X", vision5Pose.getX());
-        SmartDashboard.putNumber("buf 5 med Y", vision5Pose.getY());    
-        SmartDashboard.putNumber("buf 5 med dist",Math.sqrt(Math.pow(vision5Pose.getX()-x, 2) + Math.pow(vision5Pose.getY()-y,2) ) );
-
-        Pose2d vision3avgPose = visionFieldavg3.getRobotPose();
-        SmartDashboard.putNumber("buf 3 avg X", vision3avgPose.getX());
-        SmartDashboard.putNumber("buf 3 avg Y", vision3avgPose.getY());
-        SmartDashboard.putNumber("buf 3 avg dist",Math.sqrt(Math.pow(vision3avgPose.getX()-x, 2) + Math.pow(vision3avgPose.getY()-y,2) ) );
-
-        Pose2d vision5avgPose = visionFieldavg5.getRobotPose();
-        SmartDashboard.putNumber("buf 5 avg X", vision5avgPose.getX());
-        SmartDashboard.putNumber("buf 5 avg Y", vision5avgPose.getY());    
-        SmartDashboard.putNumber("buf 5 avg dist",Math.sqrt(Math.pow(vision5avgPose.getX()-x, 2) + Math.pow(vision5avgPose.getY()-y,2) ) );
-
 
     }
 
@@ -359,32 +234,6 @@ public class Vision extends SubsystemBase {
         return visionDataArr[visionDataArr.length / 2];
     }
     //#endregion
-    
-
-    //#region BUF 3 methods
-    int next() {
-        return (lastData + 1) % buf3Avg.length;
-    }
-
-    private boolean validBuf(double time) {
-        
-        double minTime = time - 1.2;
-        for (VisionData vData : buf3Avg) {
-            if (vData.getTimeStamp() < minTime) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public double lastUpdateLatency() {
-        return getTime() - lastUpdateTime;
-    }
-
-    public boolean validVisionPosition() {
-        return lastUpdateLatency() < 1;
-    }
-    //#endregion
 
     //#region BUF 5 methods
     int next5() {
@@ -393,28 +242,21 @@ public class Vision extends SubsystemBase {
     
     private boolean validBuf5(double time) {
         double minTime = time - 2;
-        // System.out.println("---------------------------");
-        // for (int i = 0; i < buf5.length; i++) {
-        //     VisionData visionBill = buf5[i];
-        //     System.out.println(visionBill.timeStamp + ", in index:" + i);
-        // }
-        // System.out.println("---------------------------");
+        
         for (VisionData vData : buf5Avg) {
-            //System.out.println(vData.timeStamp);
             if (vData.getTimeStamp() < minTime) {
-                // System.out.println(vData.getTimeStamp() + ", " + minTime + ", " + (vData.getTimeStamp() < minTime));
                 return false;
             }
         }
         return true;
     }
    
-    public double lastUpdateLatency5() {
-        return getTime() - lastUpdateTime5;
+    public double lastUpdateTimeStamp() {
+        return lastUpdateTime5;
     }
     
     public boolean validVisionPosition5() {
-        return lastUpdateLatency5() < 1;
+        return getTime() - lastUpdateTimeStamp() < 1;
     }
     //#endregion
     

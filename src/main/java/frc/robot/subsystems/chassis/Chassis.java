@@ -54,10 +54,6 @@ public class Chassis extends SubsystemBase {
 
   private SwerveDrivePoseEstimator poseEstimator;
 
-  private SwerveDrivePoseEstimator testPoseEstimatorBuf3Avg;
-  private SwerveDrivePoseEstimator testPoseEstimatorBuf3Med;
-  private SwerveDrivePoseEstimator testPoseEstimatorBuf5Avg;
-  private SwerveDrivePoseEstimator testPoseEstimatorBuf5Med;
 
   private final Field2d field;
 
@@ -77,13 +73,9 @@ public class Chassis extends SubsystemBase {
     gyro.setYaw(0);
     poseEstimator = new SwerveDrivePoseEstimator(KINEMATICS, getAngle(), getModulePositions(), new Pose2d());
     
-    testPoseEstimatorBuf3Avg = new SwerveDrivePoseEstimator(KINEMATICS, getAngle(), getModulePositions(), new Pose2d());
-    testPoseEstimatorBuf3Med = new SwerveDrivePoseEstimator(KINEMATICS, getAngle(), getModulePositions(), new Pose2d());
-    testPoseEstimatorBuf5Avg = new SwerveDrivePoseEstimator(KINEMATICS, getAngle(), getModulePositions(), new Pose2d());
-    testPoseEstimatorBuf5Med = new SwerveDrivePoseEstimator(KINEMATICS, getAngle(), getModulePositions(), new Pose2d());
-
+    vision = new Vision(this, this.poseEstimator);
+    vision.getName();
     
-    vision = new Vision(this, poseEstimator, testPoseEstimatorBuf3Avg, testPoseEstimatorBuf3Med, testPoseEstimatorBuf5Avg, testPoseEstimatorBuf5Med);
     field = new Field2d();
     SmartDashboard.putData(field);
     SmartDashboard.putData(this);
@@ -354,29 +346,9 @@ public class Chassis extends SubsystemBase {
   public void periodic() {
     poseEstimator.update(getAngle(), getModulePositions());
 
-    testPoseEstimatorBuf3Avg.update(getAngle(), getModulePositions());
-    testPoseEstimatorBuf3Med.update(getAngle(), getModulePositions());
-    testPoseEstimatorBuf5Avg.update(getAngle(), getModulePositions());
-    testPoseEstimatorBuf5Med.update(getAngle(), getModulePositions());
-
     field.setRobotPose(getPose());
 
     SmartDashboard.putNumber("Gyro Angle",getAngle().getDegrees());
-
-    SmartDashboard.putNumber("Velocity X Test", getChassisSpeeds().vxMetersPerSecond);
-    SmartDashboard.putNumber("Velocity Y Test", getChassisSpeeds().vyMetersPerSecond);
-
-    SmartDashboard.putNumber("Pose X 3 Avg Test", testPoseEstimatorBuf3Avg.getEstimatedPosition().getX());
-    SmartDashboard.putNumber("Pose Y 3 Avg Test", testPoseEstimatorBuf3Avg.getEstimatedPosition().getY());
-   
-    SmartDashboard.putNumber("Pose X 3 Med Test", testPoseEstimatorBuf3Med.getEstimatedPosition().getX());
-    SmartDashboard.putNumber("Pose Y 3 Med Test", testPoseEstimatorBuf3Med.getEstimatedPosition().getY());
-     
-    SmartDashboard.putNumber("Pose X 5 Avg Test", testPoseEstimatorBuf5Avg.getEstimatedPosition().getX());
-    SmartDashboard.putNumber("Pose Y 5 Avg Test", testPoseEstimatorBuf5Avg.getEstimatedPosition().getY());
-        
-    SmartDashboard.putNumber("Pose X 5 Med Test", testPoseEstimatorBuf5Med.getEstimatedPosition().getX());
-    SmartDashboard.putNumber("Pose Y 5 Med Test", testPoseEstimatorBuf5Med.getEstimatedPosition().getY());
 
     SmartDashboard.putNumber("velocity of chassis", getMoveVelocity());
   }

@@ -247,7 +247,10 @@ public class RobotContainer implements Sendable{
        new pathPoint(pose.getX() - 2, pose.getY(), Rotation2d.fromDegrees(0), 0, false),
        new pathPoint(pose.getX(), pose.getY(), Rotation2d.fromDegrees(0), 0, false)};
 
-    pathPoint[] pointArrForY = {new pathPoint(0, 0, Rotation2d.fromDegrees(0), 0, false), new pathPoint(pose.getX(), pose.getY() + 2, Rotation2d.fromDegrees(0), 0, false), new pathPoint(pose.getX(), pose.getY() - 2, Rotation2d.fromDegrees(0), 0, false), new pathPoint(pose.getX(), pose.getY(), Rotation2d.fromDegrees(0), 0, false)};
+    pathPoint[] pointArrForY = {new pathPoint(0, 0, Rotation2d.fromDegrees(0), 0, false), 
+      new pathPoint(pose.getX(), pose.getY() + 2, Rotation2d.fromDegrees(0), 0, false), 
+      new pathPoint(pose.getX(), pose.getY() - 2, Rotation2d.fromDegrees(0), 0, false),
+       new pathPoint(pose.getX(), pose.getY(), Rotation2d.fromDegrees(0), 0, false)};
 
     // return new PathFollow(chassis,pointArrForX , 1, 1, 0, false).andThen(new PathFollow(chassis,pointArrForX , 2, 1.5, 0, false).
     // andThen(new PathFollow(chassis,pointArrForX , 2.5, 1.75, 0, false).andThen(new PathFollow(chassis,pointArrForX , 3, 2, 0, false).
