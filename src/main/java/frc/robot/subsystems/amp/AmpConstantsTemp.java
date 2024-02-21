@@ -39,6 +39,7 @@ public class AmpConstants{
       public static final double ARM_SENSOR_POSITION_ANGLE = Math.toRadians(-52);
       public static final double ARM_HONE_POSITION_ANGLE = Math.toRadians(-55);
       public static final double ARM_POSITION_ERROR = Math.toRadians(3);
+      public static final double ARM_DOWN_POWER = -0.2;
 
       public static final double ARM_KP = 0.0570401;
       public static final double ARM_KI = 0;

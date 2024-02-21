@@ -25,7 +25,7 @@ public class CalibrateArm extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    amp.setPowerArm(0.1);
+    amp.setArmPower(0.1);
   }
 
   // Called once the command ends or is interrupted.
@@ -35,6 +35,6 @@ public class CalibrateArm extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return amp.isClose();
+    return amp.isAtPositionSensor();
   }
 }

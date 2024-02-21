@@ -24,12 +24,12 @@ public class CloseAmp extends CommandBase {
     @Override
     public void initialize() {
         
-        amp.setBrake();
+        amp.setArmBrake();
     }
     
     @Override
     public void execute() {
-        vel = trapezoid.trapezoid(amp.getVelRadArm(), AmpConstants.Parameters.MAX_ARM_VEL_CLOSE,
+        vel = trapezoid.trapezoid(amp.getArmVel(), AmpConstants.Parameters.MAX_ARM_VEL_CLOSE,
          0, AmpConstants.Parameters.MAX_ARM_ACCEL_CLOSE, target - amp.getArmAngle());
 
         amp.setArmVelocityClose(vel);
@@ -37,12 +37,12 @@ public class CloseAmp extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return amp.isClose();
+        return amp.isAtPositionSensor();
     }
 
     @Override
     public void end(boolean interrupted) {
-        amp.setPowerArm(0);
+        amp.setArmPower(0);
     }
 
 }

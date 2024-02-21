@@ -28,7 +28,7 @@ public class AmpIntake2 extends CommandBase {
     public void initialize() {
         super.initialize();
         amp.setBrakeArm();
-        amp.setBrake();
+        amp.setArmBrake();
         amp.neosSetInverted(true);
         amp.resetStartPulses();
         initialEncoderCount = 0;
@@ -47,7 +47,7 @@ public class AmpIntake2 extends CommandBase {
         SmartDashboard.putBoolean("en lol", !hasEntered);
         if (amp.isNote())
             noteWasDetected = true;
-        if (amp.isCriticalCurrent())
+        if (amp.isIntakePushingNote())
             hasEntered = true;
 
         // Check for note reaching resting spot based on encoder counts, but only after
@@ -60,12 +60,12 @@ public class AmpIntake2 extends CommandBase {
                     "StartPose = " + initialEncoderCount);
 
         } else if (noteWasDetected) { // Note detected, use transfer speed
-            amp.setNeosPower(Parameters.INTAKE_TRANSFER_POWER); // Run motors at transfer speed
+            amp.setIntakePower(Parameters.INTAKE_TRANSFER_POWER); // Run motors at transfer speed
             System.out.println("TRANSFER: hasEntered = " + hasEntered +
                     " noteWasDetec = " + noteWasDetected + " pose = " + amp.getPoseByPulses() +
                     "StartPose = " + initialEncoderCount);
         } else if (!hasEntered) {
-            amp.setNeosPower(Parameters.INTAKE_POWER); // Run motors at intake speed until note is detected
+            amp.setIntakePower(Parameters.INTAKE_POWER); // Run motors at intake speed until note is detected
             System.out.println("INTAKE: hasEntered = " + hasEntered +
                     " noteWasDetec = " + noteWasDetected + " pose = " + amp.getPoseByPulses() +
                     "StartPose = " + initialEncoderCount);
@@ -73,7 +73,7 @@ public class AmpIntake2 extends CommandBase {
         } else {
             // if(initialEncoderCount > 0 && amp.getNeoPoseByPulses() >= initialEncoderCount
             // + Parameters.SENSOR_TO_REST_DIST){
-            amp.setNeosPower(Parameters.INTAKE_PRE_LIMIT_POWER); // Run motors at intake speed until note is detected
+            amp.setIntakePower(Parameters.INTAKE_PRE_LIMIT_POWER); // Run motors at intake speed until note is detected
             System.out.println("PRE: hasEntered = " + hasEntered +
                     " noteWasDetec = " + noteWasDetected + " pose = " + amp.getPoseByPulses() +
                     "StartPose = " + initialEncoderCount);
@@ -82,7 +82,7 @@ public class AmpIntake2 extends CommandBase {
         if (noteWasDetected) { // Placeholder for sensor detection
             SmartDashboard.putBoolean("detected ", true);
             if (initialEncoderCount == 0) { // Initialize only when note is first detected
-                SmartDashboard.putNumber("limit amp", amp.getLimitVolt());
+                SmartDashboard.putNumber("limit amp", amp.getNoteSensorVolt());
 
                 initialEncoderCount = amp.getNeoPoseByPulses();
                 SmartDashboard.putBoolean("en 6", true);
@@ -102,7 +102,7 @@ public class AmpIntake2 extends CommandBase {
 
     @Override
     public void end(boolean interrupted) {
-        amp.setNeosPower(0);// Ensure motors stop
+        amp.setIntakePower(0);// Ensure motors stop
     }
 
 }

@@ -31,7 +31,7 @@ public class GoToAngleAmp extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    amp.setBrake();
+    amp.setArmBrake();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -40,12 +40,12 @@ public class GoToAngleAmp extends Command {
       double velRad = 0;
       double currentAngleRad = amp.getArmAngle();
       if( angleRad > currentAngleRad) {
-        velRad = trap.trapezoid(amp.getVelRadArm(), maxVelRad, 0, 
+        velRad = trap.trapezoid(amp.getArmVel(), maxVelRad, 0, 
         Math.abs(acceleRad), angleRad-currentAngleRad);
         //System.out.println(" cur ang=" + currentAngleRad + " tgt=" + angleRad + " v=" + velRad);
         amp.setVel(velRad);
       } else {
-          amp.setPowerArm(-0.2);
+          amp.setArmPower(-0.2);
         }
     }
     
@@ -58,7 +58,7 @@ public class GoToAngleAmp extends Command {
   @Override
   public void end(boolean interrupted) {
     //amp.setVel(0);
-    amp.setPowerArm(0);
+    amp.setArmPower(0);
   }
 
   // Returns true when the command should end.
