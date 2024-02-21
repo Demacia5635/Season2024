@@ -27,9 +27,9 @@ public class AmpConstants{
     public static class Parameters{
       public static final double Deadband = 0.2;
 
-      public static final double ARM_BRAKE_MAX_A = 5;
+      public static final double ARM_BRAKE_MAX_A = 35;
       public static final double ARM_BRAKE_POW = 0.5;
-      public static final double ARM_RELEASE_POW = -0.2;
+      public static final double ARM_RELEASE_POW = -0.3;
 
       public static final double KP1 = 0.0570401;
       public static final double KI1 = 0;

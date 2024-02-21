@@ -5,6 +5,8 @@ import javax.swing.plaf.metal.MetalTheme;
 
 import java.util.Optional;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
 import com.fasterxml.jackson.core.StreamReadConstraints.Builder;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -78,11 +80,11 @@ public class RobotContainer implements Sendable{
   // new RunCommand(() -> {chassis.setVelocities(new ChassisSpeeds(0, 0, 0));}, chassis).andThen(new WaitCommand(2)));
   // double x = 5;
 
-  Shooter shooter;
+  // Shooter shooter;
   Amp amp;
-  Intake intake;
-  Chassis chassis;
-  SubStrip leds;
+  // Intake intake;
+  // Chassis chassis;
+  // SubStrip leds;
 
   Command intake2shooter;
   Command intake2amp;
@@ -111,8 +113,8 @@ public class RobotContainer implements Sendable{
 
   public RobotContainer() {
 
-    chassis = new Chassis();
-    intake = new Intake();
+    // chassis = new Chassis();
+    // intake = new Intake();
     //leds = new SubStrip(60);
     commandController2 = new CommandXboxController(1);
 
@@ -123,9 +125,10 @@ public class RobotContainer implements Sendable{
 
     amp = new Amp();
     commandController = new CommandXboxController(0);
-    shooter = new Shooter();
+    // shooter = new Shooter();
     //shooter.setDefaultCommand(new AngleControl(shooter, commandController));
-    chassis.setDefaultCommand(new JoyStickAmp(commandController, amp));
+    // chassis.setDefaultCommand(new JoyStickAmp(commandController, amp));
+    // amp.setDefaultCommand(new JoyStickAmp(commandController, amp));
     
     createCommands();
     
@@ -134,8 +137,8 @@ public class RobotContainer implements Sendable{
   }
 
   public void createCommands() {
-     intake2amp = (new DispenseCommand(intake)
-     .raceWith(new AmpIntake2(amp)));
+    //  intake2amp = (new DispenseCommand(intake)
+    //  .raceWith(new AmpIntake2(amp)));
     
     amp2Angle = (new RunBrakeArm(amp,false).andThen(new GoToAngleAmp(amp, Math.toRadians(55), Math.PI,Math.PI*6)).andThen(new RunBrakeArm(amp, true)));
 
@@ -188,14 +191,14 @@ public class RobotContainer implements Sendable{
   }
     private void configureBindings() {
 
-      Trigger overrideAuto = new Trigger(()->Utils.joystickOutOfDeadband(commandController));
+    //   Trigger overrideAuto = new Trigger(()->Utils.joystickOutOfDeadband(commandController));
 
-      //wanted angle = 56 angle for close to speaker
-        wantedAngle = 40;
-    //   SmartDashboard.putNumber("wanted angle", 60);
-    //   SmartDashboard.putNumber("wanted shooting vel for noga", 0);
-    //   wantedAngle = SmartDashboard.getNumber("wanted angle", 60);
-        wantedShootingVel = 16.5;
+    //   //wanted angle = 56 angle for close to speaker
+    //     wantedAngle = 40;
+    // //   SmartDashboard.putNumber("wanted angle", 60);
+    // //   SmartDashboard.putNumber("wanted shooting vel for noga", 0);
+    // //   wantedAngle = SmartDashboard.getNumber("wanted angle", 60);
+        //wantedShootingVel = 16.5;
         
     //   wantedShootingVel = SmartDashboard.getNumber("wanted shooting vel for noga", 0);
     //   commandController.b().onTrue(new AngleQuel(shooter));
@@ -213,9 +216,14 @@ public class RobotContainer implements Sendable{
         
         //Amp commands Buttons
         commandController.x().onTrue(new RunBrakeArm(amp, true));
-        /*commandController.b().onTrue(intake2amp.andThen(amp2Angle));
-        commandController.pov(90).onTrue(shootAmp);
-        commandController.pov(270).onTrue(closeAmp);*/
+        // commandController.b().onTrue(intake2amp.andThen(amp2Angle));
+        commandController.b().onTrue(shootAmp);
+        // commandController.pov(270).onTrue(closeAmp);
+        commandController.a().onTrue(new JoyStickAmp(commandController, amp));
+        commandController.y().onTrue(new RunBrakeArm(amp, false));
+        
+
+        commandController.rightBumper().onTrue(new InstantCommand(()-> {amp.stop(); amp.setNeosPower(0); amp.m2.set(ControlMode.PercentOutput, 0);}, amp));
 
     
     }
@@ -223,23 +231,26 @@ public class RobotContainer implements Sendable{
 
    
     public void calibrate() {
-        new AngleQuel(shooter).schedule();
+        // new AngleQuel(shooter).schedule();
         //(new CalibrateArm(amp).andThen(new RunBrakeArm(amp, Parameters.ARM_BRAKE_POW))).schedule();
     }
 
     public void disable(){
-        new InstantCommand(()-> {
-            shooter.stopAll();
-            intake.stop();
-        }, 
-        intake, shooter
-        ).ignoringDisable(true).schedule();
+        new InstantCommand(()-> {amp.stop();
+          amp.m2.set(ControlMode.PercentOutput, 0);
+        }, amp);
+        // new InstantCommand(()-> {
+        //     shooter.stopAll();
+        //     intake.stop();
+        // }, 
+        // intake, shooter
+        // ).ignoringDisable(true).schedule();
         //leds.turnOff().schedule();
     }
    
    
   public Command getAutonomousCommand() {
-    return new StartTOP(chassis, shooter, intake, DriverStation.getAlliance().get() == alliance.Red);
+    return null;//new StartTOP(chassis, shooter, intake, DriverStation.getAlliance().get() == alliance.Red);
 
   }
 }

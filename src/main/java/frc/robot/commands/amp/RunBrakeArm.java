@@ -28,21 +28,22 @@ public class RunBrakeArm extends Command {
   public void initialize() {
     startTime = Timer.getFPGATimestamp();
     //amp.setVel(0);
-    if(lock && !amp.isLocked) { 
-      amp.setPowerSnowblower(Parameters.ARM_BRAKE_POW);
-    } else if(!lock && amp.isLocked) {
-      amp.setPowerSnowblower(Parameters.ARM_BRAKE_POW);
-    }
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    if(lock && !amp.isLocked) { 
+      amp.setPowerSnowblower(Parameters.ARM_RELEASE_POW);
+    } else if(!lock && amp.isLocked) {
+      amp.setPowerSnowblower(Parameters.ARM_BRAKE_POW);
+    }
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    System.out.println("end");
     amp.setPowerSnowblower(0);
     if(lock) { 
       amp.setPowerArm(0);
@@ -55,10 +56,14 @@ public class RunBrakeArm extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
+    System.out.println("is locked: "+ amp.isLocked);
+    System.out.println(" brake current = " + amp.getSnowblowerA());
+    System.out.println("condition: " + (amp.getSnowblowerA()>Parameters.ARM_BRAKE_MAX_A));
     if(lock) {
-      System.out.println(" brake current = " + amp.getSnowblowerA());
+
       return amp.isLocked || amp.getSnowblowerA()>Parameters.ARM_BRAKE_MAX_A;
     } else {
+      System.out.println("here");
       return !amp.isLocked || Timer.getFPGATimestamp()-startTime >0.7;
     }
   }
