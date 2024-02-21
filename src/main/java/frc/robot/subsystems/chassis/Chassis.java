@@ -84,6 +84,9 @@ public class Chassis extends SubsystemBase {
     }
     modules[0].debug = true;
 
+    SmartDashboard.putNumber("Set Gyro Angle", 0);
+    SmartDashboard.putData("Change gyro angle ", new InstantCommand( () -> setGyroAngle(SmartDashboard.getNumber("Set Gyro Angle", 0))).ignoringDisable(true));
+
     SmartDashboard.putData("set coast",
         new InstantCommand(() -> setNeutralMode(NeutralMode.Coast)).ignoringDisable(true));
     SmartDashboard.putData("set brake",

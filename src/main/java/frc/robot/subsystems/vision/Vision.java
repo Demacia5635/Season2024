@@ -99,7 +99,7 @@ public class Vision extends SubsystemBase {
         //#endregion
 
         SmartDashboard.putData("resetVisionCycles", new InstantCommand(() -> resetVisionResetCycles()).ignoringDisable(true));
-
+        SmartDashboard.putNumber("tag 6 Y", photonPoseEstimatorForAmpSideRaspberry.getFieldTags().getTagPose(6).get().getY());
     }
 
     //#endregion
