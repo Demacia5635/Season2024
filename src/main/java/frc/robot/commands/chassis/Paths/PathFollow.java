@@ -59,7 +59,7 @@ public class PathFollow extends CommandBase {
   Trajectory traj;
   double distancePassed = 0;
   pathPoint[] points;
-  PIDController rotationPidController = new PIDController(0.31, 0.006, 0.0000025);
+  PIDController rotationPidController = new PIDController(0.55, 0.09, 0.0000025);
 
   double finishVel;
   /**
@@ -236,9 +236,14 @@ public class PathFollow extends CommandBase {
       wantedAngle = points[segmentIndex].getRotation();
     }
 
-    rotationVelocity = rotationPidController.calculate(
+   /* rotationVelocity = rotationPidController.calculate(
         chassis.getAngle().getRadians(), wantedAngle.getRadians()) * Math.toRadians(300);
+         */
+        
 
+    rotationVelocity = Math.toRadians(rotationPidController.calculate(chassis.getAngle().getDegrees(), wantedAngle.getDegrees()));
+
+    SmartDashboard.putNumber("DIFF", wantedAngle.getRadians() - chassis.getAngle().getRadians());
     if (totalLeft <= 0.01)
       velVector = new Translation2d(0, 0);
     ChassisSpeeds speed = new ChassisSpeeds(velVector.getX(), velVector.getY(), rotationVelocity);
