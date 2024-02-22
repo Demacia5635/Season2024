@@ -12,6 +12,7 @@ import frc.robot.subsystems.amp.AmpConstants.Parameters;
 public class AmpIntakeShoot extends Command {
   Amp amp;
   double startTime;
+
   /** Creates a new AmpIntakeShoot. */
   public AmpIntakeShoot(Amp amp) {
     this.amp = amp;
@@ -41,7 +42,7 @@ public class AmpIntakeShoot extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    if(Timer.getFPGATimestamp()-startTime>1){
+    if (Timer.getFPGATimestamp() - startTime > 1) {
       return true;
     }
     return false;

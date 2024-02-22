@@ -2,34 +2,25 @@ package frc.robot.subsystems.amp;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
-import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
-import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
-import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.sensors.Pigeon2;
-import com.fasterxml.jackson.annotation.JsonCreator.Mode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkMaxAnalogSensor;
 import com.revrobotics.CANAnalog.AnalogMode;
 import com.revrobotics.CANSparkBase.IdleMode;
 
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.amp.AmpConstants.*;
 import frc.robot.utils.TrapezoidCalc;
 import frc.robot.Robot;
@@ -47,15 +38,15 @@ public class Amp extends SubsystemBase {
     public DigitalInput positionSensor;
     public boolean isLocked = false;
     public boolean enable = false;
+    public double armEncoderOffset;
 
-    // periodic concept
+    // periodic data
     double targteAngle = Parameters.ARM_SENSOR_POSITION_ANGLE;
     boolean isLocking = true;
     boolean isUnlocking = false;
     double lockStartTime;
     TrapezoidCalc trap = new TrapezoidCalc();
-  
-    
+
     public Amp() {
         armMotor = new TalonFX(AmpDeviceID.ARM_MOTOR_ID);
         armMotor.configFactoryDefault();
@@ -83,19 +74,16 @@ public class Amp extends SubsystemBase {
 
     }
 
-    
-
     public void configArmPID() {
         armMotor.config_kP(0, Parameters.ARM_KP);
         armMotor.config_kI(0, Parameters.ARM_KI);
         armMotor.config_kD(0, Parameters.ARM_KD);
     }
 
-
     public double getIntakeRev() {
-        return intakeMotor.getEncoder().getPosition() / ConvertionParams.NEO_PULES_PER_REV * ConvertionParams.INTAKE_GEAR_RATIO;
+        return intakeMotor.getEncoder().getPosition() / ConvertionParams.NEO_PULES_PER_REV
+                * ConvertionParams.INTAKE_GEAR_RATIO;
     }
-      
 
     public void setLockPower(double power) {
         lockMotor.set(ControlMode.PercentOutput, power);
@@ -130,8 +118,7 @@ public class Amp extends SubsystemBase {
      * @return true if the arm is fully open
      */
     public boolean isAtUpperPosition() {
-        return Math.abs(getArmAngle() - Parameters.ARM_UPPER_POSITION_ANGLE) < 
-            Parameters.ARM_POSITION_ERROR;
+        return Math.abs(getArmAngle() - Parameters.ARM_UPPER_POSITION_ANGLE) < Parameters.ARM_POSITION_ERROR;
     }
 
     public double getNoteSensorVolt() {
@@ -155,7 +142,7 @@ public class Amp extends SubsystemBase {
         if ((isSensingNote() == true) && (last == false)) {
             noteCount++;
         }
-        return noteCount%2 !=0;
+        return noteCount % 2 != 0;
     }
 
     public void setArmBrake() {
@@ -171,20 +158,24 @@ public class Amp extends SubsystemBase {
     }
 
     public static double deadband(double value) {
-        return Math.abs(value) < Parameters.Deadband? 0 : value; 
+        return Math.abs(value) < Parameters.Deadband ? 0 : value;
     }
-   
 
     public double getArmVel() {
         return (armMotor.getSelectedSensorVelocity() * 10) / ConvertionParams.PULSE_PER_RAD;
     }
 
     public double getArmAngle() {
-        return (armMotor.getSelectedSensorPosition()) / ConvertionParams.PULSE_PER_RAD;
+        return (armMotor.getSelectedSensorPosition() - armEncoderOffset) / ConvertionParams.PULSE_PER_RAD;
     }
 
     public void setArmAngle(double radians) {
-        armMotor.setSelectedSensorPosition(radians*ConvertionParams.PULSE_PER_RAD);
+        armEncoderOffset = armMotor.getSelectedSensorPosition() - radians * ConvertionParams.PULSE_PER_RAD;
+        // armMotor.setSelectedSensorPosition(radians*ConvertionParams.PULSE_PER_RAD);
+    }
+
+    public double getArmCurrent() {
+        return armMotor.getSupplyCurrent();
     }
 
     public double ArmFF(double wantedAnglerVel) {
@@ -205,28 +196,28 @@ public class Amp extends SubsystemBase {
     @Override
     public void periodic() {
         super.periodic();
-        if(!enable && Robot.robot.isEnabled()) {
+        if (!enable && Robot.robot.isEnabled()) {
             unlock();
             isLocked = true;
             setArmBrake();
             setArmAngle(Parameters.ARM_HOME_POSITION_ANGLE);
-        goToSensor();
+            goToSensor();
             enable = true;
-        } else if(!Robot.robot.isEnabled()) {
+        } else if (!Robot.robot.isEnabled()) {
             enable = false;
             setArmCoast();
         }
-        if(isAtPositionSensor()) {
+        if (isAtPositionSensor()) {
             setArmAngle(Math.toRadians(Parameters.ARM_SENSOR_POSITION_ANGLE));
         }
         lockPeriodic();
-        //armPeriodic();
+        armPeriodic();
 
     }
 
     public boolean isIntakePushingNote() {
         return intakeMotor.getOutputCurrent() >= Parameters.CRITICAL_CURRENT;
-    }    
+    }
 
     public void setIntakePower(double p) {
         intakeMotor.set(p);
@@ -256,7 +247,8 @@ public class Amp extends SubsystemBase {
         builder.addDoubleProperty("Note Sensor Volt", this::getNoteSensorVolt, null);
         builder.addBooleanProperty("Position Sensor", this::isAtPositionSensor, null);
         builder.addBooleanProperty("Upper Position", this::isAtUpperPosition, null);
-        
+        builder.addDoubleProperty("Arm Current", this::getArmCurrent, null);
+
         SmartDashboard.putData("Brake Arm", new InstantCommand(
                 () -> this.setArmBrake(), this).ignoringDisable(true));
         SmartDashboard.putData("Coast Arm", new InstantCommand(
@@ -264,19 +256,20 @@ public class Amp extends SubsystemBase {
         SmartDashboard.putData("release brake", new InstantCommand(
                 () -> setLockPower(Parameters.UNLOCK_POWER), this));
 
-        
     }
 
     // lock as periodic
     public void lock() {
-        if(!isLocked || isUnlocking) {
+        if (!isLocked || isUnlocking) {
             isUnlocking = false;
             isLocking = true;
             isLocked = false;
-            lockStartTime = Timer.getFPGATimestamp();        }
+            lockStartTime = Timer.getFPGATimestamp();
+        }
     }
+
     public void unlock() {
-        if(isLocked || isLocking) {
+        if (isLocked || isLocking) {
             isLocking = false;
             isLocked = true;
             isUnlocking = true;
@@ -288,10 +281,10 @@ public class Amp extends SubsystemBase {
         return isLocked;
     }
 
-    public void lockPeriodic() {
-        if(Robot.robot.isEnabled()) {
-            if(isLocking) {
-                if(getLockCurrent() > Parameters.LOCK_MAX_AMPER) {
+    private void lockPeriodic() {
+        if (Robot.robot.isEnabled()) {
+            if (isLocking) {
+                if (getLockCurrent() > Parameters.LOCK_MAX_AMPER) {
                     isLocked = true;
                     isLocking = false;
                     isUnlocking = false;
@@ -299,8 +292,8 @@ public class Amp extends SubsystemBase {
                 } else {
                     setLockPower(Parameters.LOCK_POWER);
                 }
-            } else if(isUnlocking) {
-                if(Timer.getFPGATimestamp() > lockStartTime + Parameters.UNLOCK_TIME) {
+            } else if (isUnlocking) {
+                if (Timer.getFPGATimestamp() > lockStartTime + Parameters.UNLOCK_TIME) {
                     isUnlocking = false;
                     isLocked = false;
                     isLocking = false;
@@ -314,63 +307,90 @@ public class Amp extends SubsystemBase {
     }
 
     private boolean isArmInPosition() {
-        return Math.abs(getArmAngle()-targteAngle) < Parameters.ARM_POSITION_ERROR;
+        return Math.abs(getArmAngle() - targteAngle) < Parameters.ARM_POSITION_ERROR;
     }
 
     public void goToSensor() {
         targteAngle = Parameters.ARM_SENSOR_POSITION_ANGLE;
     }
+
     public void goToUpperPosition() {
         targteAngle = Parameters.ARM_UPPER_POSITION_ANGLE;
     }
 
+    public void goToClimbReadyPosition() {
+        targteAngle = Parameters.ARM_CLIMB_READY_POSITION_ANGLE;
+    }
+
+    public void climb() {
+        targteAngle = Parameters.ARM_CLIMB_POSITION_ANGLE;
+    }
+
     private void armPeriodic() {
-        if(Robot.robot.isEnabled()) {
-            if(isArmInPosition()) {
-                if(!isLocked) {
-                    setVel(0);
-                    lock();
+        if (Robot.robot.isEnabled()) {
+            if (getArmCurrent() > Parameters.ARM_DOWN_CURRENT_LIMIT && getArmPower() < 0) {
+                setArmAngle(Parameters.ARM_HOME_POSITION_ANGLE);
+                setArmPower(0);
+            } else if (isArmInPosition()) {
+                if (!isLocked) {
+                    if (targteAngle == Parameters.ARM_CLIMB_POSITION_ANGLE) {
+                        setArmPower(Parameters.ARM_CLIMB_STOP_POWER);
+                    } else {
+                        setVel(0);
+                        lock();
+                    }
                 } else {
                     setArmPower(0);
                 }
             } else {
                 double currentAngle = getArmAngle();
-                if(isLocked) {
+                if (isLocked) {
                     setVel(0);
                     unlock();
-                } else if(targteAngle > currentAngle) {
-                    double v = trap.trapezoid(getArmVel(), 
-                        Parameters.MAX_ARM_VEL_OPEN, 0, 
-                        Parameters.MAX_ARM_ACCEL_OPEN, targteAngle-currentAngle);
-                    setVel(v);
+                } else if (targteAngle > currentAngle) {
+                    if (currentAngle > Parameters.ARM_CLIMB_READY_POSITION_ANGLE) {
+                        if (getArmCurrent() > Parameters.ARM_CLIMB_MAX_POWER_TRIGGER_CURRENT) {
+                            setArmPower(Parameters.ARM_CLIMB_MAX_POWER);
+                        } else {
+                            setArmPower(Parameters.ARM_CLIMB_INITIAL_POWER);
+                        }
+                    } else {
+                        double v = trap.trapezoid(getArmVel(),
+                                Parameters.MAX_ARM_VEL_OPEN, 0,
+                                Parameters.MAX_ARM_ACCEL_OPEN, targteAngle - currentAngle);
+                        setVel(v);
+                    }
                 } else {
                     setArmPower(Parameters.ARM_DOWN_POWER);
                 }
-            } 
+            }
         }
     }
 
     // commands
     public Command getReadyCommand() {
-        return new InstantCommand(()->goToSensor(), this).andThen(
-            new WaitUntilCommand(()->isArmInPosition()),
-            new AmpIntake2(this),
-            new InstantCommand(()->goToUpperPosition(), this),
-            new WaitUntilCommand(()->isArmInPosition()));
-
-
+        return new InstantCommand(() -> goToSensor(), this).andThen(
+                new WaitUntilCommand(() -> isArmInPosition()),
+                new AmpIntake2(this),
+                new InstantCommand(() -> goToUpperPosition(), this),
+                new WaitUntilCommand(() -> isArmInPosition()));
     }
 
     public Command getCancelCommand() {
-        return new InstantCommand(()->goToSensor());
+        return new InstantCommand(() -> goToSensor());
 
     }
 
     public Command getShootCommand() {
         return new AmpIntakeShoot(this);
-
     }
 
+    public Command getClimbReadyCommand() {
+        return new InstantCommand(() -> goToClimbReadyPosition());
+    }
 
+    public Command getClimbCommand() {
+        return new InstantCommand(() -> climb());
+    }
 
 }
