@@ -59,8 +59,6 @@ public class PathFollow extends CommandBase {
   Trajectory traj;
   double distancePassed = 0;
   pathPoint[] points;
-  PIDController rotationPidController = new PIDController(0.55, 0.09, 0.0000025);
-
   double finishVel;
   /**
    * Creates a new path follower using the given points.
@@ -105,7 +103,7 @@ public class PathFollow extends CommandBase {
   @Override
   public void initialize() {
     //sets first point to chassis pose to prevent bugs with red and blue alliance
-    points[0] = new pathPoint(chassis.getPose().getX(), chassis.getPose().getY(), points[1].getRotation(), points[0].getRadius(), false);
+    points[0] = new pathPoint(chassis.getPose().getX(), chassis.getPose().getY(), Rotation2d.fromDegrees(180).minus(points[1].getRotation()), points[0].getRadius(), false);
 
     //case for red alliance (blue is the default)
     if (isRed) {
@@ -241,7 +239,7 @@ public class PathFollow extends CommandBase {
          */
         
 
-    rotationVelocity = Math.toRadians(rotationPidController.calculate(chassis.getAngle().getDegrees(), wantedAngle.getDegrees()));
+    rotationVelocity = wantedAngle.minus(chassis.getAngle()).getRadians();
 
     SmartDashboard.putNumber("DIFF", wantedAngle.getRadians() - chassis.getAngle().getRadians());
     if (totalLeft <= 0.01)
@@ -260,7 +258,7 @@ public class PathFollow extends CommandBase {
 
   @Override
   public boolean isFinished() {
-    return totalLeft <= 0.01 && Math.abs(chassis.getAngle().getDegrees() - wantedAngle.getDegrees()) <= 3;
+    return totalLeft <= 0.01 && Math.abs(chassis.getAngle().minus(wantedAngle).getDegrees()) <= 3;
   }
 
   @Override

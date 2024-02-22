@@ -1,6 +1,7 @@
 package frc.robot.utils;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.util.Color;
@@ -25,6 +26,40 @@ public class Utils {
     
   public static double deadband(double x, double threshold) {
     return (Math.abs(x) < threshold)?0:x;
+  }
+
+  public static boolean seeNote() {
+        double[] llpython = NetworkTableInstance.getDefault().getTable("limelight").getEntry("llpython").getDoubleArray(new double[8]);
+        return llpython[0]> 0 && llpython[0] < 2;
+  }
+
+  private static double shootDistance[] = {1.35, 1.7, 3.7, 4.65};
+  private static double shootAngle[] = {54, 53, 37, 34};
+  private static double shootVelocity[] = {14, 15.5, 16.5, 18};
+
+  public static double extrapolatre(double d1, double d2, double v1, double v2, double d) {
+    return v1 + (v2-v1)*(d-d1)/(d2-d1);
+  }
+  
+  public static Pair<Double,Double> getShootingAngleVelocity(double distance) {
+    double v = 0;
+    double a = 0;
+    int i = 0;
+    while(i < shootDistance.length && shootDistance[i] < distance) {
+      i++;
+    }
+    if(i == shootDistance.length) {
+      v = shootVelocity[i-1];
+      a = shootAngle[i-1];
+    } else if(i == 0) {
+      v = shootVelocity[i];
+      a = shootAngle[i];
+    } else {
+      v = extrapolatre(shootDistance[i-1],shootDistance[i], shootVelocity[i-1],shootVelocity[i], distance);
+      a = extrapolatre(shootDistance[i-1],shootDistance[i], shootAngle[i-1],shootAngle[i], distance);
+    }
+
+    return new Pair<Double,Double>(a,v);
   }
 
   // public static Command setLed(SubStrip led){

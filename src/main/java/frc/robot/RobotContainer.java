@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.shooter.AngleGoToAngle;
 import frc.robot.commands.shooter.AngleQuel;
@@ -28,6 +29,7 @@ import frc.robot.commands.amp.AmpIntake2;
 import frc.robot.commands.chassis.DriveCommand;
 import frc.robot.commands.chassis.DriveToNote;
 import frc.robot.commands.chassis.Auto.StartTOP;
+import frc.robot.commands.chassis.Paths.PathFollow;
 import frc.robot.commands.intake.DispenseCommand;
 import frc.robot.commands.intake.IntakeCommand;
 import frc.robot.commands.intake.IntakeToShooter;
@@ -79,9 +81,9 @@ public class RobotContainer implements Sendable {
   double wantedAmpVel;
   double wantedAmpAngle;
 
-  pathPoint[] points = { new pathPoint(0, 0, Rotation2d.fromDegrees(0), 0, false),
-      new pathPoint(1.35, -0.6, Rotation2d.fromDegrees(180), 0, false)
-  };
+  pathPoint[] points = {new pathPoint(0, 0, Rotation2d.fromDegrees(0), 0, false), //doesnt matter because it gets fixed in the command
+    new pathPoint(6.6, 6.7, Rotation2d.fromDegrees(0), 0, false)};
+    
   /*
    * pathPoint[] points2 = {new pathPoint(0, 0, Rotation2d.fromDegrees(0), 0,
    * false),
@@ -95,7 +97,7 @@ public class RobotContainer implements Sendable {
     vision = new Vision(chassis, chassis.getSwerveDrivePoseEstimator());
     intake = new Intake();
     // amp = new Amp();
-    leds = new SubStrip(120);
+    //leds = new SubStrip(120);
     commandController2 = new CommandXboxController(1);
 
     // alliance = DriverStation.getAlliance().get();
@@ -109,7 +111,7 @@ public class RobotContainer implements Sendable {
     shooter = new Shooter();
     // shooter.setDefaultCommand(new AngleControl(shooter, commandController));
     chassis.setDefaultCommand(
-        new DriveCommand(chassis, commandController, DriverStation.getAlliance().get() == Alliance.Red));
+        new DriveCommand(chassis, commandController, isRed));
 
     createCommands();
 
@@ -182,7 +184,7 @@ public class RobotContainer implements Sendable {
     Trigger overrideAuto = new Trigger(() -> Utils.joystickOutOfDeadband(commandController));
 
     // wanted angle = 56 angle for close to speaker
-    wantedAngle = 36.3;
+    wantedAngle = 56;
     // SmartDashboard.putNumber("wanted angle", 60);
     // SmartDashboard.putNumber("wanted shooting vel for noga", 0);
     // wantedAngle = SmartDashboard.getNumber("wanted angle", 60);
@@ -192,6 +194,7 @@ public class RobotContainer implements Sendable {
     // 0);
     // commandController.b().onTrue(new AngleQuel(shooter));
     commandController.a().onTrue(new IntakeCommand(intake));
+    //commandController.a().onTrue(new RunCommand(()->intake.setPower(1), intake));
     commandController.pov(0).whileTrue(new IntakeToShooter(intake, shooter, wantedShootingVel));
     commandController.x()
         .onTrue(new AngleGoToAngle(shooter, wantedAngle).alongWith(new ShooterPowering(shooter, wantedShootingVel)));
@@ -231,13 +234,13 @@ public class RobotContainer implements Sendable {
             shooter.stopAll();
             intake.stop();
         }, 
-        intake, shooter, leds
+        intake, shooter
         ).ignoringDisable(true).schedule();
     }
    
    
   public Command getAutonomousCommand() {
-    return new StartTOP(chassis, shooter, intake, DriverStation.getAlliance().get() == alliance.Red);
-
+    return new StartTOP(chassis, shooter, intake, isRed);
+   //return new PathFollow(chassis, points, 4, 12, 0, false);
   }
 }

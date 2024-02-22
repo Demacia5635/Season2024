@@ -6,6 +6,7 @@ package frc.robot.commands.chassis;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.chassis.Chassis;
@@ -17,22 +18,25 @@ public class GoToAngleChassis extends Command {
   Rotation2d wantedAngle;
   Chassis chassis;
   TrapezoidNoam rotationTrapezoid;
+  Translation2d speaker;
+  double kP = 0.3;
   
-  PIDController rotationPidController = new PIDController(0.23, 0.00, 0.006);
-  public GoToAngleChassis(Chassis chassis, Rotation2d wantedAngle) {
-    this.wantedAngle = wantedAngle;
+  public GoToAngleChassis(Chassis chassis, Translation2d speaker) {
+    this.speaker = speaker;
     this.chassis = chassis;
     //rotationTrapezoid = new TrapezoidNoam(180, 360);
     addRequirements(chassis);
   }
 
   @Override
-  public void initialize() {}
+  public void initialize() {
+    wantedAngle = (chassis.getPose().getTranslation().minus(speaker)).getAngle();
+  }
 
   @Override
   public void execute() {
     ChassisSpeeds speed =  new ChassisSpeeds(0, 0, 
-    Math.toRadians(rotationPidController.calculate(chassis.getAngle().getDegrees(), wantedAngle.getDegrees())));
+    wantedAngle.minus(chassis.getAngle()).getRadians() * kP);
     chassis.setVelocities(speed); 
   }
 
@@ -45,6 +49,6 @@ public class GoToAngleChassis extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return Math.abs(wantedAngle.getDegrees() - chassis.getAngle().getDegrees()) <= 3;
+    return Math.abs(wantedAngle.minus(chassis.getAngle()).getDegrees()) <= 3;
   }
 }

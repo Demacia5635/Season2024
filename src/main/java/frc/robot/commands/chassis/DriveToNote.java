@@ -22,8 +22,9 @@ public class DriveToNote extends Command {
   double lastAngle;
   NetworkTableEntry llentry;
   ChassisSpeeds speed;
+  boolean finish = false;
 
-  PIDController rotationPidController = new PIDController(0.03, 0.00, 0.006);
+  PIDController rotationPidController = new PIDController(0.08, 0.00, 0.006);
 
   Timer timer = new Timer();
 
@@ -36,16 +37,27 @@ public class DriveToNote extends Command {
     lastDistance = 0;
     distance = 0;
     llentry = NetworkTableInstance.getDefault().getTable("limelight").getEntry("llpython");
-  }
+    llpython = llentry.getDoubleArray(new double[8]);
+    finish = llpython[0] == 0;
+    timer.start();
+}
 
-  
 
   
   @Override
   public void execute() {
+    if(finish) {
+      return;
+    }
     llpython = llentry.getDoubleArray(new double[8]);
     distance = llpython[0];
     angle = llpython[1];
+    if(distance > 0) {
+      timer.reset();
+    } else {
+      return;
+    }
+    
     System.out.println("Angle Note: " + angle);
     SmartDashboard.putNumber("ANGLE NOTE", angle);
     SmartDashboard.putNumber("DISTANCE NOTE", distance);
@@ -66,10 +78,7 @@ public class DriveToNote extends Command {
     
     chassis.setVelocities(speed);
 
-    if(distance != 0){
-      timer.reset();
-    }
-    
+  
   }
 @Override
   public void initSendable(SendableBuilder builder) {
@@ -85,5 +94,10 @@ public class DriveToNote extends Command {
   }
 
 
+  @Override
+  public boolean isFinished() {
+    // TODO Auto-generated method stub
+    return finish || timer.get() > 0.5;
+  }
   
 }
