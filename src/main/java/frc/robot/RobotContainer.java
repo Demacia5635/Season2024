@@ -99,7 +99,7 @@ public class RobotContainer implements Sendable {
     // isRed);
     // chassis.setDefaultCommand(drive);
 
-    //amp = new Amp();
+    amp = new Amp();
     commandController = new CommandXboxController(0);
     shooter = new Shooter();
     // shooter.setDefaultCommand(new AngleControl(shooter, commandController));

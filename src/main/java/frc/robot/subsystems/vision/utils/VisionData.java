@@ -49,6 +49,7 @@ public class VisionData {
         else {
             if(poseSample != null){
                 System.out.println("cleared on setDifference() func pose sample isnt null, " + poseSample.getRotation().getDegrees() + " " + pose.getRotation().getDegrees());
+                clear();
             }
             else{
                 //System.out.println("cleared on setDifference() func pose sample is null estimator pose = " + bufPoseEstimator.getEstimatedPosition());
