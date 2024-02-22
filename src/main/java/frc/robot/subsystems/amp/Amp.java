@@ -20,18 +20,20 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.subsystems.amp.AmpConstants.*;
+import frc.robot.subsystems.intake.Intake;
 import frc.robot.utils.TrapezoidCalc;
 import frc.robot.Robot;
 import frc.robot.Sysid.Sysid;
 import frc.robot.Sysid.Sysid.Gains;
 import frc.robot.commands.amp.AmpIntake2;
 import frc.robot.commands.amp.AmpIntakeShoot;
+import frc.robot.commands.intake.DispenseCommand;
 
 public class Amp extends SubsystemBase {
     public final TalonFX armMotor;
     public final TalonSRX lockMotor;
     public final CANSparkMax intakeMotor;
-    public SparkAnalogSensor nodeSensor;
+    public SparkAnalogSensor noteSensor;
     public int noteCount;
     public DigitalInput positionSensor;
     public boolean isLocked = false;
@@ -65,7 +67,7 @@ public class Amp extends SubsystemBase {
 
         setIntakeBrake();
 
-        nodeSensor = intakeMotor.getAnalog(SparkAnalogSensor.Mode.kAbsolute);
+        noteSensor = intakeMotor.getAnalog(SparkAnalogSensor.Mode.kAbsolute);
 
         noteCount = 0;
         SmartDashboard.putData(this);
@@ -120,7 +122,7 @@ public class Amp extends SubsystemBase {
     }
 
     public double getNoteSensorVolt() {
-        return nodeSensor.getVoltage();
+        return noteSensor.getVoltage();
     }
 
     public boolean isSensingNote() {
@@ -333,6 +335,7 @@ public class Amp extends SubsystemBase {
                 if (!isLocked) {
                     if (targteAngle == Parameters.ARM_CLIMB_POSITION_ANGLE) {
                         setArmPower(Parameters.ARM_CLIMB_STOP_POWER);
+                        lock();
                     } else {
                         setVel(0);
                         lock();
@@ -366,10 +369,10 @@ public class Amp extends SubsystemBase {
     }
 
     // commands
-    public Command getReadyCommand() {
+    public Command getReadyCommand(Intake intake) {
         return new InstantCommand(() -> goToSensor(), this).andThen(
                 new WaitUntilCommand(() -> isArmInPosition()),
-                new AmpIntake2(this),
+                new AmpIntake2(this).raceWith(new DispenseCommand(intake)),
                 new InstantCommand(() -> goToUpperPosition(), this),
                 new WaitUntilCommand(() -> isArmInPosition()));
     }

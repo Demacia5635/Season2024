@@ -108,7 +108,7 @@ public class RobotContainer implements Sendable {
 
   public void createCommands() {
     intake2amp = (new DispenseCommand(intake).raceWith(new AmpIntake2(amp)));
-    amp2Angle = amp.getReadyCommand();
+    amp2Angle = amp.getReadyCommand(intake);
     shootAmp = amp.getShootCommand();
     closeAmp = amp.getCancelCommand();
 
