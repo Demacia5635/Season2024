@@ -210,8 +210,8 @@ public class Amp extends SubsystemBase {
         if (isAtPositionSensor()) {
             setArmAngle(Parameters.ARM_SENSOR_POSITION_ANGLE);
         }
-        lockPeriodic();
-        armPeriodic();
+        //lockPeriodic();
+        //armPeriodic();
 
     }
 
