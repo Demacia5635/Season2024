@@ -1,6 +1,5 @@
 package frc.robot.subsystems.chassis;
 
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -18,16 +17,20 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.PathFollow.Util.pathPoint;
 import frc.robot.Sysid.Sysid;
 import frc.robot.Sysid.Sysid.Gains;
 import frc.robot.commands.chassis.CheckModulesSteerVelocity;
 import frc.robot.commands.chassis.SetModuleAngle;
-import frc.robot.commands.chassis.utils.TestVelocity;
 import frc.robot.commands.intake.IntakeCommand;
 import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.vision.utils.UpdatedPoseEstimatorClasses.SwerveDrivePoseEstimator;
 import frc.robot.utils.Utils;
+import frc.robot.subsystems.chassis.SwerveModule;
 import frc.robot.PathFollow.Util.pathPoint;
 import frc.robot.commands.chassis.utils.ResetWheelCommand;
+import frc.robot.commands.chassis.utils.TestVelocity;
+
 import static frc.robot.subsystems.chassis.ChassisConstants.*;
 
 import java.util.ArrayList;
@@ -47,8 +50,11 @@ public class Chassis extends SubsystemBase {
   public static List<pathPoint> pointsForPathTeleop = new ArrayList<pathPoint>();
   public static List<pathPoint> pointsForAuto = new ArrayList<pathPoint>();
 
-  private final SwerveDrivePoseEstimator poseEstimator;
+  private SwerveDrivePoseEstimator poseEstimator;
+
+
   private final Field2d field;
+
 
   public Chassis() {
     modules = new SwerveModule[] {
@@ -62,8 +68,9 @@ public class Chassis extends SubsystemBase {
 
     gyro = new Pigeon2(GYRO_ID);
     gyro.setYaw(0);
-
     poseEstimator = new SwerveDrivePoseEstimator(KINEMATICS, getAngle(), getModulePositions(), new Pose2d());
+    
+    
     field = new Field2d();
     SmartDashboard.putData(field);
     SmartDashboard.putData(this);
@@ -71,6 +78,9 @@ public class Chassis extends SubsystemBase {
       SmartDashboard.putData(m.name, m);
     }
     modules[0].debug = true;
+
+    SmartDashboard.putNumber("Set Gyro Angle", 0);
+    SmartDashboard.putData("Change gyro angle ", new InstantCommand( () -> setGyroAngle(SmartDashboard.getNumber("Set Gyro Angle", 0))).ignoringDisable(true));
 
     SmartDashboard.putData("set coast",
         new InstantCommand(() -> setNeutralMode(NeutralMode.Coast)).ignoringDisable(true));
@@ -299,6 +309,9 @@ public class Chassis extends SubsystemBase {
     }
   }
 
+  public SwerveDrivePoseEstimator getSwerveDrivePoseEstimator(){
+    return this.poseEstimator;
+  }
 
   public Pose2d getPose() {
     return poseEstimator.getEstimatedPosition();
@@ -343,7 +356,11 @@ public class Chassis extends SubsystemBase {
   @Override
   public void periodic() {
     poseEstimator.update(getAngle(), getModulePositions());
+
     field.setRobotPose(getPose());
+
+    SmartDashboard.putNumber("Gyro Angle",getAngle().getDegrees());
+
     SmartDashboard.putNumber("velocity of chassis", getMoveVelocity());
   }
 }

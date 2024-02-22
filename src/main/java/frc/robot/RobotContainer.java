@@ -2,6 +2,8 @@ package frc.robot;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -15,6 +17,8 @@ import frc.robot.commands.shooter.AngleGoToAngle;
 import frc.robot.commands.shooter.AngleQuel;
 import frc.robot.commands.shooter.ShooterPowering;
 import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.shooter.ShooterConstants;
+import frc.robot.subsystems.vision.Vision;
 import frc.robot.utils.Utils;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.PathFollow.Util.pathPoint;
@@ -49,11 +53,12 @@ public class RobotContainer implements Sendable {
   // new RunCommand(() -> {chassis.setVelocities(new ChassisSpeeds(0, 0, 0));},
   // chassis).andThen(new WaitCommand(2)));
   // double x = 5;
-
+  
   Shooter shooter;
   Amp amp;
   Intake intake;
   Chassis chassis;
+  Vision vision;
   SubStrip leds;
 
   Command intake2shooter;
@@ -81,8 +86,9 @@ public class RobotContainer implements Sendable {
    */
 
   public RobotContainer() {
-
+    
     chassis = new Chassis();
+    vision = new Vision(chassis, chassis.getSwerveDrivePoseEstimator());
     intake = new Intake();
     // leds = new SubStrip(60);
     commandController2 = new CommandXboxController(1);
@@ -93,7 +99,7 @@ public class RobotContainer implements Sendable {
     // isRed);
     // chassis.setDefaultCommand(drive);
 
-    amp = new Amp();
+    //amp = new Amp();
     commandController = new CommandXboxController(0);
     shooter = new Shooter();
     // shooter.setDefaultCommand(new AngleControl(shooter, commandController));
