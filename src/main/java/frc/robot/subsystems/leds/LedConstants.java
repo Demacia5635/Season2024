@@ -7,7 +7,7 @@ import frc.robot.subsystems.leds.utils.IntPair;
 /** Add your docs here. */
 public class LedConstants {
     public static final IntPair[] LED_STRIPS = {
-        new IntPair(0, 60)
+        new IntPair(9, 120)
     };
     public static final double MAX_ANGLE = 50;
     public static final double EPSILON = 3;

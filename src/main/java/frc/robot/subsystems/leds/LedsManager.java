@@ -15,21 +15,21 @@ import frc.robot.subsystems.leds.utils.IndividualLed;
 import frc.robot.subsystems.leds.utils.LedsGeometry;
 
 public final class LedsManager extends SubsystemBase {
-    private final List<IndividualLed> off;
+    // private final Colors[] off;
     private static LedsManager instance;
 
     private final LedsGeometry ledsGeometry;
-    private List<IndividualLed> leds;
+    private Color[] leds;
 
     private LedsManager() {
         ledsGeometry = new LedsGeometry(LedConstants.LED_STRIPS);
-        off = IntStream.range(0, ledsGeometry.totalLength).mapToObj((i)-> new IndividualLed(i, Color.kBlack)).toList();
-        leds = new ArrayList<>();
+        // off = IntStream.range(0, ledsGeometry.totalLength).mapToObj((i)-> new IndividualLed(i, Color.kBlack)).toList();
+        leds = new Color[ledsGeometry.totalLength];
         setDefaultColor();
     }
 
     private void setDefaultColor() {
-        leds = off;
+        Arrays.fill(leds, Color.kBlack);
     }
 
     public static LedsManager getInstance() {
@@ -40,16 +40,15 @@ public final class LedsManager extends SubsystemBase {
     }
 
     public void update(IndividualLed... individualLeds) {
-        leds.addAll(Arrays.asList(individualLeds));
+        Arrays.stream(individualLeds).forEach((led) -> leds[led.index] = led.color);
     }
 
     private void setChanges() {
         ledsGeometry.setColor(leds);
-        leds = new ArrayList<>();
     }
 
     public Color[] getColors(int startIndex, int size) {
-        return IntStream.range(startIndex, size + startIndex).mapToObj(ledsGeometry::getColor).toArray(Color[]::new);
+        return IntStream.range(startIndex, size + startIndex).mapToObj((i) -> leds[i]).toArray(Color[]::new);
     }
 
     @Override

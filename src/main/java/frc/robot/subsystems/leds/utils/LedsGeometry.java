@@ -47,12 +47,12 @@ public class LedsGeometry {
         hasLMsChanged = new boolean[buffers.length];
     }
 
-    public void setColor(List<IndividualLed> leds) {
-        for (IndividualLed led : leds) {
-            IntPair indexes = deFlattenedCoords[led.index];
+    public void setColor(Color[] colors) {
+        for (int i = 0; i < totalLength; i++) {
+            IntPair indexes = deFlattenedCoords[i];
             hasLMsChanged[indexes.first] = hasLMsChanged[indexes.first]
-                    || !buffers[indexes.first].getLED(indexes.second).equals(led.color);
-            buffers[indexes.first].setLED(indexes.second, led.color);
+                    || !buffers[indexes.first].getLED(indexes.second).equals(colors[i]);
+            buffers[indexes.first].setLED(indexes.second, colors[i]);
         }
 
         for (int i = 0; i < lengths.length; i++) {

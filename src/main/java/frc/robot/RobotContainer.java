@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -36,6 +37,7 @@ import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.leds.SubStrip;
 
 public class RobotContainer implements Sendable {
+  public static RobotContainer robotContainer;
   Boolean isRed = false;
   DriverStation.Alliance alliance;
   CommandXboxController commandController;
@@ -53,11 +55,11 @@ public class RobotContainer implements Sendable {
   // new RunCommand(() -> {chassis.setVelocities(new ChassisSpeeds(0, 0, 0));},
   // chassis).andThen(new WaitCommand(2)));
   // double x = 5;
-  
-  Shooter shooter;
-  Amp amp;
-  Intake intake;
-  Chassis chassis;
+
+  public Shooter shooter;
+  public Amp amp;
+  public Intake intake;
+  public Chassis chassis;
   Vision vision;
   SubStrip leds;
 
@@ -66,13 +68,14 @@ public class RobotContainer implements Sendable {
   Command shoot;
   Command amplify;
   Command autonomousRight;
+  public Command driveToNote;
 
   Command amp2Angle;
   Command shootAmp;
   Command closeAmp;
 
-  double wantedAngle;
-  double wantedShootingVel;
+  public double wantedAngle;
+  public double wantedShootingVel;
   double wantedAmpVel;
   double wantedAmpAngle;
 
@@ -86,11 +89,13 @@ public class RobotContainer implements Sendable {
    */
 
   public RobotContainer() {
+    robotContainer = this;
     
     chassis = new Chassis();
     vision = new Vision(chassis, chassis.getSwerveDrivePoseEstimator());
     intake = new Intake();
-    // leds = new SubStrip(60);
+    // amp = new Amp();
+    leds = new SubStrip(120);
     commandController2 = new CommandXboxController(1);
 
     // alliance = DriverStation.getAlliance().get();
@@ -113,10 +118,11 @@ public class RobotContainer implements Sendable {
   }
 
   public void createCommands() {
-    intake2amp = (new DispenseCommand(intake).raceWith(new AmpIntake2(amp)));
-    amp2Angle = amp.getReadyCommand(intake);
-    shootAmp = amp.getShootCommand();
-    closeAmp = amp.getCancelCommand();
+    // intake2amp = (new DispenseCommand(intake).raceWith(new AmpIntake2(amp)));
+    // amp2Angle = amp.getReadyCommand(intake);
+    // shootAmp = amp.getShootCommand();
+    // closeAmp = amp.getCancelCommand();
+    driveToNote = new DriveToNote(chassis);
 
     // for check, can add wait command between and then
 
@@ -194,7 +200,7 @@ public class RobotContainer implements Sendable {
       shooter.stopAll();
       intake.stop();
     }, intake, shooter).andThen(new AngleQuel(shooter)));
-    commandController.y().onTrue(new DriveToNote(chassis).raceWith(new IntakeCommand(intake)));
+    commandController.y().onTrue(driveToNote.raceWith(new IntakeCommand(intake)));
     commandController.pov(180).onTrue(new InstantCommand(() -> {
       chassis.setOdometryToForward();
     }));
@@ -220,15 +226,16 @@ public class RobotContainer implements Sendable {
     ;
   }
 
-  public void disable() {
-    new InstantCommand(() -> {
-      shooter.stopAll();
-      intake.stop();
-    },
-        intake, shooter).ignoringDisable(true).schedule();
-    // leds.turnOff().schedule();
-  }
-
+    public void disable(){
+        new InstantCommand(()-> {
+            shooter.stopAll();
+            intake.stop();
+        }, 
+        intake, shooter, leds
+        ).ignoringDisable(true).schedule();
+    }
+   
+   
   public Command getAutonomousCommand() {
     return new StartTOP(chassis, shooter, intake, DriverStation.getAlliance().get() == alliance.Red);
 
