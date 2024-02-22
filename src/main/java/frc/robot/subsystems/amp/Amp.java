@@ -6,11 +6,9 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import com.ctre.phoenix.sensors.Pigeon2;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.SparkMaxAnalogSensor;
-import com.revrobotics.CANAnalog.AnalogMode;
+import com.revrobotics.SparkAnalogSensor;
 import com.revrobotics.CANSparkBase.IdleMode;
 
 import edu.wpi.first.util.sendable.SendableBuilder;
@@ -33,7 +31,7 @@ public class Amp extends SubsystemBase {
     public final TalonFX armMotor;
     public final TalonSRX lockMotor;
     public final CANSparkMax intakeMotor;
-    public SparkMaxAnalogSensor nodeSensor;
+    public SparkAnalogSensor nodeSensor;
     public int noteCount;
     public DigitalInput positionSensor;
     public boolean isLocked = false;
@@ -67,7 +65,7 @@ public class Amp extends SubsystemBase {
 
         setIntakeBrake();
 
-        nodeSensor = intakeMotor.getAnalog(AnalogMode.kAbsolute);
+        nodeSensor = intakeMotor.getAnalog(SparkAnalogSensor.Mode.kAbsolute);
 
         noteCount = 0;
         SmartDashboard.putData(this);
