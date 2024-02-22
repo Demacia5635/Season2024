@@ -51,7 +51,7 @@ public class Amp extends SubsystemBase {
         armMotor.setInverted(true);
         armMotor.setNeutralMode(NeutralMode.Coast);
         armMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 40, 40, 0.2));
-        setArmAngle(Math.toRadians(Parameters.ARM_HOME_POSITION_ANGLE));
+        setArmAngle(Parameters.ARM_HOME_POSITION_ANGLE);
         configArmPID();
 
         positionSensor = new DigitalInput(AmpConstants.AmpDeviceID.MAGNETIC_SENSOR_ID);
