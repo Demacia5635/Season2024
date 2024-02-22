@@ -28,7 +28,7 @@ public class AmpConstantsUdi {
 
     public static final double DEADBAND = 0.2;
 
-    public static final double ARM_KP = 0.1;
+    public static final double ARM_KP = 0.0570401;
     public static final double ARM_KI = 0.0;
     public static final double ARM_KD = 0.0;
 

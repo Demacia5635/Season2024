@@ -40,7 +40,7 @@ public class AmpUdi extends SubsystemBase {
     private final CANSparkMax smallWheelMotor;
     private final CANSparkMax bigWheelMotor;
     private SparkAnalogSensor noteSensor;
-    private int opticCount;
+    private int noteSensorCount;
     private DigitalInput armSensor;
     private boolean isLocked = false;
     private boolean isLocking = true;
@@ -49,10 +49,6 @@ public class AmpUdi extends SubsystemBase {
     private double targetAngle = Parameters.HOME_ANGLE;
     private TrapezoidCalc armUpTrapezoid = new TrapezoidCalc();
 
-    // ArmFeedforward ff = new ArmFeedforward(Parameters.ks1, Parameters.kg1,
-    // Parameters.kv1, Parameters.ka1);
-    // SimpleMotorFeedforward ff2 = new SimpleMotorFeedforward(Parameters.ks2,
-    // Parameters.kv2, Parameters.ka2);
     public AmpUdi() {
         armMotor = new TalonFX(AmpDeviceID.ARM_MOTOR_ID);
         armMotor.configFactoryDefault();
@@ -83,7 +79,7 @@ public class AmpUdi extends SubsystemBase {
         SmartDashboard.putData("stop amp wheels", new InstantCommand(() -> setWheelsPower(0), this));
 
         noteSensor = bigWheelMotor.getAnalog(SparkAnalogSensor.Mode.kAbsolute);
-        opticCount = 0;
+        noteSensorCount = 0;
         SmartDashboard.putData(this);
         SmartDashboard.putData("Arm Brake", new InstantCommand(
                 () -> this.setArmBrake(), this).ignoringDisable(true));
@@ -103,11 +99,6 @@ public class AmpUdi extends SubsystemBase {
         armMotor.config_kP(0, Parameters.ARM_KP);
         armMotor.config_kI(0, Parameters.ARM_KI);
         armMotor.config_kD(0, Parameters.ARM_KD);
-    }
-
-    public void wheelsSetVel(double vel1, double vel2) {
-        smallWheelMotor.set(vel1);
-        bigWheelMotor.set(vel2);
     }
 
     public void wheelsEncoderSet(double postion1, double postion2) {
@@ -165,8 +156,8 @@ public class AmpUdi extends SubsystemBase {
         return getNoteSensorVolt() < Parameters.NOTE_VOLTAGE;
     }
 
-    public void resetOpticCounts() {
-        opticCount = 0;
+    public void resetNoteSensorCounts() {
+        noteSensorCount = 0;
     }
 
     /**
@@ -176,9 +167,9 @@ public class AmpUdi extends SubsystemBase {
      */
     public boolean isNoteInside(boolean last) {
         if (isSensingNote() && (!last)) {
-            opticCount += 1;
+            noteSensorCount += 1;
         }
-        if (opticCount % 2 == 0) {
+        if (noteSensorCount % 2 == 0) {
             return false;
         }
         return true;
@@ -277,7 +268,7 @@ public class AmpUdi extends SubsystemBase {
     }
 
     public void unlock() {
-        if (isLocked || isUnLocking) {
+        if (isLocked || isLocking) {
             isLocking = false;
             isUnLocking = true;
             isLocked = true;
@@ -305,6 +296,8 @@ public class AmpUdi extends SubsystemBase {
                 isLocked = false;
                 isLocking = false;
                 isUnLocking = false;
+            } else {
+                setLockPower(Parameters.UNLOCK_POWER);
             }
         }
     }
@@ -318,7 +311,7 @@ public class AmpUdi extends SubsystemBase {
         double currentAngle = getArmAngle();
         double error = targetAngle - currentAngle;
         if (Math.abs(error) < Parameters.ARM_RAD_ERROR) {
-            return targetAngle == SENSEOR_ANGLE || isLocked;
+            return targetAngle == SENSEOR_ANGLE || isLocked || isLocking;
         }
         return false;
     }
@@ -333,7 +326,8 @@ public class AmpUdi extends SubsystemBase {
             if (Math.abs(error) > Parameters.ARM_RAD_ERROR) {
                 if (isLocked()) {
                     unlock();
-                } else if (error > 0) { // up
+                } 
+                if (error > 0) { // up
                     double vel = armUpTrapezoid.trapezoid(getArmRadPerSec(), MAX_ARM_VEL_UP, 0, MAX_ARM_ACCEL_UP,
                             error);
                     setArmVel(vel);
