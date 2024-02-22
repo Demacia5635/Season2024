@@ -36,13 +36,11 @@ import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.utils.Utils;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.PathFollow.Util.pathPoint;
-import frc.robot.commands.amp.AmpIntake;
 import frc.robot.commands.amp.AmpIntake2;
 import frc.robot.commands.amp.AmpIntakeShoot;
-import frc.robot.commands.amp.CalibrateArm;
 import frc.robot.commands.amp.GoToAngleAmp;
-import frc.robot.commands.amp.JoyStickAmp;
-import frc.robot.commands.amp.RunBrakeArm;
+
+
 import frc.robot.commands.amp.GoToAngleAmp;
 import frc.robot.commands.chassis.DriveAndPickNote;
 import frc.robot.commands.chassis.DriveCommand;
@@ -139,11 +137,9 @@ public class RobotContainer implements Sendable{
      intake2amp = (new DispenseCommand(intake)
      .raceWith(new AmpIntake2(amp)));
     
-    amp2Angle = (new RunBrakeArm(amp,false).andThen(new GoToAngleAmp(amp, Math.toRadians(55), Math.PI,Math.PI*6)).andThen(new RunBrakeArm(amp, true)));
-
-    shootAmp = (new AmpIntakeShoot(amp));
-
-    closeAmp = ((new RunBrakeArm(amp,false)).andThen((new GoToAngleAmp(amp, Math.toRadians(-55), Math.PI/2,Math.PI*2)).andThen(new RunBrakeArm(amp, true))));
+    amp2Angle = amp.getReadyCommand();
+    shootAmp = amp.getShootCommand();
+    closeAmp = amp.getCancelCommand();
 
 
     //for check, can add wait command between and then
@@ -242,7 +238,6 @@ public class RobotContainer implements Sendable{
    
   public Command getAutonomousCommand() {
     return new StartTOP(chassis, shooter, intake, DriverStation.getAlliance().get() == alliance.Red);
-    // return new AngleGoToAngle(shooter, 30);
-
+  
   }
 }

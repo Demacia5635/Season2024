@@ -30,10 +30,12 @@ public class StartTOP extends SequentialCommandGroup {
   double wantedVelClose = 15.5;
   double wantedAngleNoteT = -1;
   double wantedVelNoteT = -1;
+  double maxVel = 4;
+  double maxAceel = 10;
   Translation2d NoteT = new Translation2d(-1, -1);
   
   pathPoint[] points0 = {new pathPoint(0, 0, Rotation2d.fromDegrees(0), 0, false), //doesnt matter because it gets fixed in the command
-    new pathPoint(1.2, 7.27, Rotation2d.fromDegrees(12), 0, false)};
+    new pathPoint(1.2, 7.27, Rotation2d.fromDegrees(0), 0, false)};
 
   pathPoint[] points1 = {new pathPoint(0, 0, Rotation2d.fromDegrees(0), 0, false), //doesnt matter because it gets fixed in the command
     new pathPoint(5.21, 7.7, Rotation2d.fromDegrees(0), 0, false)};
@@ -43,7 +45,7 @@ public class StartTOP extends SequentialCommandGroup {
     new pathPoint(4.5, 6.58, Rotation2d.fromDegrees(8), 0, false)};
 
   pathPoint[] points3 = {new pathPoint(0, 0, Rotation2d.fromDegrees(0), 0, false), //doesnt matter because it gets fixed in the command
-    new pathPoint(5.87, 6.53, Rotation2d.fromDegrees(-20), 0, false)};
+    new pathPoint(5.87, 6.53, Rotation2d.fromDegrees(-7), 0, false)};
   
   
 
@@ -61,18 +63,18 @@ public class StartTOP extends SequentialCommandGroup {
     
     addCommands((new AngleGoToAngle(shooter, wantedAngleClose).alongWith(new ShooterPowering(shooter, wantedVelClose)))
     .andThen(new IntakeToShooter(intake, shooter, wantedVelClose).raceWith(new WaitCommand(0.5)))
-    .andThen(new PathFollow(chassis, points0, 3, 6, 0, isRed))
+    .andThen(new PathFollow(chassis, points0, maxVel, maxAceel, 3, isRed))
     .andThen((new DriveToNote(chassis).raceWith(new IntakeCommand(intake)))
     .andThen(new GoToAngleChassis(chassis, Rotation2d.fromDegrees(15)))
     .alongWith((new AngleGoToAngle(shooter, 38.5).alongWith(new ShooterPowering(shooter, 16.5))))
     .andThen(new IntakeToShooter(intake, shooter, 15.7).raceWith(new WaitCommand(0.5)))
-    .andThen(new PathFollow(chassis, points1, 3, 6, 3, isRed)).andThen((new DriveToNote(chassis).raceWith(new IntakeCommand(intake))))
-    .andThen(new PathFollow(chassis, points2, 3, 6, 0, isRed)
-    .alongWith((new AngleGoToAngle(shooter, 36).alongWith(new ShooterPowering(shooter, 18)))))
+    .andThen(new PathFollow(chassis, points1, maxVel, maxAceel, 3, isRed)).andThen((new DriveToNote(chassis).raceWith(new IntakeCommand(intake))))
+    .andThen(new PathFollow(chassis, points2, maxVel, maxAceel, 0, isRed)
+    .alongWith((new AngleGoToAngle(shooter, 32).alongWith(new ShooterPowering(shooter, 18)))))
     .andThen(new IntakeToShooter(intake, shooter, 18).raceWith(new WaitCommand(0.5))))
-    .andThen(new PathFollow(chassis, points3, 3, 6, 2, isRed)).andThen((new DriveToNote(chassis).raceWith(new IntakeCommand(intake)))
-    .andThen(new PathFollow(chassis, points2, 3, 6, 0, isRed)
-    .alongWith((new AngleGoToAngle(shooter, 36).alongWith(new ShooterPowering(shooter, 18)))))
+    .andThen(new PathFollow(chassis, points3, maxVel, maxAceel, 2, isRed)).andThen((new DriveToNote(chassis).raceWith(new IntakeCommand(intake)))
+    .andThen(new PathFollow(chassis, points2, maxVel, maxAceel, 0, isRed)
+    .alongWith((new AngleGoToAngle(shooter, 32).alongWith(new ShooterPowering(shooter, 18)))))
     .andThen(new IntakeToShooter(intake, shooter, 18).raceWith(new WaitCommand(0.5)))));
 
 
