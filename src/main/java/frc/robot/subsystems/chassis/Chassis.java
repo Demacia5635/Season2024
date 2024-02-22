@@ -24,11 +24,9 @@ import frc.robot.commands.chassis.CheckModulesSteerVelocity;
 import frc.robot.commands.chassis.SetModuleAngle;
 import frc.robot.commands.intake.IntakeCommand;
 import frc.robot.subsystems.intake.Intake;
-import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.utils.UpdatedPoseEstimatorClasses.SwerveDrivePoseEstimator;
 import frc.robot.utils.Utils;
 import frc.robot.subsystems.chassis.SwerveModule;
-import frc.robot.subsystems.vision.Vision;
 import frc.robot.PathFollow.Util.pathPoint;
 import frc.robot.commands.chassis.utils.ResetWheelCommand;
 import frc.robot.commands.chassis.utils.TestVelocity;
@@ -57,7 +55,6 @@ public class Chassis extends SubsystemBase {
 
   private final Field2d field;
 
-  private final Vision vision;
 
   public Chassis() {
     modules = new SwerveModule[] {
@@ -73,8 +70,6 @@ public class Chassis extends SubsystemBase {
     gyro.setYaw(0);
     poseEstimator = new SwerveDrivePoseEstimator(KINEMATICS, getAngle(), getModulePositions(), new Pose2d());
     
-    vision = new Vision(this, this.poseEstimator);
-    vision.getName();
     
     field = new Field2d();
     SmartDashboard.putData(field);
@@ -304,6 +299,9 @@ public class Chassis extends SubsystemBase {
     }
   }
 
+  public SwerveDrivePoseEstimator getSwerveDrivePoseEstimator(){
+    return this.poseEstimator;
+  }
 
   public Pose2d getPose() {
     return poseEstimator.getEstimatedPosition();
