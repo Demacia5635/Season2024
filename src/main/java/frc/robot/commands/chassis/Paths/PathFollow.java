@@ -110,7 +110,7 @@ public class PathFollow extends CommandBase {
     //case for red alliance (blue is the default)
     if (isRed) {
       for (int i = 1; i < points.length; i++) {
-        points[i] = new pathPoint(fieldLength - points[i].getX(), points[i].getY(), points[i].getRotation().minus(Rotation2d.fromDegrees(180)),
+        points[i] = new pathPoint(fieldLength - points[i].getX(), points[i].getY(), Rotation2d.fromDegrees(180).minus(points[i].getRotation()),
             points[i].getRadius(), points[i].isAprilTag());
       }
     }

@@ -70,7 +70,6 @@ public class Chassis extends SubsystemBase {
     gyro.setYaw(0);
     poseEstimator = new SwerveDrivePoseEstimator(KINEMATICS, getAngle(), getModulePositions(), new Pose2d());
     
-    
     field = new Field2d();
     SmartDashboard.putData(field);
     SmartDashboard.putData(this);
