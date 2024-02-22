@@ -49,7 +49,6 @@ public class Vision extends SubsystemBase {
     VisionData[] buf5Avg;
     int lastData5;
     double lastUpdateTime5;
-    int VisionCountCycles;
 
     //#endregion
     
@@ -64,7 +63,6 @@ public class Vision extends SubsystemBase {
         this.AmpSideRaspberry = new PhotonCamera(AmpSideRaspberryName);
         this.ShooterSideRaspberry = new PhotonCamera(ShooterSideRaspberryName);
         
-        VisionCountCycles = 0;
 
         //#region initializing photons pose estimators
         try {
@@ -97,9 +95,6 @@ public class Vision extends SubsystemBase {
         SmartDashboard.putData("no Filter vision field", noFilterVisionField);
         SmartDashboard.putData("vision Avg 5 field", visionFieldavg5);
         //#endregion
-
-        SmartDashboard.putData("resetVisionCycles", new InstantCommand(() -> resetVisionResetCycles()).ignoringDisable(true));
-        SmartDashboard.putNumber("tag 6 Y", photonPoseEstimatorForAmpSideRaspberry.getFieldTags().getTagPose(6).get().getY());
     }
 
     //#endregion
@@ -126,15 +121,7 @@ public class Vision extends SubsystemBase {
                         VisionData newVisionData5Avg = new VisionData(estimatedPose.toPose2d(), 
                         estimatedRobotPose.timestampSeconds, poseEstimator);
                         
-                        // for reseting pose
-                        if(VisionCountCycles < numOfCyclesToResetPose){
-                            Pose2d poseFromVisionWithGyroAngle = new Pose2d(newVisionData5Avg.getNotFilteredPose().getTranslation(), 
-                            chassis.getAngle()); 
-
-                            poseEstimator.resetPosition(chassis.getAngle(), chassis.getModulePositions(), 
-                            poseFromVisionWithGyroAngle);                            
-                        }
-                        else if(newVisionData5Avg != null && newVisionData5Avg.getPose() != null) {
+                        if(newVisionData5Avg != null && newVisionData5Avg.getPose() != null) {
                             lastData5 = next5(); 
                             buf5Avg[lastData5] = newVisionData5Avg;
                        
@@ -178,8 +165,6 @@ public class Vision extends SubsystemBase {
     @Override
     public void periodic() {
         super.periodic();
-        VisionCountCycles++;
-        SmartDashboard.putNumber("VisionCycleCount", VisionCountCycles);
 
         getNewDataFromLimelightX(RaspberryPi.AmpSideRaspberry);
         getNewDataFromLimelightX(RaspberryPi.ShooterSideRaspberry);
@@ -188,10 +173,6 @@ public class Vision extends SubsystemBase {
     }
 
     //#region util methods
-
-    public void resetVisionResetCycles(){
-        VisionCountCycles = 0;
-    }
 
     public double getTime() {
         return Timer.getFPGATimestamp();
