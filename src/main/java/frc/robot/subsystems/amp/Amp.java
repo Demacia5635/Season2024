@@ -206,7 +206,7 @@ public class Amp extends SubsystemBase {
             setArmCoast();
         }
         if (isAtPositionSensor()) {
-            setArmAngle(Math.toRadians(Parameters.ARM_SENSOR_POSITION_ANGLE));
+            setArmAngle(Parameters.ARM_SENSOR_POSITION_ANGLE);
         }
         lockPeriodic();
         armPeriodic();
