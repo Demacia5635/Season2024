@@ -62,8 +62,8 @@ public class RobotContainer implements Sendable {
   public Shooter shooter;
   public Amp amp;
   public Intake intake;
-  public Chassis chassis;
-  Vision vision;
+  // public Chassis chassis;
+  // Vision vision;
   SubStrip leds;
   LedControll led;
 
@@ -79,14 +79,14 @@ public class RobotContainer implements Sendable {
   public RobotContainer() {
     robotContainer = this;
     
-    chassis = new Chassis();
-    vision = new Vision(chassis, chassis.getSwerveDrivePoseEstimator());
+    // chassis = new Chassis();
+    // vision = new Vision(chassis, chassis.getSwerveDrivePoseEstimator());
     intake = new Intake();
     // amp = new Amp();
     commandController2 = new CommandXboxController(1);
     commandController = new CommandXboxController(0);
     shooter = new Shooter();
-    chassis.setDefaultCommand(new DriveCommand(chassis, commandController));
+    // chassis.setDefaultCommand(new DriveCommand(chassis, commandController));
 
     createCommands();
 
@@ -101,14 +101,19 @@ public class RobotContainer implements Sendable {
     intake.stop();
   }
   public void createCommands() {
-    driveToNote = new DriveToNote(chassis).raceWith(new IntakeCommand(intake));
-    shoot = new InstantCommand(()->shooter.isShooting(true));
-    activateShooter = new ActivateShooter(shooter, intake, chassis, false).
-        alongWith(new InstantCommand(()->shooter.isShootingAmp(false)));
+    double vel = 18;
+    double angle = 35;
+
+    // driveToNote = new DriveToNote(chassis).raceWith(new IntakeCommand(intake));
+    shoot = new IntakeToShooter(intake, shooter, vel);
+    // shoot = new InstantCommand(()->shooter.isShooting(true));
+    activateShooter = new ShooterPowering(shooter, vel).alongWith(new AngleGoToAngle(shooter, angle));
+    // activateShooter = new ActivateShooter(shooter, intake, chassis, false).
+    //     alongWith(new InstantCommand(()->shooter.isShootingAmp(false)));
     manualIntake = new IntakeCommand(intake);
-    activateAmp = new ActivateShooter(shooter, intake, chassis, false).
-        alongWith(new InstantCommand(()->shooter.isShootingAmp(true)));
-    resetOdometry = new InstantCommand(()-> {chassis.setOdometryToForward();}, chassis);
+    // activateAmp = new ActivateShooter(shooter, intake, chassis, false).
+        // alongWith(new InstantCommand(()->shooter.isShootingAmp(true)));
+    // resetOdometry = new InstantCommand(()-> {chassis.setOdometryToForward();}, chassis);
     disableCommand = new InstantCommand(()-> stopAll(),intake, shooter).andThen(new AngleQuel(shooter));
 }
 
@@ -135,17 +140,17 @@ public class RobotContainer implements Sendable {
     // RightBumper - disable all
     // Back - chassie gyro set
 
-    Trigger overrideAuto = new Trigger(() -> Utils.joystickOutOfDeadband(commandController));
+    // Trigger overrideAuto = new Trigger(() -> Utils.joystickOutOfDeadband(commandController));
 
-    commandController.y().onTrue(driveToNote);
+    // commandController.y().onTrue(driveToNote);
     commandController.x().onTrue(activateShooter);
     // B - defined in Drive
     commandController.a().onTrue(manualIntake);
-    commandController.pov(0).onTrue(shoot);
-    commandController.pov(180).onTrue(activateAmp);
+    commandController.pov(0).whileTrue(shoot);
+    // commandController.pov(180).onTrue(activateAmp);
     commandController.rightBumper().onTrue(disableCommand);
-    commandController.back().onTrue(resetOdometry);
-    overrideAuto.onTrue(chassis.getDefaultCommand());
+    // commandController.back().onTrue(resetOdometry);
+    // overrideAuto.onTrue(chassis.getDefaultCommand());
 }
 
   public void calibrate() {
@@ -153,7 +158,8 @@ public class RobotContainer implements Sendable {
   }
    
   public Command getAutonomousCommand() {
-    return new StartTOP(chassis, shooter, intake, isRed);
+    return null;
+    // return new StartTOP(chassis, shooter, intake, isRed);
    //return new PathFollow(chassis, points, 4, 12, 0, false);
   }
 }

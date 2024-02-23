@@ -5,6 +5,7 @@
 package frc.robot.commands.shooter;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -74,9 +75,8 @@ public class ActivateShooter extends Command {
     } else {
       Translation2d pos = isFollowing ? chassis.getPose().getTranslation() : from;
       Translation2d vec = speaker.minus(pos);
-      /*TODO change to get from look up table */
-      double distance = 1.35; // vec.getNorm();
-      var angleVel = Utils.getShootingAngleVelocity(distance);
+      double distance = vec.getNorm();
+      Pair<Double,Double> angleVel = Utils.getShootingAngleVelocity(distance);
       vUp = angleVel.getSecond();
       Vdown = vUp;
       a = angleVel.getFirst();
@@ -95,7 +95,7 @@ public class ActivateShooter extends Command {
       timer.start();
       shooter.feedingSetPow(1);
       intake.setPower(1);
-    } else if (isShooting && timer.get() > 0.5) {
+    } else if (isShooting && timer.get() > 0.4) {
       isShooting = false;
       shooter.isShooting(false);
       shooter.isShootingAmp(false);
@@ -109,16 +109,18 @@ public class ActivateShooter extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    shooter.stop();
-    shooter.feedingStop();
-    shooter.angleStop();
-    intake.stop();
+    if(finish) {
+      shooter.stop();
+      shooter.feedingStop();
+      shooter.angleStop();
+      intake.stop();
+    }
 
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return finish;
+    return finish || (isShooting && timer.get() > 0.5);
   }
 }
