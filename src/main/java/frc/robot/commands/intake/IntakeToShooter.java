@@ -62,7 +62,7 @@ public class IntakeToShooter extends Command {
 
         intake.setPower(1);
         shooter.feedingSetPow(1);
-        shooter.setVel(shootingVel);
+        shooter.setVel(shootingVel, 4);
         // shooter.setPow(1);
         if (shooter.isNote() && !last){
             noteCount++;

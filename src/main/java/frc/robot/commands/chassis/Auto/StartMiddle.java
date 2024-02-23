@@ -27,15 +27,12 @@ import frc.robot.utils.Utils;
 
 import static frc.robot.subsystems.shooter.ShooterConstants.*;
 
-public class StartTOP extends SequentialCommandGroup {
+public class StartMiddle extends SequentialCommandGroup {
   //shootFromAnyPlace shootFromAnyPlace = new shootFromAnyPlace();
   double wantedAngleClose = 53;
   double wantedVelClose = 15.5;
   double maxVel = 4;
   double maxAceel = 12;
-  
-  pathPoint[] leaveSpeaker = {new pathPoint(0, 0, Rotation2d.fromDegrees(0), 0, false), //doesnt matter because it gets fixed in the command
-    new pathPoint(1.4, 6.9, Rotation2d.fromDegrees(0), 0, false)};
 
   pathPoint[] goToNote1 = {new pathPoint(0, 0, Rotation2d.fromDegrees(0), 0, false), //doesnt matter because it gets fixed in the command
     new pathPoint(6.8, 7.47, Rotation2d.fromDegrees(0), 0, false)};
@@ -53,7 +50,7 @@ public class StartTOP extends SequentialCommandGroup {
   
 
   /** Creates a new StartTOP auto. */
-  public StartTOP(Chassis chassis, Shooter shooter, Intake intake, boolean isRed) {
+  public StartMiddle(Chassis chassis, Shooter shooter, Intake intake, boolean isRed) {
 
 
   Translation2d speaker = (isRed) ? new Translation2d(16.54 - (-0.04), 5.5) : new Translation2d(-0.04, 5.55);
@@ -65,7 +62,7 @@ public class StartTOP extends SequentialCommandGroup {
     .alongWith((new AngleGoToAngle(shooter, 38).alongWith(new ShooterPowering(shooter, 16.5))))
     .andThen(new GoToAngleChassis(chassis, speaker))
     .andThen(new IntakeToShooter(intake, shooter, 16.5).raceWith(new WaitCommand(0.5)))
-    .andThen((new PathFollow(chassis, goToNote1, maxVel, maxAceel, 2, isRed)).raceWith(new WaitUntilCommand(()->Utils.seeNote())))
+    .andThen(((new PathFollow(chassis, goToNote1, maxVel, maxAceel, 2, isRed))).raceWith(new WaitUntilCommand(()->Utils.seeNote())))
     .andThen((new DriveToNote(chassis).raceWith(new IntakeCommand(intake))))
     .andThen(new PathFollow(chassis, goBackToShoot, maxVel, maxAceel, 0, isRed)
     .alongWith((new AngleGoToAngle(shooter, 33).alongWith(new ShooterPowering(shooter, 18)))))

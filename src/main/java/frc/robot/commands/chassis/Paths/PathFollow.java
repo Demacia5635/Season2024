@@ -103,10 +103,11 @@ public class PathFollow extends CommandBase {
   @Override
   public void initialize() {
     //sets first point to chassis pose to prevent bugs with red and blue alliance
-    points[0] = new pathPoint(chassis.getPose().getX(), chassis.getPose().getY(), Rotation2d.fromDegrees(180).minus(points[1].getRotation()), points[0].getRadius(), false);
+    points[0] = new pathPoint(chassis.getPose().getX(), chassis.getPose().getY(), points[1].getRotation(), points[0].getRadius(), false);
 
     //case for red alliance (blue is the default)
     if (isRed) {
+      points[0] = new pathPoint(chassis.getPose().getX(), chassis.getPose().getY(), Rotation2d.fromDegrees(180).minus(points[1].getRotation()), points[0].getRadius(), false);
       for (int i = 1; i < points.length; i++) {
         points[i] = new pathPoint(fieldLength - points[i].getX(), points[i].getY(), Rotation2d.fromDegrees(180).minus(points[i].getRotation()),
             points[i].getRadius(), points[i].isAprilTag());

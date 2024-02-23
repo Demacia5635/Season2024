@@ -156,6 +156,16 @@ public class Shooter extends SubsystemBase {
                 ShooterConstants.Shooting.KV * vel +
                 ShooterConstants.Shooting.KV2 * Math.pow(vel, 2));
     }
+    
+    public void setVel(double velDown, double velUp) {
+        double ffUp = getFF(velUp);
+        double ffDown = getFF(velDown);
+        velUp = (velUp/ 10) / ShooterConstants.PEREMITER_OF_WHEEL * PULES_PER_REV;
+        motorUP.set(ControlMode.Velocity, velUp, DemandType.ArbitraryFeedForward, ffUp);
+        velDown = (velDown/ 10) / ShooterConstants.PEREMITER_OF_WHEEL * PULES_PER_REV;
+        motorDown.set(ControlMode.Velocity, velDown, DemandType.ArbitraryFeedForward, ffDown);
+        
+    }
 
     public void setVel(double vel){
         double ff = getFF(vel);
@@ -267,6 +277,7 @@ public class Shooter extends SubsystemBase {
     public double getDis(){
         return motorAngle.getSelectedSensorPosition()/ShooterConstants.AngleChanger.PULES_PER_MM - ShooterConstants.AngleChanger.MAX_DIS;
     }
+
 
     /**
      * for saftey checks if the angle motor passed its limits

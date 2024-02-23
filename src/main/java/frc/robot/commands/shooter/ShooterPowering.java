@@ -14,19 +14,28 @@ public class ShooterPowering extends Command {
     /**the wanted shooter */
     Shooter shooter;
     /**the power giving the shooter */
-    double vel;
+    double velUp;
+    double velDown;
     /**the vel the shooter needs to be to shoot */
     double maxVel;
 
     /**
      * creates a new command that power up the shooter
      * @param shooter the wanted shooter
-     * @param shootingVel the power giving the shooter -1 to 1
+     * @param shootingVelUp the power giving the shooter -1 to 1
      * @param shootingMaxVel the velocity we want the shooter to be in pules per 1/10 sec
      */
-    public ShooterPowering(Shooter shooter, double shootingVel) {
+    public ShooterPowering(Shooter shooter, double shootingVelUp, double shootingVelDown) {
         this.shooter = shooter;
-        this.vel = shootingVel;
+        this.velUp = shootingVelUp;
+        this.velDown = shootingVelDown;
+        addRequirements(shooter);
+    }
+
+    public ShooterPowering(Shooter shooter, double shootingVel){
+        this.shooter = shooter;
+        this.velUp = shootingVel;
+        this.velDown = shootingVel;
         addRequirements(shooter);
     }
 
@@ -41,7 +50,7 @@ public class ShooterPowering extends Command {
     /**giving the motor power */
     @Override
     public void execute() {
-        shooter.setVel(vel);
+        shooter.setVel(velUp, velDown);
         // shooter.setPow(pow);
     }
 
@@ -55,7 +64,7 @@ public class ShooterPowering extends Command {
     /**checks if the shooter have come to the wanted vel */
     @Override
     public boolean isFinished() {
-   return Math.abs(vel - shooter.getMotorVel(SHOOTER_MOTOR.UP) ) <= 0.3;
+   return Math.abs(velUp - shooter.getMotorVel(SHOOTER_MOTOR.UP) ) <= 0.3;
       //  return vel == shooter.getMotorVel();
         // return shooter.getMotorVel(SHOOTER_MOTOR.UP) >= maxVel && shooter.getMotorVel(SHOOTER_MOTOR.DOWN) >= maxVel;
     }

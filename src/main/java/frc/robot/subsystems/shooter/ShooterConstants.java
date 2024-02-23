@@ -57,6 +57,7 @@ public class ShooterConstants {
     }
 
     public static final double PEREMITER_OF_WHEEL = 0.075 * Math.PI;
+    public static final double ANGLE_CALIBRATE = 20;
 
     /**set up var for pow */
     public static class CommandParams {
@@ -77,5 +78,11 @@ public class ShooterConstants {
 
     public static double WANTED_ANGLE_CLOSE = 54;
     public static double WANTED_VEL_CLOSE = 14;
+
+    public static class AmpPera {
+        public static final double ANGLE = 44;
+        public static final double DOWN = 14;
+        public static final double UP = 4;
+    }
 
 }

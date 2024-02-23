@@ -100,7 +100,7 @@ public class Robot extends TimedRobot {
       m_autonomousCommand.cancel();
 
     }
-
+    m_robotContainer.resetOd();
     SmartDashboard.putBoolean("robot init", isAutonomous());
     m_robotContainer.calibrate();
   }
