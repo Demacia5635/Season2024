@@ -3,6 +3,7 @@ package frc.robot.commands.chassis.Auto;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -14,6 +15,7 @@ import frc.robot.commands.chassis.GoToAngleChassis;
 import frc.robot.commands.chassis.Paths.PathFollow;
 import frc.robot.commands.intake.IntakeCommand;
 import frc.robot.commands.intake.IntakeToShooter;
+import frc.robot.commands.shooter.ActivateShooter;
 import frc.robot.commands.shooter.AngleGoToAngle;
 import frc.robot.commands.shooter.ShooterPowering;
 import frc.robot.commands.shooter.ShooterShoot;
@@ -59,26 +61,29 @@ public class StartTOP extends SequentialCommandGroup {
   Translation2d speaker = (isRed) ? new Translation2d(16.54 - (-0.04), 5.5) : new Translation2d(-0.04, 5.55);
 
     
-    addCommands((new AngleGoToAngle(shooter, wantedAngleClose).alongWith(new ShooterPowering(shooter, wantedVelClose)))
-    .andThen(new IntakeToShooter(intake, shooter, wantedVelClose).raceWith(new WaitCommand(0.5)))
-    .andThen((new DriveToNote(chassis).raceWith(new IntakeCommand(intake)))
-    .alongWith((new AngleGoToAngle(shooter, 38).alongWith(new ShooterPowering(shooter, 16.5))))
-    .andThen(new GoToAngleChassis(chassis, speaker))
-    .andThen(new IntakeToShooter(intake, shooter, 16.5).raceWith(new WaitCommand(0.5)))
-    .andThen((new PathFollow(chassis, goToNote1, maxVel, maxAceel, 2, isRed)).raceWith(new WaitUntilCommand(()->Utils.seeNote())))
-    .andThen((new DriveToNote(chassis).raceWith(new IntakeCommand(intake))))
-    .andThen(new PathFollow(chassis, goBackToShoot, maxVel, maxAceel, 0, isRed)
-    .alongWith((new AngleGoToAngle(shooter, 33).alongWith(new ShooterPowering(shooter, 18)))))
-    .andThen(new GoToAngleChassis(chassis, speaker))
-    .andThen(new IntakeToShooter(intake, shooter, 18).raceWith(new WaitCommand(0.5))))
-    .andThen(new PathFollow(chassis, goToNote2, maxVel, maxAceel, 2, isRed)).andThen((new DriveToNote(chassis).raceWith(new IntakeCommand(intake)))
-    .andThen(new PathFollow(chassis, goBackToShoot, maxVel, maxAceel, 0, isRed)
-    .alongWith((new AngleGoToAngle(shooter, 32.3).alongWith(new ShooterPowering(shooter, 18)))))
-    .andThen(new GoToAngleChassis(chassis, speaker))
-    .andThen(new IntakeToShooter(intake, shooter, 18).raceWith(new WaitCommand(0.5)))));
+    addCommands(new ActivateShooter(shooter, intake, chassis, true));
+    addCommands(new WaitUntilCommand(()->shooter.isShootingReady()),shooter.getShootCommand());
+    addCommands((new DriveToNote(chassis).raceWith(new IntakeCommand(intake))));
+    addCommands(new GoToAngleChassis(chassis, speaker));
+    addCommands(shooter.getShootCommand());
+    addCommands((new PathFollow(chassis, goToNote1, maxVel, maxAceel, 2, isRed)).
+        raceWith(new WaitUntilCommand(()->Utils.seeNote())));
+    addCommands(takeNote(chassis, intake));
+    addCommands(new PathFollow(chassis, goBackToShoot, maxVel, maxAceel, 0, isRed));
+    addCommands(new GoToAngleChassis(chassis, speaker));
+    addCommands(shooter.getShootCommand());
+    addCommands(new PathFollow(chassis, goToNote2, maxVel, maxAceel, 2, isRed));
+    addCommands(takeNote(chassis, intake));
+    addCommands(new PathFollow(chassis, goBackToShoot, maxVel, maxAceel, 0, isRed));
+    addCommands(new GoToAngleChassis(chassis, speaker));
+    addCommands(shooter.getShootCommand());
 
 
      
+  }
+
+  private Command takeNote(Chassis chassis, Intake intake) {
+    return new DriveToNote(chassis).raceWith(new IntakeCommand(intake));
   }
 
 }

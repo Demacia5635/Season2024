@@ -104,14 +104,14 @@ public class Chassis extends SubsystemBase {
         1,
         1,
         this)).getCommand());
-    SmartDashboard.putData("Test Steer Velocity", (new CheckModulesSteerVelocity(this, 200)));
-    SmartDashboard.putData("Set Modules Angle", (new SetModuleAngle(this)));
-    new TestVelocity("Chassis", this::setVelocity, this::getMoveVelocity, 0.05, this);
-    SmartDashboard.putNumber("angle for chassis", 0);
-    SmartDashboard.putData("go to 0", new RunCommand(()->setModulesAngleFromSB(SmartDashboard.getNumber("angle for chassis", 0)), this));
+   // SmartDashboard.putData("Test Steer Velocity", (new CheckModulesSteerVelocity(this, 200)));
+   // SmartDashboard.putData("Set Modules Angle", (new SetModuleAngle(this)));
+   // new TestVelocity("Chassis", this::setVelocity, this::getMoveVelocity, 0.05, this);
+   // SmartDashboard.putNumber("angle for chassis", 0);
+   // SmartDashboard.putData("go to 0", new RunCommand(()->setModulesAngleFromSB(SmartDashboard.getNumber("angle for chassis", 0)), this));
 
-    SmartDashboard.putNumber("ANG", 0);
-    SmartDashboard.putData("go to angle position", new RunCommand(()->modules[0].setAngleByPositionPID(Rotation2d.fromDegrees(SmartDashboard.getNumber("ANG", 0))), this));
+   // SmartDashboard.putNumber("ANG", 0);
+   // SmartDashboard.putData("go to angle position", new RunCommand(()->modules[0].setAngleByPositionPID(Rotation2d.fromDegrees(SmartDashboard.getNumber("ANG", 0))), this));
 
 
   }
@@ -355,11 +355,6 @@ public class Chassis extends SubsystemBase {
   @Override
   public void periodic() {
     poseEstimator.update(getAngle(), getModulePositions());
-
     field.setRobotPose(getPose());
-
-    SmartDashboard.putNumber("Gyro Angle",getAngle().getDegrees());
-
-    SmartDashboard.putNumber("velocity of chassis", getMoveVelocity());
-  }
+ }
 }

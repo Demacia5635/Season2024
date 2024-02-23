@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.commands.shooter.ActivateShooter;
 import frc.robot.commands.shooter.AngleGoToAngle;
 import frc.robot.commands.shooter.AngleQuel;
 import frc.robot.commands.shooter.ShooterPowering;
@@ -41,8 +42,7 @@ import frc.robot.subsystems.leds.SubStrip;
 
 public class RobotContainer implements Sendable {
   public static RobotContainer robotContainer;
-  Boolean isRed = false;
-  DriverStation.Alliance alliance;
+  private Boolean isRed = false;
   CommandXboxController commandController;
   CommandXboxController commandController2;
   PS4Controller controller = new PS4Controller(1);
@@ -67,34 +67,14 @@ public class RobotContainer implements Sendable {
   SubStrip leds;
   LedControll led;
 
-  Command intake2shooter;
-  Command intake2amp;
-  Command shoot;
-  Command amplify;
-  Command autonomousRight;
-  public DriveToNote driveToNote;
-
-  Command amp2Angle;
-  Command shootAmp;
-  Command closeAmp;
-
-  public double wantedAngle;
-  public double wantedShootingVel;
-  double wantedAmpVel;
-  double wantedAmpAngle;
-
-  double wantedAmpShootingAngle;
-  double wantedAmpShootingVelUp;
-  double wantedAmpShootingVelDown;
-
-  pathPoint[] points = {new pathPoint(0, 0, Rotation2d.fromDegrees(0), 0, false), //doesnt matter because it gets fixed in the command
-    new pathPoint(6.6, 6.7, Rotation2d.fromDegrees(0), 0, false)};
-    
-  /*
-   * pathPoint[] points2 = {new pathPoint(0, 0, Rotation2d.fromDegrees(0), 0,
-   * false),
-   * new pathPoint(1.77, -0.6, Rotation2d.fromDegrees(180), 0, false)};
-   */
+  public Command shoot; // shoot to amp or to speaker
+  public Command activateShooter; // prepare to shoot
+  public Command autonomousRight;
+  public Command driveToNote;
+  public Command manualIntake;
+  public Command activateAmp;
+  public Command disableCommand;
+  public Command resetOdometry;
 
   public RobotContainer() {
     robotContainer = this;
@@ -104,155 +84,73 @@ public class RobotContainer implements Sendable {
     intake = new Intake();
     // amp = new Amp();
     commandController2 = new CommandXboxController(1);
-
-    // alliance = DriverStation.getAlliance().get();
-    // isRed = (alliance == Alliance.Red) ;
-    // DriveCommand drive = new DriveCommand(chassis, controller, commandController,
-    // isRed);
-    // chassis.setDefaultCommand(drive);
-
-    amp = new Amp();
     commandController = new CommandXboxController(0);
     shooter = new Shooter();
-    // shooter.setDefaultCommand(new AngleControl(shooter, commandController));
-    chassis.setDefaultCommand(
-        new DriveCommand(chassis, commandController, isRed));
+    chassis.setDefaultCommand(new DriveCommand(chassis, commandController));
 
     createCommands();
 
-    // leds = new SubStrip(120);
     led = new LedControll(9, 110);
     
-    SmartDashboard.putData("RC", this);
+    SmartDashboard.putData("RobotContainer", this);
     configureBindings();
   }
 
+  public void stopAll() {
+    shooter.stopAll();
+    intake.stop();
+  }
   public void createCommands() {
-    // intake2amp = (new DispenseCommand(intake).raceWith(new AmpIntake2(amp)));
-    // amp2Angle = amp.getReadyCommand(intake);
-    // shootAmp = amp.getShootCommand();
-    // closeAmp = amp.getCancelCommand();
-    driveToNote = new DriveToNote(chassis);
+    driveToNote = new DriveToNote(chassis).raceWith(new IntakeCommand(intake));
+    shoot = new InstantCommand(()->shooter.isShooting(true));
+    activateShooter = new ActivateShooter(shooter, intake, chassis, false).
+        alongWith(new InstantCommand(()->shooter.isShootingAmp(false)));
+    manualIntake = new IntakeCommand(intake);
+    activateAmp = new ActivateShooter(shooter, intake, chassis, false).
+        alongWith(new InstantCommand(()->shooter.isShootingAmp(true)));
+    resetOdometry = new InstantCommand(()-> {chassis.setOdometryToForward();}, chassis);
+    disableCommand = new InstantCommand(()-> stopAll(),intake, shooter).andThen(new AngleQuel(shooter));
+}
 
-    // for check, can add wait command between and then
-
-    // intake2shooter = (new AngleGoToAngle(shooter,
-    // ShooterConstants.CommandParams.ANGLE_COLLECT,
-    // ShooterConstants.CommandParams.MAX_VEL,
-    // ShooterConstants.CommandParams.MAX_ACCCEL))
-    // .andThen(new IntakeCommand(intake).raceWith(new GoToNote(chassis)), new
-    // ShootCommand(intake).alongWith(new ShooterFeeding(shooter,
-    // ShooterConstants.CommandParams.FEED_POWER)),
-    // new AngleGoToAngle(shooter, ShooterConstants.CommandParams.ANGLE_DEFAULT,
-    // ShooterConstants.CommandParams.MAX_VEL,
-    // ShooterConstants.CommandParams.MAX_ACCCEL));
-
-    // intake2amp = (new IntakeCommand(intake).raceWith(new GoToNote(chassis)))
-    // .andThen(new DispenseCommand(intake)
-    // .alongWith(new AmpIntake(amp, AmpConstants.CommandParams.v1,
-    // AmpConstants.CommandParams.v2)));
-
-    // amplify = new GoToAngleAmp(amp, AmpConstants.CommandParams.ANGLE_RADIANS_AMP,
-    // AmpConstants.CommandParams.MAX_VEL_RAD,
-    // AmpConstants.CommandParams.MAX_ACCEL_RAD).andThen(
-    // new AmpIntake(amp, AmpConstants.CommandParams.v1,
-    // AmpConstants.CommandParams.v2)
-    // );
-
-    // //I prefer driver will close the amp
-    // amplify = new OpenAmp(amp).andThen(new AmpIntake2(amp));
-
-    // shoot = new AngleGoToAngle(shooter,
-    // ShooterConstants.CommandParams.ANGLE_SHOOT,
-    // ShooterConstants.CommandParams.MAX_VEL,
-    // ShooterConstants.CommandParams.MAX_ACCCEL).alongWith(
-    // new RunCommand(() ->
-    // shooter.setPow(ShooterConstants.CommandParams.SHOOT_POWER), shooter)
-    // ).andThen(new ShooterFeeding(shooter,
-    // ShooterConstants.CommandParams.FEED_POWER));
-
-    // Command intake2ampnoshooter = new IntakeCommand(intake).andThen(new
-    // WaitCommand(1.5), new DispenseCommand(intake).raceWith(
-    // new AmpIntake2(amp)
-    // ));
-
+  public void isRed(boolean isRed) {
+    this.isRed = isRed;
+  }
+  public boolean isRed() {
+    return isRed;
   }
 
   @Override
   public void initSendable(SendableBuilder builder) {
-
-    // builder.addDoubleProperty("chassis angle",() ->
-    // chassis.getAngle().getDegrees(), null);
-    // builder.addStringProperty("Alliance",() -> alliance.toString(), null);
-
+    builder.addBooleanProperty("is Red Alliance", this::isRed, this::isRed);
   }
 
   private void configureBindings() {
+    // Buttons:
+    // Y - Auto Intake
+    // X - Activate Shooter
+    // B - Drive precision mode
+    // A - Manual Intake
+    // POV-UP - Shoot
+    // POV-Down - Amp
+    // RightBumper - disable all
+    // Back - chassie gyro set
 
     Trigger overrideAuto = new Trigger(() -> Utils.joystickOutOfDeadband(commandController));
 
-    // wanted angle = 56 angle for close to speaker
-    wantedAngle = 56;
-    // SmartDashboard.putNumber("wanted angle", 60);
-    // SmartDashboard.putNumber("wanted shooting vel for noga", 0);
-    // wantedAngle = SmartDashboard.getNumber("wanted angle", 60);
-    wantedShootingVel = 16.5;
-
-    wantedAmpShootingAngle = ShooterConstants.AmpPera.ANGLE;
-    wantedAmpShootingVelUp = ShooterConstants.AmpPera.UP;
-    wantedAmpShootingVelDown = ShooterConstants.AmpPera.DOWN;
-    
-
-    // wantedShootingVel = SmartDashboard.getNumber("wanted shooting vel for noga",
-    // 0);
-    // commandController.b().onTrue(new AngleQuel(shooter));
-    commandController.a().onTrue(new IntakeCommand(intake));
-    //commandController.a().onTrue(new RunCommand(()->intake.setPower(1), intake));
-    commandController.pov(180).onTrue(new AngleGoToAngle(shooter, wantedAmpShootingAngle).alongWith(new ShooterPowering(shooter, wantedAmpShootingVelUp, wantedAmpShootingVelDown)));
-    commandController.leftBumper().whileTrue(new IntakeToShooter(intake, shooter, wantedAmpShootingVelUp, wantedAmpShootingVelDown));
-    commandController.pov(0).whileTrue(new IntakeToShooter(intake, shooter, wantedShootingVel));
-    commandController.x()
-        .onTrue(new AngleGoToAngle(shooter, wantedAngle).alongWith(new ShooterPowering(shooter, wantedShootingVel)));
-
-    commandController.rightBumper().onTrue(new InstantCommand(() -> {
-      shooter.stopAll();
-      intake.stop();
-    }, intake, shooter).andThen(new AngleQuel(shooter)));
-    commandController.y().onTrue(driveToNote.raceWith(new IntakeCommand(intake)));
-    // commandController.pov(180).onTrue(new InstantCommand(() -> {
-    //   chassis.setOdometryToForward();
-    // }));
+    commandController.y().onTrue(driveToNote);
+    commandController.x().onTrue(activateShooter);
+    // B - defined in Drive
+    commandController.a().onTrue(manualIntake);
+    commandController.pov(0).onTrue(shoot);
+    commandController.pov(180).onTrue(activateAmp);
+    commandController.rightBumper().onTrue(disableCommand);
+    commandController.back().onTrue(resetOdometry);
     overrideAuto.onTrue(chassis.getDefaultCommand());
-
-    // Amp commands Buttons
-    /*
-     * commandController.b().onTrue(intake2amp.andThen(amp2Angle));
-     * commandController.pov(90).onTrue(shootAmp);
-     * commandController.pov(270).onTrue(closeAmp);
-     */
-
-  }
+}
 
   public void calibrate() {
-    new AngleQuel(shooter).schedule();
-    // (new CalibrateArm(amp).andThen(new RunBrakeArm(amp,
-    // Parameters.ARM_BRAKE_POW))).schedule();
+    disableCommand.schedule();
   }
-
-  public void resetOd() {
-    new InstantCommand(() -> chassis.setPose(new Pose2d(2.896, 8.54 - 1.21, Rotation2d.fromDegrees(0)))).schedule();
-    ;
-  }
-
-    public void disable(){
-        new InstantCommand(()-> {
-            shooter.stopAll();
-            intake.stop();
-        }, 
-        intake, shooter
-        ).ignoringDisable(true).schedule();
-    }
-   
    
   public Command getAutonomousCommand() {
     return new StartTOP(chassis, shooter, intake, isRed);

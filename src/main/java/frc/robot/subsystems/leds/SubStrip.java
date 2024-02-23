@@ -90,8 +90,9 @@ public class SubStrip extends SubsystemBase {
         double Dist = llpython[0];
         boolean isStart = RobotContainer.robotContainer.driveToNote.isScheduled();
         boolean isNotePresent = RobotContainer.robotContainer.intake.isNotePresent();
-        boolean isShooterReady = Math.abs(RobotContainer.robotContainer.wantedAngle - RobotContainer.robotContainer.shooter.getAngle()) < 1 && 
-                                 Math.abs(RobotContainer.robotContainer.wantedShootingVel - RobotContainer.robotContainer.shooter.getMotorVel(SHOOTER_MOTOR.UP)) < 0.3;
+        boolean isShooterReady = false;
+        // boolean isShooterReady = Math.abs(RobotContainer.robotContainer.wantedAngle - RobotContainer.robotContainer.shooter.getAngle()) < 1 && 
+        //                          Math.abs(RobotContainer.robotContainer.wantedShootingVel - RobotContainer.robotContainer.shooter.getMotorVel(SHOOTER_MOTOR.UP)) < 0.3;
         // System.out.println("Dist is : " + Dist);
         if(isShooterReady){
             setColor(Color.kGreen);
