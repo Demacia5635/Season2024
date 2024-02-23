@@ -10,9 +10,12 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 
 import static frc.robot.subsystems.shooter.ShooterConstants.PULES_PER_REV;
 
@@ -28,6 +31,7 @@ import frc.robot.commands.shooter.AngleQuel;
 import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.subsystems.shooter.ShooterConstants.Shooting;
 import frc.robot.subsystems.shooter.utils.LookUpTable;
+import frc.robot.subsystems.shooter.ShooterConstants.AngleChanger;;
 
 /**subsystem shooter and angle changing */
 public class Shooter extends SubsystemBase {
@@ -55,6 +59,10 @@ public class Shooter extends SubsystemBase {
     /**the lookup table */
     LookUpTable lookUpTable = new LookUpTable(ShooterConstants.LookUpTable.lookUpTable);
 
+    private boolean isShooting  = false;
+    private boolean isShootingAmp = false;
+    private boolean isShootingReady = false;
+    
     /**
      * <pre>
      * enum SHOOTER_MOTOR that contains all motors of the shooter
@@ -81,10 +89,10 @@ public class Shooter extends SubsystemBase {
         motorUP.config_kP(0, ShooterConstants.Shooting.KP);
 
         motorDown = new TalonFX(ShooterConstants.MOTOR_DOWN_ID);
+        motorDown.configFactoryDefault();
         motorDown.config_kP(0, ShooterConstants.Shooting.KP);
 
         motorFeeding = new TalonSRX(ShooterConstants.MOTOR_FEEDING_ID);
-        motorDown.configFactoryDefault();
         motorFeeding.setInverted(true);
         motorFeeding.enableCurrentLimit(true);
         motorFeeding.configContinuousCurrentLimit(20);
@@ -103,13 +111,16 @@ public class Shooter extends SubsystemBase {
 
         limitSwitch = new DigitalInput(ShooterConstants.LIMIT_SWITCH_ID);
 
+        brake(SHOOTER_MOTOR.UP, SHOOTER_MOTOR.DOWN, SHOOTER_MOTOR.FEEDING, SHOOTER_MOTOR.ANGLE);
         SmartDashboard.putData(this);
-        SmartDashboard.putData(null);
 
-        SmartDashboard.putData("SysId Shooter",new Sysid(this::setPow, ()->getMotorVel(SHOOTER_MOTOR.UP), 0.2, 0.8, this).getCommand());
+        SmartDashboard.putNumber("shoot angle set", 55);
+        SmartDashboard.putNumber("shoot velocity set", 20);
+ 
     }
     
     /**
+     * @deprecated
      * creates trapezoid algo 
      * @param dis the wanted dis in mm on the screw (absolute)
      */
@@ -158,21 +169,17 @@ public class Shooter extends SubsystemBase {
     }
     
     public void setVel(double velUp, double velDown) {
-        double ffUp = getFF(velDown);
-        double ffDown = getFF(velUp);
-        velDown = (velDown/ 10) / ShooterConstants.PEREMITER_OF_WHEEL * PULES_PER_REV;
-        motorUP.set(ControlMode.Velocity, velDown, DemandType.ArbitraryFeedForward, ffUp);
-        velUp = (velUp/ 10) / ShooterConstants.PEREMITER_OF_WHEEL * PULES_PER_REV;
-        motorDown.set(ControlMode.Velocity, velUp, DemandType.ArbitraryFeedForward, ffDown);
+        double ffUp = getFF(velUp);
+        double wantedVelUp = (velUp/ 10) / ShooterConstants.PEREMITER_OF_WHEEL * PULES_PER_REV;
+        motorUP.set(ControlMode.Velocity, wantedVelUp, DemandType.ArbitraryFeedForward, ffUp);
+        double ffDown = getFF(velDown);
+        double wantedVelDown = (velDown/ 10) / ShooterConstants.PEREMITER_OF_WHEEL * PULES_PER_REV;
+        motorDown.set(ControlMode.Velocity, wantedVelDown, DemandType.ArbitraryFeedForward, ffDown);
         
     }
 
     public void setVel(double vel){
-        double ff = getFF(vel);
-        vel = (vel / 10) / ShooterConstants.PEREMITER_OF_WHEEL * PULES_PER_REV;
-        System.out.println("FF ="+ ff + "\nVel =" + vel);
-        motorUP.set(ControlMode.Velocity, vel, DemandType.ArbitraryFeedForward, ff);
-        motorDown.set(ControlMode.Velocity, vel, DemandType.ArbitraryFeedForward, ff);
+        setVel(vel,vel);
     }
 
     public void stop(){
@@ -202,6 +209,9 @@ public class Shooter extends SubsystemBase {
         stop();
         angleStop();
         feedingStop();
+        isShooting = false;
+        isShootingAmp = false;
+        isShootingReady = false;
     }
 
     /**
@@ -268,6 +278,13 @@ public class Shooter extends SubsystemBase {
     /**reset the base dis of the angle motor also reset the encoder of the angle motor */
     public void resetDis(){
         motorAngle.setSelectedSensorPosition(0);
+    }
+
+    public double getDistanceFromAngle(double wantedAngle) {
+        double rad = Math.toRadians(wantedAngle);
+        double aCos = AngleChanger.KA * Math.cos(rad); 
+        return  aCos + 
+            Math.sqrt(Math.pow(aCos, 2) - Math.pow(AngleChanger.KA, 2) + Math.pow(AngleChanger.KB, 2));
     }
     
     /**
@@ -405,6 +422,35 @@ public class Shooter extends SubsystemBase {
         );
         
         return angle;
+    }
+
+    public boolean isShooting() {
+        return isShooting;
+    }
+    public void isShooting(boolean isShooting) {
+        this.isShooting = isShooting;
+    }
+   public boolean isShootingAmp() {
+        return isShootingAmp;
+    }
+    public void isShootingAmp(boolean isShootingAmp) {
+        this.isShootingAmp = isShootingAmp;
+    }
+  public boolean isShootingReady() {
+        return isShootingReady;
+    }
+    public void isShootingReady(boolean isShootingReady) {
+        this.isShootingReady = isShootingReady;
+    }
+    public Command getShootCommand() {
+        return new InstantCommand(()->isShooting(true)).andThen(new WaitCommand(0.5));
+    }
+    public Command getShootCommandWhenReady() {
+        return new WaitUntilCommand(()->isShootingReady).andThen(getShootCommand());
+    }
+
+    public void shoot() {
+        isShooting(true);
     }
 
     /**

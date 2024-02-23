@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.RobotContainer;
 import frc.robot.subsystems.chassis.Chassis;
 import frc.robot.subsystems.leds.SubStrip;
 import static frc.robot.utils.Utils.*;
@@ -31,10 +32,10 @@ public class DriveCommand extends Command {
   private double Dist;
 
 
-  public DriveCommand(Chassis chassis, CommandXboxController commandXboxController, boolean isRed) {
+  public DriveCommand(Chassis chassis, CommandXboxController commandXboxController) {
     this.chassis = chassis;
     this.commandXboxController = commandXboxController;
-    this.isRed = isRed;
+    this.isRed = false;
     addRequirements(chassis);
     commandXboxController.b().onTrue(new InstantCommand(() -> precisionDrive = !precisionDrive));
     // commandXboxController.y().onTrue(new InstantCommand((() -> this.wantedAngleApriltag = chassis.getClosetAngleApriltag())).andThen(() -> rotateToApriltag = true));
@@ -42,6 +43,7 @@ public class DriveCommand extends Command {
 
   @Override
   public void initialize() {
+    isRed = RobotContainer.robotContainer.isRed();
     direction = isRed ? 1 : -1;
   }
 

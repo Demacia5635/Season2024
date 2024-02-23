@@ -3,11 +3,14 @@ package frc.robot.utils;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.RobotContainer;
 import frc.robot.subsystems.leds.SubStrip;
+import frc.robot.subsystems.shooter.ShooterConstants;
 
 public class Utils {
     
@@ -16,6 +19,10 @@ public class Utils {
     }
     public static double degrees(double angle) {
         return MathUtil.inputModulus(angle, -180, 180);
+    }
+
+    public static double angleDif(Rotation2d r1, Rotation2d r2) {
+      return degrees(r1.minus(r2));
     }
     public static boolean joystickOutOfDeadband(CommandXboxController controller){
         return deadband(controller.getLeftX(), 0.1) != 0 ||
@@ -34,8 +41,8 @@ public class Utils {
   }
 
   private static double shootDistance[] = {1.35, 1.7, 3.7, 4.65};
-  private static double shootAngle[] = {54, 53, 37, 34};
-  private static double shootVelocity[] = {14, 15.5, 16.5, 18};
+  private static double shootAngle[] = {56, 53, 37, 34};
+  private static double shootVelocity[] = {16.5, 16.7, 17.5, 18};
 
   public static double extrapolatre(double d1, double d2, double v1, double v2, double d) {
     return v1 + (v2-v1)*(d-d1)/(d2-d1);
@@ -77,4 +84,9 @@ public class Utils {
   //     return led.turnOff();
   //   }
   // }
+
+  public static Translation2d speakerPosition() {
+    return RobotContainer.robotContainer.isRed()? ShooterConstants.RED_ALLIANCE_SPEAKER.getTranslation():
+      ShooterConstants.BLUE_ALLIANCE_SPEAKER.getTranslation();
+  }
 }
