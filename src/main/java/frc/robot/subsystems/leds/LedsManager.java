@@ -48,7 +48,13 @@ public final class LedsManager extends SubsystemBase {
     }
 
     public Color[] getColors(int startIndex, int size) {
-        return IntStream.range(startIndex, size + startIndex).mapToObj((i) -> leds[i]).toArray(Color[]::new);
+        // return IntStream.range(startIndex, size + startIndex).mapToObj((i) -> leds[i]).toArray(Color[]::new);
+        Color[] colors = new Color[size];
+        int end = startIndex + size;
+        for (int i = startIndex; i < end; i++) {
+            colors[i] = ledsGeometry.getColor(i);
+        }
+        return colors;
     }
 
     @Override

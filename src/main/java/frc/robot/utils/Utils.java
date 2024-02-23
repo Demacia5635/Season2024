@@ -30,7 +30,7 @@ public class Utils {
 
   public static boolean seeNote() {
         double[] llpython = NetworkTableInstance.getDefault().getTable("limelight").getEntry("llpython").getDoubleArray(new double[8]);
-        return llpython[0]> 0 && llpython[0] < 2;
+        return llpython[0] != 0 && llpython[0] < 200;
   }
 
   private static double shootDistance[] = {1.35, 1.7, 3.7, 4.65};

@@ -36,6 +36,7 @@ import frc.robot.commands.intake.IntakeToShooter;
 import frc.robot.subsystems.amp.Amp;
 import frc.robot.subsystems.chassis.Chassis;
 import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.leds.LedControll;
 import frc.robot.subsystems.leds.SubStrip;
 
 public class RobotContainer implements Sendable {
@@ -64,13 +65,14 @@ public class RobotContainer implements Sendable {
   public Chassis chassis;
   Vision vision;
   SubStrip leds;
+  LedControll led;
 
   Command intake2shooter;
   Command intake2amp;
   Command shoot;
   Command amplify;
   Command autonomousRight;
-  public Command driveToNote;
+  public DriveToNote driveToNote;
 
   Command amp2Angle;
   Command shootAmp;
@@ -97,7 +99,6 @@ public class RobotContainer implements Sendable {
     vision = new Vision(chassis, chassis.getSwerveDrivePoseEstimator());
     intake = new Intake();
     // amp = new Amp();
-    //leds = new SubStrip(120);
     commandController2 = new CommandXboxController(1);
 
     // alliance = DriverStation.getAlliance().get();
@@ -115,6 +116,9 @@ public class RobotContainer implements Sendable {
 
     createCommands();
 
+    // leds = new SubStrip(120);
+    led = new LedControll(9, 110);
+    
     SmartDashboard.putData("RC", this);
     configureBindings();
   }
