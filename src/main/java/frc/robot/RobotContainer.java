@@ -2,6 +2,7 @@ package frc.robot;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.util.sendable.Sendable;
@@ -16,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.shooter.ActivateShooter;
+import frc.robot.commands.shooter.AngleControl;
 import frc.robot.commands.shooter.AngleGoToAngle;
 import frc.robot.commands.shooter.AngleQuel;
 import frc.robot.commands.shooter.ShooterPowering;
@@ -62,9 +64,9 @@ public class RobotContainer implements Sendable {
   public Shooter shooter;
   public Amp amp;
   public Intake intake;
-  // public Chassis chassis;
-  // Vision vision;
-  SubStrip leds;
+  public Chassis chassis;
+  Vision vision;
+  // SubStrip leds;
   LedControll led;
 
   public Command shoot; // shoot to amp or to speaker
@@ -79,14 +81,14 @@ public class RobotContainer implements Sendable {
   public RobotContainer() {
     robotContainer = this;
     
-    // chassis = new Chassis();
-    // vision = new Vision(chassis, chassis.getSwerveDrivePoseEstimator());
+    chassis = new Chassis();
+    vision = new Vision(chassis, chassis.getSwerveDrivePoseEstimator());
     intake = new Intake();
     // amp = new Amp();
     commandController2 = new CommandXboxController(1);
     commandController = new CommandXboxController(0);
     shooter = new Shooter();
-    // chassis.setDefaultCommand(new DriveCommand(chassis, commandController));
+    chassis.setDefaultCommand(new DriveCommand(chassis, commandController));
 
     createCommands();
 
@@ -101,19 +103,17 @@ public class RobotContainer implements Sendable {
     intake.stop();
   }
   public void createCommands() {
-    double vel = 18;
-    double angle = 35;
 
-    // driveToNote = new DriveToNote(chassis).raceWith(new IntakeCommand(intake));
-    shoot = new IntakeToShooter(intake, shooter, vel);
-    // shoot = new InstantCommand(()->shooter.isShooting(true));
-    activateShooter = new ShooterPowering(shooter, vel).alongWith(new AngleGoToAngle(shooter, angle));
-    // activateShooter = new ActivateShooter(shooter, intake, chassis, false).
-    //     alongWith(new InstantCommand(()->shooter.isShootingAmp(false)));
+    driveToNote = new DriveToNote(chassis).raceWith(new IntakeCommand(intake));
+    // shoot = new IntakeToShooter(intake, shooter, vel);
+    shoot = new InstantCommand(()->shooter.isShooting(true));
+    // activateShooter = new ShooterPowering(shooter, vel).alongWith(new AngleGoToAngle(shooter, angle));
+    activateShooter = new ActivateShooter(shooter, intake, chassis, false).
+        alongWith(new InstantCommand(()->shooter.isShootingAmp(false)));
     manualIntake = new IntakeCommand(intake);
-    // activateAmp = new ActivateShooter(shooter, intake, chassis, false).
-        // alongWith(new InstantCommand(()->shooter.isShootingAmp(true)));
-    // resetOdometry = new InstantCommand(()-> {chassis.setOdometryToForward();}, chassis);
+    activateAmp = new ActivateShooter(shooter, intake, chassis, false).
+        alongWith(new InstantCommand(()->shooter.isShootingAmp(true)));
+    resetOdometry = new InstantCommand(()-> {chassis.setOdometryToForward();}, chassis);
     disableCommand = new InstantCommand(()-> stopAll(),intake, shooter).andThen(new AngleQuel(shooter));
 }
 
@@ -140,17 +140,19 @@ public class RobotContainer implements Sendable {
     // RightBumper - disable all
     // Back - chassie gyro set
 
-    // Trigger overrideAuto = new Trigger(() -> Utils.joystickOutOfDeadband(commandController));
+    Trigger overrideAuto = new Trigger(() -> Utils.joystickOutOfDeadband(commandController));
 
-    // commandController.y().onTrue(driveToNote);
+    commandController.y().onTrue(driveToNote);
     commandController.x().onTrue(activateShooter);
+    commandController.povRight().onTrue(new AngleControl(shooter, commandController));
     // B - defined in Drive
     commandController.a().onTrue(manualIntake);
     commandController.pov(0).whileTrue(shoot);
-    // commandController.pov(180).onTrue(activateAmp);
+    commandController.pov(180).onTrue(activateAmp);
     commandController.rightBumper().onTrue(disableCommand);
-    // commandController.back().onTrue(resetOdometry);
-    // overrideAuto.onTrue(chassis.getDefaultCommand());
+    commandController.pov(90).onTrue(new InstantCommand(()-> chassis.setPose(new Pose2d(new Translation2d(1.75, 5.5), new Rotation2d()))));
+    commandController.back().onTrue(resetOdometry);
+    overrideAuto.onTrue(chassis.getDefaultCommand() == null ? null : chassis.getDefaultCommand());
 }
 
   public void calibrate() {
@@ -158,8 +160,8 @@ public class RobotContainer implements Sendable {
   }
    
   public Command getAutonomousCommand() {
-    return null;
-    // return new StartTOP(chassis, shooter, intake, isRed);
+    // return null;
+    return new StartTOP(chassis, shooter, intake, isRed);
    //return new PathFollow(chassis, points, 4, 12, 0, false);
   }
 }

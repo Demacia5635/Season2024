@@ -76,33 +76,34 @@ public class ActivateShooter extends Command {
       Translation2d pos = isFollowing ? chassis.getPose().getTranslation() : from;
       Translation2d vec = speaker.minus(pos);
       double distance = vec.getNorm();
-      Pair<Double,Double> angleVel = Utils.getShootingAngleVelocity(distance);
-      vUp = angleVel.getSecond();
+      var angleToVel = Utils.getShootingAngleVelocity(distance);
+      System.out.println("dis= "+ distance + "\nv= "+angleToVel.getSecond()+"\na ="+angleToVel.getFirst());
+      vUp = angleToVel.getSecond();
       Vdown = vUp;
-      a = angleVel.getFirst();
-    }
-    double dis = shooter.getDistanceFromAngle(a);
-    double disError = dis - shooter.getDis();
-    disError = MathUtil.applyDeadband(disError, 2);
-    shooter.angleSetPow(-1*MathUtil.clamp(0.05 * Math.signum(disError) + disError * 0.05, -0.4, 0.4));
-    shooter.setVel(vUp, Vdown);
-    double vError = shooter.getMotorVel(SHOOTER_MOTOR.UP) - vUp;
-    boolean isReady = Math.abs(disError) < 1 && Math.abs(vError) < 0.3;
-    shooter.isShootingReady(isReady);
-    if (!isShooting && shooter.isShooting() && isReady) {
-      isShooting = true;
-      timer.reset();
-      timer.start();
-      shooter.feedingSetPow(1);
-      intake.setPower(1);
-    } else if (isShooting && timer.get() > 0.4) {
-      isShooting = false;
-      shooter.isShooting(false);
-      shooter.isShootingAmp(false);
-      shooter.feedingSetPow(0);
-      intake.setPower(0);
-      finish = !isContinious;
-      shooter.isShootingReady(false);
+      a = angleToVel.getFirst();
+      double dis = shooter.getDistanceFromAngle(a);
+      double disError = dis - shooter.getDis();
+      disError = MathUtil.applyDeadband(disError, 2);
+      shooter.angleSetPow(-1*MathUtil.clamp(0.05 * Math.signum(disError) + disError * 0.05, -0.4, 0.4));
+      shooter.setVel(vUp, Vdown);
+      double vError = shooter.getMotorVel(SHOOTER_MOTOR.UP) - vUp;
+      boolean isReady = Math.abs(disError) < 1 && Math.abs(vError) < 0.3;
+      shooter.isShootingReady(isReady);
+      if (!isShooting && shooter.isShooting() && isReady) {
+        isShooting = true;
+        timer.reset();
+        timer.start();
+        shooter.feedingSetPow(1);
+        intake.setPower(1);
+      } else if (isShooting && timer.get() > 0.4) {
+        isShooting = false;
+        shooter.isShooting(false);
+        shooter.isShootingAmp(false);
+        shooter.feedingSetPow(0);
+        intake.setPower(0);
+        finish = !isContinious;
+        shooter.isShootingReady(false);
+      }
     }
   }
 

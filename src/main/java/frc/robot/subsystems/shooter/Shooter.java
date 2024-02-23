@@ -57,7 +57,7 @@ public class Shooter extends SubsystemBase {
     DigitalInput limitSwitch;
 
     /**the lookup table */
-    LookUpTable lookUpTable = new LookUpTable(ShooterConstants.LookUpTable.lookUpTable);
+    LookUpTable lookUpTable;
 
     private boolean isShooting  = false;
     private boolean isShootingAmp = false;
@@ -110,6 +110,8 @@ public class Shooter extends SubsystemBase {
         elevationFF = new ArmFeedforward(ShooterConstants.AngleChanger.KS, ShooterConstants.AngleChanger.KG, ShooterConstants.AngleChanger.KV);
 
         limitSwitch = new DigitalInput(ShooterConstants.LIMIT_SWITCH_ID);
+
+        lookUpTable  = new LookUpTable(ShooterConstants.LookUpTable.lookUpTable);
 
         brake(SHOOTER_MOTOR.UP, SHOOTER_MOTOR.DOWN, SHOOTER_MOTOR.FEEDING, SHOOTER_MOTOR.ANGLE);
         SmartDashboard.putData(this);
@@ -332,7 +334,7 @@ public class Shooter extends SubsystemBase {
      * @param dis the current dis
      * @return the needed angle
      */
-    public double getNeededAangle(double dis){
+    public double getNeededAngle(double dis){
         return lookUpTable.get(dis)[1];
     }
     
@@ -341,7 +343,7 @@ public class Shooter extends SubsystemBase {
      * @param dis the current dis
      * @return the needed pow
      */
-    public double getNeededPow(double dis){
+    public double getNeededVel(double dis){
         return lookUpTable.get(dis)[2];
     }
 

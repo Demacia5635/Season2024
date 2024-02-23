@@ -40,9 +40,13 @@ public class Utils {
         return llpython[0] != 0 && llpython[0] < 200;
   }
 
-  private static double shootDistance[] = {1.35, 1.7, 3.7, 4.65};
-  private static double shootAngle[] = {56, 53, 37, 34};
-  private static double shootVelocity[] = {16.5, 16.7, 17.5, 18};
+  private static double shootDistance[] = {1.35, 1.96, 2.5, 3.7};
+  private static double shootAngle[] = {56, 47.5, 40, 37};
+  private static double shootVelocity[] = {17, 17, 17.5, 17.5};
+  // auto points
+  // {1.35, 1.96, 2.5, 3.7}
+  // {56, 53, 37, 34}
+  // {16.5, 16.7, 17.5, 18}
 
   public static double extrapolatre(double d1, double d2, double v1, double v2, double d) {
     return v1 + (v2-v1)*(d-d1)/(d2-d1);

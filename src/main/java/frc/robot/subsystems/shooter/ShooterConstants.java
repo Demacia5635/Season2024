@@ -16,7 +16,7 @@ public class ShooterConstants {
     public static final int LIMIT_SWITCH_ID = 1;
     
     /*set up the location of the 2 speakers */
-    public static final Pose2d BLUE_ALLIANCE_SPEAKER = new Pose2d(-0.15,2.1842, Rotation2d.fromDegrees(0));
+    public static final Pose2d BLUE_ALLIANCE_SPEAKER = new Pose2d(-0.04,5.55, Rotation2d.fromDegrees(0));
     //TODO fix it impossible 
     public static final Pose2d RED_ALLIANCE_SPEAKER = new Pose2d(6.5273,2.1842, Rotation2d.fromDegrees(180));
 
@@ -73,7 +73,11 @@ public class ShooterConstants {
 
     /**set up the lookup table var */
     public static class LookUpTable {
-        public static final double[][] lookUpTable = new double[3][3];
+        public static final double[][] lookUpTable = {
+            {1.7, 53, 16.7}, {1.96, 47.5, 17}, {2.5, 40, 17.5}, 
+            {3, 35.1, 19},  {3.7, 37, 17.5}, {4.65, 34, 18}
+              
+        };
     }
 
     public static double WANTED_ANGLE_CLOSE = 54;
