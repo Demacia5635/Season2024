@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.subsystems.shooter.Shooter.SHOOTER_MOTOR;
 
 /**command that get take the note from the intake and giving it to the shooter */
@@ -25,18 +26,29 @@ public class IntakeToShooter extends Command {
 
     boolean last;
 
-    double shootingVel;
+    double shootingVelUp;
+    double shootingVelDown;
 
     /**
      * creates a new command thats takes from the intake and giving it to the shooter
      * @param intake the wanted intake
      * @param shooter the wanted shooter
      */
-    public IntakeToShooter(Intake intake, Shooter shooter, double shootingVel) {
+    public IntakeToShooter(Intake intake, Shooter shooter, double shootingVelUp, double shoootingVelDown) {
         // Use addRequirements() here to declare subsystem dependencies.
         this.intake = intake;
         this.shooter = shooter;
-        this.shootingVel = shootingVel;
+        this.shootingVelUp = shootingVelUp;
+        this.shootingVelDown = shootingVelDown;
+        addRequirements(intake, shooter);
+        SmartDashboard.putData(this);
+    }
+
+    public IntakeToShooter(Intake intake, Shooter shooter, double shootingVel){
+        this.intake = intake;
+        this.shooter = shooter;
+        this.shootingVelUp = shootingVel;
+        this.shootingVelDown = shootingVel;
         addRequirements(intake, shooter);
         SmartDashboard.putData(this);
     }
@@ -62,7 +74,7 @@ public class IntakeToShooter extends Command {
 
         intake.setPower(1);
         shooter.feedingSetPow(1);
-        shooter.setVel(shootingVel, 4);
+        shooter.setVel(shootingVelUp, shootingVelDown);
         // shooter.setPow(1);
         if (shooter.isNote() && !last){
             noteCount++;

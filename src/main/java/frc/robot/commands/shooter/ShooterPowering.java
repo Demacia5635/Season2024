@@ -50,7 +50,7 @@ public class ShooterPowering extends Command {
     /**giving the motor power */
     @Override
     public void execute() {
-        shooter.setVel(velUp, velDown);
+        shooter.setVel(velDown, velUp);
         // shooter.setPow(pow);
     }
 

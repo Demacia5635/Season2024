@@ -83,6 +83,10 @@ public class RobotContainer implements Sendable {
   double wantedAmpVel;
   double wantedAmpAngle;
 
+  double wantedAmpShootingAngle;
+  double wantedAmpShootingVelUp;
+  double wantedAmpShootingVelDown;
+
   pathPoint[] points = {new pathPoint(0, 0, Rotation2d.fromDegrees(0), 0, false), //doesnt matter because it gets fixed in the command
     new pathPoint(6.6, 6.7, Rotation2d.fromDegrees(0), 0, false)};
     
@@ -188,17 +192,24 @@ public class RobotContainer implements Sendable {
     Trigger overrideAuto = new Trigger(() -> Utils.joystickOutOfDeadband(commandController));
 
     // wanted angle = 56 angle for close to speaker
-    wantedAngle = 44;
+    wantedAngle = 56;
     // SmartDashboard.putNumber("wanted angle", 60);
     // SmartDashboard.putNumber("wanted shooting vel for noga", 0);
     // wantedAngle = SmartDashboard.getNumber("wanted angle", 60);
-    wantedShootingVel = 14;
+    wantedShootingVel = 16.5;
+
+    wantedAmpShootingAngle = ShooterConstants.AmpPera.ANGLE;
+    wantedAmpShootingVelUp = ShooterConstants.AmpPera.UP;
+    wantedAmpShootingVelDown = ShooterConstants.AmpPera.DOWN;
+    
 
     // wantedShootingVel = SmartDashboard.getNumber("wanted shooting vel for noga",
     // 0);
     // commandController.b().onTrue(new AngleQuel(shooter));
     commandController.a().onTrue(new IntakeCommand(intake));
     //commandController.a().onTrue(new RunCommand(()->intake.setPower(1), intake));
+    commandController.pov(180).onTrue(new AngleGoToAngle(shooter, wantedAmpShootingAngle).alongWith(new ShooterPowering(shooter, wantedAmpShootingVelUp, wantedAmpShootingVelDown)));
+    commandController.leftBumper().whileTrue(new IntakeToShooter(intake, shooter, wantedAmpShootingVelUp, wantedAmpShootingVelDown));
     commandController.pov(0).whileTrue(new IntakeToShooter(intake, shooter, wantedShootingVel));
     commandController.x()
         .onTrue(new AngleGoToAngle(shooter, wantedAngle).alongWith(new ShooterPowering(shooter, wantedShootingVel)));
@@ -208,9 +219,9 @@ public class RobotContainer implements Sendable {
       intake.stop();
     }, intake, shooter).andThen(new AngleQuel(shooter)));
     commandController.y().onTrue(driveToNote.raceWith(new IntakeCommand(intake)));
-    commandController.pov(180).onTrue(new InstantCommand(() -> {
-      chassis.setOdometryToForward();
-    }));
+    // commandController.pov(180).onTrue(new InstantCommand(() -> {
+    //   chassis.setOdometryToForward();
+    // }));
     overrideAuto.onTrue(chassis.getDefaultCommand());
 
     // Amp commands Buttons
