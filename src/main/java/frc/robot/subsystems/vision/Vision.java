@@ -73,8 +73,7 @@ public class Vision extends SubsystemBase {
             PoseStrategy.AVERAGE_BEST_TARGETS, ShooterSideRaspberry, robotCenterToShooterSideRaspberry);
         } 
         catch (IOException e) {
-            System.out.println("problem with photon pose estimators");
-            e.printStackTrace();
+            System.out.println("problem with photon pose estimators, probably one of the pi's is off!");
         } 
         //#endregion
 
