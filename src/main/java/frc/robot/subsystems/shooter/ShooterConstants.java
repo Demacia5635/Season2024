@@ -18,7 +18,7 @@ public class ShooterConstants {
     /*set up the location of the 2 speakers */
     public static final Pose2d BLUE_ALLIANCE_SPEAKER = new Pose2d(-0.04,5.55, Rotation2d.fromDegrees(0));
     //TODO fix it impossible 
-    public static final Pose2d RED_ALLIANCE_SPEAKER = new Pose2d(6.5273,2.1842, Rotation2d.fromDegrees(180));
+    public static final Pose2d RED_ALLIANCE_SPEAKER = new Pose2d(16.54 - (-0.04),2.1842, Rotation2d.fromDegrees(180));
 
     /*motor falcon stats */
     public static final int PULES_PER_REV = 2048;
@@ -84,9 +84,9 @@ public class ShooterConstants {
     public static double WANTED_VEL_CLOSE = 14;
 
     public static class AmpPera {
-        public static final double ANGLE = 44;
-        public static final double DOWN = 14;
-        public static final double UP = 4;
+        public static final double ANGLE = 45;
+        public static final double DOWN = 21;
+        public static final double UP = 8;
     }
 
 }

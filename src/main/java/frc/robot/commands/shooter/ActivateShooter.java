@@ -81,6 +81,7 @@ public class ActivateShooter extends Command {
       vUp = angleToVel.getSecond();
       Vdown = vUp;
       a = angleToVel.getFirst();
+    }
       double dis = shooter.getDistanceFromAngle(a);
       double disError = dis - shooter.getDis();
       disError = MathUtil.applyDeadband(disError, 2);
@@ -105,7 +106,6 @@ public class ActivateShooter extends Command {
         shooter.isShootingReady(false);
       }
     }
-  }
 
   // Called once the command ends or is interrupted.
   @Override

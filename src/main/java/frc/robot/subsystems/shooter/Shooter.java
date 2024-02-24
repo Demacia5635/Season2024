@@ -499,6 +499,7 @@ public class Shooter extends SubsystemBase {
     @Override
     public void periodic() {
         super.periodic();
+       
         
         /*if the angle is at the end it reset the dis */
         if (isLimit()){

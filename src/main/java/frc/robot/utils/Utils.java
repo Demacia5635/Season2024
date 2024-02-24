@@ -42,7 +42,7 @@ public class Utils {
 
   private static double shootDistance[] = {1.35, 1.96, 2.5, 3.7};
   private static double shootAngle[] = {56, 47.5, 40, 37};
-  private static double shootVelocity[] = {17, 17, 17.5, 17.5};
+  private static double shootVelocity[] = {14, 17, 17.5, 17.5};
   // auto points
   // {1.35, 1.96, 2.5, 3.7}
   // {56, 53, 37, 34}

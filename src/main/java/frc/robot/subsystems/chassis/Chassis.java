@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.RobotContainer;
 import frc.robot.PathFollow.Util.pathPoint;
 import frc.robot.Sysid.Sysid;
 import frc.robot.Sysid.Sysid.Gains;
@@ -24,6 +25,7 @@ import frc.robot.commands.chassis.CheckModulesSteerVelocity;
 import frc.robot.commands.chassis.SetModuleAngle;
 import frc.robot.commands.intake.IntakeCommand;
 import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.subsystems.vision.utils.UpdatedPoseEstimatorClasses.SwerveDrivePoseEstimator;
 import frc.robot.utils.Utils;
 import frc.robot.subsystems.chassis.SwerveModule;
@@ -62,7 +64,7 @@ public class Chassis extends SubsystemBase {
         new SwerveModule(FRONT_RIGHT, this),
         new SwerveModule(BACK_LEFT, this),
         new SwerveModule(BACK_RIGHT, this),
-    };
+    };    
 
     //configAllFactoryDefaut();
 
@@ -125,6 +127,10 @@ public class Chassis extends SubsystemBase {
     SmartDashboard.putNumber("RIGHT FRONT", modules[1].getAngleDegrees());
     SmartDashboard.putNumber("LEFT BACK", modules[2].getAngleDegrees());
     SmartDashboard.putNumber("RIGHT BACK", modules[3].getAngleDegrees());
+  }
+
+  public boolean isRed() {
+    return DriverStation.getAlliance().get() == Alliance.Red;
   }
 
   public void setGyroAngle(double angle){
@@ -351,10 +357,16 @@ public class Chassis extends SubsystemBase {
     return finalVector.getAngle();
 
   }
+  
+    public static Translation2d speakerPosition() {
+    return RobotContainer.robotContainer.isRed()? ShooterConstants.RED_ALLIANCE_SPEAKER.getTranslation():
+      ShooterConstants.BLUE_ALLIANCE_SPEAKER.getTranslation();
+  }
 
   @Override
   public void periodic() {
     poseEstimator.update(getAngle(), getModulePositions());
     field.setRobotPose(getPose());
+    SmartDashboard.putNumber("Distance from speaker", speakerPosition().getDistance(getPose().getTranslation()));
  }
 }

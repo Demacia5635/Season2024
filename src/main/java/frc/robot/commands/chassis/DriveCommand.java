@@ -40,14 +40,13 @@ public class DriveCommand extends Command {
   public DriveCommand(Chassis chassis, CommandXboxController commandXboxController) {
     this.chassis = chassis;
     this.commandXboxController = commandXboxController;
-    this.isRed = false;
     addRequirements(chassis);
-    commandXboxController.b().onTrue(new InstantCommand(() -> precisionDrive = !precisionDrive));
+    commandXboxController.rightBumper().onTrue(new InstantCommand(() -> precisionDrive = !precisionDrive));
     // commandXboxController.y().onTrue(new InstantCommand((() -> this.wantedAngleApriltag = chassis.getClosetAngleApriltag())).andThen(() -> rotateToApriltag = true));
   }
   @Override
   public void initialize() {
-    isRed = RobotContainer.robotContainer.isRed();
+    isRed = chassis.isRed();
     speaker = (isRed) ? new Translation2d(16.54 - (-0.04), 5.5) : new Translation2d(-0.04, 5.55);
     direction = isRed ? 1 : -1;
   }

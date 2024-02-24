@@ -1,5 +1,7 @@
 package frc.robot;
 
+import static frc.robot.utils.Utils.speakerPosition;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -19,8 +21,10 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.shooter.ActivateShooter;
 import frc.robot.commands.shooter.AngleControl;
 import frc.robot.commands.shooter.AngleGoToAngle;
+import frc.robot.commands.shooter.AngleGoToAngle2;
 import frc.robot.commands.shooter.AngleQuel;
 import frc.robot.commands.shooter.ShooterPowering;
+import frc.robot.commands.shooter.ShooterPowering2;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.subsystems.vision.Vision;
@@ -37,6 +41,7 @@ import frc.robot.commands.chassis.Paths.PathFollow;
 import frc.robot.commands.intake.DispenseCommand;
 import frc.robot.commands.intake.IntakeCommand;
 import frc.robot.commands.intake.IntakeToShooter;
+import frc.robot.commands.intake.IntakeToShooter2;
 import frc.robot.subsystems.amp.Amp;
 import frc.robot.subsystems.chassis.Chassis;
 import frc.robot.subsystems.intake.Intake;
@@ -106,6 +111,9 @@ public class RobotContainer implements Sendable {
   }
   public void createCommands() {
 
+    SmartDashboard.putNumber("wanted vel", 0);
+    SmartDashboard.putNumber("wanted angle", 20);
+
     driveToNote = new DriveToNote(chassis, 1).raceWith(new IntakeCommand(intake));
     // shoot = new IntakeToShooter(intake, shooter, vel);
     shoot = new InstantCommand(()->shooter.isShooting(true));
@@ -123,7 +131,7 @@ public class RobotContainer implements Sendable {
     this.isRed = isRed;
   }
   public boolean isRed() {
-    return isRed;
+    return true;
   }
 
   @Override
@@ -144,29 +152,51 @@ public class RobotContainer implements Sendable {
 
     Trigger overrideAuto = new Trigger(() -> Utils.joystickOutOfDeadband(commandController));
 
+
+
     commandController.y().onTrue(driveToNote);
+    commandController.a().onTrue(manualIntake);
+    commandController.x().onTrue(new AngleGoToAngle2(shooter, 0).alongWith(new ShooterPowering2(shooter, 0)));
+
+
     //commandController.x().onTrue(activateShooter);
+    // commandController.x().onTrue(new AngleGoToAngle(shooter, Utils.getShootingAngleVelocity(
+    //speakerPosition().getDistance(chassis.getPose().getTranslation())).getFirst())
+    // .alongWith(new ShooterPowering(shooter, Utils.getShootingAngleVelocity(
+    //   speakerPosition().getDistance(chassis.getPose().getTranslation())).getSecond())));
+   // commandController.b().onTrue(new AngleGoToAngle(shooter, ShooterConstants.AmpPera.ANGLE).alongWith(new RunCommand(()->shooter.setVel(ShooterConstants.AmpPera.UP, ShooterConstants.AmpPera.DOWN), shooter)));
+   commandController.b().onTrue(activateAmp); 
+   commandController.pov(0).whileTrue(new IntakeToShooter2(intake, shooter, 15));
+    commandController.pov(180).whileTrue(new IntakeToShooter(intake, shooter, ShooterConstants.AmpPera.UP, ShooterConstants.AmpPera.DOWN));
+    commandController.back().onTrue(resetOdometry);
+    commandController.leftBumper().onTrue(disableCommand);
+
+    commandController.pov(270).onTrue(new GoToAMP(shooter, chassis, intake, true));
+    
+    /*commandController.x().onTrue(activateShooter);
     commandController.povRight().onTrue(new AngleControl(shooter, commandController));
     // B - defined in Drive
-    commandController.a().onTrue(manualIntake);
+
+    
     commandController.pov(0).whileTrue(shoot);
-    commandController.pov(180).onTrue(new AngleGoToAngle(shooter, ShooterConstants.AmpPera.ANGLE).alongWith(new RunCommand(()->shooter.setVel(ShooterConstants.AmpPera.UP, ShooterConstants.AmpPera.UP), shooter)));
-    commandController.x().onTrue(new IntakeToShooter(intake, shooter, ShooterConstants.AmpPera.UP, ShooterConstants.AmpPera.UP));
+    commandController.pov(180).onTrue();
+    commandController.x().onTrue();
     commandController.pov(270).onTrue(new 
     GoToAMP(shooter, chassis, intake, false));
-    commandController.rightBumper().onTrue(disableCommand);
-    commandController.pov(90).onTrue(new InstantCommand(()-> chassis.setPose(new Pose2d(new Translation2d(1.75, 5.5), new Rotation2d()))));
-    commandController.back().onTrue(resetOdometry);
-    overrideAuto.onTrue(chassis.getDefaultCommand() == null ? null : chassis.getDefaultCommand());
+    
+    commandController.pov(90).onTrue(new InstantCommand(()-> chassis.setPose(new Pose2d(new Translation2d(1.75, 5.5), new Rotation2d())))); */
+    overrideAuto.onTrue(chassis.getDefaultCommand());
 }
 
   public void calibrate() {
     disableCommand.schedule();
   }
+
    
   public Command getAutonomousCommand() {
     // return null;
-    return new StartTOP(chassis, shooter, intake, isRed);
+    return new RunCommand(()->shooter.angleSetPow(.1), shooter);
+    //return new StartTOP(chassis, shooter, intake, isRed);
    //return new PathFollow(chassis, points, 4, 12, 0, false);
   }
 }
