@@ -32,7 +32,7 @@ public class Utils {
     }
     
   public static double deadband(double x, double threshold) {
-    return (Math.abs(x) < threshold)?0:x;
+    return MathUtil.applyDeadband(x, threshold);
   }
 
   public static boolean seeNote() {
@@ -92,5 +92,12 @@ public class Utils {
   public static Translation2d speakerPosition() {
     return RobotContainer.robotContainer.isRed()? ShooterConstants.RED_ALLIANCE_SPEAKER.getTranslation():
       ShooterConstants.BLUE_ALLIANCE_SPEAKER.getTranslation();
+  }
+
+  public static double angelErrorInDegrees(Rotation2d r1, Rotation2d r2, double deadband) {
+    return MathUtil.applyDeadband(MathUtil.inputModulus(r1.minus(r2).getDegrees(), -180, 180),deadband);
+  }
+  public static double angelErrorInRadians(Rotation2d r1, Rotation2d r2, double deadband) {
+    return MathUtil.applyDeadband(MathUtil.angleModulus(r1.minus(r2).getRadians()),deadband);
   }
 }
