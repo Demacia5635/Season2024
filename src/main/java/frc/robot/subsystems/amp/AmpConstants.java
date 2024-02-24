@@ -48,7 +48,7 @@ public class AmpConstants{
       public static final double INTAKE_PRE_LIMIT_POWER = 0.4;
 
 
-  
+      public static final double ubNormalA = 0.5;
 
     
     }

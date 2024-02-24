@@ -13,7 +13,7 @@ import frc.robot.subsystems.amp.Amp;
 public class climb_amp extends ParallelRaceGroup {
   /** Creates a new climb_amp. */
   public climb_amp(Amp amp) {
-    addCommands(new GoToAngleAmp(amp, Math.toRadians(160), 4, 4).andThen(new GoToAngleAmp(amp, Math.toRadians(160), 4, 4)));
+    addCommands(new GoToAngleAmp(amp, Math.toRadians(160), 4, 4).andThen(new Brake_Amp(amp, true)));
   }
 
 }
