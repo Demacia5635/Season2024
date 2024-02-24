@@ -6,7 +6,6 @@ package frc.robot.utils;
 
 
 import edu.wpi.first.wpilibj.Timer;
-import static frc.robot.subsystems.chassis.ChassisConstants.*;
 
 /** Add your docs here. */
 public class Trapezoid {

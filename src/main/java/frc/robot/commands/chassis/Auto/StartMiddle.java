@@ -2,30 +2,17 @@ package frc.robot.commands.chassis.Auto;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.PathFollow.Util.pathPoint;
-import frc.robot.commands.chassis.DriveAndPickNote;
 import frc.robot.commands.chassis.DriveToNote;
-import frc.robot.commands.chassis.GoToAngleChassis;
-import frc.robot.commands.chassis.Paths.PathFollow;
 import frc.robot.commands.intake.IntakeCommand;
 import frc.robot.commands.intake.IntakeToShooter;
 import frc.robot.commands.shooter.AngleGoToAngle;
 import frc.robot.commands.shooter.ShooterPowering;
-import frc.robot.commands.shooter.ShooterShoot;
 import frc.robot.subsystems.chassis.Chassis;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.shooter.Shooter;
-import frc.robot.subsystems.shooter.ShooterConstants;
-import frc.robot.subsystems.shooter.ShooterConstants.CommandParams;
-import frc.robot.subsystems.shooter.utils.shootFromAnyPlace;
-import frc.robot.utils.Utils;
-
-import static frc.robot.subsystems.shooter.ShooterConstants.*;
 
 public class StartMiddle extends SequentialCommandGroup {
   //shootFromAnyPlace shootFromAnyPlace = new shootFromAnyPlace();

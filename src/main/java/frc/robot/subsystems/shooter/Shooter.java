@@ -5,14 +5,12 @@
 package frc.robot.subsystems.shooter;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
@@ -22,17 +20,11 @@ import static frc.robot.subsystems.shooter.ShooterConstants.PULES_PER_REV;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import frc.robot.RobotContainer;
-import frc.robot.Sysid.Sysid;
 import frc.robot.commands.shooter.ActivateShooter;
-import frc.robot.commands.shooter.AngleQuel;
-import frc.robot.subsystems.intake.Intake;
-import frc.robot.subsystems.shooter.ShooterConstants;
-import frc.robot.subsystems.shooter.ShooterConstants.Shooting;
 import frc.robot.subsystems.shooter.utils.LookUpTable;
 import frc.robot.subsystems.shooter.ShooterConstants.AngleChanger;;
 

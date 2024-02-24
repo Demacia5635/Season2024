@@ -1,20 +1,11 @@
 package frc.robot.commands.chassis;
 
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.PS4Controller;
-import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.chassis.Chassis;
-import frc.robot.subsystems.leds.SubStrip;
-import frc.robot.utils.Utils;
 
 import static frc.robot.utils.Utils.*;
 
@@ -29,7 +20,6 @@ public class DriveCommand extends Command {
   private boolean isRed;
   private boolean precisionDrive = false;
 
-  private Translation2d speaker;
   // Rotation2d wantedAngleApriltag = new Rotation2d();
   // boolean rotateToApriltag = false;
   // PIDController rotationPidController = new PIDController(0.03, 0, 0.0008);
@@ -45,7 +35,6 @@ public class DriveCommand extends Command {
   @Override
   public void initialize() {
     isRed = chassis.isRed();
-    speaker = (isRed) ? new Translation2d(16.54 - (-0.04), 5.5) : new Translation2d(-0.04, 5.55);
     direction = isRed ? 1 : -1;
   }
 
@@ -72,19 +61,17 @@ public class DriveCommand extends Command {
             * Math.toRadians(90);
       }
     } */
-    if (rot == 0 && RobotContainer.robotContainer.shooter.isActiveForSpeaker()) { // rotate to speaker
-      Translation2d vec = speaker.minus(chassis.getPose().getTranslation()); // vector from speaker to robot
-      Rotation2d tgtAngle = vec.getAngle(); // angle we need to rotate to
-      double angleError = Utils.angelErrorInRadians(tgtAngle, chassis.getAngle(), Math.toRadians(1));
-      velRot = angleError * 0.3;
-    }
     if (precisionDrive) {
       velX /= 4;
       velY /= 4;
       velRot /= 4;
     }
     ChassisSpeeds speeds = new ChassisSpeeds(velX, velY, velRot);
-    chassis.setVelocities(speeds);
+    if (rot == 0 && RobotContainer.robotContainer.shooter.isActiveForSpeaker()) { // rotate to speaker
+      chassis.setVelocitiesRotateToSpeake(speeds);
+    } else {
+      chassis.setVelocities(speeds);
+    }
   }
 
 }

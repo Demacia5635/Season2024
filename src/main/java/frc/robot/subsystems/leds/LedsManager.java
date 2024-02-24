@@ -5,9 +5,6 @@
 package frc.robot.subsystems.leds;
 
 import java.util.Arrays;
-import java.util.stream.IntStream;
-import java.util.List;
-import java.util.ArrayList;
 
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;

@@ -1,7 +1,6 @@
 package frc.robot.subsystems.leds.utils;
 
 import java.util.Arrays;
-import java.util.List;
 
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;

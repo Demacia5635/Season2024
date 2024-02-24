@@ -1,33 +1,18 @@
 package frc.robot.subsystems.intake;
 
-import frc.robot.subsystems.intake.IntakeConstants;
-
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
-import com.fasterxml.jackson.annotation.JsonCreator.Mode;
-
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.AnalogInput;
-import edu.wpi.first.wpilibj.AnalogTrigger;
 import edu.wpi.first.wpilibj.Counter;
-import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.RobotContainer;
 import frc.robot.commands.intake.DispenseCommand;
 import frc.robot.commands.intake.IntakeCommand;
-import frc.robot.commands.intake.ShootCommand;
 import frc.robot.subsystems.intake.IntakeConstants.*;
 
 public class Intake extends SubsystemBase {
