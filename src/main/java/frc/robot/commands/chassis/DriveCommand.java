@@ -2,6 +2,7 @@ package frc.robot.commands.chassis;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.PS4Controller;
@@ -23,13 +24,17 @@ public class DriveCommand extends Command {
   private double direction;
 
   private boolean isRed;
+  private boolean isLookingAtSpicer = false;
   private boolean precisionDrive = false;
+
+  private Translation2d speaker;
   Rotation2d wantedAngleApriltag = new Rotation2d();
   boolean rotateToApriltag = false;
   PIDController rotationPidController = new PIDController(0.03, 0,0.0008);
 
   private double[]llpython;
   private double Dist;
+
 
 
   public DriveCommand(Chassis chassis, CommandXboxController commandXboxController) {
@@ -40,10 +45,10 @@ public class DriveCommand extends Command {
     commandXboxController.b().onTrue(new InstantCommand(() -> precisionDrive = !precisionDrive));
     // commandXboxController.y().onTrue(new InstantCommand((() -> this.wantedAngleApriltag = chassis.getClosetAngleApriltag())).andThen(() -> rotateToApriltag = true));
   }
-
   @Override
   public void initialize() {
     isRed = RobotContainer.robotContainer.isRed();
+    speaker = (isRed) ? new Translation2d(16.54 - (-0.04), 5.5) : new Translation2d(-0.04, 5.55);
     direction = isRed ? 1 : -1;
   }
 
@@ -77,6 +82,17 @@ public class DriveCommand extends Command {
         velRot = rotationPidController.calculate(chassis.getAngle().getDegrees(),wantedAngleApriltag.getDegrees())*Math.toRadians(90);
       }
      
+    }
+    if(isLookingAtSpicer){
+      if(Math.abs(
+        (speaker.getAngle()).minus(chassis.getAngle()).getDegrees()) >= -1 &&
+      Math.abs((speaker.getAngle()).minus(chassis.getAngle()).getDegrees()) <= 1) {
+        velRot = 0;
+        rotateToApriltag = false;
+      }
+      else{
+        velRot = rotationPidController.calculate(chassis.getAngle().getDegrees(),speaker.getAngle().getDegrees())*Math.toRadians(90);
+      }
     }
     if (precisionDrive) {
       velX /= 4;
