@@ -15,7 +15,6 @@ import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.subsystems.shooter.ShooterConstants.AmpPera;
 
-import static frc.robot.subsystems.shooter.ShooterConstants.*;
 
 public class GoToAMP extends SequentialCommandGroup {
   

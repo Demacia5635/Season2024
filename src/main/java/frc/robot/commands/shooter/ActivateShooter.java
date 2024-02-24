@@ -5,7 +5,6 @@
 package frc.robot.commands.shooter;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -28,29 +27,21 @@ public class ActivateShooter extends Command {
   Chassis chassis;
   Translation2d speaker;
   boolean finish = false;
-  boolean isAmp = false;
 
   /** Creates a new ActivateShooter. */
   public ActivateShooter(Shooter shooter, Intake intake, Chassis chassis, boolean isContinious) {
-    // Use addRequirements() here to declare subsystem dependencies.
-    isFollowing = true;
+    this(shooter, intake, chassis, null, isContinious);
+  }
+
+  public ActivateShooter(Shooter shooter, Intake intake, Chassis chassis, Translation2d from, boolean isContinious) {
+    this.isFollowing = from == null;
+    this.from = from;
     this.shooter = shooter;
     this.intake = intake;
     this.chassis = chassis;
     this.timer = new Timer();
     this.isContinious = isContinious;
-    addRequirements(shooter);
-  }
-
-  public ActivateShooter(Shooter shooter, Intake intake, Chassis chassis, Translation2d from, boolean isContinious,
-      boolean isAmp) {
-    this.isFollowing = false;
-    this.shooter = shooter;
-    this.intake = intake;
-    this.timer = new Timer();
-    this.isContinious = isContinious;
     this.from = from;
-    this.isAmp = isAmp;
     addRequirements(shooter);
   }
 
@@ -60,6 +51,7 @@ public class ActivateShooter extends Command {
     speaker = Utils.speakerPosition();
     finish = false;
     timer.reset();
+    shooter.isActive(true);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -115,6 +107,7 @@ public class ActivateShooter extends Command {
       shooter.feedingStop();
       shooter.angleStop();
       intake.stop();
+      shooter.isActive(false);
     }
 
   }

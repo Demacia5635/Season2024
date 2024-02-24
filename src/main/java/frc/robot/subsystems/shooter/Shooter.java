@@ -26,8 +26,11 @@ import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
+import frc.robot.RobotContainer;
 import frc.robot.Sysid.Sysid;
+import frc.robot.commands.shooter.ActivateShooter;
 import frc.robot.commands.shooter.AngleQuel;
+import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.subsystems.shooter.ShooterConstants.Shooting;
 import frc.robot.subsystems.shooter.utils.LookUpTable;
@@ -62,6 +65,7 @@ public class Shooter extends SubsystemBase {
     private boolean isShooting  = false;
     private boolean isShootingAmp = false;
     private boolean isShootingReady = false;
+    private boolean isActive = false;
     
     /**
      * <pre>
@@ -214,6 +218,7 @@ public class Shooter extends SubsystemBase {
         isShooting = false;
         isShootingAmp = false;
         isShootingReady = false;
+        isActive = false;
     }
 
     /**
@@ -444,11 +449,29 @@ public class Shooter extends SubsystemBase {
     public void isShootingReady(boolean isShootingReady) {
         this.isShootingReady = isShootingReady;
     }
+    public boolean isActive() {
+        return isActive;
+    }
+    public void isActive(boolean isActive) {
+        this.isActive = isActive;
+    }
+
+    public boolean isActiveForSpeaker() {
+        return isActive && !isShootingAmp;
+    }
+
     public Command getShootCommand() {
         return new InstantCommand(()->isShooting(true)).andThen(new WaitCommand(0.5));
     }
     public Command getShootCommandWhenReady() {
         return new WaitUntilCommand(()->isShootingReady).andThen(getShootCommand());
+    }
+
+    public Command getActivateShooterToSpeaker() {
+        return new InstantCommand(()->isShootingAmp(false)).andThen(new ActivateShooter(this,RobotContainer.robotContainer.intake, RobotContainer.robotContainer.chassis,false));
+    }
+    public Command getActivateShooterToAmp() {
+        return new InstantCommand(()->isShootingAmp(true)).andThen(new ActivateShooter(this,RobotContainer.robotContainer.intake, RobotContainer.robotContainer.chassis,false));
     }
 
     public void shoot() {
