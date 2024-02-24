@@ -19,10 +19,7 @@ public class GoToNoteCommandTest extends Command {
 
  private double Angle;
  private double Dist;
- private double Dist_OfSet;
- private double No_Dist_OfSet;
  private double Mol;
- private double[] Array;
  private double[] llpython;
 
  // Constructor initializes the chassis and adds it as a requirement

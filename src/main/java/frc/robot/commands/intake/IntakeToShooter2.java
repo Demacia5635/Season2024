@@ -4,14 +4,10 @@
 
 package frc.robot.commands.intake;
 
-import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.intake.Intake;
-import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.shooter.Shooter;
-import frc.robot.subsystems.shooter.ShooterConstants;
-import frc.robot.subsystems.shooter.Shooter.SHOOTER_MOTOR;
 
 /**command that get take the note from the intake and giving it to the shooter */
 public class IntakeToShooter2 extends Command {
@@ -34,7 +30,7 @@ public class IntakeToShooter2 extends Command {
      * @param intake the wanted intake
      * @param shooter the wanted shooter
      */
-    public IntakeToShooter2(Intake intake, Shooter shooter, double shootingVelUp, double shoootingVelDown) {
+    public IntakeToShooter2(Intake intake, Shooter shooter, double shootingVelUp, double shootingVelDown) {
         // Use addRequirements() here to declare subsystem dependencies.
         this.intake = intake;
         this.shooter = shooter;

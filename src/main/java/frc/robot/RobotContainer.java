@@ -1,44 +1,25 @@
 package frc.robot;
 
-import static frc.robot.utils.Utils.speakerPosition;
-
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PS4Controller;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.shooter.ActivateShooter;
-import frc.robot.commands.shooter.AngleControl;
-import frc.robot.commands.shooter.AngleGoToAngle;
 import frc.robot.commands.shooter.AngleGoToAngle2;
 import frc.robot.commands.shooter.AngleQuel;
-import frc.robot.commands.shooter.ShooterPowering;
 import frc.robot.commands.shooter.ShooterPowering2;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.utils.Utils;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.PathFollow.Util.pathPoint;
-import frc.robot.commands.amp.AmpIntake2;
-
 import frc.robot.commands.chassis.DriveCommand;
 import frc.robot.commands.chassis.DriveToNote;
-import frc.robot.commands.chassis.Auto.StartTOP;
 import frc.robot.commands.chassis.Paths.GoToAMP;
-import frc.robot.commands.chassis.Paths.PathFollow;
-import frc.robot.commands.intake.DispenseCommand;
 import frc.robot.commands.intake.IntakeCommand;
 import frc.robot.commands.intake.IntakeToShooter;
 import frc.robot.commands.intake.IntakeToShooter2;
@@ -46,7 +27,6 @@ import frc.robot.subsystems.amp.Amp;
 import frc.robot.subsystems.chassis.Chassis;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.leds.LedControll;
-import frc.robot.subsystems.leds.SubStrip;
 
 public class RobotContainer implements Sendable {
   public static RobotContainer robotContainer;
@@ -131,7 +111,7 @@ public class RobotContainer implements Sendable {
     this.isRed = isRed;
   }
   public boolean isRed() {
-    return true;
+    return isRed;
   }
 
   @Override

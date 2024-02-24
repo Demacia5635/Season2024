@@ -1,9 +1,9 @@
 package frc.robot.commands.amp;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.amp.Amp;
 
-public class Climb extends CommandBase {
+public class Climb extends Command {
 
     Amp amp;
     

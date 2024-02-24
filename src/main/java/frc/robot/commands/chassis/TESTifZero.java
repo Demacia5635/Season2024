@@ -4,7 +4,6 @@
 
 package frc.robot.commands.chassis;
 
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.chassis.Chassis;
 
@@ -18,7 +17,7 @@ public class TESTifZero extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    ChassisSpeeds speeds = new ChassisSpeeds();
+//    ChassisSpeeds speeds = new ChassisSpeeds();
   }
 
   // Called every time the scheduler runs while the command is scheduled.

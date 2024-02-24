@@ -1,12 +1,12 @@
 package frc.robot.commands.intake;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.intake.Intake;
 
-public class DispenseCommand extends CommandBase {
+public class DispenseCommand extends Command {
     private final Intake intake;
     private double count = 0;
 
