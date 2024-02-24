@@ -1,5 +1,7 @@
 package frc.robot;
 
+import static frc.robot.utils.Utils.speakerPosition;
+
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.PS4Controller;
@@ -139,7 +141,7 @@ public class RobotContainer implements Sendable {
 
     commandController.y().onTrue(driveToNote);
     commandController.a().onTrue(manualIntake);
-    commandController.x().onTrue(activateShooter.alongWith(new GoToAngleChassis(chassis, speakerPosition())));
+    commandController.x().onTrue(activateShooter.alongWith(new GoToAngleChassis(chassis, Utils.speakerPosition())));
 
 
     //commandController.x().onTrue(activateShooter);
