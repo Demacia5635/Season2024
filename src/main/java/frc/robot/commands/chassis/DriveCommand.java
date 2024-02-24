@@ -72,19 +72,17 @@ public class DriveCommand extends Command {
             * Math.toRadians(90);
       }
     } */
-    if (rot == 0 && RobotContainer.robotContainer.shooter.isActiveForSpeaker()) { // rotate to speaker
-      Translation2d vec = speaker.minus(chassis.getPose().getTranslation()); // vector from speaker to robot
-      Rotation2d tgtAngle = vec.getAngle(); // angle we need to rotate to
-      double angleError = Utils.angelErrorInRadians(tgtAngle, chassis.getAngle(), Math.toRadians(1));
-      velRot = angleError * 0.3;
-    }
     if (precisionDrive) {
       velX /= 4;
       velY /= 4;
       velRot /= 4;
     }
     ChassisSpeeds speeds = new ChassisSpeeds(velX, velY, velRot);
-    chassis.setVelocities(speeds);
+    if (rot == 0 && RobotContainer.robotContainer.shooter.isActiveForSpeaker()) { // rotate to speaker
+      chassis.setVelocitiesRotateToSpeake(speeds);
+    } else {
+      chassis.setVelocities(speeds);
+    }
   }
 
 }

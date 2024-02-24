@@ -55,6 +55,7 @@ public class PathFollow extends CommandBase {
   static double fieldLength = 16.54; // in meters
   static double fieldHeight = 8.21; // in meters
   boolean isRed;
+  boolean rotateToSpeaker = false;
 
   Trajectory traj;
   double distancePassed = 0;
@@ -91,6 +92,10 @@ public class PathFollow extends CommandBase {
     // calculate the total length of the path
     segments = new Segment[1 + ((points.length - 2) * 2)];
 
+  }
+  public PathFollow(Chassis chassis, pathPoint[] points, double maxVel, double maxAcc, double finishVel,boolean isRed, boolean rotateToSpeaker) {
+    this(chassis, points, maxVel, maxAcc, finishVel, isRed);
+    this.rotateToSpeaker = rotateToSpeaker;
   }
 
   /*public String currentSegmentInfo() {
@@ -204,7 +209,7 @@ public class PathFollow extends CommandBase {
     trajField.setRobotPose(chassis.getPose());
 
     chassisPose = chassis.getPose();
-    SmartDashboard.putNumber("Angle traj", points[segmentIndex].getRotation().getDegrees());
+//    SmartDashboard.putNumber("Angle traj", points[segmentIndex].getRotation().getDegrees());
 
     // current velocity vector
     Translation2d currentVelocity = new Translation2d(chassis.getChassisSpeeds().vxMetersPerSecond,
@@ -242,11 +247,15 @@ public class PathFollow extends CommandBase {
 
     rotationVelocity = wantedAngle.minus(chassis.getAngle()).getRadians();
 
-    SmartDashboard.putNumber("DIFF", wantedAngle.getRadians() - chassis.getAngle().getRadians());
+//    SmartDashboard.putNumber("DIFF", wantedAngle.getRadians() - chassis.getAngle().getRadians());
     if (totalLeft <= 0.01)
       velVector = new Translation2d(0, 0);
     ChassisSpeeds speed = new ChassisSpeeds(velVector.getX(), velVector.getY(), rotationVelocity);
-    chassis.setVelocities(speed);
+    if(rotateToSpeaker) {
+      chassis.setVelocitiesRotateToSpeake(speed);
+    } else {
+      chassis.setVelocities(speed);
+    }
 
   }
 

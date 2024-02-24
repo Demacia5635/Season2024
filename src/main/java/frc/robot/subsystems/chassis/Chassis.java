@@ -1,5 +1,6 @@
 package frc.robot.subsystems.chassis;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -210,6 +211,12 @@ public class Chassis extends SubsystemBase {
     SwerveModuleState[] states = KINEMATICS.toSwerveModuleStates(relativeSpeeds);
     setModuleStates(states);
   }
+  public void setVelocitiesRotateToSpeake(ChassisSpeeds speeds) {
+    speeds.omegaRadiansPerSecond = getRadPerSecToSpeaker();
+    ChassisSpeeds relativeSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds, getAngle());
+    SwerveModuleState[] states = KINEMATICS.toSwerveModuleStates(relativeSpeeds);
+    setModuleStates(states);
+  }
 
 
   public void configAllFactoryDefaut() {
@@ -356,6 +363,12 @@ public class Chassis extends SubsystemBase {
 
     return finalVector.getAngle();
 
+  }
+
+  public double getRadPerSecToSpeaker() {
+    Translation2d speaker = Utils.speakerPosition();
+    double error = Utils.angelErrorInRadians(speaker.minus(getPose().getTranslation()).getAngle(), getAngle(), 1);
+    return MathUtil.clamp(error * 0.3, -MAX_OMEGA_VELOCITY, MAX_OMEGA_VELOCITY);
   }
   
     public static Translation2d speakerPosition() {
