@@ -13,24 +13,23 @@ import frc.robot.subsystems.chassis.Chassis;
 import frc.robot.utils.Trapezoid;
 import frc.robot.utils.TrapezoidNoam;
 
-public class GoToAngleChassis extends Command {
+public class GoToAngleChassisDeg extends Command {
   /** Creates a new GoToAngleChassis. */
   Rotation2d wantedAngle;
   Chassis chassis;
   TrapezoidNoam rotationTrapezoid;
-  Translation2d speaker;
-  double kP = 0.02;
+  double kP = 0.3;
   
-  public GoToAngleChassis(Chassis chassis, Translation2d speaker) {
-    this.speaker = speaker;
+  public GoToAngleChassisDeg(Chassis chassis, Rotation2d angle) {
     this.chassis = chassis;
+    this.wantedAngle = angle;
     //rotationTrapezoid = new TrapezoidNoam(180, 360);
     addRequirements(chassis);
   }
 
   @Override
   public void initialize() {
-    wantedAngle = (chassis.getPose().getTranslation().minus(speaker)).getAngle();
+    wantedAngle = (chassis.getAngle().plus(wantedAngle));
   }
 
   @Override

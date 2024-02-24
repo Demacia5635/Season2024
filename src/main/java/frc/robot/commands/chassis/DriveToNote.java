@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj.Timer;
 
 public class DriveToNote extends Command {
   Chassis chassis;
-  double velocity = 1;
+  double velocity;
   double lastDistance;
 
   double[] llpython;
@@ -24,14 +24,15 @@ public class DriveToNote extends Command {
   ChassisSpeeds speed;
   boolean finish = false;
 
-  PIDController rotationPidController = new PIDController(0.08, 0.00, 0.006);
+  PIDController rotationPidController = new PIDController(0.04, 0.00, 0.006);
 
   Timer timer = new Timer();
 
   public static boolean isStart = false;
 
-  public DriveToNote(Chassis chassis) {
+  public DriveToNote(Chassis chassis, double vel) {
     this.chassis = chassis;
+    this.velocity = vel;
     addRequirements(chassis);
   }
 
@@ -79,7 +80,8 @@ public class DriveToNote extends Command {
 
   @Override
   public boolean isFinished() {
-    return finish || timer.get() > 0.5;
+    return finish || timer.get() > 1;
   }
 
 }
+

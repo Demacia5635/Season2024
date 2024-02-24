@@ -32,6 +32,7 @@ import frc.robot.commands.amp.AmpIntake2;
 import frc.robot.commands.chassis.DriveCommand;
 import frc.robot.commands.chassis.DriveToNote;
 import frc.robot.commands.chassis.Auto.StartTOP;
+import frc.robot.commands.chassis.Paths.GoToAMP;
 import frc.robot.commands.chassis.Paths.PathFollow;
 import frc.robot.commands.intake.DispenseCommand;
 import frc.robot.commands.intake.IntakeCommand;
@@ -50,6 +51,7 @@ public class RobotContainer implements Sendable {
   PS4Controller controller = new PS4Controller(1);
 
   // pathPoint[] points = {
+    
   // new pathPoint(0, 0, Rotation2d.fromDegrees(0), 0, false),
   // new pathPoint(2, 3, Rotation2d.fromDegrees(0), 0, false),
   // };
@@ -104,7 +106,7 @@ public class RobotContainer implements Sendable {
   }
   public void createCommands() {
 
-    driveToNote = new DriveToNote(chassis).raceWith(new IntakeCommand(intake));
+    driveToNote = new DriveToNote(chassis, 1).raceWith(new IntakeCommand(intake));
     // shoot = new IntakeToShooter(intake, shooter, vel);
     shoot = new InstantCommand(()->shooter.isShooting(true));
     // activateShooter = new ShooterPowering(shooter, vel).alongWith(new AngleGoToAngle(shooter, angle));
@@ -143,12 +145,15 @@ public class RobotContainer implements Sendable {
     Trigger overrideAuto = new Trigger(() -> Utils.joystickOutOfDeadband(commandController));
 
     commandController.y().onTrue(driveToNote);
-    commandController.x().onTrue(activateShooter);
+    //commandController.x().onTrue(activateShooter);
     commandController.povRight().onTrue(new AngleControl(shooter, commandController));
     // B - defined in Drive
     commandController.a().onTrue(manualIntake);
     commandController.pov(0).whileTrue(shoot);
-    commandController.pov(180).onTrue(activateAmp);
+    commandController.pov(180).onTrue(new AngleGoToAngle(shooter, ShooterConstants.AmpPera.ANGLE).alongWith(new RunCommand(()->shooter.setVel(ShooterConstants.AmpPera.UP, ShooterConstants.AmpPera.UP), shooter)));
+    commandController.x().onTrue(new IntakeToShooter(intake, shooter, ShooterConstants.AmpPera.UP, ShooterConstants.AmpPera.UP));
+    commandController.pov(270).onTrue(new 
+    GoToAMP(shooter, chassis, intake, false));
     commandController.rightBumper().onTrue(disableCommand);
     commandController.pov(90).onTrue(new InstantCommand(()-> chassis.setPose(new Pose2d(new Translation2d(1.75, 5.5), new Rotation2d()))));
     commandController.back().onTrue(resetOdometry);

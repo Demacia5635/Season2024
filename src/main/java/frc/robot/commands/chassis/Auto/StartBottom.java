@@ -27,7 +27,7 @@ import frc.robot.utils.Utils;
 
 import static frc.robot.subsystems.shooter.ShooterConstants.*;
 
-public class StartMiddle extends SequentialCommandGroup {
+public class StartBottom extends SequentialCommandGroup {
   //shootFromAnyPlace shootFromAnyPlace = new shootFromAnyPlace();
   double wantedAngleClose = 53;
   double wantedVelClose = 15.5;
@@ -50,7 +50,7 @@ public class StartMiddle extends SequentialCommandGroup {
   
 
   /** Creates a new StartTOP auto. */
-  public StartMiddle(Chassis chassis, Shooter shooter, Intake intake, boolean isRed) {
+  public StartBottom(Chassis chassis, Shooter shooter, Intake intake, boolean isRed) {
 
 
   Translation2d speaker = (isRed) ? new Translation2d(16.54 - (-0.04), 5.5) : new Translation2d(-0.04, 5.55);
@@ -67,4 +67,5 @@ public class StartMiddle extends SequentialCommandGroup {
   }
 
 }
+
 

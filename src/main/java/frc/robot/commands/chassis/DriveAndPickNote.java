@@ -10,6 +10,6 @@ public class DriveAndPickNote extends ParallelRaceGroup {
   /** Auto drive to note and intake it. */
   public DriveAndPickNote(Chassis chassis, Intake intake) {
 
-    addCommands(new DriveToNote(chassis), new IntakeCommand(intake));
+    addCommands(new DriveToNote(chassis, 1), new IntakeCommand(intake));
   }
 }
