@@ -200,7 +200,7 @@ public class RobotContainer implements Sendable{
         commandController.y().onTrue(new DriveToNote(chassis).raceWith(new IntakeCommand(intake)));
         //amp_climp
         //priper to climb:)
-        commandController.b().onTrue(new GoToAngleAmp(amp, Math.toRadians(110), 2, 2).alongWith(new AngleGoToAngle(shooter, 0)));
+        commandController.b().onTrue(new GoToAngleAmp(amp, Math.toRadians(120), 2, 2).alongWith(new AngleGoToAngle(shooter, 0)));
         //commandController.rightTrigger().onTrue(new GoToAngleAmp(amp, wantedAngle, wantedAmpVel, wantedAmpAngle));
         // if(controller.getCrossButton()) new InstantCommand(()->{chassis.setOdometryToForward();});
     // commandController.x().onTrue(new InstantCommand(()->{chassis.setOdometryToForward();}));
