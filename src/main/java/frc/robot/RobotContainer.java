@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.shooter.ActivateShooter;
 import frc.robot.commands.shooter.AngleControl;
@@ -35,6 +36,7 @@ import frc.robot.commands.amp.AmpIntake2;
 
 import frc.robot.commands.chassis.DriveCommand;
 import frc.robot.commands.chassis.DriveToNote;
+import frc.robot.commands.chassis.GoToAngleChassis;
 import frc.robot.commands.chassis.Auto.StartTOP;
 import frc.robot.commands.chassis.Paths.GoToAMP;
 import frc.robot.commands.chassis.Paths.PathFollow;
@@ -50,7 +52,7 @@ import frc.robot.subsystems.leds.SubStrip;
 
 public class RobotContainer implements Sendable {
   public static RobotContainer robotContainer;
-  private Boolean isRed = false;
+  private Boolean isRed = true;
   CommandXboxController commandController;
   CommandXboxController commandController2;
   PS4Controller controller = new PS4Controller(1);
@@ -156,7 +158,7 @@ public class RobotContainer implements Sendable {
 
     commandController.y().onTrue(driveToNote);
     commandController.a().onTrue(manualIntake);
-    commandController.x().onTrue(new AngleGoToAngle2(shooter, 0).alongWith(new ShooterPowering2(shooter, 0)));
+    commandController.x().onTrue(activateShooter.alongWith(new GoToAngleChassis(chassis, speakerPosition())));
 
 
     //commandController.x().onTrue(activateShooter);
@@ -166,12 +168,12 @@ public class RobotContainer implements Sendable {
     //   speakerPosition().getDistance(chassis.getPose().getTranslation())).getSecond())));
    // commandController.b().onTrue(new AngleGoToAngle(shooter, ShooterConstants.AmpPera.ANGLE).alongWith(new RunCommand(()->shooter.setVel(ShooterConstants.AmpPera.UP, ShooterConstants.AmpPera.DOWN), shooter)));
    commandController.b().onTrue(activateAmp); 
-   commandController.pov(0).whileTrue(new IntakeToShooter2(intake, shooter, 15));
+   commandController.pov(0).whileTrue(new IntakeToShooter(intake, shooter, 15));
     commandController.pov(180).whileTrue(new IntakeToShooter(intake, shooter, ShooterConstants.AmpPera.UP, ShooterConstants.AmpPera.DOWN));
     commandController.back().onTrue(resetOdometry);
     commandController.leftBumper().onTrue(disableCommand);
 
-    commandController.pov(270).onTrue(new GoToAMP(shooter, chassis, intake, true));
+    commandController.pov(270).onTrue(new GoToAMP(shooter, chassis, intake, true).raceWith(new WaitCommand(2)));
     
     /*commandController.x().onTrue(activateShooter);
     commandController.povRight().onTrue(new AngleControl(shooter, commandController));
@@ -195,8 +197,8 @@ public class RobotContainer implements Sendable {
    
   public Command getAutonomousCommand() {
     // return null;
-    return new RunCommand(()->shooter.angleSetPow(.1), shooter);
-    //return new StartTOP(chassis, shooter, intake, isRed);
+    //return new RunCommand(()->shooter.angleSetPow(.1), shooter);
+    return new StartTOP(chassis, shooter, intake, isRed);
    //return new PathFollow(chassis, points, 4, 12, 0, false);
   }
 }

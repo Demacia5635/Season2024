@@ -84,9 +84,9 @@ public class ShooterConstants {
     public static double WANTED_VEL_CLOSE = 14;
 
     public static class AmpPera {
-        public static final double ANGLE = 45;
-        public static final double DOWN = 21;
-        public static final double UP = 8;
+        public static final double ANGLE = 46;
+        public static final double DOWN = 23;
+        public static final double UP = 7;
     }
 
 }
