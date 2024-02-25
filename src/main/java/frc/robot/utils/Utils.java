@@ -66,11 +66,15 @@ public class Utils {
   }
 
   public static Translation2d speakerPosition() {
-    return RobotContainer.robotContainer.isRed()? Field.Speaker: Field.RedSpeaker;
+    return RobotContainer.robotContainer.isRed()? Field.RedSpeaker: Field.Speaker;
   }
 
   public static Translation2d ampPosition() {
-    return RobotContainer.robotContainer.isRed()? Field.AMP: Field.RedAMP;
+    return RobotContainer.robotContainer.isRed()? Field.RedAMP: Field.AMP;
+  }
+
+  public static Translation2d subShootPosition() {
+    return RobotContainer.robotContainer.isRed()? Field.RedSubShootPosition: Field.SubShootPosition;
   }
 
   public static double angelErrorInDegrees(Rotation2d r1, Rotation2d r2, double deadband) {

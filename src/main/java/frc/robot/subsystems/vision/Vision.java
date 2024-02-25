@@ -161,6 +161,7 @@ public class Vision extends SubsystemBase {
     @Override
     public void periodic() {
         super.periodic();
+        /* 
 
         try {
             getNewDataFromLimelightX(RaspberryPi.AmpSideRaspberry);
@@ -169,6 +170,7 @@ public class Vision extends SubsystemBase {
         } catch (Exception e) {
 
         }
+        */
 
     }
 

@@ -54,6 +54,7 @@ public class RobotContainer implements Sendable {
   public Command disableCommand;
   public Command resetOdometry;
 
+
   public RobotContainer() {
     robotContainer = this;
     
@@ -100,12 +101,7 @@ public class RobotContainer implements Sendable {
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    SmartDashboard.putBoolean("is Red Alliance", isRed);
-    try {
-      Thread.sleep(30);
-    } catch (InterruptedException e) {
-    }
-    builder.addBooleanProperty("is Red Alliance", null, this::isRed);
+    builder.addBooleanProperty("is Red",this::isRed, this::isRed);
   }
 
   private void configureBindings() {
@@ -117,6 +113,7 @@ public class RobotContainer implements Sendable {
     // POV-UP - Shoot
     // POV-Down - Amp
     // POV-Left - Go to Amp and shoot
+    // POV-Right - Active shooter to shoot from subwaffer
     // RightBumper - disable all
     // Back - chassie gyro set
 
@@ -131,6 +128,7 @@ public class RobotContainer implements Sendable {
     commandController.back().onTrue(resetOdometry);
     commandController.leftBumper().onTrue(disableCommand);
     commandController.pov(270).onTrue(new GoToAMP1());
+    commandController.pov(90).onTrue(shooter.activateShooterToSpeakerFromSub());
     
     overrideAuto.onTrue(chassis.getDefaultCommand());
 }

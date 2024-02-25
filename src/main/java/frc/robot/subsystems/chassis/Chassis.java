@@ -116,7 +116,7 @@ public class Chassis extends SubsystemBase {
   }
 
   public boolean isRed() {
-    return DriverStation.getAlliance().get() == Alliance.Red;
+    return RobotContainer.robotContainer.isRed();
   }
 
   public void setGyroAngle(double angle){
@@ -349,7 +349,7 @@ public class Chassis extends SubsystemBase {
 
   public double getRadPerSecToSpeaker() {
     Translation2d speaker = Utils.speakerPosition();
-    double error = Utils.angelErrorInRadians(speaker.minus(getPose().getTranslation()).getAngle(), getAngle(), 1);
+    double error = Utils.angelErrorInRadians(speaker.minus(getPose().getTranslation()).getAngle(), getAngle(), Math.toRadians(1));
     return MathUtil.clamp(error * 0.3, -MAX_OMEGA_VELOCITY, MAX_OMEGA_VELOCITY);
   }
   

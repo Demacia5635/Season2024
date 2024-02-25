@@ -25,6 +25,8 @@ import frc.robot.RobotContainer;
 import frc.robot.commands.intake.IntakeCommand;
 import frc.robot.commands.shooter.ActivateShooter;
 import frc.robot.subsystems.shooter.utils.LookUpTable;
+import frc.robot.utils.Utils;
+
 import static frc.robot.subsystems.shooter.ShooterConstants.*;
 
 /**subsystem shooter and angle changing */
@@ -374,7 +376,11 @@ public class Shooter extends SubsystemBase {
      * @return a command that will set isShootingToAmp false and activate the shooter to shoot at the amp
      */
     public Command activateShooterToSpeaker() {
-        return new InstantCommand(()->isShootingAmp(false)).andThen(new ActivateShooter(this,RobotContainer.robotContainer.intake, RobotContainer.robotContainer.chassis,false));
+        return new InstantCommand(()->isShootingAmp(false)).alongWith(new ActivateShooter(this,RobotContainer.robotContainer.intake, RobotContainer.robotContainer.chassis,false));
+    }
+    public Command activateShooterToSpeakerFromSub() {
+        return new InstantCommand(()->isShootingAmp(false)).
+        alongWith(new ActivateShooter(this,RobotContainer.robotContainer.intake, RobotContainer.robotContainer.chassis,Utils.subShootPosition(),false));
     }
 
     /**

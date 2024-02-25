@@ -36,6 +36,7 @@ public class DriveCommand extends Command {
   public void initialize() {
     isRed = chassis.isRed();
     direction = isRed ? 1 : -1;
+    System.out.println(" is red = " + isRed);
   }
 
   @Override
