@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.shooter.AngleQuel;
 import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.utils.Utils;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -22,6 +23,7 @@ import frc.robot.commands.chassis.GoToAngleChassis;
 import frc.robot.commands.chassis.Auto.StartTOP;
 import frc.robot.commands.chassis.Paths.GoToAMP;
 import frc.robot.commands.intake.IntakeCommand;
+import frc.robot.commands.intake.IntakeToShooter;
 import frc.robot.subsystems.amp.Amp;
 import frc.robot.subsystems.chassis.Chassis;
 import frc.robot.subsystems.intake.Intake;
@@ -95,11 +97,11 @@ public class RobotContainer implements Sendable {
 
     driveToNote = new DriveToNote(chassis, 1).raceWith(new IntakeCommand(intake));
     // shoot = new IntakeToShooter(intake, shooter, vel);
-    shoot = shooter.getShootCommand();
+    shoot = shooter.shootCommand();
     // activateShooter = new ShooterPowering(shooter, vel).alongWith(new AngleGoToAngle(shooter, angle));
-    activateShooter = shooter.getActivateShooterToSpeaker();
+    activateShooter = shooter.activateShooterToSpeaker();
     manualIntake = new IntakeCommand(intake);
-    activateAmp = shooter.getActivateShooterToAmp();
+    activateAmp = shooter.activateShooterToAmp();
     resetOdometry = new InstantCommand(()-> {chassis.setOdometryToForward();}, chassis);
     disableCommand = new InstantCommand(()-> stopAll(),intake, shooter).andThen(new AngleQuel(shooter));
 }
@@ -147,7 +149,7 @@ public class RobotContainer implements Sendable {
    // commandController.b().onTrue(new AngleGoToAngle(shooter, ShooterConstants.AmpPera.ANGLE).alongWith(new RunCommand(()->shooter.setVel(ShooterConstants.AmpPera.UP, ShooterConstants.AmpPera.DOWN), shooter)));
    commandController.b().onTrue(activateAmp); 
    commandController.pov(0).whileTrue(new IntakeToShooter(intake, shooter, 15));
-    commandController.pov(180).whileTrue(new IntakeToShooter(intake, shooter, ShooterConstants.AmpPera.UP, ShooterConstants.AmpPera.DOWN));
+    commandController.pov(180).whileTrue(new IntakeToShooter(intake, shooter, ShooterConstants.AmpVar.UP, ShooterConstants.AmpVar.DOWN));
     commandController.back().onTrue(resetOdometry);
     commandController.leftBumper().onTrue(disableCommand);
 

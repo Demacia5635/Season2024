@@ -25,7 +25,7 @@ public class TurnToSpeaker extends Command {
     public TurnToSpeaker(Chassis chassis) {
         // Use addRequirements() here to declare subsystem dependencies.
         this.chassis = chassis;
-        speaker = DriverStation.getAlliance().get() == Alliance.Red ? ShooterConstants.RED_ALLIANCE_SPEAKER : ShooterConstants.BLUE_ALLIANCE_SPEAKER ;
+        speaker = DriverStation.getAlliance().get() == Alliance.Red ? ShooterConstants.Speaker.RED_ALLIANCE_SPEAKER : ShooterConstants.Speaker.BLUE_ALLIANCE_SPEAKER ;
         addRequirements(chassis);
     }
 

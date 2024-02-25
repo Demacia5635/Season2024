@@ -23,18 +23,15 @@ public class AngleQuel extends Command {
         addRequirements(shooter);
     }
 
-    // Called when the command is initially scheduled.
     @Override
     public void initialize() {}
 
-    // Called every time the scheduler runs while the command is scheduled.
     /**set the anlge motor pow */
     @Override
     public void execute() {
         shooter.angleSetPow(0.3);
     }
 
-    // Called once the command ends or is interrupted.
     /**stops the anlge motor and reset the dis */
     @Override
     public void end(boolean interrupted) {
@@ -42,7 +39,6 @@ public class AngleQuel extends Command {
         shooter.resetDis();
     }
 
-    // Returns true when the command should end.
     /**check if the motor is at the limit */
     @Override
     public boolean isFinished() {

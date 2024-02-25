@@ -8,7 +8,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.Shooter.SHOOTER_MOTOR;
 
-/**command that moving the feeding motor until the note is in the shotooter */
+/** @deprecated
+ * command that moving the feeding motor until the note is in the shotooter */
 public class ShooterFeeding extends Command {
 
     /**the wanted shooter */
@@ -28,7 +29,6 @@ public class ShooterFeeding extends Command {
         addRequirements(shooter);
     }
 
-    // Called when the command is initially scheduled.
     /**put the feeding motor at brake */
     @Override
     public void initialize() {
@@ -36,7 +36,6 @@ public class ShooterFeeding extends Command {
         shooter.brake(SHOOTER_MOTOR.FEEDING);
     }
 
-    // Called every time the scheduler runs while the command is scheduled.
     /**set the feeding motor power */
     @Override
     public void execute() {
@@ -52,14 +51,12 @@ public class ShooterFeeding extends Command {
         }
     }
 
-    // Called once the command ends or is interrupted.
     /**stop the feeding motor when the note is in the shooter */
     @Override
     public void end(boolean interrupted) {
         shooter.feedingStop();
     }
 
-    // Returns true when the command should end.
     /**checks if the note is in the shooter */
     @Override
     public boolean isFinished() {

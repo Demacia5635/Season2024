@@ -19,7 +19,7 @@ public class GoToAMP1 extends ParallelRaceGroup {
   
   public GoToAMP1() {
     Shooter shooter = RobotContainer.robotContainer.shooter;
-    addCommands(shooter.getActivateShooterToAmp());
-    addCommands(new PathFollow(toAmp).andThen(shooter.getShootCommand()));
+    addCommands(shooter.activateShooterToAmp());
+    addCommands(new PathFollow(toAmp).andThen(shooter.shootCommand()));
   }
 }

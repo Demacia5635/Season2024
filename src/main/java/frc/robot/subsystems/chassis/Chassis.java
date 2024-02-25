@@ -357,8 +357,8 @@ public class Chassis extends SubsystemBase {
   }
   
     public static Translation2d speakerPosition() {
-    return RobotContainer.robotContainer.isRed()? ShooterConstants.RED_ALLIANCE_SPEAKER.getTranslation():
-      ShooterConstants.BLUE_ALLIANCE_SPEAKER.getTranslation();
+    return RobotContainer.robotContainer.isRed()? ShooterConstants.Speaker.RED_ALLIANCE_SPEAKER.getTranslation():
+      ShooterConstants.Speaker.BLUE_ALLIANCE_SPEAKER.getTranslation();
   }
 
   @Override

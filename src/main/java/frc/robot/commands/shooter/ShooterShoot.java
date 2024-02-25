@@ -10,7 +10,8 @@ import frc.robot.subsystems.shooter.Shooter;
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
-/**sequential command group that will make the shooter shoot */
+/** @deprecated
+ * sequential command group that will make the shooter shoot */
 public class ShooterShoot extends SequentialCommandGroup {
 
     /**

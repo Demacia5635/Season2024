@@ -63,12 +63,12 @@ public class StartTOP1 extends SequentialCommandGroup {
     }
 
     private Command shoot() {
-        return shooter.getShootCommand();
+        return shooter.shootCommand();
     }
 
     private Command initShooter() {
         return new ActivateShooter(shooter, intake, chassis, true)
-                .andThen(new WaitUntilCommand(() -> shooter.isShootingReady()));
+                .andThen(new WaitUntilCommand(() -> shooter.isShootingReady));
     }
 
     private Command goTo(pathPoint point) {

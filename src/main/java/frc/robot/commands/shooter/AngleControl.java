@@ -28,11 +28,9 @@ public class AngleControl extends Command {
         addRequirements(shooter);
     }
 
-    // Called when the command is initially scheduled.
     @Override
     public void initialize() {}
 
-    // Called every time the scheduler runs while the command is scheduled.
     /**if the joystick is less than 0.3 that means its does not meant to be there and calibrate to 0 */
     @Override
     public void execute() {
@@ -40,14 +38,12 @@ public class AngleControl extends Command {
         shooter.angleSetPow(pow);
     }
 
-    // Called once the command ends or is interrupted.
     /**stop the angle motor when finishing the command */
     @Override
     public void end(boolean interrupted) {
         shooter.angleStop();
     }
 
-    // Returns true when the command should end.
     /**checks if the amper is more than the limit */
     @Override
     public boolean isFinished() {

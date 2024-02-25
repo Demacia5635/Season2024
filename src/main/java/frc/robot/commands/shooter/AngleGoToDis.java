@@ -41,7 +41,9 @@ public class AngleGoToDis extends Command {
     }
 
     // Called every time the scheduler runs while the command is scheduled.
-    /**using the motion magic control mode to go to the specific dis */
+    /**
+     * using specifc pow to go to the right angle
+     */
     @Override
     public void execute() {
         if ((wantedDis - shooter.getDis()) > 0){
@@ -51,14 +53,12 @@ public class AngleGoToDis extends Command {
         }
     }
 
-    // Called once the command ends or is interrupted.
     /**stop the angle motor when the command have finished */
     @Override
     public void end(boolean interrupted) {
         shooter.angleStop();
     }
 
-    // Returns true when the command should end.
     /**
      * every headline is for every if condition
      * @limits use the limits function from shooter to check if the anlge motor have not run off
@@ -75,18 +75,5 @@ public class AngleGoToDis extends Command {
                 ((wantedDis - startDis > 0) && (shooter.getDis() >= wantedDis)) ||
                 ((wantedDis - startDis < 0) && (shooter.getDis() <= wantedDis)) ||
                 (Math.abs(wantedDis - shooter.getDis())) < 1);
-        // if (!shooter.isSupplyLimit(SHOOTER_MOTOR.ANGLE)){
-        //     if (!shooter.isDisLimits(wantedDis - startDis > 0)){
-        //         if (!((wantedDis - startDis > 0) && (shooter.getDis() >= wantedDis))){
-        //             if (!((wantedDis - startDis < 0) && (shooter.getDis() <= wantedDis))){
-        //                 if (!(Math.abs(wantedDis - shooter.getDis()) < 1)){
-        //                     return false;
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
-
-        // return true;
     }
 }

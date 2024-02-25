@@ -8,7 +8,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.Shooter.SHOOTER_MOTOR;
 
-/**command that will send the note from the feeding motor to the shooting motor */
+/** @deprecated
+ * command that will send the note from the feeding motor to the shooting motor */
 public class ShooterSending extends Command {
 
     /**the wanted shooter */

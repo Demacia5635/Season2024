@@ -1,6 +1,8 @@
 package frc.robot.subsystems.shooter.utils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -11,14 +13,10 @@ import java.util.List;
  */
 public class LookUpTable {
 
-    /**
-     * The internal table data as a list of double arrays.
-     */
+    /**The internal table data as a list of double arrays. */
     private final List<double[]> table;
 
-    /**
-     * The number of columns in the table (one more than the actual number of interpolated values).
-     */
+    /**The number of columns in the table (one more than the actual number of interpolated values). */
     private final int size;
 
     /**
@@ -43,6 +41,7 @@ public class LookUpTable {
      */
     public LookUpTable(double[][] table) {
         this.table = new ArrayList<>();
+        sort(table);
         for (double[] row : table) {
             this.table.add(row);
         }
@@ -55,6 +54,19 @@ public class LookUpTable {
         }
     }
 
+    /**
+     * sort an array
+     * @param arr the wanted sorted array in double[][]
+     */
+    private void sort(double[][] arr){
+        Arrays.sort(arr, new Comparator<double[]>() {
+            @Override
+            public int compare(double[] entry1, double[] entry2){
+                return Double.compare(entry1[0], entry2[0]);
+            }
+        });
+    }
+    
     /**
      * Adds a new row to the table.
      *

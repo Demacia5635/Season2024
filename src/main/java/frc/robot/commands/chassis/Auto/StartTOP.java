@@ -24,7 +24,6 @@ import frc.robot.subsystems.chassis.Chassis;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterConstants;
-import frc.robot.subsystems.shooter.ShooterConstants.CommandParams;
 import frc.robot.subsystems.shooter.utils.shootFromAnyPlace;
 import frc.robot.utils.Utils;
 

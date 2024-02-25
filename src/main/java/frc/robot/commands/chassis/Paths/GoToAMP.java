@@ -12,7 +12,7 @@ import frc.robot.subsystems.chassis.Chassis;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterConstants;
-import frc.robot.subsystems.shooter.ShooterConstants.AmpPera;
+import frc.robot.subsystems.shooter.ShooterConstants.AmpVar;
 
 
 public class GoToAMP extends SequentialCommandGroup {
@@ -24,9 +24,9 @@ public class GoToAMP extends SequentialCommandGroup {
       new pathPoint(15.13, 8.5, Rotation2d.fromDegrees(-90), 0, false)};
     
 
-    addCommands(new PathFollow(chassis, pointsToAmp, 2, 6, 0, isRed).alongWith(new AngleGoToAngle(shooter, AmpPera.ANGLE))
+    addCommands(new PathFollow(chassis, pointsToAmp, 2, 6, 0, isRed).alongWith(new AngleGoToAngle(shooter, AmpVar.ANGLE))
     .alongWith(new ActivateShooter(shooter, intake, chassis, false).
     alongWith(new InstantCommand(()->shooter.isShootingAmp(true))))
-    .andThen(new IntakeToShooter(intake, shooter, ShooterConstants.AmpPera.UP, ShooterConstants.AmpPera.DOWN)).withTimeout(1));
+    .andThen(new IntakeToShooter(intake, shooter, ShooterConstants.AmpVar.UP, ShooterConstants.AmpVar.DOWN)).withTimeout(1));
   }
 }

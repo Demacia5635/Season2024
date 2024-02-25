@@ -44,14 +44,13 @@ public class Utils {
   public static double extrapolatre(double d1, double d2, double v1, double v2, double d) {
     return v1 + (v2-v1)*(d-d1)/(d2-d1);
   }
-  
+
   public static Pair<Double,Double> getShootingAngleVelocity(double distance) {
     double v = 0;
     double a = 0;
     int i = 0;
-    while(i < shootDistance.length && shootDistance[i] < distance) {
-      i++;
-    }
+    for(i = 0; i < shootDistance.length && shootDistance[i] < distance; i++)
+
     if(i == shootDistance.length) {
       v = shootVelocity[i-1];
       a = shootAngle[i-1];

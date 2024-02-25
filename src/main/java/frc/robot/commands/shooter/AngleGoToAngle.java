@@ -35,7 +35,6 @@ public class AngleGoToAngle extends Command {
         this.wantedAngle = angle;
     }
 
-    // Called when the command is initially scheduled.
     /**
      * set the angle motor in brake mode
      * set the start dis
@@ -49,7 +48,6 @@ public class AngleGoToAngle extends Command {
         wantedDis = AngleChanger.KA * Math.cos(wantedAngle * Math.PI / 180) + Math.sqrt(Math.pow(AngleChanger.KA, 2) * Math.pow(Math.cos(wantedAngle * Math.PI / 180), 2) - Math.pow(AngleChanger.KA, 2) + Math.pow(AngleChanger.KB, 2));
     }
 
-    // Called every time the scheduler runs while the command is scheduled.
     /**using constant pow to go to the specific dis */
     @Override
     public void execute() {
@@ -63,14 +61,12 @@ public class AngleGoToAngle extends Command {
         // shooter.angleMotionMagic(wantedDis);
     }
 
-    // Called once the command ends or is interrupted.
     /**stop the angle motor when the command have finished */
     @Override
     public void end(boolean interrupted) {
         shooter.angleStop();
     }
 
-    // Returns true when the command should end.
     /**
      * every headline is for every if condition
      * @limits use the limits function from shooter to check if the anlge motor have not run off
@@ -83,33 +79,18 @@ public class AngleGoToAngle extends Command {
     @Override
     public boolean isFinished() {
 
-        SmartDashboard.putBoolean("1", !shooter.isSupplyLimit(SHOOTER_MOTOR.ANGLE));
-        SmartDashboard.putBoolean("2", !shooter.isDisLimits(wantedDis - startDis > 0));
+        // SmartDashboard.putBoolean("1", shooter.isSupplyLimit(SHOOTER_MOTOR.ANGLE));
+        // SmartDashboard.putBoolean("2", shooter.isDisLimits(wantedDis - startDis > 0));
 
-        SmartDashboard.putBoolean("3", !((wantedDis - startDis > 0) && (shooter.getDis() >= wantedDis)));
-        SmartDashboard.putBoolean("4", !((wantedDis - startDis < 0) && (shooter.getDis() <= wantedDis)));
-        SmartDashboard.putBoolean("5", !(Math.abs(wantedDis - shooter.getDis()) < 1));
+        // SmartDashboard.putBoolean("3", ((wantedDis - startDis > 0) && (shooter.getDis() >= wantedDis)));
+        // SmartDashboard.putBoolean("4", ((wantedDis - startDis < 0) && (shooter.getDis() <= wantedDis)));
+        // SmartDashboard.putBoolean("5", (Math.abs(wantedDis - shooter.getDis()) < 1));
 
+        return ((shooter.isSupplyLimit(SHOOTER_MOTOR.ANGLE)) ||
+                (shooter.isDisLimits(wantedDis - startDis > 0)) ||
+                ((wantedDis - startDis > 0) && (shooter.getDis() >= wantedDis)) ||
+                ((wantedDis - startDis < 0) && (shooter.getDis() <= wantedDis)) ||
+                (Math.abs(wantedDis - shooter.getDis())) < 1);
 
-
-        if (!shooter.isSupplyLimit(SHOOTER_MOTOR.ANGLE)){
-            if (!shooter.isDisLimits(wantedDis - startDis > 0)){
-                if (!((wantedDis - startDis > 0) && (shooter.getDis() >= wantedDis))){
-                    if (!((wantedDis - startDis < 0) && (shooter.getDis() <= wantedDis))){
-                        if (!(Math.abs(wantedDis - shooter.getDis()) < 1)){
-                            return false;
-                        }
-                    }
-                }
-            }
-        }
-
-
-       
-
-
-
-
-        return true;
     }
 }
