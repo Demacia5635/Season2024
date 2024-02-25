@@ -10,7 +10,6 @@ import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 
-
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.Pair;
@@ -29,19 +28,19 @@ import static frc.robot.subsystems.vision.VisionConstants.*;
 //#endregion
 
 public class Vision extends SubsystemBase {
-    //#region declaring fields    
+    // #region declaring fields
     Field2d noFilterVisionField;
     Field2d visionFieldavg5;
-    //#endregion
+    // #endregion
 
-    //#region declaring limelights
+    // #region declaring limelights
     PhotonCamera AmpSideRaspberry;
     PhotonPoseEstimator photonPoseEstimatorForAmpSideRaspberry;
     PhotonCamera ShooterSideRaspberry;
     PhotonPoseEstimator photonPoseEstimatorForShooterSideRaspberry;
-    //#endregion
+    // #endregion
 
-    //#region declaring poseEstimator chassis and buffers 
+    // #region declaring poseEstimator chassis and buffers
     SwerveDrivePoseEstimator poseEstimator;
     Chassis chassis;
 
@@ -49,11 +48,11 @@ public class Vision extends SubsystemBase {
     int lastData5;
     double lastUpdateTime5;
 
-    //#endregion
-    
-    //#region C'tor
+    // #endregion
+
+    // #region C'tor
     public Vision(Chassis chassis, SwerveDrivePoseEstimator estimator) {
-        
+
         this.chassis = chassis;
         this.poseEstimator = estimator;
         this.lastData5 = -1;
@@ -61,122 +60,125 @@ public class Vision extends SubsystemBase {
 
         this.AmpSideRaspberry = new PhotonCamera(AmpSideRaspberryName);
         this.ShooterSideRaspberry = new PhotonCamera(ShooterSideRaspberryName);
-        
 
-        //#region initializing photons pose estimators
+        // #region initializing photons pose estimators
         try {
-            this.photonPoseEstimatorForAmpSideRaspberry = new PhotonPoseEstimator(AprilTagFieldLayout.loadFromResource(AprilTagFields.k2024Crescendo.m_resourceFile),
-            PoseStrategy.AVERAGE_BEST_TARGETS, AmpSideRaspberry, robotCenterToAmpSideRaspberry);
+            this.photonPoseEstimatorForAmpSideRaspberry = new PhotonPoseEstimator(
+                    AprilTagFieldLayout.loadFromResource(AprilTagFields.k2024Crescendo.m_resourceFile),
+                    PoseStrategy.AVERAGE_BEST_TARGETS, AmpSideRaspberry, robotCenterToAmpSideRaspberry);
 
-            this.photonPoseEstimatorForShooterSideRaspberry = new PhotonPoseEstimator(AprilTagFieldLayout.loadFromResource(AprilTagFields.k2024Crescendo.m_resourceFile),
-            PoseStrategy.AVERAGE_BEST_TARGETS, ShooterSideRaspberry, robotCenterToShooterSideRaspberry);
-        } 
-        catch (IOException e) {
+            this.photonPoseEstimatorForShooterSideRaspberry = new PhotonPoseEstimator(
+                    AprilTagFieldLayout.loadFromResource(AprilTagFields.k2024Crescendo.m_resourceFile),
+                    PoseStrategy.AVERAGE_BEST_TARGETS, ShooterSideRaspberry, robotCenterToShooterSideRaspberry);
+        } catch (IOException e) {
             System.out.println("problem with photon pose estimators, probably one of the pi's is off!");
-        } 
-        //#endregion
+        }
+        // #endregion
 
-        //#region initializing buffers
-      
+        // #region initializing buffers
+
         for (int i = 0; i < buf5Avg.length; i++) {
             this.buf5Avg[i] = new VisionData(null, 0, poseEstimator);
         }
-        
-        //#endregion
 
-        //#region initializing fields for testing
-        this.noFilterVisionField= new Field2d();   
+        // #endregion
+
+        // #region initializing fields for testing
+        this.noFilterVisionField = new Field2d();
         this.visionFieldavg5 = new Field2d();
-        //#endregion
+        // #endregion
 
-        //#region putting fields on shuffleboard
+        // #region putting fields on shuffleboard
         SmartDashboard.putData("no Filter vision field", noFilterVisionField);
         SmartDashboard.putData("vision Avg 5 field", visionFieldavg5);
-        //#endregion
+        // #endregion
     }
 
-    //#endregion
-    
-    //#region Vision Main Methods
+    // #endregion
 
+    // #region Vision Main Methods
 
-    // calls the limelights to get updates and put the data in the buffer 
+    // calls the limelights to get updates and put the data in the buffer
     private void getNewDataFromLimelightX(RaspberryPi raspberryPi) {
-        //determines camera
+        // determines camera
         PhotonPoseEstimator photonPoseEstimator;
-        if(raspberryPi.equals(RaspberryPi.ShooterSideRaspberry))
+        if (raspberryPi.equals(RaspberryPi.ShooterSideRaspberry))
             photonPoseEstimator = photonPoseEstimatorForShooterSideRaspberry;
         else
             photonPoseEstimator = photonPoseEstimatorForAmpSideRaspberry;
 
         if (chassis.getVelocity().getNorm() <= maxValidVelcity) {
             var PhotonUpdate = photonPoseEstimator.update();
-            if(PhotonUpdate != null){
+            if (PhotonUpdate != null) {
                 try {
                     var estimatedRobotPose = PhotonUpdate.get();
                     var estimatedPose = estimatedRobotPose.estimatedPose;
-                    if(estimatedRobotPose != null){
-                        VisionData newVisionData5Avg = new VisionData(estimatedPose.toPose2d(), 
-                        estimatedRobotPose.timestampSeconds, poseEstimator);
-                        
-                        if(newVisionData5Avg != null && newVisionData5Avg.getPose() != null) {
-                            lastData5 = next5(); 
+                    if (estimatedRobotPose != null) {
+                        VisionData newVisionData5Avg = new VisionData(estimatedPose.toPose2d(),
+                                estimatedRobotPose.timestampSeconds, poseEstimator);
+
+                        if (newVisionData5Avg != null && newVisionData5Avg.getPose() != null) {
+                            lastData5 = next5();
                             buf5Avg[lastData5] = newVisionData5Avg;
-                       
+
                             noFilterVisionField.setRobotPose(newVisionData5Avg.getPose());
-                        }   
+                        }
                     }
-                } catch (NoSuchElementException e) {
-                    //System.out.println("got exception at get new data eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
+                } catch (Exception e) {
+                    // System.out.println("got exception at get new data
+                    // eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
                 }
             }
         }
     }
-    
-    //takes the visions snapshots from the buffer and medians or avg it and add vision mesurements to pose estimator
+
+    // takes the visions snapshots from the buffer and medians or avg it and add
+    // vision mesurements to pose estimator
     public void updateRobotPose5() {
         double time = getTime();
         if (validBuf5(time)) {
             Pair<Pose2d, Double> vData5AvgPair = avg(buf5Avg);
-            VisionData vDataAvg5 = new VisionData(vData5AvgPair.getFirst(), vData5AvgPair.getSecond(), poseEstimator)  ;
-            SmartDashboard.putBoolean("updates",vDataAvg5.getPose() != null && vDataAvg5 != null);
+            VisionData vDataAvg5 = new VisionData(vData5AvgPair.getFirst(), vData5AvgPair.getSecond(), poseEstimator);
+            SmartDashboard.putBoolean("updates", vDataAvg5.getPose() != null && vDataAvg5 != null);
             if (vDataAvg5.getPose() != null && vDataAvg5 != null) {
 
                 poseEstimator.addVisionMeasurement(new Pose2d(vDataAvg5.getPose().getTranslation(),
-                 chassis.getAngle()), vDataAvg5.getTimeStamp());
+                        chassis.getAngle()), vDataAvg5.getTimeStamp());
                 visionFieldavg5.setRobotPose(vDataAvg5.getPose());
 
                 lastUpdateTime5 = time;
 
-                for (VisionData vd : buf5Avg){
+                for (VisionData vd : buf5Avg) {
                     vd.clear();
                 }
-                
+
             }
-        } 
+        }
     }
 
-
-    //#endregion
-
+    // #endregion
 
     @Override
     public void periodic() {
         super.periodic();
 
-        getNewDataFromLimelightX(RaspberryPi.AmpSideRaspberry);
-        getNewDataFromLimelightX(RaspberryPi.ShooterSideRaspberry);
-        updateRobotPose5();
+        try {
+            getNewDataFromLimelightX(RaspberryPi.AmpSideRaspberry);
+            getNewDataFromLimelightX(RaspberryPi.ShooterSideRaspberry);
+            updateRobotPose5();
+        } catch (Exception e) {
+
+        }
 
     }
 
-    //#region util methods
+    // #region util methods
 
     public double getTime() {
         return Timer.getFPGATimestamp();
     }
 
-    public  Pair<Pose2d, Double> avg(VisionData[] visionDataArr) {
+    public Pair<Pose2d, Double> avg(VisionData[] visionDataArr) {
 
         double averageX = 0.0;
         double averageY = 0.0;
@@ -184,7 +186,7 @@ public class Vision extends SubsystemBase {
         double avarageTimeStamp = 0.0;
 
         for (VisionData vData : visionDataArr) {
-            if(vData != null && vData.getPose() != null){
+            if (vData != null && vData.getPose() != null) {
                 Pose2d pose = vData.getPose();
                 averageX += pose.getTranslation().getX();
                 averageY += pose.getTranslation().getY();
@@ -198,7 +200,8 @@ public class Vision extends SubsystemBase {
         averageRotation /= visionDataArr.length;
         avarageTimeStamp /= visionDataArr.length;
         // Create a new Pose2d with the calculated averages
-        return new Pair<Pose2d, Double>((new Pose2d(averageX, averageY, new Rotation2d(averageRotation))), avarageTimeStamp);
+        return new Pair<Pose2d, Double>((new Pose2d(averageX, averageY, new Rotation2d(averageRotation))),
+                avarageTimeStamp);
     }
 
     Comparator<VisionData> comperator = new Comparator<VisionData>() {
@@ -207,21 +210,21 @@ public class Vision extends SubsystemBase {
             return Double.compare(data0.getDiffrence(), data1.getDiffrence());
         }
     };
-    
+
     public VisionData median(VisionData[] visionDataArr) {
         Arrays.sort(visionDataArr, comperator);
         return visionDataArr[visionDataArr.length / 2];
     }
-    //#endregion
+    // #endregion
 
-    //#region BUF 5 methods
+    // #region BUF 5 methods
     int next5() {
         return (lastData5 + 1) % buf5Avg.length;
     }
-    
+
     private boolean validBuf5(double time) {
         double minTime = time - 2;
-        
+
         for (VisionData vData : buf5Avg) {
             if (vData.getTimeStamp() < minTime) {
                 return false;
@@ -229,17 +232,14 @@ public class Vision extends SubsystemBase {
         }
         return true;
     }
-   
+
     public double lastUpdateTimeStamp() {
         return lastUpdateTime5;
     }
-    
+
     public boolean validVisionPosition5() {
         return getTime() - lastUpdateTimeStamp() < 1;
     }
-    //#endregion
-    
-    
+    // #endregion
 
-    
 }
