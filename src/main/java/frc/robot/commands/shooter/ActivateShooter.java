@@ -177,7 +177,6 @@ public class ActivateShooter extends Command {
             intake.setPower(0);
             finish = !isContinious;
             shooter.isShootingReady(false);
-
         }
     }
 

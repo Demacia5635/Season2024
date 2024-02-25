@@ -11,10 +11,10 @@ public  final class VisionConstants {
 
 
   public static final Transform3d robotCenterToAmpSideRaspberry = new Transform3d(0.24, -0.32, 0.49, 
-  new Rotation3d(Math.toRadians(-6), Math.toRadians(-30), 0));
+  new Rotation3d(Math.toRadians(-6), Math.toRadians(-55), 0));
 
   public static final Transform3d robotCenterToShooterSideRaspberry = new Transform3d(-0.344, -0.264, 0.281, 
-  new Rotation3d(0, Math.toRadians(-35), Math.toRadians(180)));
+  new Rotation3d(0, Math.toRadians(-59), Math.toRadians(180)));
 
   public static final double maxValidVelcity = 2.0; // m/s - ignoring vision data abve this velocity
   public static final double maxValidAngleDiff = 10.0; // degrees - ignoring vision data if vision heading is off by more than this value
