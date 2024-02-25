@@ -6,8 +6,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Field;
 import frc.robot.RobotContainer;
-import frc.robot.subsystems.shooter.ShooterConstants;
 
 public class Utils {
     
@@ -40,10 +40,6 @@ public class Utils {
   private static double shootDistance[] = {1.35, 1.96, 2.5, 3.7};
   private static double shootAngle[] = {56, 47.5, 40, 37};
   private static double shootVelocity[] = {14, 17, 17.5, 17.5};
-  // auto points
-  // {1.35, 1.96, 2.5, 3.7}
-  // {56, 53, 37, 34}
-  // {16.5, 16.7, 17.5, 18}
 
   public static double extrapolatre(double d1, double d2, double v1, double v2, double d) {
     return v1 + (v2-v1)*(d-d1)/(d2-d1);
@@ -70,25 +66,12 @@ public class Utils {
     return new Pair<Double,Double>(a,v);
   }
 
-  // public static Command setLed(SubStrip led){
-  //   double[] llpython = NetworkTableInstance.getDefault().getTable("limelight").getEntry("llpython").getDoubleArray(new double[8]);
-  //   double Dist = llpython[0];
-  //   System.out.println("Dist is : " + Dist);
-  //   if(Dist != 0){
-  //     if(Dist <= 150){
-  //       return led.setBlink(Color.kGreen);
-  //     }
-  //     else{
-  //       return led.setColor(Color.kGreen);
-  //     }
-  //   } else {
-  //     return led.turnOff();
-  //   }
-  // }
-
   public static Translation2d speakerPosition() {
-    return RobotContainer.robotContainer.isRed()? ShooterConstants.RED_ALLIANCE_SPEAKER.getTranslation():
-      ShooterConstants.BLUE_ALLIANCE_SPEAKER.getTranslation();
+    return RobotContainer.robotContainer.isRed()? Field.Speaker: Field.RedSpeaker;
+  }
+
+  public static Translation2d ampPosition() {
+    return RobotContainer.robotContainer.isRed()? Field.AMP: Field.RedAMP;
   }
 
   public static double angelErrorInDegrees(Rotation2d r1, Rotation2d r2, double deadband) {

@@ -2,23 +2,24 @@
 package frc.robot.commands.chassis.Paths;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
+import frc.robot.Field;
+import frc.robot.RobotContainer;
 import frc.robot.PathFollow.Util.pathPoint;
-import frc.robot.subsystems.chassis.Chassis;
-import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.shooter.Shooter;
 
 
-public class GoToAMP1 extends ParallelCommandGroup {
+public class GoToAMP1 extends ParallelRaceGroup {
   
-  
-  public GoToAMP1(Shooter shooter, Chassis chassis, Intake intake, boolean isRed) {
-
-    pathPoint[] pointsToAmp = {
-      new pathPoint(0, 0, Rotation2d.fromDegrees(0), 0, false),
-      new pathPoint(14.321, 0.1, Rotation2d.fromDegrees(-90), 0.25, false)
+    pathPoint[] toAmp = {
+      new pathPoint(new Translation2d(), new Rotation2d()),
+      new pathPoint(Field.AMP, Rotation2d.fromDegrees(-90))
     };
+  
+  public GoToAMP1() {
+    Shooter shooter = RobotContainer.robotContainer.shooter;
     addCommands(shooter.getActivateShooterToAmp());
-    addCommands(new PathFollow(chassis, pointsToAmp, 4, 12, 0, isRed).andThen(shooter.getShootCommand()));
+    addCommands(new PathFollow(toAmp).andThen(shooter.getShootCommand()));
   }
 }

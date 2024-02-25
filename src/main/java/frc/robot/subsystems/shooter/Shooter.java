@@ -24,6 +24,7 @@ import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import frc.robot.RobotContainer;
+import frc.robot.commands.intake.IntakeCommand;
 import frc.robot.commands.shooter.ActivateShooter;
 import frc.robot.subsystems.shooter.utils.LookUpTable;
 import frc.robot.subsystems.shooter.ShooterConstants.AngleChanger;;
@@ -453,7 +454,8 @@ public class Shooter extends SubsystemBase {
     }
 
     public Command getShootCommand() {
-        return new InstantCommand(()->isShooting(true)).andThen(new WaitCommand(0.5));
+        Command cmd = new InstantCommand(()->isShooting(true)).andThen(new WaitCommand(0.5)); 
+        return cmd.raceWith(RobotContainer.robotContainer.intake.getActivateIntakeCommand());
     }
     public Command getShootCommandWhenReady() {
         return new WaitUntilCommand(()->isShootingReady).andThen(getShootCommand());

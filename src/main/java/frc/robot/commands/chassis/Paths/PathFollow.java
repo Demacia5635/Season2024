@@ -14,6 +14,8 @@ import static frc.robot.subsystems.chassis.ChassisConstants.*;
 import edu.wpi.first.math.trajectory.Trajectory.State;
 import java.util.ArrayList;
 import java.util.List;
+
+import frc.robot.RobotContainer;
 import frc.robot.PathFollow.Util.Leg;
 import frc.robot.PathFollow.Util.RoundedPoint;
 import frc.robot.PathFollow.Util.Segment;
@@ -62,6 +64,11 @@ public class PathFollow extends Command {
    * @param maxAccel the max accel in m/s2 (squared)
    * 
    */
+
+  public PathFollow(pathPoint[] points) {
+    this(RobotContainer.robotContainer.chassis,points,ChassisConstants.MAX_DRIVE_VELOCITY, ChassisConstants.DRIVE_ACCELERATION,0,RobotContainer.robotContainer.isRed());
+  }
+  
   public PathFollow(Chassis chassis, pathPoint[] points, double maxVel, double maxAcc, double finishVel,boolean isRed) {
     SmartDashboard.putData("Traj", trajField);
     this.points = points;

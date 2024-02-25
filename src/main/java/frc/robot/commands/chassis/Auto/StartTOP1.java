@@ -5,6 +5,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import frc.robot.Field;
 import frc.robot.RobotContainer;
 import frc.robot.Constants.ChassisConstants;
 import frc.robot.PathFollow.Util.pathPoint;
@@ -27,19 +28,11 @@ public class StartTOP1 extends SequentialCommandGroup {
     boolean isRed;
     Translation2d speaker;
 
-    static final double fieldLength = 16.54;
-    static final double fieldWidth = 8.21;
-
-    double nearNotesX = 1.4;
-    double farNotesX = fieldLength/2 - 1.5;
-    double topNearNoteY = fieldWidth/2 + 2*1.48 - 0.5; 
-    double topFarNoteY = fieldWidth/2 + 2*1.68;
-
     pathPoint dummyPoint = new pathPoint(0, 0, new Rotation2d(), 0, false);
-    pathPoint nearNote = new pathPoint(nearNotesX, topFarNoteY, Rotation2d.fromDegrees(-4), 0, false);
-    pathPoint topFarNote = new pathPoint(farNotesX, topFarNoteY, new Rotation2d(0), 0, false);
-    pathPoint secondFarNote = new pathPoint(farNotesX, topFarNoteY-1.68, new Rotation2d(0), 0, false);
-    pathPoint shootPoint = new pathPoint(2.5, 6.58, new Rotation2d(), 0, false);
+    pathPoint wingNote = offset(Field.WingNotes[0], -1.5,-0.5, -4);
+    pathPoint centerNote1 = offset(Field.CenterNotes[0], -2,0,0);
+    pathPoint centerNote2 = offset(Field.CenterNotes[1], -2,0,0);
+    pathPoint shootPoint = offset(Field.Speaker, 2.5,1,0);
 
     /** Creates a new StartTOP auto. */
     public StartTOP1() {
@@ -51,17 +44,22 @@ public class StartTOP1 extends SequentialCommandGroup {
 
         addCommands(initShooter());
         addCommands(shoot());
-        addCommands(getNote(nearNote));
+        addCommands(getNote(wingNote));
         addCommands(turnToSpeaker());
         addCommands(shoot());
-        addCommands(getNote(topFarNote));
+        addCommands(getNote(centerNote1));
         addCommands(goTo(shootPoint));
         addCommands(turnToSpeaker());
         addCommands(shoot());
-        addCommands(getNote(secondFarNote));
+        addCommands(getNote(centerNote2));
         addCommands(goTo(shootPoint));
         addCommands(turnToSpeaker());
         addCommands(shoot());
+    }
+
+    pathPoint offset(Translation2d from, double x, double y, double angle) {
+        Translation2d p = from.plus(new Translation2d(x,y));
+        return new pathPoint(p.getX(), p.getY(), Rotation2d.fromDegrees(angle),0,false);
     }
 
     private Command shoot() {

@@ -8,7 +8,9 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.Counter;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.intake.DispenseCommand;
@@ -141,6 +143,10 @@ public class Intake extends SubsystemBase {
         t *= IntakeConstants.Parameters.COUNTER_M_PERA;
         t += IntakeConstants.Parameters.COUNTER_B_PERA;
         return t < 300;
+    }
+
+    public Command getActivateIntakeCommand() {
+        return new StartEndCommand(()->setPower(1), ()->setPower(0), this);
     }
 
     @Override

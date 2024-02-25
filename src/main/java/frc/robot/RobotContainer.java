@@ -8,21 +8,15 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.commands.shooter.ActivateShooter;
-import frc.robot.commands.shooter.AngleGoToAngle2;
 import frc.robot.commands.shooter.AngleQuel;
-import frc.robot.commands.shooter.ShooterPowering2;
 import frc.robot.subsystems.shooter.Shooter;
-import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.utils.Utils;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.chassis.DriveCommand;
 import frc.robot.commands.chassis.DriveToNote;
-import frc.robot.commands.chassis.Paths.GoToAMP;
+import frc.robot.commands.chassis.Paths.GoToAMP1;
 import frc.robot.commands.intake.IntakeCommand;
-import frc.robot.commands.intake.IntakeToShooter;
-import frc.robot.commands.intake.IntakeToShooter2;
 import frc.robot.subsystems.amp.Amp;
 import frc.robot.subsystems.chassis.Chassis;
 import frc.robot.subsystems.intake.Intake;
@@ -96,13 +90,11 @@ public class RobotContainer implements Sendable {
 
     driveToNote = new DriveToNote(chassis, 1).raceWith(new IntakeCommand(intake));
     // shoot = new IntakeToShooter(intake, shooter, vel);
-    shoot = new InstantCommand(()->shooter.isShooting(true));
+    shoot = shooter.getShootCommand();
     // activateShooter = new ShooterPowering(shooter, vel).alongWith(new AngleGoToAngle(shooter, angle));
-    activateShooter = new ActivateShooter(shooter, intake, chassis, false).
-        alongWith(new InstantCommand(()->shooter.isShootingAmp(false)));
+    activateShooter = shooter.getActivateShooterToSpeaker();
     manualIntake = new IntakeCommand(intake);
-    activateAmp = new ActivateShooter(shooter, intake, chassis, false).
-        alongWith(new InstantCommand(()->shooter.isShootingAmp(true)));
+    activateAmp = shooter.getActivateShooterToAmp();
     resetOdometry = new InstantCommand(()-> {chassis.setOdometryToForward();}, chassis);
     disableCommand = new InstantCommand(()-> stopAll(),intake, shooter).andThen(new AngleQuel(shooter));
 }
@@ -127,6 +119,7 @@ public class RobotContainer implements Sendable {
     // A - Manual Intake
     // POV-UP - Shoot
     // POV-Down - Amp
+    // POV-Left - Go to Amp and shoot
     // RightBumper - disable all
     // Back - chassie gyro set
 
@@ -135,23 +128,15 @@ public class RobotContainer implements Sendable {
 
 
     commandController.y().onTrue(driveToNote);
+    commandController.x().onTrue(activateShooter);
+    // B - in Drive Command
     commandController.a().onTrue(manualIntake);
-    commandController.x().onTrue(new AngleGoToAngle2(shooter, 0).alongWith(new ShooterPowering2(shooter, 0)));
-
-
-    //commandController.x().onTrue(activateShooter);
-    // commandController.x().onTrue(new AngleGoToAngle(shooter, Utils.getShootingAngleVelocity(
-    //speakerPosition().getDistance(chassis.getPose().getTranslation())).getFirst())
-    // .alongWith(new ShooterPowering(shooter, Utils.getShootingAngleVelocity(
-    //   speakerPosition().getDistance(chassis.getPose().getTranslation())).getSecond())));
-   // commandController.b().onTrue(new AngleGoToAngle(shooter, ShooterConstants.AmpPera.ANGLE).alongWith(new RunCommand(()->shooter.setVel(ShooterConstants.AmpPera.UP, ShooterConstants.AmpPera.DOWN), shooter)));
-   commandController.b().onTrue(activateAmp); 
-   commandController.pov(0).whileTrue(new IntakeToShooter2(intake, shooter, 15));
-    commandController.pov(180).whileTrue(new IntakeToShooter(intake, shooter, ShooterConstants.AmpPera.UP, ShooterConstants.AmpPera.DOWN));
+    commandController.pov(0).whileTrue(shoot);
+    commandController.pov(180).onTrue(activateAmp);
     commandController.back().onTrue(resetOdometry);
     commandController.leftBumper().onTrue(disableCommand);
 
-    commandController.pov(270).onTrue(new GoToAMP(shooter, chassis, intake, true));
+    commandController.pov(270).onTrue(new GoToAMP1());
     
     /*commandController.x().onTrue(activateShooter);
     commandController.povRight().onTrue(new AngleControl(shooter, commandController));
