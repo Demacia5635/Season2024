@@ -1,5 +1,7 @@
 package frc.robot;
 
+import static frc.robot.utils.Utils.speakerPosition;
+
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.PS4Controller;
@@ -7,6 +9,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.shooter.AngleQuel;
 import frc.robot.subsystems.shooter.Shooter;
@@ -15,7 +18,9 @@ import frc.robot.utils.Utils;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.chassis.DriveCommand;
 import frc.robot.commands.chassis.DriveToNote;
-import frc.robot.commands.chassis.Paths.GoToAMP1;
+import frc.robot.commands.chassis.GoToAngleChassis;
+import frc.robot.commands.chassis.Auto.StartTOP;
+import frc.robot.commands.chassis.Paths.GoToAMP;
 import frc.robot.commands.intake.IntakeCommand;
 import frc.robot.subsystems.amp.Amp;
 import frc.robot.subsystems.chassis.Chassis;
@@ -24,7 +29,7 @@ import frc.robot.subsystems.leds.LedControll;
 
 public class RobotContainer implements Sendable {
   public static RobotContainer robotContainer;
-  private Boolean isRed = false;
+  private Boolean isRed = true;
   CommandXboxController commandController;
   CommandXboxController commandController2;
   PS4Controller controller = new PS4Controller(1);
@@ -131,12 +136,22 @@ public class RobotContainer implements Sendable {
     commandController.x().onTrue(activateShooter);
     // B - in Drive Command
     commandController.a().onTrue(manualIntake);
-    commandController.pov(0).whileTrue(shoot);
-    commandController.pov(180).onTrue(activateAmp);
+    commandController.x().onTrue(activateShooter.alongWith(new GoToAngleChassis(chassis, Utils.speakerPosition())));
+
+
+    //commandController.x().onTrue(activateShooter);
+    // commandController.x().onTrue(new AngleGoToAngle(shooter, Utils.getShootingAngleVelocity(
+    //speakerPosition().getDistance(chassis.getPose().getTranslation())).getFirst())
+    // .alongWith(new ShooterPowering(shooter, Utils.getShootingAngleVelocity(
+    //   speakerPosition().getDistance(chassis.getPose().getTranslation())).getSecond())));
+   // commandController.b().onTrue(new AngleGoToAngle(shooter, ShooterConstants.AmpPera.ANGLE).alongWith(new RunCommand(()->shooter.setVel(ShooterConstants.AmpPera.UP, ShooterConstants.AmpPera.DOWN), shooter)));
+   commandController.b().onTrue(activateAmp); 
+   commandController.pov(0).whileTrue(new IntakeToShooter(intake, shooter, 15));
+    commandController.pov(180).whileTrue(new IntakeToShooter(intake, shooter, ShooterConstants.AmpPera.UP, ShooterConstants.AmpPera.DOWN));
     commandController.back().onTrue(resetOdometry);
     commandController.leftBumper().onTrue(disableCommand);
 
-    commandController.pov(270).onTrue(new GoToAMP1());
+    commandController.pov(270).onTrue(new GoToAMP(shooter, chassis, intake, true).raceWith(new WaitCommand(2)));
     
     /*commandController.x().onTrue(activateShooter);
     commandController.povRight().onTrue(new AngleControl(shooter, commandController));
@@ -160,8 +175,8 @@ public class RobotContainer implements Sendable {
    
   public Command getAutonomousCommand() {
     // return null;
-    return new RunCommand(()->shooter.angleSetPow(.1), shooter);
-    //return new StartTOP(chassis, shooter, intake, isRed);
+    //return new RunCommand(()->shooter.angleSetPow(.1), shooter);
+    return new StartTOP(chassis, shooter, intake, isRed);
    //return new PathFollow(chassis, points, 4, 12, 0, false);
   }
 }
