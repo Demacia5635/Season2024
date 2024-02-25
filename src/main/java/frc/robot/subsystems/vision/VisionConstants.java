@@ -7,7 +7,7 @@ public  final class VisionConstants {
 
     
   public static final String AmpSideRaspberryName = "Amp_Side_Raspberry";
-  public static final String ShooterSideRaspberryName = "Shooter_Side_Raspberry";
+  public static final String ShooterSideRaspberryName = " ";
 
 
   public static final Transform3d robotCenterToAmpSideRaspberry = new Transform3d(0.24, -0.32, 0.49, 

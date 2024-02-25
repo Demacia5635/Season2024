@@ -8,6 +8,8 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Field;
+import frc.robot.RobotContainer;
 import frc.robot.subsystems.chassis.Chassis;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.shooter.Shooter;
@@ -83,7 +85,6 @@ public class ActivateShooter extends Command {
      */
     public ActivateShooter(Shooter shooter, Intake intake, Chassis chassis, Translation2d from, boolean isContinious) {
         this.isFollowing = from == null;
-        this.from = from;
         this.shooter = shooter;
         this.intake = intake;
         this.chassis = chassis;
@@ -106,6 +107,10 @@ public class ActivateShooter extends Command {
         timer.reset();
         shooter.isActive(true);
         startDis = shooter.getDis();
+        shooter.isShootingFrom = from != null;
+        if(from != null && RobotContainer.robotContainer.isRed()) {
+            from = Field.toRed(from);
+        }
     }
 
     /**
@@ -127,40 +132,33 @@ public class ActivateShooter extends Command {
             Translation2d pos = isFollowing ? chassis.getPose().getTranslation() : from;
             Translation2d vec = speaker.minus(pos);
             double dis = vec.getNorm();
-            System.out.println("dis = "+ dis);
-            // Pair<Double,Double> getAngleAndVel = Utils.getShootingAngleVelocity(dis);
-            // velUp = getAngleAndVel.getSecond();
-            // velDown = getAngleAndVel.getSecond();
-            // angle = getAngleAndVel.getFirst();
-
-            velUp = shooter.getNeededVel(dis);
-            velDown = shooter.getNeededVel(dis);
-            angle = shooter.getNeededAngle(dis);
+            var av = Utils.getShootingAngleVelocity(dis);
+            angle = av.getFirst();
+            velDown = av.getSecond();
+            velUp = velDown;
         }
-        System.out.println("vel Up = " + velUp + "\n" +
-                           "vel Down =" + velDown + "\n" +
-                           "angle =" + angle);
-
         /*put the anlge motor at the wanted angle */
-        double dis = shooter.getDistanceFromAngle(angle);
-        double disError = dis - shooter.getDis();
-        disError = MathUtil.applyDeadband(disError, 1.5);
-        shooter.angleSetPow(
-            shooter.isDisLimits(shooter.getDis() > startDis) ?
-            -1 * MathUtil.clamp(0.05 * Math.signum(disError) + disError * 0.05, -0.4, 0.4) :
-            0);
+        double angleError = shooter.getAngle() - angle;
+        System.out.println("angle = " + angle + " error = " + angleError);
+        angleError = Math.abs(angleError) > 1.5 ? angleError: 0;
+        System.out.println(" angleError=" + angleError);
+        double power = shooter.isDisLimits(angleError > 0) ? 0:
+                MathUtil.clamp(0.05 * Math.signum(angleError) + angleError * 0.05, -0.4, 0.4);
+        System.out.println(" angle power = " + power + " is limit =" + shooter.isDisLimits(angleError > 0) + 
+             " power1 = "+ (0.05 * Math.signum(angleError) + angleError * 0.05));
+        shooter.angleSetPow(power);
 
         /*start the shooting motors */
         shooter.setVel(velUp, velDown);
         double velErrorUp = shooter.getMotorVel(SHOOTER_MOTOR.UP) - velUp;
         double velErrorDown = shooter.getMotorVel(SHOOTER_MOTOR.DOWN) - velDown;
-        isReady = Math.abs(disError) < 1 && 
+        isReady = Math.abs(angleError) < 1 && 
                           Math.abs(velErrorUp) < 0.3 && 
                           Math.abs(velErrorDown) < 0.3;
         shooter.isShootingReady(isReady);
 
         /*checks if the shooter is ready and if the timer did not hit 0.4*/
-        if (!isShooting && shooter.isShooting && isReady) {
+        if (!isShooting && shooter.isShooting) {
             /*if the shooter is ready than start the timer */
             isShooting = true;
             timer.reset();

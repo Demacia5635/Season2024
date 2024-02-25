@@ -21,6 +21,7 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
+import frc.robot.Field;
 import frc.robot.RobotContainer;
 import frc.robot.commands.intake.IntakeCommand;
 import frc.robot.commands.shooter.ActivateShooter;
@@ -66,6 +67,7 @@ public class Shooter extends SubsystemBase {
 
     /**is the shooter is active */
     public boolean isActive = false;
+    public boolean isShootingFrom = false;
     
     /**
      * <pre>
@@ -244,6 +246,7 @@ public class Shooter extends SubsystemBase {
         isShooting(false);
         isShootingAmp(false);
         isShootingReady(false);
+        isShootingFrom = false;
     }
 
     /**
@@ -380,7 +383,7 @@ public class Shooter extends SubsystemBase {
     }
     public Command activateShooterToSpeakerFromSub() {
         return new InstantCommand(()->isShootingAmp(false)).
-        alongWith(new ActivateShooter(this,RobotContainer.robotContainer.intake, RobotContainer.robotContainer.chassis,Utils.subShootPosition(),false));
+        alongWith(new ActivateShooter(this,RobotContainer.robotContainer.intake, RobotContainer.robotContainer.chassis,Field.SubShootPosition,false));
     }
 
     /**
@@ -396,7 +399,7 @@ public class Shooter extends SubsystemBase {
      * @return isActive and not isShootingAmp
      */
     public boolean isActiveToSpeaker() {
-        return isActive && !isShootingAmp;
+        return isActive && !isShootingAmp && !isShootingFrom;
     }
 
     /**
@@ -416,7 +419,7 @@ public class Shooter extends SubsystemBase {
      * @return the dis in mm
      */
     public double getDis(){
-        return motorAngle.getSelectedSensorPosition() / AngleChanger.PULES_PER_MM - (-1 * AngleChanger.MAX_DIS);
+        return motorAngle.getSelectedSensorPosition() / AngleChanger.PULES_PER_MM + AngleChanger.MAX_DIS;
     }
 
     /**
@@ -425,6 +428,7 @@ public class Shooter extends SubsystemBase {
      * @return if the limits have passed (false means you are fine)
      */
     public boolean isDisLimits(boolean isUpDirection){
+        System.out.println(" isUpDir =" +  isUpDirection + " dis=" + getDis());
         return isUpDirection ? getDis() >= AngleChanger.MAX_DIS : getDis() <= AngleChanger.MIN_DIS;
     }
 
