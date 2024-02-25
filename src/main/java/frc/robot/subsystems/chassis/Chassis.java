@@ -343,11 +343,8 @@ public class Chassis extends SubsystemBase {
      if(currentAprilTagVector.getNorm() < finalVector.getNorm()){
       finalVector = currentAprilTagVector;
      }
-      
     }
-
     return finalVector.getAngle();
-
   }
 
   public double getRadPerSecToSpeaker() {
@@ -357,8 +354,7 @@ public class Chassis extends SubsystemBase {
   }
   
     public static Translation2d speakerPosition() {
-    return RobotContainer.robotContainer.isRed()? ShooterConstants.Speaker.RED_ALLIANCE_SPEAKER.getTranslation():
-      ShooterConstants.Speaker.BLUE_ALLIANCE_SPEAKER.getTranslation();
+    return Utils.speakerPosition();
   }
 
   @Override
