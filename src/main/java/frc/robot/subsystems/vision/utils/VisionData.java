@@ -3,7 +3,7 @@ package frc.robot.subsystems.vision.utils;
 import edu.wpi.first.math.geometry.Pose2d;
 import frc.robot.subsystems.vision.utils.UpdatedPoseEstimatorClasses.SwerveDrivePoseEstimator;
 
-import static frc.robot.subsystems.vision.VisionConstants.*;
+import static frc.robot.subsystems.vision.VisionConstants2.*;
 //object to save vision data that includes a pose a timestamp and the difference at that moment from the odometrey
 
 public class VisionData {

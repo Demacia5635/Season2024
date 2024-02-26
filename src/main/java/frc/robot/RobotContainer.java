@@ -23,7 +23,8 @@ import frc.robot.commands.shooter.AngleQuel;
 import frc.robot.commands.shooter.ShooterPowering;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterConstants;
-import frc.robot.subsystems.vision.Vision;
+import frc.robot.subsystems.vision.Vision2;
+import frc.robot.subsystems.vision.Vision2;
 import frc.robot.utils.Utils;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.PathFollow.Util.pathPoint;
@@ -65,7 +66,7 @@ public class RobotContainer implements Sendable {
   public Amp amp;
   public Intake intake;
   public Chassis chassis;
-  Vision vision;
+  Vision2 vision;
   // SubStrip leds;
   LedControll led;
 
@@ -82,7 +83,7 @@ public class RobotContainer implements Sendable {
     robotContainer = this;
     
     chassis = new Chassis();
-    vision = new Vision(chassis, chassis.getSwerveDrivePoseEstimator());
+    vision = new Vision2(chassis, chassis.getSwerveDrivePoseEstimator());
     intake = new Intake();
     // amp = new Amp();
     commandController2 = new CommandXboxController(1);
