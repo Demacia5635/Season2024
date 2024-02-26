@@ -1,16 +1,9 @@
 package frc.robot.subsystems.vision;
 
 //#region imports
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Comparator;
 
-import org.photonvision.PhotonCamera;
-import org.photonvision.PhotonPoseEstimator;
-import org.photonvision.PhotonPoseEstimator.PoseStrategy;
-
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -19,24 +12,17 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.chassis.Chassis;
-import frc.robot.subsystems.vision.utils.RaspberryPi;
+import frc.robot.subsystems.vision.utils.LimelightVisionUtils;
 import frc.robot.subsystems.vision.utils.VisionData;
 import frc.robot.subsystems.vision.utils.UpdatedPoseEstimatorClasses.SwerveDrivePoseEstimator;
 
 import static frc.robot.subsystems.vision.VisionConstants.*;
 //#endregion
 
-public class Vision extends SubsystemBase {
+public class VisionLimelight extends SubsystemBase {
     // #region declaring fields
     Field2d noFilterVisionField;
     Field2d visionFieldavg5;
-    // #endregion
-
-    // #region declaring limelights
-    PhotonCamera AmpSideRaspberry;
-    PhotonPoseEstimator photonPoseEstimatorForAmpSideRaspberry;
-    PhotonCamera ShooterSideRaspberry;
-    PhotonPoseEstimator photonPoseEstimatorForShooterSideRaspberry;
     // #endregion
 
     // #region declaring poseEstimator chassis and buffers
@@ -46,51 +32,25 @@ public class Vision extends SubsystemBase {
     VisionData[] buf5Avg;
     int lastData5;
     double lastUpdateTime5;
+    double[] timestamp = {0,0};
 
     // #endregion
 
     // #region C'tor
-    public Vision(Chassis chassis, SwerveDrivePoseEstimator estimator) {
+    public VisionLimelight(Chassis chassis, SwerveDrivePoseEstimator estimator) {
 
         this.chassis = chassis;
         this.poseEstimator = estimator;
         this.lastData5 = -1;
         this.buf5Avg = new VisionData[5];
 
-        this.AmpSideRaspberry = new PhotonCamera(AmpSideRaspberryName);
-        this.ShooterSideRaspberry = new PhotonCamera(ShooterSideRaspberryName);
-
-        // #region initializing photons pose estimators
-        try {
-            this.photonPoseEstimatorForAmpSideRaspberry = new PhotonPoseEstimator(
-                    AprilTagFieldLayout.loadFromResource(AprilTagFields.k2024Crescendo.m_resourceFile),
-                    PoseStrategy.AVERAGE_BEST_TARGETS, AmpSideRaspberry, robotCenterToAmpSideRaspberry);
-
-            this.photonPoseEstimatorForShooterSideRaspberry = new PhotonPoseEstimator(
-                    AprilTagFieldLayout.loadFromResource(AprilTagFields.k2024Crescendo.m_resourceFile),
-                    PoseStrategy.AVERAGE_BEST_TARGETS, ShooterSideRaspberry, robotCenterToShooterSideRaspberry);
-        } catch (IOException e) {
-            System.out.println("problem with photon pose estimators, probably one of the pi's is off!");
-        }
-        // #endregion
-
-        // #region initializing buffers
-
         for (int i = 0; i < buf5Avg.length; i++) {
             this.buf5Avg[i] = new VisionData(null, 0, poseEstimator);
         }
-
-        // #endregion
-
-        // #region initializing fields for testing
         this.noFilterVisionField = new Field2d();
         this.visionFieldavg5 = new Field2d();
-        // #endregion
-
-        // #region putting fields on shuffleboard
         SmartDashboard.putData("no Filter vision field", noFilterVisionField);
         SmartDashboard.putData("vision Avg 5 field", visionFieldavg5);
-        // #endregion
     }
 
     // #endregion
@@ -98,34 +58,17 @@ public class Vision extends SubsystemBase {
     // #region Vision Main Methods
 
     // calls the limelights to get updates and put the data in the buffer
-    private void getNewDataFromLimelightX(RaspberryPi raspberryPi) {
+    private void getNewDataFromLimelights() {
         // determines camera
-        PhotonPoseEstimator photonPoseEstimator;
-        if (raspberryPi.equals(RaspberryPi.ShooterSideRaspberry))
-            photonPoseEstimator = photonPoseEstimatorForShooterSideRaspberry;
-        else
-            photonPoseEstimator = photonPoseEstimatorForAmpSideRaspberry;
-
         if (chassis.getVelocity().getNorm() <= maxValidVelcity) {
-            var PhotonUpdate = photonPoseEstimator.update();
-            if (PhotonUpdate != null) {
-                try {
-                    var estimatedRobotPose = PhotonUpdate.get();
-                    var estimatedPose = estimatedRobotPose.estimatedPose;
-                    if (estimatedRobotPose != null) {
-                        VisionData newVisionData5Avg = new VisionData(estimatedPose.toPose2d(),
-                                estimatedRobotPose.timestampSeconds, poseEstimator);
-
-                        if (newVisionData5Avg != null && newVisionData5Avg.getPose() != null) {
-                            lastData5 = next5();
-                            buf5Avg[lastData5] = newVisionData5Avg;
-
-                            noFilterVisionField.setRobotPose(newVisionData5Avg.getPose());
-                        }
-                    }
-                } catch (Exception e) {
-                    // System.out.println("got exception at get new data
-                    // eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
+            for(int i = 0; i < LimelightVisionUtils.LimeLightTables.length; i++) {
+                var data = LimelightVisionUtils.getVisionPose(i);
+                if(data != null && data.getSecond() > timestamp[i]) {
+                    Pose2d pose = data.getFirst();
+                    timestamp[i] = data.getSecond();
+                    lastData5 = next5();
+                    buf5Avg[lastData5] = new VisionData(pose, timestamp[i], poseEstimator);
+                    noFilterVisionField.setRobotPose(pose);
                 }
             }
         }
@@ -162,8 +105,7 @@ public class Vision extends SubsystemBase {
         super.periodic();
 
         try {
-            getNewDataFromLimelightX(RaspberryPi.AmpSideRaspberry);
-            getNewDataFromLimelightX(RaspberryPi.ShooterSideRaspberry);
+            getNewDataFromLimelights();
             updateRobotPose5();
         } catch (Exception e) {
 
