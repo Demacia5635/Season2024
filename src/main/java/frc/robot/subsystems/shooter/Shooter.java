@@ -383,7 +383,8 @@ public class Shooter extends SubsystemBase {
     }
     public Command activateShooterToSpeakerFromSub() {
         return new InstantCommand(()->isShootingAmp(false)).
-        alongWith(new ActivateShooter(this,RobotContainer.robotContainer.intake, RobotContainer.robotContainer.chassis,Field.SubShootPosition,false));
+        alongWith(new ActivateShooter(this,RobotContainer.robotContainer.intake,
+                             RobotContainer.robotContainer.chassis,1.35,false));
     }
 
     /**
@@ -428,7 +429,6 @@ public class Shooter extends SubsystemBase {
      * @return if the limits have passed (false means you are fine)
      */
     public boolean isDisLimits(boolean isUpDirection){
-        System.out.println(" isUpDir =" +  isUpDirection + " dis=" + getDis());
         return isUpDirection ? getDis() >= AngleChanger.MAX_DIS : getDis() <= AngleChanger.MIN_DIS;
     }
 

@@ -49,8 +49,9 @@ public class Utils {
     double v = 0;
     double a = 0;
     int i = 0;
-    for(i = 0; i < shootDistance.length && shootDistance[i] < distance; i++)
-
+    while(i < shootDistance.length && shootDistance[i] < distance) {
+      i++;
+    }
     if(i == shootDistance.length) {
       v = shootVelocity[i-1];
       a = shootAngle[i-1];

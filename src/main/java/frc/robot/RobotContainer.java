@@ -2,6 +2,9 @@ package frc.robot;
 
 import static frc.robot.utils.Utils.speakerPosition;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.PS4Controller;
@@ -129,7 +132,8 @@ public class RobotContainer implements Sendable {
     commandController.leftBumper().onTrue(disableCommand);
     commandController.pov(270).onTrue(new GoToAMP1());
     commandController.pov(90).onTrue(shooter.activateShooterToSpeakerFromSub());
-    
+    commandController.rightBumper().onTrue(new InstantCommand(()->{
+      chassis.setPose(new Pose2d(new Field().Speaker.plus(new Translation2d(1.35,0)) , new Rotation2d()));}));
     overrideAuto.onTrue(chassis.getDefaultCommand());
 }
 

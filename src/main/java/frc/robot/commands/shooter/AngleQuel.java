@@ -29,7 +29,7 @@ public class AngleQuel extends Command {
     /**set the anlge motor pow */
     @Override
     public void execute() {
-        shooter.angleSetPow(0.3);
+        shooter.angleSetPow(0.5);
     }
 
     /**stops the anlge motor and reset the dis */

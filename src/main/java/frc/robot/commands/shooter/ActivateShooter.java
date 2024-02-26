@@ -19,9 +19,6 @@ import frc.robot.utils.Utils;
 
 public class ActivateShooter extends Command {
 
-    /**the position we want to shoot if not from chassis */
-    Translation2d from;
-
     /**true if shoot from chassis*/
     boolean isFollowing;
 
@@ -61,8 +58,7 @@ public class ActivateShooter extends Command {
     /**the angle to the shooter */
     double angle;
 
-    /**the start angle */
-    double startDis;
+    double fromDistance = 0;
 
     /**
      * activate the shooter from the chassis pos
@@ -72,7 +68,7 @@ public class ActivateShooter extends Command {
      * @param isContinious if the command will not stop the motor 
      */
     public ActivateShooter(Shooter shooter, Intake intake, Chassis chassis, boolean isContinious) {
-        this(shooter, intake, chassis, null, isContinious);
+        this(shooter, intake, chassis, 0, isContinious);
     }
 
     /**
@@ -83,14 +79,14 @@ public class ActivateShooter extends Command {
      * @param from the pos to shoot, if null will shoot from chassis pos
      * @param isContinious if the command will not stop the motor
      */
-    public ActivateShooter(Shooter shooter, Intake intake, Chassis chassis, Translation2d from, boolean isContinious) {
-        this.isFollowing = from == null;
+    public ActivateShooter(Shooter shooter, Intake intake, Chassis chassis, double fromDistance, boolean isContinious) {
+        this.isFollowing = fromDistance == 0;
         this.shooter = shooter;
         this.intake = intake;
         this.chassis = chassis;
         this.timer = new Timer();
         this.isContinious = isContinious;
-        this.from = from;
+        this.fromDistance = fromDistance;
         addRequirements(shooter);
     }
 
@@ -106,11 +102,7 @@ public class ActivateShooter extends Command {
         finish = false;
         timer.reset();
         shooter.isActive(true);
-        startDis = shooter.getDis();
-        shooter.isShootingFrom = from != null;
-        if(from != null && RobotContainer.robotContainer.isRed()) {
-            from = Field.toRed(from);
-        }
+        shooter.isShootingFrom = fromDistance > 0;
     }
 
     /**
@@ -129,9 +121,8 @@ public class ActivateShooter extends Command {
             angle = ShooterConstants.AmpVar.ANGLE;
 
         } else {
-            Translation2d pos = isFollowing ? chassis.getPose().getTranslation() : from;
-            Translation2d vec = speaker.minus(pos);
-            double dis = vec.getNorm();
+            double dis = fromDistance > 0? fromDistance:
+                speaker.minus(chassis.getPose().getTranslation()).getNorm();
             var av = Utils.getShootingAngleVelocity(dis);
             angle = av.getFirst();
             velDown = av.getSecond();
@@ -139,12 +130,10 @@ public class ActivateShooter extends Command {
         }
         /*put the anlge motor at the wanted angle */
         double angleError = shooter.getAngle() - angle;
-        System.out.println("angle = " + angle + " error = " + angleError);
         angleError = Math.abs(angleError) > 1.5 ? angleError: 0;
-        System.out.println(" angleError=" + angleError);
         double power = shooter.isDisLimits(angleError > 0) ? 0:
-                MathUtil.clamp(0.05 * Math.signum(angleError) + angleError * 0.05, -0.4, 0.4);
-        System.out.println(" angle power = " + power + " is limit =" + shooter.isDisLimits(angleError > 0) + 
+                MathUtil.clamp(0.07 * Math.signum(angleError) + angleError * 0.06, -0.4, 0.4);
+        System.out.println("angle=" + angle + " error=" + angleError + "angle power = " + power + " is limit =" + shooter.isDisLimits(angleError > 0) + 
              " power1 = "+ (0.05 * Math.signum(angleError) + angleError * 0.05));
         shooter.angleSetPow(power);
 
@@ -166,7 +155,7 @@ public class ActivateShooter extends Command {
             shooter.feedingSetPow(1);
             intake.setPower(1);
 
-        } else if (isShooting && timer.get() > 0.4) {
+        } else if (isShooting && timer.get() > 0.5) {
             /*if the shooter is shooting and the timer hit 0.4 than stop shooting */
             isShooting = false;
             shooter.isShooting(false);
@@ -195,6 +184,6 @@ public class ActivateShooter extends Command {
      */
     @Override
     public boolean isFinished() {
-      return finish || (isShooting && timer.get() > 0.5);
+      return finish;
     }
 }
