@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.shooter.Shooter;
 
 /**command that will quel the angle motor */
-public class AngleQuel extends Command {
+public class AngleCalibrate extends Command {
 
     /**the wanted shooter */
     Shooter shooter;
@@ -17,7 +17,7 @@ public class AngleQuel extends Command {
      * creates a new command that quel the shooter angle
      * @param shooter the wanted shooter
      */
-    public AngleQuel(Shooter shooter) {
+    public AngleCalibrate(Shooter shooter) {
         // Use addRequirements() here to declare subsystem dependencies.
         this.shooter = shooter;
         addRequirements(shooter);

@@ -44,11 +44,11 @@ public class Field {
         new Translation2d(WingNoteX,CentrY)
     };
     public static final Translation2d[] CenterNotes = {
-        new Translation2d(CentrX,CentrY + 2*66*INCH),
-        new Translation2d(CentrX,CentrY + 1*66*INCH),
-        new Translation2d(CentrX,CentrY + 0*66*INCH),
-        new Translation2d(CentrX,CentrY - 1*66*INCH),
-        new Translation2d(CentrX,CentrY - 2*66*INCH)
+        new Translation2d(CentrX,CentrY + 2*1.68),
+        new Translation2d(CentrX,CentrY + 1*1.68),
+        new Translation2d(CentrX,CentrY + 0*1.68),
+        new Translation2d(CentrX,CentrY - 1*1.68),
+        new Translation2d(CentrX,CentrY - 2*1.68)
     };
 
     public static final Translation2d Speaker = new Translation2d(-0.04, 5.55);
@@ -77,5 +77,9 @@ public class Field {
     public static final Translation2d RedAMP = toRed(AMP);
 
     public static final Translation2d RedSubShootPosition =toRed(SubShootPosition);
+
+    public static Translation2d offset(Translation2d base, double dx, double dy) {
+        return base.minus(new  Translation2d(dx,dy));
+    }
 
 }

@@ -80,6 +80,10 @@ public class LedControll extends SubsystemBase{
         currentH %= 180;
     }
 
+    public void turnOff(){
+        setColor(Color.kBlack);
+    }
+
     /**
      * <pre>
      * will check what color suppose to be based on the level
@@ -95,21 +99,24 @@ public class LedControll extends SubsystemBase{
     public void periodic() {
         super.periodic();
 
-        boolean Dist = Utils.seeNote();
+        boolean isSeeNote = Utils.seeNote();
         boolean isStart = DriveToNote.isStart;
         boolean isNotePresent = RobotContainer.robotContainer.intake.isNotePresent();
         boolean isShooterReady = RobotContainer.robotContainer.shooter.isShootingReady;
+        boolean isShumi = RobotContainer.robotContainer.commandController2.y().whileTrue(null).getAsBoolean();
 
-        if(isShooterReady){
+        if (isShumi){
+            setColor(Color.kBlue);
+        } else if(isShooterReady){
             setColor(Color.kWhite);
         } else if(isStart){
             setColor(Color.kOrange);
         } else if (isNotePresent){
             setColor(Color.kPurple);
-        } else if (Dist){
+        } else if (isSeeNote){
             setColor(Color.kGreen);
         } else {
-            setColor(Color.kBlack);
+            turnOff();
         }
     }
 }

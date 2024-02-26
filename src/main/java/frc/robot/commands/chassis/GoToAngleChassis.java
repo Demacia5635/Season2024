@@ -28,14 +28,12 @@ public class GoToAngleChassis extends Command {
 
   @Override
   public void initialize() {
-    wantedAngle = (chassis.getPose().getTranslation().minus(speaker)).getAngle();
   }
 
   @Override
   public void execute() {
-    ChassisSpeeds speed =  new ChassisSpeeds(0, 0, 
-    wantedAngle.minus(chassis.getAngle()).getRadians() * kP);
-    chassis.setVelocities(speed); 
+    ChassisSpeeds speed =  new ChassisSpeeds(0, 0, 0);
+    chassis.setVelocitiesRotateToSpeake(speed); 
   }
 
 
@@ -47,6 +45,6 @@ public class GoToAngleChassis extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return Math.abs(wantedAngle.minus(chassis.getAngle()).getDegrees()) <= 3;
+    return chassis.isAimingSpeaker();
   }
 }

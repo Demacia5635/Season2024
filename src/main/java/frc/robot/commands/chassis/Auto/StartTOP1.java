@@ -19,7 +19,7 @@ import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.utils.Utils;
 
-public class StartTOP1 extends SequentialCommandGroup {
+public class StartTOP1 extends Command {
     double maxVel = ChassisConstants.MAX_DRIVE_VELOCITY;
     double maxAceel = ChassisConstants.DRIVE_ACCELERATION;
     Chassis chassis;
@@ -27,11 +27,12 @@ public class StartTOP1 extends SequentialCommandGroup {
     Shooter shooter;
     boolean isRed;
     Translation2d speaker;
+    SequentialCommandGroup cmd;
 
     pathPoint dummyPoint = new pathPoint(0, 0, new Rotation2d(), 0, false);
     pathPoint wingNote = offset(Field.WingNotes[0], -1.5,-0.5, -4);
-    pathPoint centerNote1 = offset(Field.CenterNotes[0], -2,0,0);
-    pathPoint centerNote2 = offset(Field.CenterNotes[1], -2,0,0);
+    pathPoint centerNote1 = offset(Field.CenterNotes[0], -2,-1,0);
+    pathPoint centerNote2 = offset(Field.CenterNotes[1], -2,-1,0);
     pathPoint shootPoint = offset(Field.Speaker, 2.5,1,0);
 
     /** Creates a new StartTOP auto. */
@@ -39,36 +40,52 @@ public class StartTOP1 extends SequentialCommandGroup {
         this.chassis = RobotContainer.robotContainer.chassis;
         this.intake = RobotContainer.robotContainer.intake;
         this.shooter = RobotContainer.robotContainer.shooter;
+    }
+
+    @Override
+    public void initialize() {
         this.isRed = RobotContainer.robotContainer.isRed();
         speaker = Utils.speakerPosition();
+        cmd = new SequentialCommandGroup(initShooter());
 
-        addCommands(initShooter());
         addCommands(shoot());
-        addCommands(getNote(wingNote));
+        addCommands(takeNote());
         addCommands(turnToSpeaker());
         addCommands(shoot());
         addCommands(getNote(centerNote1));
         addCommands(goTo(shootPoint));
-        addCommands(turnToSpeaker());
+        //addCommands(turnToSpeaker());
         addCommands(shoot());
         addCommands(getNote(centerNote2));
         addCommands(goTo(shootPoint));
-        addCommands(turnToSpeaker());
+        //addCommands(turnToSpeaker());
         addCommands(shoot());
+        cmd.schedule();
+
     }
 
-    pathPoint offset(Translation2d from, double x, double y, double angle) {
-        Translation2d p = from.plus(new Translation2d(x,y));
-        return new pathPoint(p.getX(), p.getY(), Rotation2d.fromDegrees(angle),0,false);
+    @Override
+    public boolean isFinished() {
+        return !cmd.isScheduled();
     }
+
+    private void addCommands(Command c) {
+        cmd.addCommands(c);
+    }
+    
+
+    pathPoint offset(Translation2d from, double x, double y, double angle) {
+        System.out.println(" Point at " + (from.getX() + x) + " / " + (from.getY()+y));
+        return new pathPoint(from.getX()+x, from.getY()+ y, Rotation2d.fromDegrees(angle),0,false);
+    }
+
 
     private Command shoot() {
         return shooter.shootCommand();
     }
 
     private Command initShooter() {
-        return new ActivateShooter(shooter, intake, chassis, true)
-                .andThen(new WaitUntilCommand(() -> shooter.isShootingReady));
+        return new WaitUntilCommand(() -> shooter.isShootingReady());
     }
 
     private Command goTo(pathPoint point) {
@@ -86,7 +103,7 @@ public class StartTOP1 extends SequentialCommandGroup {
     }
 
     private Command takeNote() {
-        return (new DriveToNote(chassis, 1).raceWith(new IntakeCommand(intake))).withTimeout(1);
+        return (new DriveToNote(chassis, 1).raceWith(new IntakeCommand(intake))).withTimeout(2);
     }
 
 }

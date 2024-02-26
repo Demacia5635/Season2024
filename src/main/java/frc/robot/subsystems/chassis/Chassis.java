@@ -43,6 +43,8 @@ public class Chassis extends SubsystemBase {
 
   private final Field2d field;
 
+  boolean isAimingSpeaker = false;
+
 
   public Chassis() {
     modules = new SwerveModule[] {
@@ -56,7 +58,7 @@ public class Chassis extends SubsystemBase {
 
     gyro = new Pigeon2(GYRO_ID);
     gyro.setYaw(0);
-    poseEstimator = new SwerveDrivePoseEstimator(KINEMATICS, getAngle(), getModulePositions(), new Pose2d());
+    poseEstimator = new SwerveDrivePoseEstimator(KINEMATICS, getRawAngle(), getModulePositions(), new Pose2d());
     
     field = new Field2d();
     SmartDashboard.putData(field);
@@ -183,7 +185,7 @@ public class Chassis extends SubsystemBase {
   }
 
   public void setPose(Pose2d pose){
-    poseEstimator.resetPosition(getAngle(), getModulePositions(), pose);
+    poseEstimator.resetPosition(getRawAngle(), getModulePositions(), pose);
   }
 
   /**
@@ -198,9 +200,11 @@ public class Chassis extends SubsystemBase {
   }
   public void setVelocitiesRotateToSpeake(ChassisSpeeds speeds) {
     speeds.omegaRadiansPerSecond = getRadPerSecToSpeaker();
-    ChassisSpeeds relativeSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds, getAngle());
-    SwerveModuleState[] states = KINEMATICS.toSwerveModuleStates(relativeSpeeds);
-    setModuleStates(states);
+    setVelocities(speeds);
+  }
+  public void setVelocitiesRotateToAngle(ChassisSpeeds speeds, Rotation2d angle) {
+    speeds.omegaRadiansPerSecond = getRadPerSecToAngle(angle);
+    setVelocities(speeds);
   }
 
 
@@ -243,14 +247,16 @@ public class Chassis extends SubsystemBase {
   /**
    * Returns the angle of the gyro
    */
-  public Rotation2d getAngle() {
+  public Rotation2d getRawAngle() {
     return Rotation2d.fromDegrees(gyro.getYaw());
+  }
+  public Rotation2d getAngle() {
+    return getPose().getRotation();
   }
 
   public void setOdometryToForward() {
-    gyro.setYaw(0);
-    poseEstimator.resetPosition(Rotation2d.fromDegrees(0), getModulePositions(),
-        new Pose2d(poseEstimator.getEstimatedPosition().getTranslation(), getAngle()));
+    poseEstimator.resetPosition(getRawAngle(), getModulePositions(),
+        new Pose2d(poseEstimator.getEstimatedPosition().getTranslation(), Rotation2d.fromDegrees(0)));
   }
 
   /**
@@ -268,6 +274,7 @@ public class Chassis extends SubsystemBase {
 
   /**
    * Returns the state of every module
+   * 
    * 
    * @return Velocity in m/s, angle in Rotation2d
    */
@@ -350,16 +357,27 @@ public class Chassis extends SubsystemBase {
   public double getRadPerSecToSpeaker() {
     Translation2d speaker = Utils.speakerPosition();
     double error = Utils.angelErrorInRadians(getPose().getTranslation().minus(speaker).getAngle(), getAngle(), Math.toRadians(1));
-    return MathUtil.clamp(error * 0.3, -MAX_OMEGA_VELOCITY, MAX_OMEGA_VELOCITY);
+    error = Math.abs(error) < Math.toRadians(3)? 0 : error;
+    isAimingSpeaker = error == 0;
+    return MathUtil.clamp(error * 1, -MAX_OMEGA_VELOCITY, MAX_OMEGA_VELOCITY);
+  }
+  public double getRadPerSecToAngle(Rotation2d angle) {
+    double error = Utils.angelErrorInRadians(angle, getAngle(), Math.toRadians(1));
+    error = Math.abs(error) < Math.toRadians(3)? 0 : error;
+    return MathUtil.clamp(error * 1, -MAX_OMEGA_VELOCITY, MAX_OMEGA_VELOCITY);
   }
   
     public static Translation2d speakerPosition() {
     return Utils.speakerPosition();
   }
 
+  public boolean isAimingSpeaker() {
+    return isAimingSpeaker;
+  }
+
   @Override
   public void periodic() {
-    poseEstimator.update(getAngle(), getModulePositions());
+    poseEstimator.update(getRawAngle(), getModulePositions());
     field.setRobotPose(getPose());
     SmartDashboard.putNumber("Distance from speaker", speakerPosition().getDistance(getPose().getTranslation()));
  }

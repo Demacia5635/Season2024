@@ -2,6 +2,7 @@ package frc.robot.subsystems.vision.utils;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import frc.robot.subsystems.vision.utils.UpdatedPoseEstimatorClasses.SwerveDrivePoseEstimator;
+import frc.robot.utils.Utils;
 
 import static frc.robot.subsystems.vision.VisionConstants.*;
 //object to save vision data that includes a pose a timestamp and the difference at that moment from the odometrey
@@ -42,7 +43,7 @@ public class VisionData {
 
         Pose2d poseSample = this.bufPoseEstimator.getSample(timeStamp);
         if (poseSample != null 
-        && Math.abs(poseSample.getRotation().minus(pose.getRotation()).getDegrees()) < maxValidAngleDiff) {
+        && Math.abs(Utils.angelErrorInDegrees(poseSample.getRotation(),pose.getRotation(),0)) < maxValidAngleDiff) {
             
             diffrence = poseSample.getTranslation().getDistance(pose.getTranslation());
         } 

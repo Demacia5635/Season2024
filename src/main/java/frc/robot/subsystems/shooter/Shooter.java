@@ -21,12 +21,9 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
-import frc.robot.Field;
 import frc.robot.RobotContainer;
-import frc.robot.commands.intake.IntakeCommand;
 import frc.robot.commands.shooter.ActivateShooter;
 import frc.robot.subsystems.shooter.utils.LookUpTable;
-import frc.robot.utils.Utils;
 
 import static frc.robot.subsystems.shooter.ShooterConstants.*;
 
@@ -68,6 +65,11 @@ public class Shooter extends SubsystemBase {
     /**is the shooter is active */
     public boolean isActive = false;
     public boolean isShootingFrom = false;
+
+    /** Calibrate */
+    public boolean inCalibration = false;
+    public double calibrateAngle = 0;
+    public double calibrateVelocity = 0;
     
     /**
      * <pre>
@@ -400,7 +402,7 @@ public class Shooter extends SubsystemBase {
      * @return isActive and not isShootingAmp
      */
     public boolean isActiveToSpeaker() {
-        return isActive && !isShootingAmp && !isShootingFrom;
+        return isActive && !isShootingAmp && !isShootingFrom  && !inCalibration;
     }
 
     /**
@@ -597,6 +599,10 @@ public class Shooter extends SubsystemBase {
         builder.addBooleanProperty("Is shooting ready", ()-> isShootingReady, null);
         builder.addBooleanProperty("Is shooter active", ()-> isActive, null);
         builder.addBooleanProperty("Is active to speaker", this::isActiveToSpeaker, null);
+
+        builder.addBooleanProperty("Calibrate",this::inCalibration, this::inCalibration);
+        builder.addDoubleProperty("calibrate Angle", this::calibrateAngle, this::calibrateAngle);
+        builder.addDoubleProperty("calibrate Velocity", this::calibrateVelocity, this::calibrateVelocity);
         
         /*put on the shuffleBoard all the commands */
         SmartDashboard.putData("Dis reset", new InstantCommand(()-> resetDis()).ignoringDisable(true));
@@ -611,6 +617,29 @@ public class Shooter extends SubsystemBase {
 
     }
 
+    /** Calibrate */
+    boolean inCalibration() {
+        return inCalibration;
+    }
+    void inCalibration(boolean inCalibration) {
+        this.inCalibration = inCalibration;
+    }
+    double calibrateAngle() {
+        return calibrateAngle;
+    }
+    void calibrateAngle(double calibrateAngle) {
+        this.calibrateAngle = calibrateAngle;
+    }
+    double calibrateVelocity() {
+        return calibrateVelocity;
+    }
+    void calibrateVelocity(double calibrateVelocity) {
+        this.calibrateVelocity = calibrateVelocity;
+    }
+
+    public boolean isShootingReady() {
+        return isShootingReady;
+    }
     /** if the angle is at the end it reset the dis */
     @Override
     public void periodic() {

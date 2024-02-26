@@ -130,11 +130,9 @@ public class ActivateShooter extends Command {
         }
         /*put the anlge motor at the wanted angle */
         double angleError = shooter.getAngle() - angle;
-        angleError = Math.abs(angleError) > 1.5 ? angleError: 0;
+        angleError = Math.abs(angleError) > 0.5 ? angleError: 0;
         double power = shooter.isDisLimits(angleError > 0) ? 0:
                 MathUtil.clamp(0.07 * Math.signum(angleError) + angleError * 0.06, -0.4, 0.4);
-        System.out.println("angle=" + angle + " error=" + angleError + "angle power = " + power + " is limit =" + shooter.isDisLimits(angleError > 0) + 
-             " power1 = "+ (0.05 * Math.signum(angleError) + angleError * 0.05));
         shooter.angleSetPow(power);
 
         /*start the shooting motors */

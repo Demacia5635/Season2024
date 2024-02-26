@@ -15,10 +15,12 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.commands.shooter.AngleQuel;
+import frc.robot.commands.shooter.ActivateShooter;
+import frc.robot.commands.shooter.AngleCalibrate;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.subsystems.vision.Vision;
+import frc.robot.subsystems.vision.VisionLimelight;
 import frc.robot.utils.Utils;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.chassis.DriveCommand;
@@ -39,13 +41,13 @@ public class RobotContainer implements Sendable {
   public static RobotContainer robotContainer;
   private Boolean isRed = true;
   CommandXboxController commandController;
-  CommandXboxController commandController2;
+  public CommandXboxController commandController2;
  
   public Shooter shooter;
   public Amp amp;
   public Intake intake;
   public Chassis chassis;
-  public Vision vision;
+  public VisionLimelight vision;
   public LedControll led;
 
   public Command shoot; // shoot to amp or to speaker
@@ -62,7 +64,7 @@ public class RobotContainer implements Sendable {
     robotContainer = this;
     
     chassis = new Chassis();
-    vision = new Vision(chassis, chassis.getSwerveDrivePoseEstimator());
+    vision = new VisionLimelight(chassis, chassis.getSwerveDrivePoseEstimator());
     intake = new Intake();
     // amp = new Amp();
     commandController2 = new CommandXboxController(1);
@@ -91,8 +93,8 @@ public class RobotContainer implements Sendable {
     activateShooter = shooter.activateShooterToSpeaker();
     manualIntake = new IntakeCommand(intake);
     activateAmp = shooter.activateShooterToAmp();
-    resetOdometry = new InstantCommand(()-> {chassis.setOdometryToForward();}, chassis);
-    disableCommand = new InstantCommand(()-> stopAll(),intake, shooter).andThen(new AngleQuel(shooter));
+    resetOdometry = new InstantCommand(()-> chassis.setOdometryToForward()).ignoringDisable(true);
+    disableCommand = new InstantCommand(()-> stopAll(),intake, shooter).andThen(new AngleCalibrate(shooter));
 }
 
   public void isRed(boolean isRed) {
@@ -135,6 +137,9 @@ public class RobotContainer implements Sendable {
     commandController.rightBumper().onTrue(new InstantCommand(()->{
       chassis.setPose(new Pose2d(new Field().Speaker.plus(new Translation2d(1.35,0)) , new Rotation2d()));}));
     overrideAuto.onTrue(chassis.getDefaultCommand());
+
+
+    commandController2.b().onTrue(new InstantCommand((()->vision.setResetOdo(true))).ignoringDisable(true));
 }
 
   public void calibrate() {
@@ -143,6 +148,6 @@ public class RobotContainer implements Sendable {
 
    
   public Command getAutonomousCommand() {
-    return new StartTOP1();
+    return new StartTOP1().alongWith(new ActivateShooter(shooter, intake, chassis, true));
   }
 }

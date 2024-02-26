@@ -7,6 +7,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * Utility class for vision
@@ -19,7 +20,7 @@ public class LimelightVisionUtils {
     }
     public static final NetworkTable LIMELIGHT_AMP_TABLE = NetworkTableInstance.getDefault().getTable("limelight-amp");
     public static final NetworkTable LIMELIGHT_SHOOTER_TABLE = NetworkTableInstance.getDefault().getTable("limelight-shooter");
-    public static final double MAX_DISTANCE_FOR_LIMELIGHT = 5;
+    public static final double MAX_DISTANCE_FOR_LIMELIGHT = 6;
 
     public static NetworkTable[] LimeLightTables = {LIMELIGHT_AMP_TABLE, LIMELIGHT_SHOOTER_TABLE};
 
@@ -45,8 +46,7 @@ public class LimelightVisionUtils {
         if (robotPose.length <7)
             return null;
 
-        double latency = robotPose[6];
-
+        double latency = robotPose[6]/1000.0;
         Rotation2d robotRotation = Rotation2d.fromDegrees(robotPose[5]);
         Translation2d robotTranslation = new Translation2d(robotPose[0], robotPose[1]);
         double distance = robotPose[9];
@@ -55,6 +55,6 @@ public class LimelightVisionUtils {
         }
         return new Pair<Pose2d, Double>(
                 new Pose2d(robotTranslation, robotRotation),
-                timeStamp - (latency / 1000));
+                timeStamp - latency);
     }
 }

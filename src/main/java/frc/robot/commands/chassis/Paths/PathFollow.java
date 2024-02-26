@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 
 import static frc.robot.subsystems.chassis.ChassisConstants.*;
 import edu.wpi.first.math.trajectory.Trajectory.State;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,6 +56,7 @@ public class PathFollow extends Command {
   double distancePassed = 0;
   pathPoint[] points;
   double finishVel;
+
   /**
    * Creates a new path follower using the given points.
    * 
@@ -65,18 +67,25 @@ public class PathFollow extends Command {
    * 
    */
 
-  public PathFollow(pathPoint[] points) {
-    this(RobotContainer.robotContainer.chassis,points,ChassisConstants.MAX_DRIVE_VELOCITY, ChassisConstants.DRIVE_ACCELERATION,0,RobotContainer.robotContainer.isRed());
+  public PathFollow(pathPoint[] points, double velocity) {
+    this(RobotContainer.robotContainer.chassis, points, velocity, velocity * 2,
+        0, RobotContainer.robotContainer.isRed());
   }
-  
-  public PathFollow(Chassis chassis, pathPoint[] points, double maxVel, double maxAcc, double finishVel,boolean isRed) {
+
+  public PathFollow(pathPoint[] points) {
+    this(RobotContainer.robotContainer.chassis, points, ChassisConstants.MAX_DRIVE_VELOCITY,
+        ChassisConstants.DRIVE_ACCELERATION,
+        0, RobotContainer.robotContainer.isRed());
+  }
+
+  public PathFollow(Chassis chassis, pathPoint[] points, double maxVel, double maxAcc, double finishVel,
+      boolean isRed) {
     SmartDashboard.putData("Traj", trajField);
     this.points = points;
     this.finishVel = finishVel;
     this.isRed = isRed;
 
     this.chassis = chassis;
-
 
     // gets the wanted angle for the robot to finish the path in
 
@@ -92,28 +101,35 @@ public class PathFollow extends Command {
     segments = new Segment[1 + ((points.length - 2) * 2)];
 
   }
-  public PathFollow(Chassis chassis, pathPoint[] points, double maxVel, double maxAcc, double finishVel,boolean isRed, boolean rotateToSpeaker) {
+
+  public PathFollow(Chassis chassis, pathPoint[] points, double maxVel, double maxAcc, double finishVel, boolean isRed,
+      boolean rotateToSpeaker) {
     this(chassis, points, maxVel, maxAcc, finishVel, isRed);
     this.rotateToSpeaker = rotateToSpeaker;
   }
 
-  /*public String currentSegmentInfo() {
-
-    if (segments == null)
-      return "";
-    return segments[segmentIndex].toString();
-  }*/
+  /*
+   * public String currentSegmentInfo() {
+   * 
+   * if (segments == null)
+   * return "";
+   * return segments[segmentIndex].toString();
+   * }
+   */
 
   @Override
   public void initialize() {
-    //sets first point to chassis pose to prevent bugs with red and blue alliance
-    points[0] = new pathPoint(chassis.getPose().getX(), chassis.getPose().getY(), points[1].getRotation(), points[0].getRadius(), false);
+    // sets first point to chassis pose to prevent bugs with red and blue alliance
+    points[0] = new pathPoint(chassis.getPose().getX(), chassis.getPose().getY(), points[1].getRotation(),
+        points[0].getRadius(), false);
 
-    //case for red alliance (blue is the default)
+    // case for red alliance (blue is the default)
     if (isRed) {
-      points[0] = new pathPoint(chassis.getPose().getX(), chassis.getPose().getY(), Rotation2d.fromDegrees(180).minus(points[1].getRotation()), points[0].getRadius(), false);
+      points[0] = new pathPoint(chassis.getPose().getX(), chassis.getPose().getY(),
+          Rotation2d.fromDegrees(180).minus(points[1].getRotation()), points[0].getRadius(), false);
       for (int i = 1; i < points.length; i++) {
-        points[i] = new pathPoint(fieldLength - points[i].getX(), points[i].getY(), Rotation2d.fromDegrees(180).minus(points[i].getRotation()),
+        points[i] = new pathPoint(fieldLength - points[i].getX(), points[i].getY(),
+            Rotation2d.fromDegrees(180).minus(points[i].getRotation()),
             points[i].getRadius(), points[i].isAprilTag());
       }
     }
@@ -138,7 +154,7 @@ public class PathFollow extends Command {
         segments[segmentIndexCreator] = corners[i].getArc();
 
         segments[segmentIndexCreator + 1] = new Leg(corners[i].getCurveEnd(), corners[i + 1].getCurveStart(),
-          points[segmentIndexCreator].isAprilTag());
+            points[segmentIndexCreator].isAprilTag());
         segments[segmentIndexCreator].setAprilTagMode(points[segmentIndexCreator].isAprilTag());
         segmentIndexCreator += 2;
       }
@@ -156,7 +172,6 @@ public class PathFollow extends Command {
     totalLeft = pathLength;
     segmentIndex = 0;
 
-
     List<State> list = new ArrayList<>();
     for (int i = 0; i < points.length; i++) {
       State temp = new State();
@@ -164,7 +179,6 @@ public class PathFollow extends Command {
       list.add(temp);
     }
 
-    
     // System.out.println("LIST: " + list);
 
     traj = new Trajectory(list);
@@ -172,7 +186,6 @@ public class PathFollow extends Command {
 
     vecVel = new Translation2d(0, 0);
   }
-
 
   // calculates the position of the closet april tag and returns it's position
   boolean foundAprilTag = false;
@@ -194,21 +207,21 @@ public class PathFollow extends Command {
     return finalVector.getAngle();
   }
 
-  
-  public static double convertAlliance(double x){
-    return fieldLength - x; 
+  public static double convertAlliance(double x) {
+    return fieldLength - x;
   }
-  public static double fixY(double y){
+
+  public static double fixY(double y) {
     return fieldHeight - y;
   }
-  
 
   @Override
   public void execute() {
     trajField.setRobotPose(chassis.getPose());
 
     chassisPose = chassis.getPose();
-//    SmartDashboard.putNumber("Angle traj", points[segmentIndex].getRotation().getDegrees());
+    // SmartDashboard.putNumber("Angle traj",
+    // points[segmentIndex].getRotation().getDegrees());
 
     // current velocity vector
     Translation2d currentVelocity = new Translation2d(chassis.getChassisSpeeds().vxMetersPerSecond,
@@ -221,39 +234,40 @@ public class PathFollow extends Command {
       if (segmentIndex != segments.length - 1 || segments[segmentIndex].getLength() <= 0.15)
         segmentIndex++;
     }
-
-    Translation2d velVector = segments[segmentIndex].calc(chassisPose.getTranslation(), driveVelocity);
-
     driveVelocity = driveTrapezoid.calculate(
         totalLeft - segments[segmentIndex].distancePassed(chassisPose.getTranslation()),
         currentVelocity.getNorm(), finishVel);
+
+    Translation2d velVector = segments[segmentIndex].calc(chassisPose.getTranslation(), driveVelocity);
+
     // System.out.println("APRILTAG MODE: " +
     // segments[segmentIndex].isAprilTagMode());
     if (segments[segmentIndex].isAprilTagMode()) {
       if (!foundAprilTag)
         wantedAngle = getAngleApriltag();
-
     }
 
     else {
       wantedAngle = points[segmentIndex].getRotation();
     }
 
-   /* rotationVelocity = rotationPidController.calculate(
-        chassis.getAngle().getRadians(), wantedAngle.getRadians()) * Math.toRadians(300);
-         */
-        
+    /*
+     * rotationVelocity = rotationPidController.calculate(
+     * chassis.getAngle().getRadians(), wantedAngle.getRadians()) *
+     * Math.toRadians(300);
+     */
 
-    rotationVelocity = wantedAngle.minus(chassis.getAngle()).getRadians();
+//    rotationVelocity = wantedAngle.minus(chassis.getAngle()).getRadians();
 
-//    SmartDashboard.putNumber("DIFF", wantedAngle.getRadians() - chassis.getAngle().getRadians());
-    if (totalLeft <= 0.01)
+    // SmartDashboard.putNumber("DIFF", wantedAngle.getRadians() -
+    // chassis.getAngle().getRadians());
+    if (totalLeft <= 0.1)
       velVector = new Translation2d(0, 0);
-    ChassisSpeeds speed = new ChassisSpeeds(velVector.getX(), velVector.getY(), rotationVelocity);
-    if(rotateToSpeaker) {
+    ChassisSpeeds speed = new ChassisSpeeds(velVector.getX(), velVector.getY(), 0);
+    if (rotateToSpeaker) {
       chassis.setVelocitiesRotateToSpeake(speed);
     } else {
-      chassis.setVelocities(speed);
+      chassis.setVelocitiesRotateToAngle(speed, wantedAngle);
     }
 
   }
@@ -267,12 +281,13 @@ public class PathFollow extends Command {
 
   @Override
   public boolean isFinished() {
-    return totalLeft <= 0.01 && Math.abs(chassis.getAngle().minus(wantedAngle).getDegrees()) <= 3;
+    return totalLeft <= 0.1;
   }
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    //builder.addStringProperty("Current Segment", () -> currentSegmentInfo(), null);
+    // builder.addStringProperty("Current Segment", () -> currentSegmentInfo(),
+    // null);
     builder.addDoubleProperty("Distance Passed", () -> {
       return distancePassed;
     }, null);
@@ -294,7 +309,7 @@ public class PathFollow extends Command {
 
   public void printSegments() {
     // for (Segment s : segments) {
-      // System.out.println(s);
+    // System.out.println(s);
     // }
   }
 }

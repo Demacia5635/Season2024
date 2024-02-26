@@ -10,7 +10,8 @@ public class IntakeCommand extends Command {
     private double initialEncoderCount = 0;
     private boolean hasEntered = false;
 
-    public IntakeCommand(Intake intake) {
+    public 
+    IntakeCommand(Intake intake) {
         this.intake = intake;
         addRequirements(intake);
     }

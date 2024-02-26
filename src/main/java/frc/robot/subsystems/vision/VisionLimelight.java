@@ -34,6 +34,7 @@ public class VisionLimelight extends SubsystemBase {
     double lastUpdateTime5;
     double[] timestamp = {0,0};
 
+    boolean resetOdometryFromBuffer;
     // #endregion
 
     // #region C'tor
@@ -43,6 +44,8 @@ public class VisionLimelight extends SubsystemBase {
         this.poseEstimator = estimator;
         this.lastData5 = -1;
         this.buf5Avg = new VisionData[5];
+
+        this.resetOdometryFromBuffer = false;
 
         for (int i = 0; i < buf5Avg.length; i++) {
             this.buf5Avg[i] = new VisionData(null, 0, poseEstimator);
@@ -67,6 +70,10 @@ public class VisionLimelight extends SubsystemBase {
                     Pose2d pose = data.getFirst();
                     timestamp[i] = data.getSecond();
                     lastData5 = next5();
+                    if(resetOdometryFromBuffer){
+                        resetOdometryFromBuffer = false;
+                        resetPoseLimeight(pose);
+                    }
                     buf5Avg[lastData5] = new VisionData(pose, timestamp[i], poseEstimator);
                     noFilterVisionField.setRobotPose(pose);
                 }
@@ -78,24 +85,33 @@ public class VisionLimelight extends SubsystemBase {
     // vision mesurements to pose estimator
     public void updateRobotPose5() {
         double time = getTime();
+        SmartDashboard.putBoolean("is valid buff", validBuf5(time));
         if (validBuf5(time)) {
             Pair<Pose2d, Double> vData5AvgPair = avg(buf5Avg);
-            VisionData vDataAvg5 = new VisionData(vData5AvgPair.getFirst(), vData5AvgPair.getSecond(), poseEstimator);
-            SmartDashboard.putBoolean("updates", vDataAvg5.getPose() != null && vDataAvg5 != null);
-            if (vDataAvg5.getPose() != null && vDataAvg5 != null) {
-
-                poseEstimator.addVisionMeasurement(new Pose2d(vDataAvg5.getPose().getTranslation(),
-                        chassis.getAngle()), vDataAvg5.getTimeStamp());
-                visionFieldavg5.setRobotPose(vDataAvg5.getPose());
-
+            Pose2d pose = vData5AvgPair.getFirst();
+            double timestamp = vData5AvgPair.getSecond();
+//            VisionData vDataAvg5 = new VisionData(vData5AvgPair.getFirst(), vData5AvgPair.getSecond(), poseEstimator);
+//            SmartDashboard.putBoolean("updates", vDataAvg5.getPose() != null && vDataAvg5 != null);
+//            if (vDataAvg5.getPose() != null && vDataAvg5 != null) {
+                
+                poseEstimator.addVisionMeasurement(new Pose2d(pose.getTranslation(),chassis.getAngle()), timestamp);
+                visionFieldavg5.setRobotPose(pose);
                 lastUpdateTime5 = time;
 
                 for (VisionData vd : buf5Avg) {
                     vd.clear();
                 }
 
-            }
+        //    }
         }
+    }
+
+    public void resetPoseLimeight(Pose2d poseFromBuffer) {
+        chassis.setPose(poseFromBuffer);
+    }
+
+    public void setResetOdo(boolean is) {
+        resetOdometryFromBuffer = is;
     }
 
     // #endregion
@@ -163,7 +179,7 @@ public class VisionLimelight extends SubsystemBase {
     }
 
     private boolean validBuf5(double time) {
-        double minTime = time - 2;
+        double minTime = time - 3;
 
         for (VisionData vData : buf5Avg) {
             if (vData.getTimeStamp() < minTime) {
