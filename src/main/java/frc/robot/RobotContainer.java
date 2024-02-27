@@ -111,16 +111,23 @@ public class RobotContainer implements Sendable {
 
   private void configureBindings() {
     // Buttons:
+    //Driver controller
     // Y - Auto Intake
     // X - Activate Shooter
     // B - Drive precision mode
     // A - Manual Intake
     // POV-UP - Shoot
-    // POV-Down - Amp
+    // POV-Down -
     // POV-Left - Go to Amp and shoot
     // POV-Right - Active shooter to shoot from subwaffer
-    // RightBumper - disable all
+    // LeftBumber - disable all
+    //RightBumper - speaker from subwoofer
     // Back - chassie gyro set
+    //Start - Amp
+
+    //Operator Controller
+
+
 
     Trigger overrideAuto = new Trigger(() -> Utils.joystickOutOfDeadband(commandController));
 
@@ -129,13 +136,11 @@ public class RobotContainer implements Sendable {
     // B - in Drive Command
     commandController.a().onTrue(manualIntake);
      commandController.pov(0).onTrue(shoot);
-    commandController.pov(180).onTrue(activateAmp);
+    commandController.start().onTrue(activateAmp);
     commandController.back().onTrue(resetOdometry);
     commandController.leftBumper().onTrue(disableCommand);
     commandController.pov(270).onTrue(new GoToAMP1());
-    commandController.pov(90).onTrue(shooter.activateShooterToSpeakerFromSub());
-    commandController.rightBumper().onTrue(new InstantCommand(()->{
-      chassis.setPose(new Pose2d(new Field().Speaker.plus(new Translation2d(1.35,0)) , new Rotation2d()));}));
+    commandController.rightBumper().onTrue(shooter.activateShooterToSpeakerFromSub());
     overrideAuto.onTrue(chassis.getDefaultCommand());
 
 

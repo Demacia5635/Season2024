@@ -357,7 +357,7 @@ public class Chassis extends SubsystemBase {
   public double getRadPerSecToSpeaker() {
     Translation2d speaker = Utils.speakerPosition();
     double error = Utils.angelErrorInRadians(getPose().getTranslation().minus(speaker).getAngle(), getAngle(), Math.toRadians(1));
-    error = Math.abs(error) < Math.toRadians(3)? 0 : error;
+    error = Math.abs(error) < Math.toRadians(1)? 0 : error;
     isAimingSpeaker = error == 0;
     return MathUtil.clamp(error * 1, -MAX_OMEGA_VELOCITY, MAX_OMEGA_VELOCITY);
   }

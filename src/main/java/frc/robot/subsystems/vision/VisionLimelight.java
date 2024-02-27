@@ -94,7 +94,8 @@ public class VisionLimelight extends SubsystemBase {
 //            SmartDashboard.putBoolean("updates", vDataAvg5.getPose() != null && vDataAvg5 != null);
 //            if (vDataAvg5.getPose() != null && vDataAvg5 != null) {
                 
-                poseEstimator.addVisionMeasurement(new Pose2d(pose.getTranslation(),chassis.getAngle()), timestamp);
+                // poseEstimator.addVisionMeasurement(new Pose2d(pose.getTranslation(),chassis.getAngle()), timestamp);
+                poseEstimator.addVisionMeasurement(pose, timestamp);
                 visionFieldavg5.setRobotPose(pose);
                 lastUpdateTime5 = time;
 
