@@ -173,8 +173,6 @@ public class RobotContainer implements Sendable {
     commandController2.pov(180).onTrue(
       (new RunCommand(()->shooter.feedingSetPow(-0.5), intake).withTimeout(0.2))
       .andThen(new InstantCommand(()->shooter.feedingSetPow(0), intake)));
-    commandController2.pov(0).onTrue(new InstantCommand(() -> amp.setArmAngle(Math.toRadians(10))));
-
 }
 
   public void calibrate() {
