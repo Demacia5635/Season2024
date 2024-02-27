@@ -54,7 +54,7 @@ public class Shooter extends SubsystemBase {
     LookUpTable lookUpTable;
 
     /**is the shooter shoot */
-    public boolean isShooting  = false;
+    private boolean isShooting  = false;
     
     /**is the shooter is shooting to the amp */
     public boolean isShootingAmp = false;
@@ -161,7 +161,7 @@ public class Shooter extends SubsystemBase {
      * @param pow the wanted pow in -1 to 1
      */
     public void angleSetPow(double pow){
-        pow*=0.5;
+        pow*=0.6;
         motorAngle.set(ControlMode.PercentOutput, pow);
     }
 
@@ -432,7 +432,7 @@ public class Shooter extends SubsystemBase {
      * @return if the limits have passed (false means you are fine)
      */
     public boolean isDisLimits(boolean isUpDirection){
-        return isUpDirection ? getDis() >= AngleChanger.MAX_DIS : getDis() <= AngleChanger.MIN_DIS;
+        return isUpDirection ? getDis() >= AngleChanger.MAX_DIS - 4 : getDis() <= AngleChanger.MIN_DIS+4;
     }
 
     /**
@@ -649,5 +649,13 @@ public class Shooter extends SubsystemBase {
         if (isLimit()){
             resetDis();
         }
+    }
+
+    public boolean getIsShooting() {
+        return isShooting;
+    }
+
+    public void setIsShooting(boolean is) {
+        isShooting = is;
     }
 }

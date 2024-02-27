@@ -80,9 +80,9 @@ public class ShooterConstants {
 
     /*var for shooting to the amp */
     public static class AmpVar {
-        public static final double ANGLE = 46;
-        public static final double DOWN = 23;
-        public static final double UP = 7;
+        public static final double ANGLE = 48.5;
+        public static final double DOWN = 12;
+        public static final double UP = 4.5;
     }
 
     /*set up the location of the 2 speakers */

@@ -7,6 +7,7 @@ package frc.robot.commands.shooter;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Field;
 import frc.robot.RobotContainer;
@@ -131,8 +132,14 @@ public class ActivateShooter extends Command {
         /*put the anlge motor at the wanted angle */
         double angleError = shooter.getAngle() - angle;
         angleError = Math.abs(angleError) > 0.5 ? angleError: 0;
-        double power = shooter.isDisLimits(angleError > 0) ? 0:
+        boolean isAtLimit = shooter.isDisLimits(angleError > 0);
+
+        double power = isAtLimit ? 0:
                 MathUtil.clamp(0.07 * Math.signum(angleError) + angleError * 0.06, -0.4, 0.4);
+        if(isAtLimit) {
+            System.out.println(" shooter is at limtit " + " angle = " + angle + " angle error =" + angleError + " cur angle = " + 
+                shooter.getAngle());
+        }
         shooter.angleSetPow(power);
 
         /*start the shooting motors */
@@ -145,7 +152,7 @@ public class ActivateShooter extends Command {
         shooter.isShootingReady(isReady);
 
         /*checks if the shooter is ready and if the timer did not hit 0.4*/
-        if (!isShooting && shooter.isShooting) {
+        if (!isShooting && shooter.getIsShooting()) {
             /*if the shooter is ready than start the timer */
             isShooting = true;
             timer.reset();
@@ -182,6 +189,7 @@ public class ActivateShooter extends Command {
      */
     @Override
     public boolean isFinished() {
+        SmartDashboard.putBoolean("is activate finish", finish);
       return finish;
     }
 }

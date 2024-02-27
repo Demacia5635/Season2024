@@ -34,6 +34,11 @@ public class VisionLimelight extends SubsystemBase {
     double lastUpdateTime5;
     double[] timestamp = {0,0};
 
+    Rotation2d blueSpeakerAngle = null;
+    double blueSpeakerDistance = 0;
+    Rotation2d redSpeakerAngle = null;
+    double redSpeakerDistance=0;
+
     boolean resetOdometryFromBuffer;
     // #endregion
 

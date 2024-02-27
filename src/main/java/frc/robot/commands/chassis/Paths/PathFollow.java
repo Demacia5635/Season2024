@@ -80,7 +80,6 @@ public class PathFollow extends Command {
 
   public PathFollow(Chassis chassis, pathPoint[] points, double maxVel, double maxAcc, double finishVel,
       boolean isRed) {
-    SmartDashboard.putData("Traj", trajField);
     this.points = points;
     this.finishVel = finishVel;
     this.isRed = isRed;
@@ -91,7 +90,6 @@ public class PathFollow extends Command {
 
     // creates new coreners array of the "arc points" in the path
     addRequirements(chassis);
-    SmartDashboard.putData(this);
 
     // creates trapezoid object for drive and rotation
     driveTrapezoid = new TrapezoidNoam(maxVel, maxAcc);
@@ -217,6 +215,7 @@ public class PathFollow extends Command {
 
   @Override
   public void execute() {
+
     trajField.setRobotPose(chassis.getPose());
 
     chassisPose = chassis.getPose();
@@ -281,7 +280,7 @@ public class PathFollow extends Command {
 
   @Override
   public boolean isFinished() {
-    return totalLeft <= 0.1;
+    return totalLeft <= 0.2;
   }
 
   @Override

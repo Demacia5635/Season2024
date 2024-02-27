@@ -37,7 +37,6 @@ public class TestVelocity extends Command {
         this.subsystm = subsystem;
         this.treshHold = treshHold;
         addRequirements(subsystem);
-        SmartDashboard.putData(name, this);
     }
 
     @Override
@@ -95,21 +94,6 @@ public class TestVelocity extends Command {
         return (int)(goodN*100/n);
     }
 
-    @Override
-    public void initSendable(SendableBuilder builder) {
-        super.initSendable(builder);
-        SmartDashboard.putNumber("Target Velocity", 0);
-        builder.addDoubleProperty("Target Velocity", null, this::updateVelocity);
-        builder.addDoubleProperty("min v", ()->minV, null);
-        builder.addDoubleProperty("max v", ()->maxV, null);
-        builder.addDoubleProperty("acceleration", ()->acceleration, null);
-        builder.addDoubleProperty("avg velocity", ()->n>0?avgVelocity/n:0, null);
-        builder.addDoubleProperty("max error", ()->maxError, null);
-        builder.addIntegerProperty("N Highs", ()->nHighs, null);
-        builder.addIntegerProperty("N Lows", ()->nLows, null);
-        builder.addIntegerProperty("N", ()->n, null);
-        builder.addIntegerProperty("% good time", this::goodPercent, null);
-    }
 
     @Override
     public void end(boolean interrupted) {

@@ -53,6 +53,8 @@ public class LimelightVisionUtils {
         if(distance > MAX_DISTANCE_FOR_LIMELIGHT || distance == 0){
             return null;
         }
+
+//        if(limelightTable.g  etEntry("ti").getDouble(0))) 
         return new Pair<Pose2d, Double>(
                 new Pose2d(robotTranslation, robotRotation),
                 timeStamp - latency);

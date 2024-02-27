@@ -23,7 +23,7 @@ public class Field {
     public static final double AMPZoneWidth = 1*FEET + 5.75*INCH;
     public static final Translation2d AMPZoneCorner = new Translation2d(0, FiledWidth-AMPZoneWidth);
     public static final double AMPWidth = 48*INCH;
-    public static final Translation2d AMP = new Translation2d(4*FEET + 1.5*INCH + AMPWidth/2, FiledWidth);
+    public static final Translation2d AMP = new Translation2d(4*FEET + 1.5*INCH + AMPWidth/2 + 0.1, FiledWidth);
     public static final Translation2d SubShootPosition = new Translation2d(1.4,AMP.getY());
     public static final double ampx = 4*FEET + 1.5*INCH + AMPWidth/2;
 
