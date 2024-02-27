@@ -59,6 +59,8 @@ public class AmpConstants {
     public static final double INTAKE_POWER = 0.4;
     public static final double INTAKE_PRE_LIMIT_POWER = 0.4;
 
+    public static final double MAX_SNOWBLOWER_VOLT = 30;
+
   }
 
   public static class armStatesParameters {

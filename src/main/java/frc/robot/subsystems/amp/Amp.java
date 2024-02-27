@@ -4,6 +4,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
+import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.revrobotics.CANSparkLowLevel.MotorType;
@@ -393,5 +394,18 @@ public class Amp extends SubsystemBase {
     public Command getClimbCommand() {
         return new InstantCommand(() -> climb());
     }
+
+    public void setSnowBlowerPower( double power) {
+       lockMotor.set(TalonSRXControlMode.PercentOutput, power);
+    }
+
+    public double getSnowBlowerAmper() {
+        return lockMotor.getSupplyCurrent();
+    }
+
+    public boolean getNeedStop() {
+        return lockMotor.getSupplyCurrent() > AmpConstants.Parameters.MAX_SNOWBLOWER_VOLT;
+    }
+
 
 }
