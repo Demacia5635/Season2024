@@ -161,6 +161,7 @@ public class Shooter extends SubsystemBase {
      * @param pow the wanted pow in -1 to 1
      */
     public void angleSetPow(double pow){
+        pow*=0.5;
         motorAngle.set(ControlMode.PercentOutput, pow);
     }
 
