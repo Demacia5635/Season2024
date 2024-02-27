@@ -5,20 +5,26 @@
 package frc.robot.commands.chassis;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.chassis.Chassis;
 
-public class GoTOAngleTapezoid extends Command {
-  /** Creates a new GoTOAngleTapezoid. */
-  public GoTOAngleTapezoid() {
-    // Use addRequirements() here to declare subsystem dependencies.
+public class TESTifZero extends Command {
+  Chassis chassis;
+  public TESTifZero(Chassis chassis) {
+    this.chassis = chassis;
+    addRequirements(chassis);
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+//    ChassisSpeeds speeds = new ChassisSpeeds();
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {}
+  public void execute() {
+    
+  }
 
   // Called once the command ends or is interrupted.
   @Override

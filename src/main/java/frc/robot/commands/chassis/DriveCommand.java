@@ -4,52 +4,75 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.RobotContainer;
 import frc.robot.subsystems.chassis.Chassis;
 
-import static frc.robot.Constants.ChassisConstants.*;
+import static frc.robot.utils.Utils.*;
+
+import static frc.robot.subsystems.chassis.ChassisConstants.*;
 
 public class DriveCommand extends Command {
   private final Chassis chassis;
-  private final CommandXboxController controller;
+  private final CommandXboxController commandXboxController;
 
+  private double direction;
+
+  private boolean isRed;
   private boolean precisionDrive = false;
 
-  public DriveCommand(Chassis chassis, CommandXboxController controller) {
+  // Rotation2d wantedAngleApriltag = new Rotation2d();
+  // boolean rotateToApriltag = false;
+  // PIDController rotationPidController = new PIDController(0.03, 0, 0.0008);
+
+  public DriveCommand(Chassis chassis, CommandXboxController commandXboxController) {
     this.chassis = chassis;
-    this.controller = controller;
-
+    this.commandXboxController = commandXboxController;
     addRequirements(chassis);
-
-    controller.pov(0).onTrue(new InstantCommand(() -> precisionDrive = !precisionDrive));
+    commandXboxController.b().onTrue(new InstantCommand(() -> precisionDrive = !precisionDrive));
+    // commandXboxController.y().onTrue(new InstantCommand((() -> this.wantedAngleApriltag = chassis.getClosetAngleApriltag())).andThen(() -> rotateToApriltag = true));
   }
 
   @Override
   public void initialize() {
-    chassis.stop();
+    isRed = chassis.isRed();
+    direction = isRed ? 1 : -1;
+    System.out.println(" is red = " + isRed);
   }
 
   @Override
   public void execute() {
-    double joyX = deadband(controller.getLeftX(), 0.1);
-    double joyY = deadband(controller.getLeftY(), 0.1);
-    double rot = -(deadband(controller.getRightTriggerAxis(), 0.1) - deadband(controller.getLeftTriggerAxis(), 0.1));
-    
-    double velX = Math.pow(joyX, 3) * MAX_DRIVE_VELOCITY;
-    double velY = Math.pow(joyY, 3) * MAX_DRIVE_VELOCITY;
-    double velRot = Math.pow(rot, 3) * MAX_ANGULAR_VELOCITY;
-    
+    double joyX = deadband(commandXboxController.getLeftY(), 0.1) * direction;
+    double joyY = deadband(commandXboxController.getLeftX(), 0.1) * direction;
+    double rot = -(deadband(commandXboxController.getRightTriggerAxis(), 0.1)
+        - deadband(commandXboxController.getLeftTriggerAxis(), 0.1));
+
+    double velX = Math.pow(joyX, 2) * MAX_DRIVE_VELOCITY * Math.signum(joyX);
+    double velY = Math.pow(joyY, 2) * MAX_DRIVE_VELOCITY * Math.signum(joyY);
+    double velRot = Math.pow(rot, 2) * MAX_OMEGA_VELOCITY * Math.signum(rot);
+
+    /*
+    if (rotateToApriltag) {
+      if (Math.abs(
+          (wantedAngleApriltag).minus(chassis.getAngle()).getDegrees()) >= -1 &&
+          Math.abs((wantedAngleApriltag).minus(chassis.getAngle()).getDegrees()) <= 1) {
+        velRot = 0;
+        rotateToApriltag = false;
+      } else {
+        velRot = rotationPidController.calculate(chassis.getAngle().getDegrees(), wantedAngleApriltag.getDegrees())
+            * Math.toRadians(90);
+      }
+    } */
     if (precisionDrive) {
-      velX /= 2;
-      velY /= 2;
-      velRot /= 2;
+      velX /= 4;
+      velY /= 4;
+      velRot /= 4;
     }
-
-    ChassisSpeeds speeds = new ChassisSpeeds(velY, velX, Math.toRadians(velRot));
-    chassis.setVelocities(speeds);
+    ChassisSpeeds speeds = new ChassisSpeeds(velX, velY, velRot);
+    if (rot == 0 && RobotContainer.robotContainer.shooter.isActiveToSpeaker()) { // rotate to speaker
+      chassis.setVelocitiesRotateToSpeake(speeds);
+    } else {
+      chassis.setVelocities(speeds);
+    }
   }
 
-  private double deadband(double x, double threshold) {
-    if (Math.abs(x) < threshold) return 0;
-    else return x;
-  }
 }
