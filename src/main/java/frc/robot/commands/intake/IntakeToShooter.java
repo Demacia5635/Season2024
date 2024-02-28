@@ -37,7 +37,6 @@ public class IntakeToShooter extends Command {
         this.shootingVelUp = shootingVelUp;
         this.shootingVelDown = shootingVelDown;
         addRequirements(intake, shooter);
-        SmartDashboard.putData(this);
     }
 
     public IntakeToShooter(Intake intake, Shooter shooter, double shootingVel){
@@ -46,7 +45,6 @@ public class IntakeToShooter extends Command {
         this.shootingVelUp = shootingVel;
         this.shootingVelDown = shootingVel;
         addRequirements(intake, shooter);
-        SmartDashboard.putData(this);
     }
 
     // Called when the command is initially scheduled.

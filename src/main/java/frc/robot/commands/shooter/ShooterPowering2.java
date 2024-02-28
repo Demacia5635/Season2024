@@ -45,8 +45,8 @@ public class ShooterPowering2 extends Command {
     @Override
     public void initialize() {
         shooter.brake(SHOOTER_MOTOR.UP, SHOOTER_MOTOR.DOWN);
-        velUp = SmartDashboard.getNumber("wanted vel", 0);
-        velDown = SmartDashboard.getNumber("wanted vel", 0);
+        // velUp = SmartDashboard.getNumber("wanted vel", 0);
+        // velDown = SmartDashboard.getNumber("wanted vel", 0);
 
     }
 

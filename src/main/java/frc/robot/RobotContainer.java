@@ -33,6 +33,7 @@ import frc.robot.commands.chassis.GoToAngleChassis;
 import frc.robot.commands.chassis.Auto.StartTOP;
 import frc.robot.commands.chassis.Auto.StartTOP1;
 import frc.robot.commands.chassis.Auto.AutoChooser;
+import frc.robot.commands.chassis.Auto.Shoot;
 import frc.robot.commands.chassis.Auto.StartBottom1;
 import frc.robot.commands.chassis.Auto.StartMiddle1;
 import frc.robot.commands.chassis.Paths.GoToAMP;
@@ -56,7 +57,6 @@ public class RobotContainer implements Sendable {
   public Chassis chassis;
   public VisionLimelight vision;
   public LedControll led;
-
   public Command shoot; // shoot to amp or to speaker
   public Command activateShooter; // prepare to shoot
   public Command autonomousRight;
@@ -66,9 +66,6 @@ public class RobotContainer implements Sendable {
   public Command disableCommand;
   public Command resetOdometry;
 
-  private static final String Forword_oton = "rorword";
-  private static final String Smale_oton = "smal";
-  private static final String Big_oton = "big";
 
   private SendableChooser<Command> autoChoose;
 
@@ -100,7 +97,7 @@ public class RobotContainer implements Sendable {
     SmartDashboard.putNumber("wanted vel", 0);
     SmartDashboard.putNumber("wanted angle", 20);
 
-    driveToNote = new DriveToNote(chassis, 1).raceWith(new IntakeCommand(intake));
+    driveToNote = new DriveToNote(chassis, 1.5).raceWith(new IntakeCommand(intake));
     shoot = shooter.shootCommand();
     activateShooter = shooter.activateShooterToSpeaker();
     manualIntake = new IntakeCommand(intake);
@@ -111,10 +108,12 @@ public class RobotContainer implements Sendable {
     Command startTop = new ActivateShooter(shooter, intake, chassis, true).alongWith(new StartTOP1());
     Command StartMiddle = new ActivateShooter(shooter, intake, chassis, true).alongWith(new StartMiddle1());
     Command startBottom = new ActivateShooter(shooter, intake, chassis, true).alongWith(new StartBottom1());
+    Command shoot = new ActivateShooter(shooter, intake, chassis, true).alongWith(new Shoot());
     autoChoose = new SendableChooser<Command>();
     autoChoose.setDefaultOption("Top",startTop);
     autoChoose.addOption("Middle", StartMiddle);
     autoChoose.addOption("Bottom", startBottom);
+    autoChoose.addOption("shoot", shoot);
     SmartDashboard.putData("Auto Chooser", autoChoose);
 
 }
@@ -130,6 +129,7 @@ public class RobotContainer implements Sendable {
   public void initSendable(SendableBuilder builder) {
     builder.addBooleanProperty("is Red",this::isRed, this::isRed);
   }
+
 
   private void configureBindings() {
     // Buttons:
@@ -173,12 +173,15 @@ public class RobotContainer implements Sendable {
     commandController2.pov(180).onTrue(
       (new RunCommand(()->shooter.feedingSetPow(-0.5), intake).withTimeout(0.2))
       .andThen(new InstantCommand(()->shooter.feedingSetPow(0), intake)));
+    commandController2.leftBumper().whileTrue(new InstantCommand(()-> {intake.setPower(1); shooter.feedingSetPow(1); shooter.setVel(10);}, shooter, intake));
+    commandController2.pov(0).onTrue(new RunCommand(()-> intake.setPower(-1), intake).withTimeout(0.3));
 }
 
   public void calibrate() {
     disableCommand.schedule();
   }
 
+ 
    
   public Command getAutonomousCommand() {
     Command cmd = autoChoose.getSelected();
@@ -187,7 +190,8 @@ public class RobotContainer implements Sendable {
     System.out.println(" -------------------------------------------");
     System.out.println(" -------------------------------------------");
     System.out.println(" -------------------------------------------");
-    return cmd;
+    return 
+    cmd;
     //return new StartTOP1().alongWith(new ActivateShooter(shooter, intake, chassis, true));
     //return new RunCommand(()->shooter.setVel(10), shooter);
   }

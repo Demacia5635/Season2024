@@ -37,7 +37,7 @@ public class IntakeToShooter2 extends Command {
         this.shootingVelUp = shootingVelUp;
         this.shootingVelDown = shootingVelDown;
         addRequirements(intake, shooter);
-        SmartDashboard.putData(this);
+        //SmartDashboard.putData(this);
     }
 
     public IntakeToShooter2(Intake intake, Shooter shooter, double shootingVel){
@@ -46,7 +46,7 @@ public class IntakeToShooter2 extends Command {
         this.shootingVelUp = shootingVel;
         this.shootingVelDown = shootingVel;
         addRequirements(intake, shooter);
-        SmartDashboard.putData(this);
+        //SmartDashboard.putData(this);
     }
 
     // Called when the command is initially scheduled.
@@ -55,8 +55,8 @@ public class IntakeToShooter2 extends Command {
         noteCount = 0;
         last = false;
 
-        shootingVelDown = SmartDashboard.getNumber("wanted vel", 0);
-        shootingVelUp = SmartDashboard.getNumber("wanted vel", 0);
+        //shootingVelDown = SmartDashboard.getNumber("wanted vel", 0);
+        //shootingVelUp = SmartDashboard.getNumber("wanted vel", 0);
 
     }
 

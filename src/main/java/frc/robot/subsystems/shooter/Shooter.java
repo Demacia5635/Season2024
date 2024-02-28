@@ -365,7 +365,7 @@ public class Shooter extends SubsystemBase {
      * @return acommand that set shoter to true and wait 0.5 sec
      */
     public Command shootCommand() {
-        return new InstantCommand(()-> shoot()).andThen(new WaitCommand(0.5)
+        return new InstantCommand(()-> shoot()).andThen(new WaitCommand(1)
             .raceWith(RobotContainer.robotContainer.intake.getActivateIntakeCommand()));
     }
 

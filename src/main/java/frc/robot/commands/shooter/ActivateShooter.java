@@ -189,7 +189,7 @@ public class ActivateShooter extends Command {
      */
     @Override
     public boolean isFinished() {
-        SmartDashboard.putBoolean("is activate finish", finish);
+        //SmartDashboard.putBoolean("is activate finish", finish);
       return finish;
     }
 }

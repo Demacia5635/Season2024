@@ -4,6 +4,7 @@
 
 package frc.robot.commands.shooter;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.shooter.Shooter;
 
@@ -20,7 +21,9 @@ public class AngleCalibrate extends Command {
     public AngleCalibrate(Shooter shooter) {
         // Use addRequirements() here to declare subsystem dependencies.
         this.shooter = shooter;
+        
         addRequirements(shooter);
+        
     }
 
     @Override
@@ -29,7 +32,7 @@ public class AngleCalibrate extends Command {
     /**set the anlge motor pow */
     @Override
     public void execute() {
-        shooter.angleSetPow(0.5);
+        shooter.angleSetPow(0.22);
     }
 
     /**stops the anlge motor and reset the dis */
@@ -42,6 +45,7 @@ public class AngleCalibrate extends Command {
     /**check if the motor is at the limit */
     @Override
     public boolean isFinished() {
+       // SmartDashboard.putBoolean("is limit shooter", shooter.isLimit());
         return shooter.isLimit();
     }
 }

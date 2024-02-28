@@ -57,7 +57,7 @@ public class AngleGoToAngle extends Command {
             shooter.angleSetPow(-0.4);
         }
 
-        SmartDashboard.putNumber("power sign", (wantedAngle - shooter.getDis()));
+        //SmartDashboard.putNumber("power sign", (wantedAngle - shooter.getDis()));
         // shooter.angleMotionMagic(wantedDis);
     }
 

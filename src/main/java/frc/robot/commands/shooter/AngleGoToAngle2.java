@@ -45,7 +45,7 @@ public class AngleGoToAngle2 extends Command {
     public void initialize() {
         shooter.brake(SHOOTER_MOTOR.ANGLE);
         startDis = shooter.getDis();
-        wantedAngle = SmartDashboard.getNumber("wanted angle", 20);
+        //wantedAngle = SmartDashboard.getNumber("wanted angle", 20);
 
         wantedDis = AngleChanger.KA * Math.cos(wantedAngle * Math.PI / 180) + Math.sqrt(Math.pow(AngleChanger.KA, 2) * Math.pow(Math.cos(wantedAngle * Math.PI / 180), 2) - Math.pow(AngleChanger.KA, 2) + Math.pow(AngleChanger.KB, 2));
     }
@@ -60,7 +60,7 @@ public class AngleGoToAngle2 extends Command {
             shooter.angleSetPow(-0.4);
         }
 
-        SmartDashboard.putNumber("power sign", (wantedAngle - shooter.getDis()));
+        //SmartDashboard.putNumber("power sign", (wantedAngle - shooter.getDis()));
         // shooter.angleMotionMagic(wantedDis);
     }
 
@@ -84,12 +84,12 @@ public class AngleGoToAngle2 extends Command {
     @Override
     public boolean isFinished() {
 
-        SmartDashboard.putBoolean("1", !shooter.isSupplyLimit(SHOOTER_MOTOR.ANGLE));
-        SmartDashboard.putBoolean("2", !shooter.isDisLimits(wantedDis - startDis > 0));
+        // SmartDashboard.putBoolean("1", !shooter.isSupplyLimit(SHOOTER_MOTOR.ANGLE));
+        // SmartDashboard.putBoolean("2", !shooter.isDisLimits(wantedDis - startDis > 0));
 
-        SmartDashboard.putBoolean("3", !((wantedDis - startDis > 0) && (shooter.getDis() >= wantedDis)));
-        SmartDashboard.putBoolean("4", !((wantedDis - startDis < 0) && (shooter.getDis() <= wantedDis)));
-        SmartDashboard.putBoolean("5", !(Math.abs(wantedDis - shooter.getDis()) < 1));
+        // SmartDashboard.putBoolean("3", !((wantedDis - startDis > 0) && (shooter.getDis() >= wantedDis)));
+        // SmartDashboard.putBoolean("4", !((wantedDis - startDis < 0) && (shooter.getDis() <= wantedDis)));
+        // SmartDashboard.putBoolean("5", !(Math.abs(wantedDis - shooter.getDis()) < 1));
 
 
 
