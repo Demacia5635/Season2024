@@ -1,9 +1,13 @@
 package frc.robot.subsystems.intake;
 
+import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
+
 public class IntakeConstants {
 
     public static class IntakeDeviceID{
-        public static final int MOTOR = 41;
+        public static final int MOTOR1 = 41;
+        public static final int MOTOR2 = 42;
+
         public static final int LIGHT_LIMIT = 0;
         public static final int MECHANICAL_LIMIT = 0;
         public static final int COUNTER_ID = 3;
@@ -18,6 +22,8 @@ public class IntakeConstants {
 
         public static final double DEADBAND = 0.2;
         public static final boolean IS_INVERTED = true;
+        public static final boolean IS_INVERTED2 = false;
+
         public static final double NOT_PRESENCE_VOLTAGE = 4;
 
         public static final double MIN_CURRENT_TO_AMP = 50;

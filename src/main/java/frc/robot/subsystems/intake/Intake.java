@@ -18,15 +18,25 @@ import frc.robot.commands.intake.IntakeCommand;
 import frc.robot.subsystems.intake.IntakeConstants.*;
 
 public class Intake extends SubsystemBase {
-    public final TalonFX motor;
+    public final TalonFX motor1;
+    public final TalonFX motor2;
+
     public AnalogInput limitInput;
     Counter counter;
 
     // SimpleMotorFeedforward ff2 = new SimpleMotorFeedforward(Parameters.ks2,
     // Parameters.kv2, Parameters.ka2);
     public Intake() {
-        motor = new TalonFX(IntakeDeviceID.MOTOR);
-        motor.setInverted(Parameters.IS_INVERTED);
+
+
+        motor1 = new TalonFX(IntakeDeviceID.MOTOR1);
+        motor1.configFactoryDefault();
+        motor1.setInverted(Parameters.IS_INVERTED);
+
+        motor2 = new TalonFX(IntakeDeviceID.MOTOR2);
+        motor1.configFactoryDefault();
+        motor2.setInverted(Parameters.IS_INVERTED2);
+
 
         limitInput = new AnalogInput(IntakeDeviceID.LIGHT_LIMIT);
         limitInput.setAccumulatorInitialValue(0);
@@ -54,13 +64,13 @@ public class Intake extends SubsystemBase {
     }
 
     public void configDevices() {
-        motor.config_kP(0, Parameters.KP);
-        motor.config_kI(0, Parameters.KI);
-        motor.config_kD(0, Parameters.KD);
+        motor1.config_kP(0, Parameters.KP);
+        motor1.config_kI(0, Parameters.KI);
+        motor1.config_kD(0, Parameters.KD);
     }
 
     public double getpower() {
-        double pMotor = motor.getMotorOutputPercent();
+        double pMotor = motor1.getMotorOutputPercent();
         return pMotor;
     }
 
@@ -76,41 +86,54 @@ public class Intake extends SubsystemBase {
     }
 
     public boolean isCriticalCurrent() {
-        return motor.getOutputCurrent() >= Parameters.CRITICAL_CURRENT;
+        return motor1.getOutputCurrent() >= Parameters.CRITICAL_CURRENT;
     }
 
     public void setPower(double p1) {
-        motor.set(ControlMode.PercentOutput, p1);
+        motor1.set(ControlMode.PercentOutput, p1);
+        motor2.set(ControlMode.PercentOutput, p1);
     }
 
     public void setVelocity(double velocity) {
-        motor.set(ControlMode.Velocity, velocity);
+        motor1.set(ControlMode.Velocity, velocity);
+        motor2.set(ControlMode.Velocity, velocity);
+
     }
 
     public double getMotorCurrent() {
-        return motor.getOutputCurrent();
+        return motor1.getOutputCurrent();
     }
 
     public TalonFX getIntakeMotor() {
-        return motor;
+        return motor1;
     }
 
     public double getEncoderPos() {
-        return motor.getSelectedSensorPosition();
+        return motor1.getSelectedSensorPosition();
+    }
+
+    public double getEncoderPos2() {
+        return motor2.getSelectedSensorPosition();
     }
 
     public void setBrake() {
         System.out.println("brake");
-        motor.setNeutralMode(NeutralMode.Brake);
+        motor1.setNeutralMode(NeutralMode.Brake);
+        motor2.setNeutralMode(NeutralMode.Brake);
+
     }
 
     public void setCoast() {
         System.out.println("coast");
-        motor.setNeutralMode(NeutralMode.Coast);
+        motor1.setNeutralMode(NeutralMode.Coast);
+        motor2.setNeutralMode(NeutralMode.Coast);
+
     }
 
     public void stop() {
-        motor.set(ControlMode.PercentOutput, 0);
+        motor1.set(ControlMode.PercentOutput, 0);
+        motor2.set(ControlMode.PercentOutput, 0);
+
     }
 
     public static double deadband(double value) {
@@ -129,7 +152,7 @@ public class Intake extends SubsystemBase {
     }
 
     public double getRadVelocity() {
-        return (motor.getSelectedSensorVelocity() * ConvertionParams.MOTOR_GEAR_RATIO
+        return (motor1.getSelectedSensorVelocity() * ConvertionParams.MOTOR_GEAR_RATIO
                 / ConvertionParams.MOTOR_PULSES_PER_SPIN) * 2 * Math.PI;
     }
 
