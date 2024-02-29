@@ -33,9 +33,11 @@ import frc.robot.commands.chassis.GoToAngleChassis;
 import frc.robot.commands.chassis.Auto.StartTOP;
 import frc.robot.commands.chassis.Auto.StartTOP1;
 import frc.robot.commands.chassis.Auto.AutoChooser;
+import frc.robot.commands.chassis.Auto.Fowrard;
 import frc.robot.commands.chassis.Auto.Shoot;
 import frc.robot.commands.chassis.Auto.StartBottom1;
 import frc.robot.commands.chassis.Auto.StartBottomEscape;
+import frc.robot.commands.chassis.Auto.StartBottomPlayoffs;
 import frc.robot.commands.chassis.Auto.StartMiddle1;
 import frc.robot.commands.chassis.Paths.GoToAMP;
 import frc.robot.commands.chassis.Paths.GoToAMP1;
@@ -111,12 +113,16 @@ public class RobotContainer implements Sendable {
     Command startBottom = new ActivateShooter(shooter, intake, chassis, true).alongWith(new StartBottom1());
     Command shoot = new ActivateShooter(shooter, intake, chassis, true).alongWith(new Shoot());
     Command StartBottomEscape = new ActivateShooter(shooter, intake, chassis, true).alongWith(new StartBottomEscape());
+    Command PlayOffs = new ActivateShooter(shooter, intake, chassis, true).alongWith(new StartBottomPlayoffs());
+
     autoChoose = new SendableChooser<Command>();
-    autoChoose.setDefaultOption("Top",startTop);
+    autoChoose.setDefaultOption("Playoffs", PlayOffs);
+    autoChoose.addOption("Top",startTop);
     autoChoose.addOption("Middle", StartMiddle);
     autoChoose.addOption("Bottom", startBottom);
     autoChoose.addOption("shoot", shoot);
     autoChoose.addOption("StartBottomEscape", StartBottomEscape);
+
     SmartDashboard.putData("Auto Chooser", autoChoose);
 
 }

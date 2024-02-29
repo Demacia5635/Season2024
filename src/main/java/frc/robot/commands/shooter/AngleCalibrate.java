@@ -39,7 +39,9 @@ public class AngleCalibrate extends Command {
     @Override
     public void end(boolean interrupted) {
         shooter.angleStop();
-        shooter.resetDis();
+        if(isFinished()) {
+           shooter.resetDis();
+        }
     }
 
     /**check if the motor is at the limit */

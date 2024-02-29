@@ -19,7 +19,7 @@ import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.utils.Utils;
 
-public class StartBottomEscape extends Command {
+public class StartBottomPlayoffs extends Command {
     double maxVel = ChassisConstants.MAX_DRIVE_VELOCITY;
     double maxAceel = ChassisConstants.DRIVE_ACCELERATION;
     Chassis chassis;
@@ -30,10 +30,11 @@ public class StartBottomEscape extends Command {
     SequentialCommandGroup cmd;
 
     pathPoint dummyPoint = new pathPoint(0, 0, new Rotation2d(), 0, false);
-    pathPoint wingNote = offset(Field.WingNotes[2], 0,-2.7, -4);
+    pathPoint escapePoint = offset(Field.WingNotes[2], 0,-2.7, -4);
+    pathPoint centerNote1 = offset(Field.CenterNotes[4], -0.5,-0,0);
 
     /** Creates a new StartTOP auto. */
-    public StartBottomEscape() {
+    public StartBottomPlayoffs() {
         this.chassis = RobotContainer.robotContainer.chassis;
         this.intake = RobotContainer.robotContainer.intake;
         this.shooter = RobotContainer.robotContainer.shooter;
@@ -46,7 +47,10 @@ public class StartBottomEscape extends Command {
         cmd = new SequentialCommandGroup(initShooter());
 
         addCommands(shoot());
-        addCommands(goTo(wingNote));
+        addCommands(goTo(escapePoint));
+        addCommands(getNote(centerNote1));
+        addCommands(goTo(escapePoint));
+        addCommands(shoot());
 
         //addCommands(getNote(centerNote1));
         //addCommands(goTo(shootPoint));

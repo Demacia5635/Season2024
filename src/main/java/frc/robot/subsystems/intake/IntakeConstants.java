@@ -22,7 +22,7 @@ public class IntakeConstants {
 
         public static final double DEADBAND = 0.2;
         public static final boolean IS_INVERTED = true;
-        public static final boolean IS_INVERTED2 = false;
+        public static final boolean IS_INVERTED2 = true;
 
         public static final double NOT_PRESENCE_VOLTAGE = 4;
 

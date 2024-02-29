@@ -116,7 +116,7 @@ public class LedControll extends SubsystemBase{
         } else if (isSeeNote){
             setColor(Color.kGreen);
         } else {
-            turnOff();
+            setColor(Color.kRed);
         }
     }
 }
