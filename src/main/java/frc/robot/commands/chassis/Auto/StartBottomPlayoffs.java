@@ -11,6 +11,7 @@ import frc.robot.Constants.ChassisConstants;
 import frc.robot.PathFollow.Util.pathPoint;
 import frc.robot.commands.chassis.DriveToNote;
 import frc.robot.commands.chassis.GoToAngleChassis;
+import frc.robot.commands.chassis.TurnToSpeaker;
 import frc.robot.commands.chassis.Paths.PathFollow;
 import frc.robot.commands.intake.IntakeCommand;
 import frc.robot.commands.shooter.ActivateShooter;
@@ -30,9 +31,9 @@ public class StartBottomPlayoffs extends Command {
     SequentialCommandGroup cmd;
 
     pathPoint dummyPoint = new pathPoint(0, 0, new Rotation2d(), 0, false);
-    pathPoint escapePoint = offset(Field.WingNotes[2], 0,-2.7, -4);
-    pathPoint shootPoint = offset(Field.WingNotes[2], 0, -2.7, -4);
-    pathPoint centerNote1 = offset(Field.CenterNotes[4], -0.5,-0,0);
+    pathPoint escapePoint = offset(Field.WingNotes[2], 0,-2.4, 0);
+    pathPoint shootPoint = offset(Field.WingNotes[2], 0, -1.7, 0);
+    pathPoint centerNote1 = offset(Field.CenterNotes[4], -1,0,15);
 
     /** Creates a new StartTOP auto. */
     public StartBottomPlayoffs() {
@@ -50,7 +51,8 @@ public class StartBottomPlayoffs extends Command {
         addCommands(shoot());
         addCommands(goTo(escapePoint));
         addCommands(getNote(centerNote1));
-        addCommands(goTo(escapePoint));
+        addCommands(goTo(shootPoint));
+        addCommands(new TurnToSpeaker(chassis).withTimeout(2));
         addCommands(shoot());
 
         //addCommands(getNote(centerNote1));
