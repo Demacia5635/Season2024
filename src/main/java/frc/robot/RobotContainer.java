@@ -37,6 +37,7 @@ import frc.robot.commands.chassis.Auto.StartBottom1;
 import frc.robot.commands.chassis.Auto.StartMiddle1;
 import frc.robot.commands.chassis.Paths.GoToAMP;
 import frc.robot.commands.chassis.Paths.GoToAMP1;
+import frc.robot.commands.chassis.Paths.PathUtils.TestForPathPlannerGUI;
 import frc.robot.commands.intake.IntakeCommand;
 import frc.robot.commands.intake.IntakeToShooter;
 import frc.robot.subsystems.amp.Amp;
@@ -45,6 +46,11 @@ import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.leds.LedControll;
 
 public class RobotContainer implements Sendable {
+
+  TestForPathPlannerGUI testForPathPlannerGUI = new TestForPathPlannerGUI("C:/Users/User/Season2024-2/src/main/deploy/pathplanner/paths/second test.path");
+
+
+
   public static RobotContainer robotContainer;
   private Boolean isRed = true;
   CommandXboxController commandController;
@@ -181,13 +187,8 @@ public class RobotContainer implements Sendable {
 
    
   public Command getAutonomousCommand() {
-    Command cmd = autoChoose.getSelected();
-    System.out.println(" -------------------------------------------");
-    System.out.println(" Auto command = " + cmd);
-    System.out.println(" -------------------------------------------");
-    System.out.println(" -------------------------------------------");
-    System.out.println(" -------------------------------------------");
-    return cmd;
+    System.out.println(testForPathPlannerGUI.getXandY()[1]);
+    return new WaitCommand(15);
     //return new StartTOP1().alongWith(new ActivateShooter(shooter, intake, chassis, true));
     //return new RunCommand(()->shooter.setVel(10), shooter);
   }
