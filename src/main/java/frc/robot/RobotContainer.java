@@ -47,7 +47,7 @@ import frc.robot.subsystems.leds.LedControll;
 
 public class RobotContainer implements Sendable {
 
-  TestForPathPlannerGUI testForPathPlannerGUI = new TestForPathPlannerGUI("C:/Users/User/Season2024-2/src/main/deploy/pathplanner/paths/second test.path");
+  TestForPathPlannerGUI testForPathPlannerGUI = new TestForPathPlannerGUI("C:/Users/User/Season2024-2/src/main/deploy/pathplanner/paths/New Path.path");
 
 
 
@@ -187,7 +187,7 @@ public class RobotContainer implements Sendable {
 
    
   public Command getAutonomousCommand() {
-    System.out.println(testForPathPlannerGUI.getXandY()[1]);
+    System.out.println(testForPathPlannerGUI.getPointsNoRadius()[1]);
     return new WaitCommand(15);
     //return new StartTOP1().alongWith(new ActivateShooter(shooter, intake, chassis, true));
     //return new RunCommand(()->shooter.setVel(10), shooter);
