@@ -48,7 +48,7 @@ public class StartBottomPlayoffs extends Command {
         speaker = Utils.speakerPosition();
         cmd = new SequentialCommandGroup(initShooter());
 
-        addCommands(shoot());
+        addCommands(shootSubWoofer());
         addCommands(goTo(escapePoint));
         addCommands(getNote(centerNote1));
         addCommands(goTo(shootPoint));
@@ -105,8 +105,13 @@ public class StartBottomPlayoffs extends Command {
                 .andThen(takeNote());
     }
 
+    private Command shootSubWoofer() {
+        return shooter.activateShooterToSpeakerFromSub();
+    }
+
+
     private Command takeNote() {
-        return (new DriveToNote(chassis, 1).raceWith(new IntakeCommand(intake))).withTimeout(2);
+        return (new DriveToNote(chassis, 1, false).raceWith(new IntakeCommand(intake))).withTimeout(2);
     }
 
 }

@@ -45,7 +45,7 @@ public class StartBottom extends SequentialCommandGroup {
     
     addCommands((new AngleGoToAngle(shooter, wantedAngleClose).alongWith(new ShooterPowering(shooter, wantedVelClose)))
     .andThen(new IntakeToShooter(intake, shooter, wantedVelClose).raceWith(new WaitCommand(0.5)))
-    .andThen((new DriveToNote(chassis, 3).raceWith(new IntakeCommand(intake)))
+    .andThen((new DriveToNote(chassis, 3, true).raceWith(new IntakeCommand(intake)))
     .alongWith((new AngleGoToAngle(shooter, 36).alongWith(new ShooterPowering(shooter, 16.5))))
     .andThen(new IntakeToShooter(intake, shooter, 16.5).raceWith(new WaitCommand(0.5)))));
 

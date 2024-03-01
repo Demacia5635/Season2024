@@ -121,7 +121,18 @@ public class ActivateShooter extends Command {
             velDown = ShooterConstants.AmpVar.DOWN;
             angle = ShooterConstants.AmpVar.ANGLE;
 
-        } else {
+        } else if (shooter.isShootingPodium()) {
+            velUp = SmartDashboard.getNumber("UP", 0);
+            velDown = SmartDashboard.getNumber("DOWN", 0);
+            angle = SmartDashboard.getNumber("ANGLE SHOOTER", 0);
+
+
+
+            //   velUp = ShooterConstants.PodiumVar.UP;
+            // velDown = ShooterConstants.PodiumVar.DOWN;
+            // angle = ShooterConstants.PodiumVar.ANGLE;
+        }
+          else {
             double dis = fromDistance > 0? fromDistance:
                 speaker.minus(chassis.getPose().getTranslation()).getNorm();
             var av = Utils.getShootingAngleVelocity(dis);
@@ -147,8 +158,8 @@ public class ActivateShooter extends Command {
         double velErrorUp = shooter.getMotorVel(SHOOTER_MOTOR.UP) - velUp;
         double velErrorDown = shooter.getMotorVel(SHOOTER_MOTOR.DOWN) - velDown;
         isReady = Math.abs(angleError) < 1 && 
-                          Math.abs(velErrorUp) < 0.3 && 
-                          Math.abs(velErrorDown) < 0.3;
+                          Math.abs(velErrorUp) < 0.6 && 
+                          Math.abs(velErrorDown) < 0.6;
         shooter.isShootingReady(isReady);
 
         /*checks if the shooter is ready and if the timer did not hit 0.4*/

@@ -68,6 +68,8 @@ public class RobotContainer implements Sendable {
   public Command activateAmp;
   public Command disableCommand;
   public Command resetOdometry;
+  public Command activatePodium;
+
 
 
   private SendableChooser<Command> autoChoose;
@@ -96,15 +98,19 @@ public class RobotContainer implements Sendable {
     intake.stop();
   }
   public void createCommands() {
+    SmartDashboard.putNumber("UP", 0);
+    SmartDashboard.putNumber("DOWN", 0);
+    SmartDashboard.putNumber("ANGLE SHOOTER", 0);
 
-    SmartDashboard.putNumber("wanted vel", 0);
-    SmartDashboard.putNumber("wanted angle", 20);
 
-    driveToNote = new DriveToNote(chassis, 1.5).raceWith(new IntakeCommand(intake));
+
+    driveToNote = new DriveToNote(chassis, 1.5, true).raceWith(new IntakeCommand(intake));
     shoot = shooter.shootCommand();
     activateShooter = shooter.activateShooterToSpeaker();
     manualIntake = new IntakeCommand(intake);
     activateAmp = shooter.activateShooterToAmp();
+    activatePodium = shooter.activateShooterToPodium();
+
     resetOdometry = new InstantCommand(()-> chassis.setOdometryToForward()).ignoringDisable(true);
     disableCommand = new InstantCommand(()-> stopAll(),intake, shooter).andThen(new AngleCalibrate(shooter));
 
@@ -179,6 +185,7 @@ public class RobotContainer implements Sendable {
     commandController2.y().onTrue(shooter.activateShooterToSpeakerFromSub());
     commandController2.x().onTrue(activateShooter);
     commandController2.a().onTrue(activateAmp);
+    commandController2.pov(270).onTrue(activatePodium);
     commandController2.pov(180).onTrue(
       (new RunCommand(()->shooter.feedingSetPow(-0.5), intake).withTimeout(0.2))
       .andThen(new InstantCommand(()->shooter.feedingSetPow(0), intake)));

@@ -48,7 +48,7 @@ public class StartMiddle1 extends Command {
         speaker = Utils.speakerPosition();
         cmd = new SequentialCommandGroup(initShooter());
 
-        addCommands(shoot());
+        addCommands(shootSubWoofer());
         addCommands(takeNote());
         //addCommands(turnToSpeaker());
         addCommands(goTo(shootPoint));
@@ -105,8 +105,12 @@ public class StartMiddle1 extends Command {
                 .andThen(takeNote());
     }
 
+    private Command shootSubWoofer() {
+        return shooter.activateShooterToSpeakerFromSub();
+    }
+
     private Command takeNote() {
-        return (new DriveToNote(chassis, 1).raceWith(new IntakeCommand(intake))).withTimeout(2);
+        return (new DriveToNote(chassis, 1, true).raceWith(new IntakeCommand(intake))).withTimeout(2);
     }
 
 }

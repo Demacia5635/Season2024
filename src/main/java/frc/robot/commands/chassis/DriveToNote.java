@@ -21,6 +21,7 @@ public class DriveToNote extends Command {
   NetworkTableEntry llentry;
   ChassisSpeeds speed;
   boolean finish = false;
+  boolean countTime;
 
   PIDController rotationPidController = new PIDController(0.04, 0.00, 0.006);
 
@@ -28,9 +29,10 @@ public class DriveToNote extends Command {
 
   public static boolean isStart = false;
 
-  public DriveToNote(Chassis chassis, double vel) {
+  public DriveToNote(Chassis chassis, double vel, boolean countTime) {
     this.chassis = chassis;
     this.velocity = vel;
+    this.countTime = countTime;
     addRequirements(chassis);
   }
 
@@ -78,7 +80,7 @@ public class DriveToNote extends Command {
 
   @Override
   public boolean isFinished() {
-    return finish || timer.get() > 1;
+    return finish || (timer.get() > 1 && countTime);
   }
 
 }

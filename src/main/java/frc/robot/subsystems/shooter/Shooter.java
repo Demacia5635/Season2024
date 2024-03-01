@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
@@ -22,7 +23,13 @@ import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import frc.robot.RobotContainer;
+import frc.robot.Sysid.Sysid;
 import frc.robot.commands.shooter.ActivateShooter;
+import frc.robot.subsystems.shooter.ShooterConstants.AngleChanger;
+import frc.robot.subsystems.shooter.ShooterConstants.LookUpTableVar;
+import frc.robot.subsystems.shooter.ShooterConstants.ShooterID;
+import frc.robot.subsystems.shooter.ShooterConstants.ShooterVar;
+import frc.robot.subsystems.shooter.ShooterConstants.Shooting;
 import frc.robot.subsystems.shooter.utils.LookUpTable;
 
 import static frc.robot.subsystems.shooter.ShooterConstants.*;
@@ -58,6 +65,7 @@ public class Shooter extends SubsystemBase {
     
     /**is the shooter is shooting to the amp */
     public boolean isShootingAmp = false;
+    public boolean isShootingPodium = false;
 
     /**is the shooter is ready to shoot */
     public boolean isShootingReady = false;
@@ -132,7 +140,15 @@ public class Shooter extends SubsystemBase {
         brake(SHOOTER_MOTOR.UP, SHOOTER_MOTOR.DOWN, SHOOTER_MOTOR.FEEDING, SHOOTER_MOTOR.ANGLE);
         
         /*put all the init sendable into the smart dashboard */
+        SmartDashboard.putNumber("wanted vel", 0);
+        SmartDashboard.putData("set vel shooter", new RunCommand(()->setVel(SmartDashboard.getNumber("wanted vel", 0)), this));
+
+
         SmartDashboard.putData(this);
+        SmartDashboard.putData("Shooter Move Sysid",
+        (new Sysid(this::setPow, this::getMotorUpVel, 0.2, 0.8, this)).getCommand());
+
+        
     }
     
     /**
@@ -365,7 +381,7 @@ public class Shooter extends SubsystemBase {
      * @return acommand that set shoter to true and wait 0.5 sec
      */
     public Command shootCommand() {
-        return new InstantCommand(()-> shoot()).andThen(new WaitCommand(1)
+        return new InstantCommand(()-> shoot()).andThen(new WaitCommand(2)
             .raceWith(RobotContainer.robotContainer.intake.getActivateIntakeCommand()));
     }
 
@@ -382,7 +398,7 @@ public class Shooter extends SubsystemBase {
      * @return a command that will set isShootingToAmp false and activate the shooter to shoot at the amp
      */
     public Command activateShooterToSpeaker() {
-        return new InstantCommand(()->isShootingAmp(false)).alongWith(new ActivateShooter(this,RobotContainer.robotContainer.intake, RobotContainer.robotContainer.chassis,false));
+        return (new InstantCommand((()->isShootingAmp(false))).andThen(new InstantCommand(()->setIsShootingPodium(false)))).alongWith(new ActivateShooter(this,RobotContainer.robotContainer.intake, RobotContainer.robotContainer.chassis,false));
     }
     public Command activateShooterToSpeakerFromSub() {
         return new InstantCommand(()->isShootingAmp(false)).
@@ -523,6 +539,12 @@ public class Shooter extends SubsystemBase {
         }
     }
 
+
+    public double getMotorUpVel() {
+        return motorUP.getSelectedSensorVelocity()*10/(ShooterVar.PULES_PER_REV)* ShooterVar.PEREMITER_OF_WHEEL;
+
+    }
+
     /**
      * get the amper of every motor
      * @param motor the wanted motor 
@@ -618,6 +640,8 @@ public class Shooter extends SubsystemBase {
 
     }
 
+    
+
     /** Calibrate */
     boolean inCalibration() {
         return inCalibration;
@@ -657,5 +681,18 @@ public class Shooter extends SubsystemBase {
 
     public void setIsShooting(boolean is) {
         isShooting = is;
+    }
+
+    public Command activateShooterToPodium() {
+        return new InstantCommand(()->setIsShootingPodium(true)).andThen(new ActivateShooter(this,RobotContainer.robotContainer.intake, RobotContainer.robotContainer.chassis,false));
+
+    }
+
+    public void setIsShootingPodium(boolean isShootingPodium) {
+        this.isShootingPodium = isShootingPodium;
+    }
+
+    public boolean isShootingPodium() {
+        return isShootingPodium;
     }
 }

@@ -1,6 +1,7 @@
 package frc.robot.subsystems.chassis;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -357,9 +358,9 @@ public class Chassis extends SubsystemBase {
   public double getRadPerSecToSpeaker() {
     Translation2d speaker = Utils.speakerPosition();
     double error = Utils.angelErrorInRadians(getPose().getTranslation().minus(speaker).getAngle(), getAngle(), Math.toRadians(1));
-    error = Math.abs(error) < Math.toRadians(1)? 0 : error;
+    error = Math.abs(error) < Math.toRadians(3)? 0 : error;
     isAimingSpeaker = error == 0;
-    return MathUtil.clamp(error * 1, -MAX_OMEGA_VELOCITY, MAX_OMEGA_VELOCITY);
+    return MathUtil.clamp(error * 0.2, -MAX_OMEGA_VELOCITY, MAX_OMEGA_VELOCITY);
   }
   public double getRadPerSecToAngle(Rotation2d angle) {
     double error = Utils.angelErrorInRadians(angle, getAngle(), Math.toRadians(1));

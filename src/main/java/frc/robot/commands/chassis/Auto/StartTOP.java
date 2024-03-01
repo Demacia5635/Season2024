@@ -68,7 +68,7 @@ public class StartTOP extends SequentialCommandGroup {
     addCommands((new AngleGoToAngle(shooter, wantedAngleClose).alongWith(new ShooterPowering(shooter, wantedVelClose)))
     .andThen(new IntakeToShooter(intake, shooter, wantedVelClose).raceWith(new WaitCommand(0.5)))
     .andThen(new PathFollow(chassis, leaveSpeaker, maxVel, maxAceel, 2, isRed))
-    .andThen((new DriveToNote(chassis, 1).raceWith(new IntakeCommand(intake)))
+    .andThen((new DriveToNote(chassis, 1, true).raceWith(new IntakeCommand(intake)))
     .alongWith((new AngleGoToAngle(shooter, 34.7).alongWith(new ShooterPowering(shooter, 16.5))))
     .andThen(new GoToAngleChassis(chassis, speaker))
     .andThen(new IntakeToShooter(intake, shooter, 16.5).raceWith(new WaitCommand(0.5)))));
@@ -89,7 +89,7 @@ public class StartTOP extends SequentialCommandGroup {
   }
 
   private Command takeNote(Chassis chassis, Intake intake) {
-    return new DriveToNote(chassis, 1.5).raceWith(new IntakeCommand(intake));
+    return new DriveToNote(chassis, 1.5, true).raceWith(new IntakeCommand(intake));
   }
 
 }
