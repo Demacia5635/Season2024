@@ -33,7 +33,7 @@ public class StartBottomPlayoffs extends Command {
     pathPoint dummyPoint = new pathPoint(0, 0, new Rotation2d(), 0, false);
     pathPoint escapePoint = offset(Field.WingNotes[2], 0,-2.4, 0);
     pathPoint shootPoint = offset(Field.WingNotes[2], 0, -1.7, -20);
-    pathPoint centerNote1 = offset(Field.CenterNotes[4], -1,0,15);
+    pathPoint centerNote1 = offset(Field.CenterNotes[4], 0,0,15);
 
     /** Creates a new StartTOP auto. */
     public StartBottomPlayoffs() {
