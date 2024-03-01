@@ -122,15 +122,12 @@ public class ActivateShooter extends Command {
             angle = ShooterConstants.AmpVar.ANGLE;
 
         } else if (shooter.isShootingPodium()) {
-            velUp = SmartDashboard.getNumber("UP", 0);
-            velDown = SmartDashboard.getNumber("DOWN", 0);
-            angle = SmartDashboard.getNumber("ANGLE SHOOTER", 0);
-
-
-
-            //   velUp = ShooterConstants.PodiumVar.UP;
-            // velDown = ShooterConstants.PodiumVar.DOWN;
-            // angle = ShooterConstants.PodiumVar.ANGLE;
+            // velUp = SmartDashboard.getNumber("UP", 0);
+            // velDown = SmartDashboard.getNumber("DOWN", 0);
+            // angle = SmartDashboard.getNumber("ANGLE SHOOTER", 0);
+              velUp = ShooterConstants.PodiumVar.UP;
+            velDown = ShooterConstants.PodiumVar.DOWN;
+            angle = ShooterConstants.PodiumVar.ANGLE;
         }
           else {
             double dis = fromDistance > 0? fromDistance:

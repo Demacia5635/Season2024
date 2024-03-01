@@ -183,6 +183,7 @@ public class RobotContainer implements Sendable {
 
     commandController2.b().onTrue(new InstantCommand((()->vision.setResetOdo(true))).ignoringDisable(true));
     commandController2.y().onTrue(shooter.activateShooterToSpeakerFromSub());
+    
     commandController2.x().onTrue(activateShooter);
     commandController2.a().onTrue(activateAmp);
     commandController2.pov(270).onTrue(activatePodium);

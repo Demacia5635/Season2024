@@ -11,9 +11,7 @@ public class ShooterConstants {
     
         public static final double UP = 16;
         public static final double DOWN = 16;
-        public static final double ANGLE = 31.5;
-
-
+        public static final double ANGLE = 37;
         
     }
     
@@ -64,8 +62,8 @@ public class ShooterConstants {
         public static final double KP = 0.3;
         public static final double KD = KP / 100;
     
-        public static final double MAX_DIS = 246;
-        public static final double MIN_DIS = 98;
+        public static final double MAX_DIS = 226;
+        public static final double MIN_DIS = 100;
     }
 
     /**vars for shooting */
