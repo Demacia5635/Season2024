@@ -32,7 +32,7 @@ public class StartBottomPlayoffs extends Command {
 
     pathPoint dummyPoint = new pathPoint(0, 0, new Rotation2d(), 0, false);
     pathPoint escapePoint = offset(Field.WingNotes[2], 0,-2.4, 0);
-    pathPoint shootPoint = offset(Field.WingNotes[2], 0, -1.7, 0);
+    pathPoint shootPoint = offset(Field.WingNotes[2], 0, -1.7, -20);
     pathPoint centerNote1 = offset(Field.CenterNotes[4], -1,0,15);
 
     /** Creates a new StartTOP auto. */
@@ -52,7 +52,6 @@ public class StartBottomPlayoffs extends Command {
         addCommands(goTo(escapePoint));
         addCommands(getNote(centerNote1));
         addCommands(goTo(shootPoint));
-        addCommands(new TurnToSpeaker(chassis).withTimeout(2));
         addCommands(shoot());
 
         //addCommands(getNote(centerNote1));
@@ -92,7 +91,7 @@ public class StartBottomPlayoffs extends Command {
     }
 
     private Command goTo(pathPoint point) {
-        return new PathFollow(chassis, new pathPoint[] { dummyPoint, point }, maxVel, maxAceel, 0, isRed, true);
+        return new PathFollow(chassis, new pathPoint[] { dummyPoint, point }, maxVel, maxAceel, 0, isRed, false);
     }
 
     private Command turnToSpeaker() {
@@ -101,7 +100,7 @@ public class StartBottomPlayoffs extends Command {
     }
 
     private Command getNote(pathPoint point) {
-        return (new PathFollow(chassis, new pathPoint[] { dummyPoint, point }, maxVel, maxAceel, 1, isRed)
+        return (new PathFollow(chassis, new pathPoint[] { dummyPoint, point }, 2, maxAceel, 1, isRed)
                 .raceWith(new WaitUntilCommand(() -> Utils.seeNote())))
                 .andThen(takeNote());
     }

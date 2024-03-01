@@ -39,8 +39,8 @@ public class Utils {
   }
  
   private static double shootDistance[] = {1.35, 1.96, 2.5, 3.05,5};
-  private static double shootAngle[] = {56, 46.5, 37.5, 34.5, 26.5};
-  private static double shootVelocity[] = {14, 16, 17, 17.5,22};
+  private static double shootAngle[] = {57, 46.5, 37.5, 34.5, 26.5};
+  private static double shootVelocity[] = {15, 16, 17, 17.5,22};
 
   public static double extrapolatre(double d1, double d2, double v1, double v2, double d) {
     return v1 + (v2-v1)*(d-d1)/(d2-d1);
