@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.shooter.ActivateShooter;
 import frc.robot.commands.shooter.AngleCalibrate;
@@ -61,7 +62,8 @@ public class RobotContainer implements Sendable {
   public VisionLimelight vision;
   public LedControll led;
   public Command shoot; // shoot to amp or to speaker
-  public Command activateShooter; // prepare to shoot
+  public Command 
+  activateShooter; // prepare to shoot
   public Command autonomousRight;
   public Command driveToNote;
   public Command manualIntake;
@@ -104,7 +106,7 @@ public class RobotContainer implements Sendable {
 
 
 
-    driveToNote = new DriveToNote(chassis, 1.5, true).raceWith(new IntakeCommand(intake));
+    driveToNote = new DriveToNote(chassis, 1.6, true).raceWith(new IntakeCommand(intake));
     shoot = shooter.getShootCommand();
     activateShooter = shooter.getActivateShooterToSpeaker();
     manualIntake = new IntakeCommand(intake);
@@ -114,10 +116,14 @@ public class RobotContainer implements Sendable {
     resetOdometry = new InstantCommand(()-> chassis.setOdometryToForward()).ignoringDisable(true);
     disableCommand = new InstantCommand(()-> stopAll(),intake, shooter).andThen(new AngleCalibrate(shooter));
 
-    Command startTop = new ActivateShooter(shooter, intake, chassis, true).alongWith(new StartTOP1());
+    Command startTop = (new AngleCalibrate(shooter))
+      .andThen((new ActivateShooter(shooter, intake, chassis, true))
+      .alongWith(new StartTOP1()));
     Command StartMiddle = new ActivateShooter(shooter, intake, chassis, true).alongWith(new StartMiddle1());
     Command startBottom = new ActivateShooter(shooter, intake, chassis, true).alongWith(new StartBottom1());
-    Command shoot = new ActivateShooter(shooter, intake, chassis, true).alongWith(new Shoot());
+    Command autoShoot = (new AngleCalibrate(shooter))
+      .andThen(new ActivateShooter(shooter, intake, chassis, true)
+      .alongWith((new WaitUntilCommand(()->shooter.getIsShootingReady())).andThen(shooter.getShootCommand())));;
     Command StartBottomEscape = new ActivateShooter(shooter, intake, chassis, true).alongWith(new StartBottomEscape());
     Command PlayOffs = new ActivateShooter(shooter, intake, chassis, true).alongWith(new StartBottomPlayoffs());
 
@@ -126,11 +132,10 @@ public class RobotContainer implements Sendable {
     autoChoose.addOption("Top",startTop);
     autoChoose.addOption("Middle", StartMiddle);
     autoChoose.addOption("Bottom", startBottom);
-    autoChoose.addOption("shoot", shoot);
+    autoChoose.addOption("shoot", autoShoot);
     autoChoose.addOption("StartBottomEscape", StartBottomEscape);
 
     SmartDashboard.putData("Auto Chooser", autoChoose);
-
 }
 
   public void isRed(boolean isRed) {
@@ -166,6 +171,7 @@ public class RobotContainer implements Sendable {
 
 
 
+
     Trigger overrideAuto = new Trigger(() -> Utils.joystickOutOfDeadband(commandController));
 
     commandController.y().onTrue(driveToNote);
@@ -180,7 +186,6 @@ public class RobotContainer implements Sendable {
     commandController.rightBumper().onTrue(shooter.getActivateShooterToSpeakerFromSub());
     overrideAuto.onTrue(chassis.getDefaultCommand());
 
-
     commandController2.b().onTrue(new InstantCommand((()->vision.setResetOdo(true))).ignoringDisable(true));
     commandController2.y().onTrue(shooter.getActivateShooterToSpeakerFromSub());
     
@@ -193,6 +198,7 @@ public class RobotContainer implements Sendable {
     commandController2.leftBumper().whileTrue(new InstantCommand(()-> {intake.setPower(1); shooter.feedingSetPow(1); shooter.setVel(10);}, shooter, intake));
     commandController2.pov(0).onTrue(new RunCommand(()-> intake.setPower(-1), intake).withTimeout(0.3));
 }
+
 
   public void calibrate() {
     disableCommand.schedule();
@@ -207,8 +213,7 @@ public class RobotContainer implements Sendable {
     System.out.println(" -------------------------------------------");
     System.out.println(" -------------------------------------------");
     System.out.println(" -------------------------------------------");
-    return 
-    cmd;
+    return cmd;
     //return new StartTOP1().alongWith(new ActivateShooter(shooter, intake, chassis, true));
     //return new RunCommand(()->shooter.setVel(10), shooter);
   }

@@ -45,7 +45,7 @@ public class StartBottomEscape extends Command {
         speaker = Utils.speakerPosition();
         cmd = new SequentialCommandGroup(initShooter());
 
-        addCommands(shootSubWoofer());
+        addCommands(shoot());
         addCommands(goTo(wingNote));
 
         //addCommands(getNote(centerNote1));
@@ -98,11 +98,6 @@ public class StartBottomEscape extends Command {
                 .raceWith(new WaitUntilCommand(() -> Utils.seeNote())))
                 .andThen(takeNote());
     }
-
-    private Command shootSubWoofer() {
-        return shooter.getActivateShooterToSpeakerFromSub();
-    }
-
 
     private Command takeNote() {
         return (new DriveToNote(chassis, 1, true).raceWith(new IntakeCommand(intake))).withTimeout(2);

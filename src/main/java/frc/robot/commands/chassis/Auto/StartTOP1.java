@@ -48,20 +48,19 @@ public class StartTOP1 extends Command {
         speaker = Utils.speakerPosition();
         cmd = new SequentialCommandGroup(initShooter());
 
-        addCommands(shootSubWoofer());
+        addCommands(shoot());
         addCommands(takeNote());
-        //addCommands(turnToSpeaker());
-        addCommands(goTo(shootPoint));
+        addCommands(goTo(shootPoint, 1));
         addCommands(shoot());
         addCommands(getNote(centerNote1));
-        addCommands(goTo(shootPoint));
-        //addCommands(turnToSpeaker());
+        addCommands(goTo(shootPoint, 2));
         addCommands(shoot());
-        addCommands(getNote(centerNote2));
-        addCommands(goTo(shootPoint));
-        //addCommands(turnToSpeaker());
-        addCommands(shoot());
+        // addCommands(getNote(centerNote2));
+        // addCommands(goTo(wingNote));
+        // addCommands(shoot());
+        
         cmd.schedule();
+        System.out.println(" Start Top - started command");
 
     }
 
@@ -90,7 +89,11 @@ public class StartTOP1 extends Command {
     }
 
     private Command goTo(pathPoint point) {
-        return new PathFollow(chassis, new pathPoint[] { dummyPoint, point }, maxVel, maxAceel, 0, isRed, true);
+        return goTo(point, maxVel);
+    }
+
+    private Command goTo(pathPoint point, double maxv) {
+        return new PathFollow(chassis, new pathPoint[] { dummyPoint, point }, maxv, maxAceel, 0, isRed, true);
     }
 
     private Command turnToSpeaker() {
@@ -102,10 +105,6 @@ public class StartTOP1 extends Command {
         return (new PathFollow(chassis, new pathPoint[] { dummyPoint, point }, maxVel, maxAceel, 1, isRed)
                 .raceWith(new WaitUntilCommand(() -> Utils.seeNote())))
                 .andThen(takeNote());
-    }
-
-    private Command shootSubWoofer() {
-        return shooter.getActivateShooterToSpeakerFromSub();
     }
 
     private Command takeNote() {

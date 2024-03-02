@@ -33,7 +33,7 @@ public class StartBottomPlayoffs extends Command {
     pathPoint dummyPoint = new pathPoint(0, 0, new Rotation2d(), 0, false);
     pathPoint escapePoint = offset(Field.WingNotes[2], 0,-2.4, 0);
     pathPoint shootPoint = offset(Field.WingNotes[2], 0, -1.7, -20);
-    pathPoint centerNote1 = offset(Field.CenterNotes[4], 0,0,15);
+    pathPoint centerNote1 = offset(Field.CenterNotes[4], -0.3,0,15);
 
     /** Creates a new StartTOP auto. */
     public StartBottomPlayoffs() {
@@ -48,7 +48,7 @@ public class StartBottomPlayoffs extends Command {
         speaker = Utils.speakerPosition();
         cmd = new SequentialCommandGroup(initShooter());
 
-        addCommands(shootSubWoofer());
+        addCommands(shoot());
         addCommands(goTo(escapePoint));
         addCommands(getNote(centerNote1));
         addCommands(goTo(shootPoint));
@@ -103,10 +103,6 @@ public class StartBottomPlayoffs extends Command {
         return (new PathFollow(chassis, new pathPoint[] { dummyPoint, point }, 2, maxAceel, 1, isRed)
                 .raceWith(new WaitUntilCommand(() -> Utils.seeNote())))
                 .andThen(takeNote());
-    }
-
-    private Command shootSubWoofer() {
-        return shooter.getActivateShooterToSpeakerFromSub();
     }
 
 

@@ -122,14 +122,16 @@ public class ActivateShooter extends Command {
             angle = ShooterConstants.AmpVar.ANGLE;
 
         } else if (shooter.getIsShootingPodium()) {
-            // velUp = SmartDashboard.getNumber("UP", 0);
-            // velDown = SmartDashboard.getNumber("DOWN", 0);
-            // angle = SmartDashboard.getNumber("ANGLE SHOOTER", 0);
-              velUp = ShooterConstants.PodiumVar.UP;
+            velUp = ShooterConstants.PodiumVar.UP;
             velDown = ShooterConstants.PodiumVar.DOWN;
             angle = ShooterConstants.PodiumVar.ANGLE;
-        }
-          else {
+        } else if (shooter.isShootingClose()) {
+            var av = Utils.getShootingClose();
+            angle = av.getFirst();
+            velDown = av.getSecond();
+            velUp = velDown;
+        
+        } else {
             double dis = fromDistance > 0? fromDistance:
                 speaker.minus(chassis.getPose().getTranslation()).getNorm();
             var av = Utils.getShootingAngleVelocity(dis);
@@ -168,11 +170,13 @@ public class ActivateShooter extends Command {
             shooter.feedingSetPow(1);
             intake.setPower(1);
 
-        } else if (isShooting && timer.get() > 0.5) {
+        } else if (isShooting && timer.get() > 1.0) {
             /*if the shooter is shooting and the timer hit 0.4 than stop shooting */
             isShooting = false;
             shooter.setIsShooting(false);
             shooter.setIsShootingAmp(false);
+            shooter.isShootingClose(false);
+            shooter.setIsShootingPodium(false);
             shooter.feedingSetPow(0);
             intake.setPower(0);
             finish = !isContinious;
@@ -185,6 +189,8 @@ public class ActivateShooter extends Command {
      */
     @Override
     public void end(boolean interrupted) {
+
+    SmartDashboard.putBoolean("is interrupted", interrupted);
       if(finish) {
         shooter.stopAll();
         intake.stop();

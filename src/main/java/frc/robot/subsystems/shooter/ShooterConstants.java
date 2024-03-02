@@ -6,6 +6,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 /**the constants of the shooter */
 public class ShooterConstants {
 
+    
     /**ids for motors and sensors */
     public static class ShooterID {
         /*set up the id for all the motors */
@@ -64,7 +65,7 @@ public class ShooterConstants {
     public static class Shooting {
         /*shooting feed forward */
         public static final double KS = 0.134913294868407;
-        public static final double KV = 0.015947964948241;
+        public static final double KV = 0.017947964948241;
         public static final double KV2 = 0.001053738244123;
 
         /*shooting pid */
@@ -92,7 +93,7 @@ public class ShooterConstants {
     public static class PodiumVar {
         public static final double UP = 16;
         public static final double DOWN = 16;
-        public static final double ANGLE = 37;
+        public static final double ANGLE = 41;
         
     }
     

@@ -55,6 +55,7 @@ public class Shooter extends SubsystemBase {
     
     /**is the shooter is shooting from the podium */
     private boolean isShootingPodium = false;
+    private boolean isShootingClose = false;
 
     /**is the shooter is ready to shoot */
     private boolean isShootingReady = false;
@@ -316,6 +317,8 @@ public class Shooter extends SubsystemBase {
      * @param isShootingPodium what isShootingPodium will be
      */
     public void setIsShootingPodium(boolean isShootingPodium) {
+        isShootingAmp = false;
+        isShootingClose = false;
         this.isShootingPodium = isShootingPodium;
     }
 
@@ -397,7 +400,7 @@ public class Shooter extends SubsystemBase {
      * @return a command that will set isShootingToAmp false and activate the shooter to shoot at the amp
      */
     public Command getActivateShooterToSpeaker() {
-        return (new InstantCommand((()->setIsShootingAmp(false)))).alongWith(new ActivateShooter(this,RobotContainer.robotContainer.intake, RobotContainer.robotContainer.chassis,false));
+        return (new InstantCommand((()->{setIsShootingAmp(false); setIsShootingPodium(false);}))).alongWith(new ActivateShooter(this,RobotContainer.robotContainer.intake, RobotContainer.robotContainer.chassis,false));
     }
 
     /**
@@ -405,7 +408,7 @@ public class Shooter extends SubsystemBase {
      * @return a command that will make the shooter shoot from the sub offer
      */
     public Command getActivateShooterToSpeakerFromSub() {
-        return new InstantCommand(()->setIsShootingAmp(false)).
+        return new InstantCommand(()->isShootingClose(true)).
         alongWith(new ActivateShooter(this,RobotContainer.robotContainer.intake,
                              RobotContainer.robotContainer.chassis,1.35,false));
     }
@@ -440,6 +443,15 @@ public class Shooter extends SubsystemBase {
      */
     public boolean getIsShootingPodium() {
         return isShootingPodium;
+    }
+
+    public boolean isShootingClose() {
+        return isShootingClose;
+    }
+    public void isShootingClose(boolean isShootingClose) {
+        isShootingAmp = false;
+        isShootingPodium = false;
+        this.isShootingClose = isShootingClose;
     }
     
 

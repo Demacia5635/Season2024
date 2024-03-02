@@ -80,7 +80,7 @@ public class DriveToNote extends Command {
 
   @Override
   public boolean isFinished() {
-    return finish || (timer.get() > 1 && countTime);
+    return finish || (timer.get() > 1.5 && countTime);
   }
 
 }

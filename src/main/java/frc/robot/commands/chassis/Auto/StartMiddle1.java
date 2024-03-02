@@ -33,7 +33,7 @@ public class StartMiddle1 extends Command {
     pathPoint wingNote = offset(Field.WingNotes[1], -2,0, -4);
     pathPoint centerNote1 = offset(Field.CenterNotes[3], -1.5,-0.5,0);
     pathPoint centerNote2 = offset(Field.CenterNotes[3], -1,0,0);
-    pathPoint shootPoint = offset(Field.Speaker, 2.5,-1,0);
+    pathPoint shootPoint = offset(Field.Speaker, 2.5, 0,0);
 
     /** Creates a new StartTOP auto. */
     public StartMiddle1() {
@@ -48,10 +48,10 @@ public class StartMiddle1 extends Command {
         speaker = Utils.speakerPosition();
         cmd = new SequentialCommandGroup(initShooter());
 
-        addCommands(shootSubWoofer());
+        addCommands(shoot());
         addCommands(takeNote());
         //addCommands(turnToSpeaker());
-        addCommands(goTo(shootPoint));
+        addCommands(goTo(shootPoint, 1));
         addCommands(shoot());
         // addCommands(getNote(centerNote1));
         // addCommands(goTo(shootPoint));
@@ -91,7 +91,11 @@ public class StartMiddle1 extends Command {
     }
 
     private Command goTo(pathPoint point) {
-        return new PathFollow(chassis, new pathPoint[] { dummyPoint, point }, maxVel, maxAceel, 0, isRed, true);
+        return goTo(point, maxVel);
+    }
+
+    private Command goTo(pathPoint point, double maxv) {
+        return new PathFollow(chassis, new pathPoint[] { dummyPoint, point }, maxv, maxAceel, 0, isRed, true);
     }
 
     private Command turnToSpeaker() {
@@ -103,10 +107,6 @@ public class StartMiddle1 extends Command {
         return (new PathFollow(chassis, new pathPoint[] { dummyPoint, point }, maxVel, maxAceel, 1, isRed)
                 .raceWith(new WaitUntilCommand(() -> Utils.seeNote())))
                 .andThen(takeNote());
-    }
-
-    private Command shootSubWoofer() {
-        return shooter.getActivateShooterToSpeakerFromSub();
     }
 
     private Command takeNote() {
