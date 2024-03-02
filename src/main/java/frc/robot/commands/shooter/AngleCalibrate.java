@@ -39,15 +39,11 @@ public class AngleCalibrate extends Command {
     @Override
     public void end(boolean interrupted) {
         shooter.angleStop();
-        if(isFinished()) {
-           shooter.resetDis();
-        }
     }
 
     /**check if the motor is at the limit */
     @Override
     public boolean isFinished() {
-       // SmartDashboard.putBoolean("is limit shooter", shooter.isLimit());
         return shooter.isLimit();
     }
 }

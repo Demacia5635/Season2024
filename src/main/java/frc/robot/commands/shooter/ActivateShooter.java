@@ -15,7 +15,7 @@ import frc.robot.subsystems.chassis.Chassis;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterConstants;
-import frc.robot.subsystems.shooter.Shooter.SHOOTER_MOTOR;
+import frc.robot.subsystems.shooter.ShooterConstants.SHOOTER_MOTOR;
 import frc.robot.utils.Utils;
 
 public class ActivateShooter extends Command {
@@ -102,8 +102,8 @@ public class ActivateShooter extends Command {
         speaker = Utils.speakerPosition();
         finish = false;
         timer.reset();
-        shooter.isActive(true);
-        shooter.isShootingFrom = fromDistance > 0;
+        shooter.setIsActive(true);
+        shooter.setIsShootingFrom(fromDistance > 0);
     }
 
     /**
@@ -116,12 +116,12 @@ public class ActivateShooter extends Command {
     @Override
     public void execute() {
         /*checks if shooting to the amp or the speakeer */
-        if (shooter.isShootingAmp) {
+        if (shooter.getIsShootingAmp()) {
             velUp = ShooterConstants.AmpVar.UP;
             velDown = ShooterConstants.AmpVar.DOWN;
             angle = ShooterConstants.AmpVar.ANGLE;
 
-        } else if (shooter.isShootingPodium()) {
+        } else if (shooter.getIsShootingPodium()) {
             // velUp = SmartDashboard.getNumber("UP", 0);
             // velDown = SmartDashboard.getNumber("DOWN", 0);
             // angle = SmartDashboard.getNumber("ANGLE SHOOTER", 0);
@@ -157,7 +157,7 @@ public class ActivateShooter extends Command {
         isReady = Math.abs(angleError) < 1 && 
                           Math.abs(velErrorUp) < 0.6 && 
                           Math.abs(velErrorDown) < 0.6;
-        shooter.isShootingReady(isReady);
+        shooter.setIsShootingReady(isReady);
 
         /*checks if the shooter is ready and if the timer did not hit 0.4*/
         if (!isShooting && shooter.getIsShooting()) {
@@ -171,12 +171,12 @@ public class ActivateShooter extends Command {
         } else if (isShooting && timer.get() > 0.5) {
             /*if the shooter is shooting and the timer hit 0.4 than stop shooting */
             isShooting = false;
-            shooter.isShooting(false);
-            shooter.isShootingAmp(false);
+            shooter.setIsShooting(false);
+            shooter.setIsShootingAmp(false);
             shooter.feedingSetPow(0);
             intake.setPower(0);
             finish = !isContinious;
-            shooter.isShootingReady(false);
+            shooter.setIsShootingReady(false);
         }
     }
 

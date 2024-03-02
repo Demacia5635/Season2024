@@ -6,7 +6,7 @@ package frc.robot.commands.shooter;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.shooter.Shooter;
-import frc.robot.subsystems.shooter.Shooter.SHOOTER_MOTOR;
+import frc.robot.subsystems.shooter.ShooterConstants.SHOOTER_MOTOR;
 
 /**command that will give vel to the shooter shooting motors */
 public class ShooterPowering extends Command {

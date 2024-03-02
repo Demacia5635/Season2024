@@ -26,7 +26,7 @@ public class GoToAMP extends SequentialCommandGroup {
 
     addCommands(new PathFollow(chassis, pointsToAmp, 2, 6, 0, isRed).alongWith(new AngleGoToAngle(shooter, AmpVar.ANGLE))
     .alongWith(new ActivateShooter(shooter, intake, chassis, false).
-    alongWith(new InstantCommand(()->shooter.isShootingAmp(true))))
+    alongWith(new InstantCommand(()->shooter.setIsShootingAmp(true))))
     .andThen(new IntakeToShooter(intake, shooter, ShooterConstants.AmpVar.UP, ShooterConstants.AmpVar.DOWN)).withTimeout(1));
   }
 }

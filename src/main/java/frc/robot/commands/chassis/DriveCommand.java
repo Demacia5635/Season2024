@@ -69,7 +69,7 @@ public class DriveCommand extends Command {
       velRot /= 4;
     }
     ChassisSpeeds speeds = new ChassisSpeeds(velX, velY, velRot);
-    if (rot == 0 && RobotContainer.robotContainer.shooter.isActiveToSpeaker()) { // rotate to speaker
+    if (rot == 0 && RobotContainer.robotContainer.shooter.getIsActiveToSpeaker()) { // rotate to speaker
       chassis.setVelocitiesRotateToSpeake(speeds);
     } else {
       chassis.setVelocities(speeds);

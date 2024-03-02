@@ -105,11 +105,11 @@ public class RobotContainer implements Sendable {
 
 
     driveToNote = new DriveToNote(chassis, 1.5, true).raceWith(new IntakeCommand(intake));
-    shoot = shooter.shootCommand();
-    activateShooter = shooter.activateShooterToSpeaker();
+    shoot = shooter.getShootCommand();
+    activateShooter = shooter.getActivateShooterToSpeaker();
     manualIntake = new IntakeCommand(intake);
-    activateAmp = shooter.activateShooterToAmp();
-    activatePodium = shooter.activateShooterToPodium();
+    activateAmp = shooter.getActivateShooterToAmp();
+    activatePodium = shooter.getActivateShooterToPodium();
 
     resetOdometry = new InstantCommand(()-> chassis.setOdometryToForward()).ignoringDisable(true);
     disableCommand = new InstantCommand(()-> stopAll(),intake, shooter).andThen(new AngleCalibrate(shooter));
@@ -177,12 +177,12 @@ public class RobotContainer implements Sendable {
     commandController.back().onTrue(resetOdometry);
     commandController.leftBumper().onTrue(disableCommand);
     commandController.pov(270).onTrue(new GoToAMP1());
-    commandController.rightBumper().onTrue(shooter.activateShooterToSpeakerFromSub());
+    commandController.rightBumper().onTrue(shooter.getActivateShooterToSpeakerFromSub());
     overrideAuto.onTrue(chassis.getDefaultCommand());
 
 
     commandController2.b().onTrue(new InstantCommand((()->vision.setResetOdo(true))).ignoringDisable(true));
-    commandController2.y().onTrue(shooter.activateShooterToSpeakerFromSub());
+    commandController2.y().onTrue(shooter.getActivateShooterToSpeakerFromSub());
     
     commandController2.x().onTrue(activateShooter);
     commandController2.a().onTrue(activateAmp);

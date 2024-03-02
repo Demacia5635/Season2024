@@ -6,15 +6,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 /**the constants of the shooter */
 public class ShooterConstants {
 
-
-    public static class  PodiumVar {
-    
-        public static final double UP = 16;
-        public static final double DOWN = 16;
-        public static final double ANGLE = 37;
-        
-    }
-    
     /**ids for motors and sensors */
     public static class ShooterID {
         /*set up the id for all the motors */
@@ -62,8 +53,11 @@ public class ShooterConstants {
         public static final double KP = 0.3;
         public static final double KD = KP / 100;
     
+        /*the max and min dis of the angle changer */
         public static final double MAX_DIS = 226;
         public static final double MIN_DIS = 100;
+
+        public static final double BOUNDARY_DIS = 4;
     }
 
     /**vars for shooting */
@@ -94,10 +88,34 @@ public class ShooterConstants {
         public static final double UP = 4.375;
     }
 
+    /**var for shooting from the podium */
+    public static class PodiumVar {
+        public static final double UP = 16;
+        public static final double DOWN = 16;
+        public static final double ANGLE = 37;
+        
+    }
+    
     /*set up the location of the 2 speakers */
     public static class Speaker {
         public static final Pose2d BLUE_ALLIANCE_SPEAKER = new Pose2d(-0.04,5.55, Rotation2d.fromDegrees(0));
         public static final Pose2d RED_ALLIANCE_SPEAKER = new Pose2d(16.54 - (-0.04),2.1842, Rotation2d.fromDegrees(180));
+    }
+
+    /**
+     * <pre>
+     * enum SHOOTER_MOTOR that contains all motors of the shooter
+     * UP - the shooting motor thats up
+     * DOWN - the shooting motor thats down
+     * FEEDING - the feeding motor
+     * ANGLE - the motor of the angle changer
+     * </pre>
+     */
+    public enum SHOOTER_MOTOR {
+        UP,
+        DOWN,
+        FEEDING,
+        ANGLE,
     }
 
 }

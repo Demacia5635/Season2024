@@ -83,11 +83,11 @@ public class StartBottomPlayoffs extends Command {
 
 
     private Command shoot() {
-        return shooter.shootCommand();
+        return shooter.getShootCommand();
     }
 
     private Command initShooter() {
-        return new WaitUntilCommand(() -> shooter.isShootingReady());
+        return new WaitUntilCommand(() -> shooter.getIsShootingReady());
     }
 
     private Command goTo(pathPoint point) {
@@ -106,7 +106,7 @@ public class StartBottomPlayoffs extends Command {
     }
 
     private Command shootSubWoofer() {
-        return shooter.activateShooterToSpeakerFromSub();
+        return shooter.getActivateShooterToSpeakerFromSub();
     }
 
 

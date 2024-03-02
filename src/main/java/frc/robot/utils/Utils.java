@@ -48,9 +48,9 @@ public class Utils {
 
   public static Pair<Double,Double> getShootingAngleVelocity(double distance) {
     Shooter shooter = RobotContainer.robotContainer.shooter; 
-    if(shooter.inCalibration) {
-      System.out.println(" calibrate - " + shooter.calibrateAngle + " " + shooter.calibrateVelocity);
-      return new Pair<Double,Double>(shooter.calibrateAngle, shooter.calibrateVelocity);
+    if(shooter.getIsInCalibration()) {
+      System.out.println(" calibrate - " + shooter.getCalibrateAngle() + " " + shooter.getCalibrateVel());
+      return new Pair<Double,Double>(shooter.getCalibrateAngle(), shooter.getCalibrateVel());
     }
     double v = 0;
     double a = 0;

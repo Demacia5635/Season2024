@@ -82,11 +82,11 @@ public class StartBottom1 extends Command {
 
 
     private Command shoot() {
-        return shooter.shootCommand();
+        return shooter.getShootCommand();
     }
 
     private Command initShooter() {
-        return new WaitUntilCommand(() -> shooter.isShootingReady());
+        return new WaitUntilCommand(() -> shooter.getIsShootingReady());
     }
 
     private Command goTo(pathPoint point) {
@@ -105,7 +105,7 @@ public class StartBottom1 extends Command {
     }
 
     private Command shootSubWoofer() {
-        return shooter.activateShooterToSpeakerFromSub();
+        return shooter.getActivateShooterToSpeakerFromSub();
     }
 
     private Command takeNote() {

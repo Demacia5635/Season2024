@@ -22,7 +22,7 @@ public class GoToAMP1 extends Command {
     @Override
     public void initialize() {
       Shooter shooter = RobotContainer.robotContainer.shooter;
-        cmd = shooter.activateShooterToAmp().raceWith(new PathFollow(toAmp,1).andThen(shooter.shootCommand()));
+        cmd = shooter.getActivateShooterToAmp().raceWith(new PathFollow(toAmp,1).andThen(shooter.getShootCommand()));
         cmd.schedule();
     }
 

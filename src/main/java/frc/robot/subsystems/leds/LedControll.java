@@ -102,7 +102,7 @@ public class LedControll extends SubsystemBase{
         boolean isSeeNote = Utils.seeNote();
         boolean isStart = DriveToNote.isStart;
         boolean isNotePresent = RobotContainer.robotContainer.intake.isNotePresent();
-        boolean isShooterReady = RobotContainer.robotContainer.shooter.isShootingReady;
+        boolean isShooterReady = RobotContainer.robotContainer.shooter.getIsShootingReady();
         boolean isShumi = RobotContainer.robotContainer.commandController2.rightBumper().getAsBoolean();
 
         if(isShumi) {
