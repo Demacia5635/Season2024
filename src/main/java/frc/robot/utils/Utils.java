@@ -4,6 +4,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Field;
@@ -37,7 +38,15 @@ public class Utils {
         double[] llpython = NetworkTableInstance.getDefault().getTable("limelight").getEntry("llpython").getDoubleArray(new double[8]);
         return llpython[0] != 0 && llpython[0] < 200;
   }
- 
+
+  public static int getPipeline() {
+    return (int) NetworkTableInstance.getDefault().getTable("limelight").getEntry("getpipe").getDouble(0);
+  }
+
+  public static void setPipeline(int pipeline) {
+     NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(pipeline);
+}
+  //usful : https://github.com/NAHSRobotics-Team5667/2020-FRC/blob/master/src/main/java/frc/robot/utils/LimeLight.java
   private static double shootDistance[] = {1.35, 1.96, 2.5, 3.05,5};
   private static double shootAngle[] = {56, 47.5, 41, 35.5, 27.5};
   private static double shootVelocity[] = {15, 16, 17, 17.5,22};
