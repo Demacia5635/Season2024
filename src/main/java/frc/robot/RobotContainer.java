@@ -167,7 +167,7 @@ public class RobotContainer implements Sendable {
     // Back - chassie gyro set
     //Start - Amp
 
-    //Operator Controller
+    
 
 
 
@@ -186,17 +186,25 @@ public class RobotContainer implements Sendable {
     commandController.rightBumper().onTrue(shooter.getActivateShooterToSpeakerFromSub());
     overrideAuto.onTrue(chassis.getDefaultCommand());
 
+    //Operator Controller
+    //b -> set odometry to vision
+    //y -> Shooter from Subwofer
+    //x -> Shooter from Look up table
+    //a -> amp
+    //rightBumper -> Shooter from Podium
+    //leftBumper -> Take note bakewords
+    //pov(down) -> puke from intake(remove stack note)
+    //pov(up) -> puke from Shooter(remove stack note)
     commandController2.b().onTrue(new InstantCommand((()->vision.setResetOdo(true))).ignoringDisable(true));
     commandController2.y().onTrue(shooter.getActivateShooterToSpeakerFromSub());
-    
     commandController2.x().onTrue(activateShooter);
     commandController2.a().onTrue(activateAmp);
-    commandController2.pov(270).onTrue(activatePodium);
-    commandController2.pov(180).onTrue(
+    commandController2.rightBumper().onTrue(activatePodium);
+    commandController2.leftBumper().onTrue(
       (new RunCommand(()->shooter.feedingSetPow(-0.5), intake).withTimeout(0.2))
       .andThen(new InstantCommand(()->shooter.feedingSetPow(0), intake)));
-    commandController2.leftBumper().whileTrue(new InstantCommand(()-> {intake.setPower(1); shooter.feedingSetPow(1); shooter.setVel(10);}, shooter, intake));
-    commandController2.pov(0).onTrue(new RunCommand(()-> intake.setPower(-1), intake).withTimeout(0.3));
+    commandController2.pov(0).whileTrue(new InstantCommand(()-> {intake.setPower(1); shooter.feedingSetPow(1); shooter.setVel(10);}, shooter, intake));
+    commandController2.pov(180).onTrue(new RunCommand(()-> intake.setPower(-1), intake).withTimeout(0.3));
 }
 
 
