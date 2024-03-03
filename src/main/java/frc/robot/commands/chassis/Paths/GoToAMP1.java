@@ -10,6 +10,7 @@ import frc.robot.PathFollow.Util.pathPoint;
 import frc.robot.subsystems.shooter.Shooter;
 
 
+
 public class GoToAMP1 extends Command {
   
     pathPoint[] toAmp = {

@@ -260,6 +260,12 @@ public class SwerveModule implements Sendable {
     public Rotation2d getAngle() {
         return Rotation2d.fromDegrees(absoluteEncoder.getAbsolutePosition() - angleOffset);
     }
+
+
+    public double getAngleDegreesRaw() {
+        return absoluteEncoder.getAbsolutePosition();
+    }
+
     /**
      * Get the module angle in degrees in the -180 to 180 range
      * @return

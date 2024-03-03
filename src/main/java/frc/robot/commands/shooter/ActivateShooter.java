@@ -9,6 +9,8 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Field;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.chassis.Chassis;
@@ -161,6 +163,9 @@ public class ActivateShooter extends Command {
                           Math.abs(velErrorDown) < 0.6;
         shooter.setIsShootingReady(isReady);
 
+        if(isShooting)
+             System.out.println("timer value" + timer.get());
+
         /*checks if the shooter is ready and if the timer did not hit 0.4*/
         if (!isShooting && shooter.getIsShooting()) {
             /*if the shooter is ready than start the timer */
@@ -170,9 +175,10 @@ public class ActivateShooter extends Command {
             shooter.feedingSetPow(1);
             intake.setPower(1);
 
-        } else if (isShooting && timer.get() > 1.0) {
+        } else if (isShooting && timer.get() > 1) {
             /*if the shooter is shooting and the timer hit 0.4 than stop shooting */
             isShooting = false;
+            timer.reset();
             shooter.setIsShooting(false);
             shooter.setIsShootingAmp(false);
             shooter.isShootingClose(false);
@@ -189,12 +195,21 @@ public class ActivateShooter extends Command {
      */
     @Override
     public void end(boolean interrupted) {
-
-    SmartDashboard.putBoolean("is interrupted", interrupted);
+        System.out.println(" activated eneded - int=" + interrupted + " finish=" + finish);
+        if(interrupted) {
+            Command c = CommandScheduler.getInstance().requiring(shooter);
+            System.out.println(c + c.getName());
+            if(c != null) {
+                if(c instanceof SequentialCommandGroup) {
+                    SequentialCommandGroup sc = (SequentialCommandGroup) c;
+                }
+            }
+        }
       if(finish) {
         shooter.stopAll();
         intake.stop();
       }
+
 
     }
 

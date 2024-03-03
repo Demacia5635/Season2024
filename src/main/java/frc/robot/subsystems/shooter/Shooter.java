@@ -408,9 +408,11 @@ public class Shooter extends SubsystemBase {
      * @return a command that will make the shooter shoot from the sub offer
      */
     public Command getActivateShooterToSpeakerFromSub() {
-        return new InstantCommand(()->isShootingClose(true)).
+        Command c = new InstantCommand(()->isShootingClose(true)).
         alongWith(new ActivateShooter(this,RobotContainer.robotContainer.intake,
                              RobotContainer.robotContainer.chassis,1.35,false));
+        c.setName("activate from sub");
+        return c;
     }
 
     /**

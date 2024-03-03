@@ -61,6 +61,7 @@ public class Chassis extends SubsystemBase {
     gyro.setYaw(0);
     poseEstimator = new SwerveDrivePoseEstimator(KINEMATICS, getRawAngle(), getModulePositions(), new Pose2d());
     
+    setNeutralMode(NeutralMode.Brake);
     field = new Field2d();
     SmartDashboard.putData(field);
     SmartDashboard.putData(this);
@@ -79,7 +80,7 @@ public class Chassis extends SubsystemBase {
     SmartDashboard.putData("reset wheels", new InstantCommand(() -> resetWheels()).ignoringDisable(true));
         SmartDashboard.putData("reset pose", new InstantCommand(() -> setOdometryToForward()).ignoringDisable(true));
 
-    SmartDashboard.putData("calibrate", new InstantCommand(()->calibrate(), this));
+    SmartDashboard.putData("calibrate", new InstantCommand(()->calibrate(), this).ignoringDisable(true));
 
     SmartDashboard.putData("Chassis Move Sysid",
         (new Sysid(this::setModulesPower, this::getMoveVelocity, 0.2, 0.8, this)).getCommand());
@@ -112,10 +113,10 @@ public class Chassis extends SubsystemBase {
   }
 
   public void calibrate() {
-    SmartDashboard.putNumber("LEFT FRONT", modules[0].getAngleDegrees());
-    SmartDashboard.putNumber("RIGHT FRONT", modules[1].getAngleDegrees());
-    SmartDashboard.putNumber("LEFT BACK", modules[2].getAngleDegrees());
-    SmartDashboard.putNumber("RIGHT BACK", modules[3].getAngleDegrees());
+    SmartDashboard.putNumber("LEFT FRONT", modules[0].getAngleDegreesRaw());
+    SmartDashboard.putNumber("RIGHT FRONT", modules[1].getAngleDegreesRaw());
+    SmartDashboard.putNumber("LEFT BACK", modules[2].getAngleDegreesRaw());
+    SmartDashboard.putNumber("RIGHT BACK", modules[3].getAngleDegreesRaw());
   }
 
   public boolean isRed() {

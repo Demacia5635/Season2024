@@ -85,8 +85,8 @@ public class ShooterConstants {
     /*var for shooting to the amp */
     public static class AmpVar {
         public static final double ANGLE = 48.5;
-        public static final double DOWN = 17.5;
-        public static final double UP = 4.375;
+        public static final double DOWN = 19;
+        public static final double UP = 4.5;
     }
 
     /**var for shooting from the podium */

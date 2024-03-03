@@ -31,7 +31,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.chassis.DriveCommand;
 import frc.robot.commands.chassis.DriveToNote;
 import frc.robot.commands.chassis.GoToAngleChassis;
-import frc.robot.commands.chassis.Auto.StartTOP;
 import frc.robot.commands.chassis.Auto.StartTOP1;
 import frc.robot.commands.chassis.Auto.AutoChooser;
 import frc.robot.commands.chassis.Auto.Fowrard;
@@ -40,7 +39,6 @@ import frc.robot.commands.chassis.Auto.StartBottom1;
 import frc.robot.commands.chassis.Auto.StartBottomEscape;
 import frc.robot.commands.chassis.Auto.StartBottomPlayoffs;
 import frc.robot.commands.chassis.Auto.StartMiddle1;
-import frc.robot.commands.chassis.Paths.GoToAMP;
 import frc.robot.commands.chassis.Paths.GoToAMP1;
 import frc.robot.commands.intake.IntakeCommand;
 import frc.robot.commands.intake.IntakeToShooter;
@@ -107,25 +105,40 @@ public class RobotContainer implements Sendable {
 
 
     driveToNote = new DriveToNote(chassis, 1.6, true).raceWith(new IntakeCommand(intake));
+    driveToNote.setName("Drive to Note");
     shoot = shooter.getShootCommand();
+    shoot.setName("Shoot");
     activateShooter = shooter.getActivateShooterToSpeaker();
+    activateShooter.setName("activateShooter");
     manualIntake = new IntakeCommand(intake);
+    manualIntake.setName("manualIntake");
     activateAmp = shooter.getActivateShooterToAmp();
+    activateAmp.setName("Activate Amp");
     activatePodium = shooter.getActivateShooterToPodium();
+    activatePodium.setName("activate podium");
 
     resetOdometry = new InstantCommand(()-> chassis.setOdometryToForward()).ignoringDisable(true);
+    resetOdometry.setName("reset odometry");
     disableCommand = new InstantCommand(()-> stopAll(),intake, shooter).andThen(new AngleCalibrate(shooter));
+    disableCommand.setName("disable command");
 
     Command startTop = (new AngleCalibrate(shooter))
       .andThen((new ActivateShooter(shooter, intake, chassis, true))
       .alongWith(new StartTOP1()));
+    startTop.setName("TOP");
     Command StartMiddle = new ActivateShooter(shooter, intake, chassis, true).alongWith(new StartMiddle1());
+    StartMiddle.setName("Middle");
     Command startBottom = new ActivateShooter(shooter, intake, chassis, true).alongWith(new StartBottom1());
+    startBottom.setName("Buttom");
     Command autoShoot = (new AngleCalibrate(shooter))
       .andThen(new ActivateShooter(shooter, intake, chassis, true)
-      .alongWith((new WaitUntilCommand(()->shooter.getIsShootingReady())).andThen(shooter.getShootCommand())));;
+      .alongWith((new WaitUntilCommand(()->shooter.getIsShootingReady())).andThen(shooter.getShootCommand())));
+      autoShoot.setName("auto shoot");
+    Command justShootFromSubWuffer = shooter.getActivateShooterToSpeakerFromSub();
     Command StartBottomEscape = new ActivateShooter(shooter, intake, chassis, true).alongWith(new StartBottomEscape());
+    StartBottomEscape.setName("start b escape");
     Command PlayOffs = new ActivateShooter(shooter, intake, chassis, true).alongWith(new StartBottomPlayoffs());
+    PlayOffs.setName("playpoff");
 
     autoChoose = new SendableChooser<Command>();
     autoChoose.setDefaultOption("Playoffs", PlayOffs);
@@ -134,6 +147,8 @@ public class RobotContainer implements Sendable {
     autoChoose.addOption("Bottom", startBottom);
     autoChoose.addOption("shoot", autoShoot);
     autoChoose.addOption("StartBottomEscape", StartBottomEscape);
+    autoChoose.addOption("just shoot from subwuffer", justShootFromSubWuffer);
+
 
     SmartDashboard.putData("Auto Chooser", autoChoose);
 }
@@ -178,7 +193,7 @@ public class RobotContainer implements Sendable {
     commandController.x().onTrue(activateShooter);
     // B - in Drive Command
     commandController.a().onTrue(manualIntake);
-    commandController.pov(0).whileTrue(shoot);
+    commandController.pov(0).onTrue(shoot);
     commandController.start().onTrue(activateAmp);
     commandController.back().onTrue(resetOdometry);
     commandController.leftBumper().onTrue(disableCommand);
@@ -197,18 +212,30 @@ public class RobotContainer implements Sendable {
     //pov(up) -> puke from Shooter(remove stack note)
     //pov(right) -> exposer+1
     //pov(left) -> exposer-1
-    commandController2.b().onTrue(new InstantCommand((()->vision.setResetOdo(true))).ignoringDisable(true));
+    Command driverB = new InstantCommand((()->vision.setResetOdo(true))).ignoringDisable(true);
+    driverB.setName("Perlman B");
+    commandController2.b().onTrue(driverB);
     commandController2.y().onTrue(shooter.getActivateShooterToSpeakerFromSub());
     commandController2.x().onTrue(activateShooter);
     commandController2.a().onTrue(activateAmp);
     commandController2.rightBumper().onTrue(activatePodium);
-    commandController2.leftBumper().onTrue(
-      (new RunCommand(()->shooter.feedingSetPow(-0.5), intake).withTimeout(0.2))
-      .andThen(new InstantCommand(()->shooter.feedingSetPow(0), intake)));
-    commandController2.pov(0).whileTrue(new InstantCommand(()-> {intake.setPower(1); shooter.feedingSetPow(1); shooter.setVel(10);}, shooter, intake));
-    commandController2.pov(180).onTrue(new RunCommand(()-> intake.setPower(-1), intake).withTimeout(0.3));
-    commandController2.pov(90).onTrue(new InstantCommand(() -> {Utils.setPipeline(Utils.getPipeline() + 1); }));
-    commandController2.pov(270).onTrue(new InstantCommand(() -> {Utils.setPipeline(Utils.getPipeline() - 1); }));
+    Command PerlmanleftBumper = (new RunCommand(()->shooter.feedingSetPow(-0.5), intake).withTimeout(0.2))
+      .andThen(new InstantCommand(()->shooter.feedingSetPow(0), intake));
+    PerlmanleftBumper.setName("Perlman l Bumber");
+    commandController2.leftBumper().onTrue(PerlmanleftBumper);
+    Command Ppov0 = new InstantCommand(()-> {intake.setPower(1); shooter.feedingSetPow(1); shooter.setVel(10);}, shooter, intake);
+    Ppov0.setName("P Pov0");
+    commandController2.pov(0).whileTrue(Ppov0);
+    Command Ppov180 = new RunCommand(()-> intake.setPower(-1), intake).withTimeout(0.3);
+    Ppov180.setName("P Pov 180");
+    commandController2.pov(180).onTrue(Ppov180);
+
+    Command Ppov90 = new InstantCommand(() -> {Utils.setPipeline(Math.min(Utils.getPipeline() + 1, 6)); }).ignoringDisable(true);
+    Ppov180.setName("P Pov 90");
+    commandController2.pov(90).onTrue(Ppov90);
+
+  
+    commandController2.pov(270).onTrue(new InstantCommand(() -> {Utils.setPipeline(Math.max(Utils.getPipeline() - 1, 0)); }).ignoringDisable(true));
 
 }
 

@@ -51,7 +51,7 @@ public class StartMiddle1 extends Command {
         addCommands(shoot());
         addCommands(takeNote());
         //addCommands(turnToSpeaker());
-        addCommands(goTo(shootPoint, 1));
+        addCommands(goTo(shootPoint, 0.5));
         addCommands(shoot());
         // addCommands(getNote(centerNote1));
         // addCommands(goTo(shootPoint));
