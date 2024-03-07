@@ -1,4 +1,4 @@
-package frc.robot.commands.chassis;
+package frc.robot.commands.chassis.tests;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.chassis.Chassis;

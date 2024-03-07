@@ -22,6 +22,7 @@ import frc.robot.Sysid.Sysid;
 import frc.robot.Sysid.Sysid.Gains;
 import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.subsystems.vision.utils.UpdatedPoseEstimatorClasses.SwerveDrivePoseEstimator;
+import frc.robot.utils.Trapezoid;
 import frc.robot.utils.Utils;
 import static frc.robot.subsystems.chassis.ChassisConstants.*;
 
@@ -35,6 +36,7 @@ import com.ctre.phoenix.sensors.Pigeon2;
 public class Chassis extends SubsystemBase {
   private final SwerveModule[] modules;
   private final Pigeon2 gyro;
+  private Trapezoid rotationTrapezoid = new Trapezoid(MAX_OMEGA_VELOCITY, MAX_OMEGA_ACCELERATION);
 
   public static List<pathPoint> pointsForPathTeleop = new ArrayList<pathPoint>();
   public static List<pathPoint> pointsForAuto = new ArrayList<pathPoint>();
@@ -104,7 +106,6 @@ public class Chassis extends SubsystemBase {
 
    // SmartDashboard.putNumber("ANG", 0);
    // SmartDashboard.putData("go to angle position", new RunCommand(()->modules[0].setAngleByPositionPID(Rotation2d.fromDegrees(SmartDashboard.getNumber("ANG", 0))), this));
-
 
    setNeutralMode(NeutralMode.Brake);
   }
@@ -197,8 +198,13 @@ public class Chassis extends SubsystemBase {
    * @param speeds In m/s and rad/s
    */
   public void setVelocities(ChassisSpeeds speeds) {
+    double param = 0.2;
     ChassisSpeeds relativeSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds, getAngle());
-    SwerveModuleState[] states = KINEMATICS.toSwerveModuleStates(relativeSpeeds);
+    Translation2d newSpeeds = new Translation2d(relativeSpeeds.vxMetersPerSecond,
+     relativeSpeeds.vyMetersPerSecond).rotateBy(Rotation2d.fromRadians(relativeSpeeds.omegaRadiansPerSecond * param));
+    ChassisSpeeds newChassisSpeeds = new ChassisSpeeds(newSpeeds.getX(), newSpeeds.getY(), relativeSpeeds.omegaRadiansPerSecond);
+    SwerveModuleState[] states = KINEMATICS.toSwerveModuleStates(newChassisSpeeds);
+    
     setModuleStates(states);
   }
   public void setVelocitiesRotateToSpeake(ChassisSpeeds speeds) {
@@ -364,10 +370,10 @@ public class Chassis extends SubsystemBase {
     isAimingSpeaker = error == 0;
     return MathUtil.clamp(error * 0.2, -MAX_OMEGA_VELOCITY, MAX_OMEGA_VELOCITY);
   }
-  public double getRadPerSecToAngle(Rotation2d angle) {
-    double error = Utils.angelErrorInRadians(angle, getAngle(), Math.toRadians(1));
-    error = Math.abs(error) < Math.toRadians(3)? 0 : error;
-    return MathUtil.clamp(error * 1, -MAX_OMEGA_VELOCITY, MAX_OMEGA_VELOCITY);
+  public double getRadPerSecToAngle(Rotation2d fieldRelativeAngle) {
+      double rotateVel = rotationTrapezoid.calculate(
+        fieldRelativeAngle.minus(getAngle()).getRadians(), getChassisSpeeds().omegaRadiansPerSecond, 0);
+      return rotateVel;
   }
   
     public static Translation2d speakerPosition() {
