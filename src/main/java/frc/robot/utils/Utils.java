@@ -36,7 +36,8 @@ public class Utils {
 
   public static boolean seeNote() {
         double[] llpython = NetworkTableInstance.getDefault().getTable("limelight").getEntry("llpython").getDoubleArray(new double[8]);
-        return llpython[0] != 0 && llpython[0] < 200;
+        return llpython!= null && llpython.length>0 && llpython[0] != 0 && llpython[0] < 200;
+        //return llpython[0] != 0 && llpython[0] < 200;
   }
 
   public static int getPipeline() {

@@ -106,6 +106,7 @@ public class Chassis extends SubsystemBase {
    // SmartDashboard.putData("go to angle position", new RunCommand(()->modules[0].setAngleByPositionPID(Rotation2d.fromDegrees(SmartDashboard.getNumber("ANG", 0))), this));
 
 
+   setNeutralMode(NeutralMode.Brake);
   }
 
   public SwerveModule[] getModules() {

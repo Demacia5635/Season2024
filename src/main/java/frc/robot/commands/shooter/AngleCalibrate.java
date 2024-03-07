@@ -6,6 +6,7 @@ package frc.robot.commands.shooter;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import frc.robot.subsystems.shooter.Shooter;
 
 /**command that will quel the angle motor */
@@ -32,7 +33,7 @@ public class AngleCalibrate extends Command {
     /**set the anlge motor pow */
     @Override
     public void execute() {
-        shooter.angleSetPow(0.22);
+        shooter.angleSetPow(0.17);
     }
 
     /**stops the anlge motor and reset the dis */

@@ -49,7 +49,10 @@ public class LimelightVisionUtils {
         double latency = robotPose[6]/1000.0;
         Rotation2d robotRotation = Rotation2d.fromDegrees(robotPose[5]);
         Translation2d robotTranslation = new Translation2d(robotPose[0], robotPose[1]);
-        double distance = robotPose[9];
+        double distance =  (robotPose.length >= 9) ? robotPose[9]: 1;
+        //double distance =  robotPose[9];
+
+       
         if(distance > MAX_DISTANCE_FOR_LIMELIGHT || distance == 0){
             return null;
         }

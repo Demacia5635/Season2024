@@ -55,7 +55,7 @@ public class ShooterConstants {
         public static final double KD = KP / 100;
     
         /*the max and min dis of the angle changer */
-        public static final double MAX_DIS = 226;
+        public static final double MAX_DIS = 225;
         public static final double MIN_DIS = 100;
 
         public static final double BOUNDARY_DIS = 4;

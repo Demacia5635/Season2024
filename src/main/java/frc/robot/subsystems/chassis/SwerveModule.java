@@ -426,6 +426,10 @@ public class SwerveModule implements Sendable {
         steerMotor.configFactoryDefault();
         moveMotor.configFactoryDefault();
     }
+
+    public void setSteerCoast() {
+        steerMotor.setNeutralMode(NeutralMode.Coast);
+    }
     
 
 }

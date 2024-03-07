@@ -19,7 +19,7 @@ import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.utils.Utils;
 
-public class StartBottomEscape extends Command {
+public class StartBottom2 extends Command {
     double maxVel = ChassisConstants.MAX_DRIVE_VELOCITY;
     double maxAceel = ChassisConstants.DRIVE_ACCELERATION;
     Chassis chassis;
@@ -30,10 +30,13 @@ public class StartBottomEscape extends Command {
     SequentialCommandGroup cmd;
 
     pathPoint dummyPoint = new pathPoint(0, 0, new Rotation2d(), 0, false);
-    pathPoint wingNote = offset(Field.WingNotes[2], -1,-2.7, -4);
+    pathPoint wingNote = offset(Field.WingNotes[2], -1,-0.5, 20);
+    pathPoint centerNote1 = offset(Field.CenterNotes[3], -1,-1,0);
+    pathPoint centerNote2 = offset(Field.CenterNotes[4], -1,-1,0);
+    pathPoint shootPoint = offset(Field.Speaker, 2.5,-1.5,0);
 
     /** Creates a new StartTOP auto. */
-    public StartBottomEscape() {
+    public StartBottom2() {
         this.chassis = RobotContainer.robotContainer.chassis;
         this.intake = RobotContainer.robotContainer.intake;
         this.shooter = RobotContainer.robotContainer.shooter;
@@ -45,9 +48,9 @@ public class StartBottomEscape extends Command {
         speaker = Utils.speakerPosition();
         cmd = new SequentialCommandGroup(initShooter());
 
+        addCommands(takeNote());
+        addCommands(goTo(shootPoint,1));
         addCommands(shoot());
-        addCommands(goTo(wingNote));
-
         //addCommands(getNote(centerNote1));
         //addCommands(goTo(shootPoint));
         //addCommands(turnToSpeaker());
@@ -85,7 +88,11 @@ public class StartBottomEscape extends Command {
     }
 
     private Command goTo(pathPoint point) {
-        return new PathFollow(chassis, new pathPoint[] { dummyPoint, point }, maxVel, maxAceel, 0, isRed, true);
+        return goTo(point, maxVel);
+    }
+
+    private Command goTo(pathPoint point, double maxv) {
+        return new PathFollow(chassis, new pathPoint[] { dummyPoint, point }, maxv, maxAceel, 0, isRed, true);
     }
 
     private Command turnToSpeaker() {

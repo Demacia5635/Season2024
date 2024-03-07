@@ -31,9 +31,9 @@ public class StartTOP1 extends Command {
 
     pathPoint dummyPoint = new pathPoint(0, 0, new Rotation2d(), 0, false);
     pathPoint wingNote = offset(Field.WingNotes[0], -1.5,-0.5, -4);
-    pathPoint centerNote1 = offset(Field.CenterNotes[0], -1,-0.5,0);
+    pathPoint centerNote1 = offset(Field.CenterNotes[0], -1,0,0);
     pathPoint centerNote2 = offset(Field.CenterNotes[1], -1,-1,0);
-    pathPoint shootPoint = offset(Field.Speaker, 2.5,0.5,0);
+    pathPoint shootPoint = offset(Field.Speaker, 2.5,1,0);
 
     /** Creates a new StartTOP auto. */
     public StartTOP1() {
@@ -50,7 +50,7 @@ public class StartTOP1 extends Command {
 
         addCommands(shoot());
         addCommands(takeNote());
-        addCommands(goTo(shootPoint, 1));
+        addCommands(goTo(shootPoint, 0.5));
         addCommands(shoot());
         addCommands(getNote(centerNote1));
         addCommands(goTo(shootPoint, 2));
