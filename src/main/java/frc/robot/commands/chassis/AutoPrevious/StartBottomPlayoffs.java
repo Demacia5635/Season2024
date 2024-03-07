@@ -1,4 +1,4 @@
-package frc.robot.commands.chassis.Auto;
+package frc.robot.commands.chassis.AutoPrevious;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -11,6 +11,7 @@ import frc.robot.Constants.ChassisConstants;
 import frc.robot.PathFollow.Util.pathPoint;
 import frc.robot.commands.chassis.DriveToNote;
 import frc.robot.commands.chassis.GoToAngleChassis;
+import frc.robot.commands.chassis.TurnToSpeaker;
 import frc.robot.commands.chassis.Paths.PathFollow;
 import frc.robot.commands.intake.IntakeCommand;
 import frc.robot.commands.shooter.ActivateShooter;
@@ -19,7 +20,7 @@ import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.utils.Utils;
 
-public class StartBottom1 extends Command {
+public class StartBottomPlayoffs extends Command {
     double maxVel = ChassisConstants.MAX_DRIVE_VELOCITY;
     double maxAceel = ChassisConstants.DRIVE_ACCELERATION;
     Chassis chassis;
@@ -30,13 +31,12 @@ public class StartBottom1 extends Command {
     SequentialCommandGroup cmd;
 
     pathPoint dummyPoint = new pathPoint(0, 0, new Rotation2d(), 0, false);
-    pathPoint wingNote = offset(Field.WingNotes[2], -1,-0.5, 20);
-    pathPoint centerNote1 = offset(Field.CenterNotes[3], -1,-1,0);
-    pathPoint centerNote2 = offset(Field.CenterNotes[4], -1,-1,0);
-    pathPoint shootPoint = offset(Field.Speaker, 2.5,-1.5,0);
+    pathPoint escapePoint = offset(Field.WingNotes[2], -1,-2.4, 0);
+    pathPoint shootPoint = offset(Field.WingNotes[2], 0, -1, 0);
+    pathPoint centerNote1 = offset(Field.CenterNotes[4], -0.3,0,15);
 
     /** Creates a new StartTOP auto. */
-    public StartBottom1() {
+    public StartBottomPlayoffs() {
         this.chassis = RobotContainer.robotContainer.chassis;
         this.intake = RobotContainer.robotContainer.intake;
         this.shooter = RobotContainer.robotContainer.shooter;
@@ -49,9 +49,11 @@ public class StartBottom1 extends Command {
         cmd = new SequentialCommandGroup(initShooter());
 
         addCommands(shoot());
-        addCommands(takeNote());
-        addCommands(goTo(shootPoint,1));
+        addCommands(goTo(escapePoint));
+        addCommands(getNote(centerNote1));
+        addCommands(goTo(shootPoint));
         addCommands(shoot());
+
         //addCommands(getNote(centerNote1));
         //addCommands(goTo(shootPoint));
         //addCommands(turnToSpeaker());
@@ -89,11 +91,7 @@ public class StartBottom1 extends Command {
     }
 
     private Command goTo(pathPoint point) {
-        return goTo(point, maxVel);
-    }
-
-    private Command goTo(pathPoint point, double maxv) {
-        return new PathFollow(chassis, new pathPoint[] { dummyPoint, point }, maxv, maxAceel, 0, isRed, true);
+        return new PathFollow(chassis, new pathPoint[] { dummyPoint, point }, maxVel, maxAceel, 0, isRed, false);
     }
 
     private Command turnToSpeaker() {
@@ -102,13 +100,14 @@ public class StartBottom1 extends Command {
     }
 
     private Command getNote(pathPoint point) {
-        return (new PathFollow(chassis, new pathPoint[] { dummyPoint, point }, maxVel, maxAceel, 1, isRed)
+        return (new PathFollow(chassis, new pathPoint[] { dummyPoint, point }, 2, maxAceel, 1, isRed)
                 .raceWith(new WaitUntilCommand(() -> Utils.seeNote())))
                 .andThen(takeNote());
     }
 
+
     private Command takeNote() {
-        return (new DriveToNote(chassis, 1, true).raceWith(new IntakeCommand(intake))).withTimeout(2);
+        return (new DriveToNote(chassis, 1, false).raceWith(new IntakeCommand(intake))).withTimeout(2);
     }
 
 }

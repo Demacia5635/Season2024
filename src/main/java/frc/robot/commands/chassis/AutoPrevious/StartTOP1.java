@@ -1,4 +1,4 @@
-package frc.robot.commands.chassis.Auto;
+package frc.robot.commands.chassis.AutoPrevious;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -19,7 +19,7 @@ import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.utils.Utils;
 
-public class StartTOP2 extends Command {
+public class StartTOP1 extends Command {
     double maxVel = ChassisConstants.MAX_DRIVE_VELOCITY;
     double maxAceel = ChassisConstants.DRIVE_ACCELERATION;
     Chassis chassis;
@@ -36,7 +36,7 @@ public class StartTOP2 extends Command {
     pathPoint shootPoint = offset(Field.Speaker, 2.5,1,0);
 
     /** Creates a new StartTOP auto. */
-    public StartTOP2() {
+    public StartTOP1() {
         this.chassis = RobotContainer.robotContainer.chassis;
         this.intake = RobotContainer.robotContainer.intake;
         this.shooter = RobotContainer.robotContainer.shooter;
@@ -48,6 +48,7 @@ public class StartTOP2 extends Command {
         speaker = Utils.speakerPosition();
         cmd = new SequentialCommandGroup(initShooter());
 
+        addCommands(shoot());
         addCommands(takeNote());
         addCommands(goTo(shootPoint, 0.5));
         addCommands(shoot());

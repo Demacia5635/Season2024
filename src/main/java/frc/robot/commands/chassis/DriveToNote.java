@@ -1,8 +1,11 @@
 
 package frc.robot.commands.chassis;
 
+import static frc.robot.subsystems.chassis.ChassisConstants.COLLECT_OFFSET_METERS;
+import static frc.robot.subsystems.chassis.ChassisConstants.MAX_DRIVE_VELOCITY;
 import static frc.robot.subsystems.chassis.ChassisConstants.MAX_OMEGA_ACCELERATION;
 import static frc.robot.subsystems.chassis.ChassisConstants.MAX_OMEGA_VELOCITY;
+import static frc.robot.subsystems.chassis.ChassisConstants.METER_IN_CM;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -52,6 +55,7 @@ public class DriveToNote extends Command {
   }
 
   private double calcTimeToRotate(double angle){
+    angle = Math.toRadians(angle);
     return 2 * (Math.sqrt(Math.abs(angle) / MAX_OMEGA_ACCELERATION));
   }
 
@@ -70,13 +74,14 @@ public class DriveToNote extends Command {
     }
    //double rotateVel = (Math.abs(angle - 3) <= 3) ? 0 : rotationPidController.calculate(-angle, 3);
     double fieldRelativeAngle = angle + chassis.getAngle().getDegrees();
+    double distanceMeters = distance/METER_IN_CM;
     fieldRelativeAngle = Math.toRadians(fieldRelativeAngle); 
-    velocity = Math.min((distance - 7) / calcTimeToRotate(angle), 4);
+    velocity = Math.min((distanceMeters - COLLECT_OFFSET_METERS) / calcTimeToRotate(angle), MAX_DRIVE_VELOCITY);
     speed = new ChassisSpeeds(velocity * Math.cos(fieldRelativeAngle), velocity * Math.sin(fieldRelativeAngle), MAX_OMEGA_VELOCITY);
 
     lastDistance = distance;
     lastAngle = fieldRelativeAngle;
-    chassis.setVelocitiesRotateToAngle(speed, Rotation2d.fromDegrees(fieldRelativeAngle));
+    chassis.setVelocitiesRotateToAngle(speed, Rotation2d.fromRadians(fieldRelativeAngle));
 
   }
 
@@ -89,7 +94,7 @@ public class DriveToNote extends Command {
 
   @Override
   public boolean isFinished() {
-    return finish || (timer.get() > 1.5 && countTime);
+    return finish || (timer.get() > -(0.5*velocity) + 1.5 && countTime);
   }
 
 }

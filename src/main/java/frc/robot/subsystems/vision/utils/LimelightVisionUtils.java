@@ -8,6 +8,7 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.RobotContainer;
 
 /**
  * Utility class for vision
@@ -23,6 +24,53 @@ public class LimelightVisionUtils {
     public static final double MAX_DISTANCE_FOR_LIMELIGHT = 6;
 
     public static NetworkTable[] LimeLightTables = {LIMELIGHT_AMP_TABLE, LIMELIGHT_SHOOTER_TABLE};
+
+
+    public static double getIdShooter() {
+        return LIMELIGHT_SHOOTER_TABLE.getEntry("tid").getDouble(0);
+    }
+
+    public static double getIdAmp() {
+        return LIMELIGHT_AMP_TABLE.getEntry("tid").getDouble(0);
+    }
+
+    //first is amp second is shooter
+    public static Pair<Boolean, Boolean> isInFrontOfShooter() {
+        double id = (RobotContainer.robotContainer.isRed()) ? 4 : 7;
+        return new Pair<Boolean, Boolean>(getIdAmp()== id, getIdShooter() == id);
+    }
+
+    public static boolean isSeeSpeaker(){
+        return isInFrontOfShooter().getFirst() || isInFrontOfShooter().getSecond();
+    }
+
+    public static Translation2d getDxDy() {
+        Pair<Boolean, Boolean> pair = isInFrontOfShooter();
+        double dx;
+        double dy;
+        if (pair.getSecond()) {
+            dx = LIMELIGHT_SHOOTER_TABLE.getEntry("targetpose_robotspace").getDoubleArray(new double[6])[0];
+            dy = LIMELIGHT_SHOOTER_TABLE.getEntry("targetpose_robotspace").getDoubleArray(new double[6])[1];
+            return new Translation2d(dx, dy); 
+        }
+        if (pair.getFirst()) {
+             dx = LIMELIGHT_AMP_TABLE.getEntry("targetpose_robotspace").getDoubleArray(new double[6])[0];
+            dy = LIMELIGHT_AMP_TABLE.getEntry("targetpose_robotspace").getDoubleArray(new double[6])[1];
+            return new Translation2d(dx, dy); 
+        }
+        return null;
+        //cannot be in this distance (out of field)
+    }
+
+    public static Rotation2d getTA() {
+        Translation2d xy = getDxDy();
+        return (xy ==null) ? new Rotation2d(0) : xy.getAngle();
+    }
+
+
+
+    
+
 
 
     /**

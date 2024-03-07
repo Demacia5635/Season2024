@@ -1,7 +1,9 @@
-package frc.robot.commands.chassis.Auto;
+package frc.robot.commands.chassis.AutoPrevious;
 
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.RobotContainer;
@@ -11,7 +13,7 @@ import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.utils.Utils;
 
-public class Shoot extends Command {
+public class Fowrard extends Command {
     double maxVel = ChassisConstants.MAX_DRIVE_VELOCITY;
     double maxAceel = ChassisConstants.DRIVE_ACCELERATION;
     Chassis chassis;
@@ -20,10 +22,11 @@ public class Shoot extends Command {
     boolean isRed;
     Translation2d speaker;
     SequentialCommandGroup cmd;
+    double direction;
 
 
     /** Creates a new StartTOP auto. */
-    public Shoot() {
+    public Fowrard() {
         this.chassis = RobotContainer.robotContainer.chassis;
         this.intake = RobotContainer.robotContainer.intake;
         this.shooter = RobotContainer.robotContainer.shooter;
@@ -34,15 +37,16 @@ public class Shoot extends Command {
         this.isRed = RobotContainer.robotContainer.isRed();
         speaker = Utils.speakerPosition();
         cmd = new SequentialCommandGroup(initShooter());
+        direction = isRed ? 1 : -1;
 
-        addCommands(shoot());
+        addCommands(new RunCommand( ()-> chassis.setVelocities(new ChassisSpeeds(2 * direction,0,0))));
         cmd.schedule();
 
     }
 
     @Override
     public boolean isFinished() {
-        return !cmd.isScheduled();
+        return false;
     }
 
     private void addCommands(Command c) {

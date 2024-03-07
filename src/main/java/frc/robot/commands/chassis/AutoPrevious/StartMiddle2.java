@@ -1,4 +1,4 @@
-package frc.robot.commands.chassis.Auto;
+package frc.robot.commands.chassis.AutoPrevious;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -19,7 +19,7 @@ import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.utils.Utils;
 
-public class StartBottom2 extends Command {
+public class StartMiddle2 extends Command {
     double maxVel = ChassisConstants.MAX_DRIVE_VELOCITY;
     double maxAceel = ChassisConstants.DRIVE_ACCELERATION;
     Chassis chassis;
@@ -28,15 +28,15 @@ public class StartBottom2 extends Command {
     boolean isRed;
     Translation2d speaker;
     SequentialCommandGroup cmd;
-
+    
     pathPoint dummyPoint = new pathPoint(0, 0, new Rotation2d(), 0, false);
-    pathPoint wingNote = offset(Field.WingNotes[2], -1,-0.5, 20);
-    pathPoint centerNote1 = offset(Field.CenterNotes[3], -1,-1,0);
-    pathPoint centerNote2 = offset(Field.CenterNotes[4], -1,-1,0);
-    pathPoint shootPoint = offset(Field.Speaker, 2.5,-1.5,0);
+    pathPoint wingNote = offset(Field.WingNotes[1], -2,0, -4);
+    pathPoint centerNote1 = offset(Field.CenterNotes[3], -1.5,-0.5,0);
+    pathPoint centerNote2 = offset(Field.CenterNotes[3], -1,0,0);
+    pathPoint shootPoint = offset(Field.Speaker, 2.5, 0,0);
 
     /** Creates a new StartTOP auto. */
-    public StartBottom2() {
+    public StartMiddle2() {
         this.chassis = RobotContainer.robotContainer.chassis;
         this.intake = RobotContainer.robotContainer.intake;
         this.shooter = RobotContainer.robotContainer.shooter;
@@ -49,16 +49,18 @@ public class StartBottom2 extends Command {
         cmd = new SequentialCommandGroup(initShooter());
 
         addCommands(takeNote());
-        addCommands(goTo(shootPoint,1));
+        //addCommands(turnToSpeaker());
+        addCommands(goTo(shootPoint, 0.5));
         addCommands(shoot());
-        //addCommands(getNote(centerNote1));
+        // addCommands(getNote(centerNote1));
+        // addCommands(goTo(shootPoint));
+        // addCommands(turnToSpeaker());
+        // addCommands(shoot());
+
+        //addCommands(getNote(centerNote2));
         //addCommands(goTo(shootPoint));
         //addCommands(turnToSpeaker());
         //addCommands(shoot());
-//        addCommands(getNote(centerNote2));
-//        addCommands(goTo(shootPoint));
-        //addCommands(turnToSpeaker());
-//        addCommands(shoot());
         cmd.schedule();
 
     }
@@ -84,7 +86,7 @@ public class StartBottom2 extends Command {
     }
 
     private Command initShooter() {
-        return new WaitUntilCommand(() -> shooter.getIsShootingReady());
+        return new WaitUntilCommand(shooter::getIsShootingReady);
     }
 
     private Command goTo(pathPoint point) {

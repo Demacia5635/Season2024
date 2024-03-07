@@ -68,9 +68,9 @@ public final class ChassisConstants {
   public static final double MAX_STEER_VELOCITY = 600;
   public static final double STEER_ACCELERATION = 6000;
   public static final double MAX_STEER_ERROR = 1;
-  public static final double MAX_OMEGA_VELOCITY = Math.toRadians(650);
+  public static final double MAX_OMEGA_VELOCITY = Math.toRadians(180);
 
-  public static final double MAX_OMEGA_ACCELERATION = Math.toRadians(6000);
+  public static final double MAX_OMEGA_ACCELERATION = Math.toRadians(360);
 
   // Pulse per meter/degrees
   public static final double WHEEL_DIAMETER = 4 * 0.0254; // 4 inch
@@ -105,6 +105,11 @@ public final class ChassisConstants {
   public static final PID_Constants BACK_POSITION_STEER_PID = new PID_Constants(0.055, 0.0015, 0.000098);
   public static final double FRONT_INTEGRAL_ZONE = 9;
   public static final double BACK_INTEGRAL_ZONE = 8;
+
+
+//useful data
+public static final double METER_IN_CM = 100;
+public static final double COLLECT_OFFSET_METERS = 0.7;
 
 
   public final static SwerveModuleConstants FRONT_LEFT = new SwerveModuleConstants(

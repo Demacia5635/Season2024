@@ -33,7 +33,7 @@ public class GoToAngleChassis extends Command {
   @Override
   public void execute() {
     ChassisSpeeds speed =  new ChassisSpeeds(0, 0, 0);
-    chassis.setVelocitiesRotateToSpeake(speed); 
+    chassis.setVelocitiesRotateToSpeaker(speed); 
   }
 
 

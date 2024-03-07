@@ -21,6 +21,7 @@ import frc.robot.PathFollow.Util.pathPoint;
 import frc.robot.Sysid.Sysid;
 import frc.robot.Sysid.Sysid.Gains;
 import frc.robot.subsystems.shooter.ShooterConstants;
+import frc.robot.subsystems.vision.utils.LimelightVisionUtils;
 import frc.robot.subsystems.vision.utils.UpdatedPoseEstimatorClasses.SwerveDrivePoseEstimator;
 import frc.robot.utils.Trapezoid;
 import frc.robot.utils.Utils;
@@ -198,7 +199,7 @@ public class Chassis extends SubsystemBase {
    * @param speeds In m/s and rad/s
    */
   public void setVelocities(ChassisSpeeds speeds) {
-    double param = 0.2;
+    double param = -0.2;
     ChassisSpeeds relativeSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds, getAngle());
     Translation2d newSpeeds = new Translation2d(relativeSpeeds.vxMetersPerSecond,
      relativeSpeeds.vyMetersPerSecond).rotateBy(Rotation2d.fromRadians(relativeSpeeds.omegaRadiansPerSecond * param));
@@ -207,7 +208,7 @@ public class Chassis extends SubsystemBase {
     
     setModuleStates(states);
   }
-  public void setVelocitiesRotateToSpeake(ChassisSpeeds speeds) {
+  public void setVelocitiesRotateToSpeaker(ChassisSpeeds speeds) {
     speeds.omegaRadiansPerSecond = getRadPerSecToSpeaker();
     setVelocities(speeds);
   }
@@ -365,11 +366,12 @@ public class Chassis extends SubsystemBase {
 
   public double getRadPerSecToSpeaker() {
     Translation2d speaker = Utils.speakerPosition();
-    double error = Utils.angelErrorInRadians(getPose().getTranslation().minus(speaker).getAngle(), getAngle(), Math.toRadians(1));
-    error = Math.abs(error) < Math.toRadians(3)? 0 : error;
-    isAimingSpeaker = error == 0;
-    return MathUtil.clamp(error * 0.2, -MAX_OMEGA_VELOCITY, MAX_OMEGA_VELOCITY);
+    if(LimelightVisionUtils.isSeeSpeaker()) {
+      return getRadPerSecToAngle(getAngle().plus(LimelightVisionUtils.getTA()));
+    }
+    return getRadPerSecToAngle(speaker.getAngle());
   }
+
   public double getRadPerSecToAngle(Rotation2d fieldRelativeAngle) {
       double rotateVel = rotationTrapezoid.calculate(
         fieldRelativeAngle.minus(getAngle()).getRadians(), getChassisSpeeds().omegaRadiansPerSecond, 0);

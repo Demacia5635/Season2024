@@ -6,6 +6,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -25,6 +26,7 @@ import frc.robot.subsystems.chassis.*;
 import frc.robot.utils.TrapezoidNoam;
 
 public class PathFollow extends Command {
+  Timer timer = new Timer();
 
   Chassis chassis;
   RoundedPoint[] corners;
@@ -264,7 +266,7 @@ public class PathFollow extends Command {
       velVector = new Translation2d(0, 0);
     ChassisSpeeds speed = new ChassisSpeeds(velVector.getX(), velVector.getY(), 0);
     if (rotateToSpeaker) {
-      chassis.setVelocitiesRotateToSpeake(speed);
+      chassis.setVelocitiesRotateToSpeaker(speed);
     } else {
       chassis.setVelocitiesRotateToAngle(speed, wantedAngle);
     }
@@ -273,7 +275,7 @@ public class PathFollow extends Command {
 
   @Override
   public void end(boolean interrupted) {
-    chassis.stop();
+    if(finishVel == 0) chassis.stop();
     driveTrapezoid.debug = false;
     // .useAcceleration = true;
   }
