@@ -57,6 +57,9 @@ public class Shooter extends SubsystemBase {
     private boolean isShootingPodium = false;
     private boolean isShootingClose = false;
 
+    private boolean isUnderStage = false;
+
+
     /**is the shooter is ready to shoot */
     private boolean isShootingReady = false;
 
@@ -76,6 +79,7 @@ public class Shooter extends SubsystemBase {
     private double calibrateVel = 0;
 
     private double offset = 0;
+
     
     /**creates a new shooter and angle changer*/
     public Shooter() {
@@ -380,6 +384,15 @@ public class Shooter extends SubsystemBase {
         return new InstantCommand(()->setIsShootingPodium(true)).andThen(new ActivateShooter(this,RobotContainer.robotContainer.intake, RobotContainer.robotContainer.chassis,false));
     }
 
+
+        /**
+     * get the command that will activate the shooter to shoot from the podium
+     * @return a command that will shoot from the podium
+     */
+    public Command getActivateShooterToUnderStage() {
+        return new InstantCommand(()->setIsUnderStage(true)).andThen(new ActivateShooter(this,RobotContainer.robotContainer.intake, RobotContainer.robotContainer.chassis,false));
+    }
+
     /**
      * set isShooting to true and then wait for 0.5 sec
      * @return acommand that set shoter to true and wait 0.5 sec
@@ -402,7 +415,7 @@ public class Shooter extends SubsystemBase {
      * @return a command that will set isShootingToAmp false and activate the shooter to shoot at the amp
      */
     public Command getActivateShooterToSpeaker() {
-        return (new InstantCommand((()->{setIsShootingAmp(false); setIsShootingPodium(false);}))).alongWith(new ActivateShooter(this,RobotContainer.robotContainer.intake, RobotContainer.robotContainer.chassis,false));
+        return (new InstantCommand((()->{setIsShootingAmp(false); setIsShootingPodium(false); setIsUnderStage(false);}))).alongWith(new ActivateShooter(this,RobotContainer.robotContainer.intake, RobotContainer.robotContainer.chassis,false));
     }
 
     /**
@@ -710,5 +723,13 @@ public class Shooter extends SubsystemBase {
         if (isLimit()){
             resetDis();
         }
+    }
+
+    public boolean isUnderStage() {
+        return isUnderStage;
+    }
+
+    public void setIsUnderStage(boolean is) {
+        isUnderStage = is;
     }
 }

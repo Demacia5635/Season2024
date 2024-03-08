@@ -133,7 +133,12 @@ public class ActivateShooter extends Command {
             velDown = av.getSecond();
             velUp = velDown;
         
-        } else {
+        } else if(shooter.isUnderStage()) {
+            velUp = 0;
+            velDown = 0;
+            angle = ShooterConstants.PodiumVar.ANGLE;
+        }
+         else {
             double dis = fromDistance > 0? fromDistance:
                 speaker.minus(chassis.getPose().getTranslation()).getNorm();
             var av = Utils.getShootingAngleVelocity(dis);

@@ -124,7 +124,7 @@ public class RobotContainer implements Sendable {
 
     resetOdometry = new InstantCommand(()-> chassis.setOdometryToForward()).ignoringDisable(true);
     resetOdometry.setName("reset odometry");
-    disableCommand = new InstantCommand(()-> stopAll(),intake, shooter).andThen(new AngleCalibrate(shooter));
+    disableCommand = new InstantCommand(()-> stopAll(),intake, shooter).andThen(shooter.getActivateShooterToUnderStage());
     disableCommand.setName("disable command");
 
     Command startTop = (new AngleCalibrate(shooter))
@@ -279,7 +279,7 @@ public class RobotContainer implements Sendable {
 
 
   public void calibrate() {
-    disableCommand.schedule();
+    new AngleCalibrate(shooter).schedule();
   }
 
  
