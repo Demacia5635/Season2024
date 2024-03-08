@@ -74,6 +74,8 @@ public class Shooter extends SubsystemBase {
 
     /**the calibration velocity */
     private double calibrateVel = 0;
+
+    private double offset = 0;
     
     /**creates a new shooter and angle changer*/
     public Shooter() {
@@ -286,7 +288,7 @@ public class Shooter extends SubsystemBase {
      * reset the base dis of the angle motor also reset the encoder of the angle motor 
      */
     public void resetDis() {
-        motorAngle.setSelectedSensorPosition(0);
+        offset = motorAngle.getSelectedSensorPosition();
     }
 
     /**
@@ -524,13 +526,19 @@ public class Shooter extends SubsystemBase {
         return  aCos + 
             Math.sqrt(Math.pow(aCos, 2) - Math.pow(AngleChanger.KA, 2) + Math.pow(AngleChanger.KB, 2));
     }
+
+
+    public double getSelectedSensorPosition() {
+        return motorAngle.getSelectedSensorPosition() - offset;
+    }
+
     
     /**
      * caculate the dis the angle motor at
      * @return the dis in mm
      */
     public double getDis() {
-        return motorAngle.getSelectedSensorPosition() / AngleChanger.PULES_PER_MM + AngleChanger.MAX_DIS;
+        return getSelectedSensorPosition() / AngleChanger.PULES_PER_MM + AngleChanger.MIN_DIS;
     }
 
     /**
