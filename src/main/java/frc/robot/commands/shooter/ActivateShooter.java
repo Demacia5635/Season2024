@@ -17,17 +17,13 @@ import frc.robot.subsystems.chassis.Chassis;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterConstants;
+import frc.robot.subsystems.shooter.ShooterConstants.SHOOTER_MODE;
 import frc.robot.subsystems.shooter.ShooterConstants.SHOOTER_MOTOR;
 import frc.robot.utils.Utils;
 
 public class ActivateShooter extends Command {
 
-    /**true if shoot from chassis*/
-    boolean isFollowing;
-
-    /**true if the command wont stop the motors*/
-    boolean isContinious;
-
+    
     /**true if currently is shooting */
     boolean isShooting;
 
@@ -46,9 +42,6 @@ public class ActivateShooter extends Command {
     /**the pos to the speaker pos*/
     Translation2d speaker;
 
-    /**var that will stop the command */    
-    boolean finish = false;
-
     /**a var to check if the shooter is ready to shoot */
     boolean isReady = false;
 
@@ -61,18 +54,7 @@ public class ActivateShooter extends Command {
     /**the angle to the shooter */
     double angle;
 
-    double fromDistance = 0;
-
-    /**
-     * activate the shooter from the chassis pos
-     * @param shooter the wanted shooter
-     * @param intake the wanted intake
-     * @param chassis the wanted chassis pos
-     * @param isContinious if the command will not stop the motor 
-     */
-    public ActivateShooter(Shooter shooter, Intake intake, Chassis chassis, boolean isContinious) {
-        this(shooter, intake, chassis, 0, isContinious);
-    }
+    boolean hasCalibrated = false;
 
     /**
      * activate the shooter
@@ -82,14 +64,11 @@ public class ActivateShooter extends Command {
      * @param from the pos to shoot, if null will shoot from chassis pos
      * @param isContinious if the command will not stop the motor
      */
-    public ActivateShooter(Shooter shooter, Intake intake, Chassis chassis, double fromDistance, boolean isContinious) {
-        this.isFollowing = fromDistance == 0;
+    public ActivateShooter(Shooter shooter, Intake intake, Chassis chassis) {
         this.shooter = shooter;
         this.intake = intake;
         this.chassis = chassis;
         this.timer = new Timer();
-        this.isContinious = isContinious;
-        this.fromDistance = fromDistance;
         addRequirements(shooter);
     }
 
@@ -101,11 +80,6 @@ public class ActivateShooter extends Command {
      */
     @Override
     public void initialize() {
-        speaker = Utils.speakerPosition();
-        finish = false;
-        timer.reset();
-        shooter.setIsActive(true);
-        shooter.setIsShootingFrom(fromDistance > 0);
     }
 
     /**
@@ -117,35 +91,62 @@ public class ActivateShooter extends Command {
      */
     @Override
     public void execute() {
-        /*checks if shooting to the amp or the speakeer */
-        if (shooter.getIsShootingAmp()) {
-            velUp = ShooterConstants.AmpVar.UP;
-            velDown = ShooterConstants.AmpVar.DOWN;
-            angle = ShooterConstants.AmpVar.ANGLE;
+        speaker = Utils.speakerPosition();
 
-        } else if (shooter.getIsShootingPodium()) {
-            velUp = ShooterConstants.PodiumVar.UP;
-            velDown = ShooterConstants.PodiumVar.DOWN;
-            angle = ShooterConstants.PodiumVar.ANGLE;
-        } else if (shooter.isShootingClose()) {
-            var av = Utils.getShootingClose();
-            angle = av.getFirst();
-            velDown = av.getSecond();
-            velUp = velDown;
+        if(!hasCalibrated) {
+            shooter.angleSetPow(-0.3);
+            if (shooter.isLimit()) {
+                shooter.angleSetPow(0);
+                hasCalibrated = true;
+            } else {
+                return;
+            }
+        }
+
+        switch (shooter.getShooterMode()) {
+            case AMP:
+                // velUp = ShooterConstants.AmpVar.UP;
+                // velDown = ShooterConstants.AmpVar.DOWN;
+                // angle = ShooterConstants.AmpVar.ANGLE;
+                velDown = SmartDashboard.getNumber("vel calibrate", 0);
+                velUp = velDown;
+                angle = SmartDashboard.getNumber("angle calibrate", 0);
+
+                break;
+
+            case PODIUM:
+                velUp = ShooterConstants.PodiumVar.UP;
+                velDown = ShooterConstants.PodiumVar.DOWN;
+                angle = ShooterConstants.PodiumVar.ANGLE;
+                break;
+
+            case SUBWOOFER:
+                var av = Utils.getShootingClose();
+                angle = av.getFirst();
+                velDown = av.getSecond();
+                velUp = velDown;
+                break;
+
+            // case AUTO :
+            case AUTO_CONTINIOUS, AUTO:
+
+                double dis = speaker.minus(chassis.getPose().getTranslation()).getNorm();
+                av = Utils.getShootingAngleVelocity(dis);
+                angle = av.getFirst();
+                velDown = av.getSecond();
+                velUp = velDown;
+
+                break;
+
+            case IDLE:
+                velUp = 0;
+                velDown = 0;
+                angle = ShooterConstants.PodiumVar.ANGLE;
+                break;
         
-        } else if(shooter.isUnderStage()) {
-            velUp = 0;
-            velDown = 0;
-            angle = ShooterConstants.PodiumVar.ANGLE;
+          
         }
-         else {
-            double dis = fromDistance > 0? fromDistance:
-                speaker.minus(chassis.getPose().getTranslation()).getNorm();
-            var av = Utils.getShootingAngleVelocity(dis);
-            angle = av.getFirst();
-            velDown = av.getSecond();
-            velUp = velDown;
-        }
+       
         /*put the anlge motor at the wanted angle */
         double angleError = shooter.getAngle() - angle;
         angleError = Math.abs(angleError) > 0.5 ? angleError: 0;
@@ -164,9 +165,9 @@ public class ActivateShooter extends Command {
         double velErrorUp = shooter.getMotorVel(SHOOTER_MOTOR.UP) - velUp;
         double velErrorDown = shooter.getMotorVel(SHOOTER_MOTOR.DOWN) - velDown;
         isReady = Math.abs(angleError) < 1 && 
-                          Math.abs(velErrorUp) < 0.6 && 
-                          Math.abs(velErrorDown) < 0.6;
-        shooter.setIsShootingReady(isReady);
+                          Math.abs(velErrorUp) < 0.5 && 
+                          Math.abs(velErrorDown) < 0.5;
+        shooter.setIsShootingReady(isReady && velDown>0);
 
         if(isShooting)
              System.out.println("timer value" + timer.get());
@@ -185,13 +186,13 @@ public class ActivateShooter extends Command {
             isShooting = false;
             timer.reset();
             shooter.setIsShooting(false);
-            shooter.setIsShootingAmp(false);
-            shooter.isShootingClose(false);
-            shooter.setIsShootingPodium(false);
             shooter.feedingSetPow(0);
             intake.setPower(0);
-            finish = !isContinious;
             shooter.setIsShootingReady(false);
+
+            if (shooter.getShooterMode()!=SHOOTER_MODE.AUTO_CONTINIOUS) {
+                shooter.setShooterMode(SHOOTER_MODE.IDLE);
+            }
         }
     }
 
@@ -200,20 +201,6 @@ public class ActivateShooter extends Command {
      */
     @Override
     public void end(boolean interrupted) {
-        System.out.println(" activated eneded - int=" + interrupted + " finish=" + finish);
-        if(interrupted) {
-            Command c = CommandScheduler.getInstance().requiring(shooter);
-            System.out.println(c + c.getName());
-            if(c != null) {
-                if(c instanceof SequentialCommandGroup) {
-                    SequentialCommandGroup sc = (SequentialCommandGroup) c;
-                }
-            }
-        }
-      if(finish) {
-        shooter.stopAll();
-        intake.stop();
-      }
 
 
     }
@@ -224,6 +211,6 @@ public class ActivateShooter extends Command {
     @Override
     public boolean isFinished() {
         //SmartDashboard.putBoolean("is activate finish", finish);
-      return finish;
+      return false;
     }
 }

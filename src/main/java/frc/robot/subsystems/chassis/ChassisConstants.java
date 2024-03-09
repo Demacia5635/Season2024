@@ -68,9 +68,9 @@ public final class ChassisConstants {
   public static final double MAX_STEER_VELOCITY = 600;
   public static final double STEER_ACCELERATION = 6000;
   public static final double MAX_STEER_ERROR = 1;
-  public static final double MAX_OMEGA_VELOCITY = Math.toRadians(180);
+  public static final double MAX_OMEGA_VELOCITY = Math.toRadians(720);
 
-  public static final double MAX_OMEGA_ACCELERATION = Math.toRadians(360);
+  public static final double MAX_OMEGA_ACCELERATION = Math.toRadians(4000);
 
   // Pulse per meter/degrees
   public static final double WHEEL_DIAMETER = 4 * 0.0254; // 4 inch
@@ -96,7 +96,8 @@ public final class ChassisConstants {
   public static final FF_Constants FRONT_STEER_FF = new FF_Constants(0.069108623637248, 0.00034365326824, 0.000702476229803);
   public static final FF_Constants BACK_STEER_FF = new FF_Constants(0.080821555555163, 0.000529165452406, 0.004994578577863);
   public static final FF_Constants MOVE_FF_LESS = new FF_Constants(0.1, 0.2, 0.02251759948634);
-  public static final FF_Constants MOVE_FF_MORE = new FF_Constants(0.1, 0.223, 0.03251759948634);
+  public static final FF_Constants MOVE_FF_MORE = new FF_Constants(0.2, 0.223, 0.03251759948634);
+  public static final FF_Constants MOVE_FF_MORE2 = new FF_Constants(1, 0.25, 0.03251759948634);
 
 
 
@@ -115,12 +116,14 @@ public static final double COLLECT_OFFSET_METERS = 0.7;
   public final static SwerveModuleConstants FRONT_LEFT = new SwerveModuleConstants(
       5, 6, 13,
       new Translation2d(0.332, 0.277),
-      20.91796875,
+      21.1816,
       MOVE_PID,
       FRONT_STEER_PID,
       FRONT_POSITION_STEER_PID,
       MOVE_FF_LESS,
       MOVE_FF_MORE,
+      MOVE_FF_MORE2,
+
       FRONT_STEER_FF,
       PULSES_PER_METER,
       FRONT_PULSES_PER_DEGREE,
@@ -129,12 +132,14 @@ public static final double COLLECT_OFFSET_METERS = 0.7;
   public final static SwerveModuleConstants FRONT_RIGHT = new SwerveModuleConstants(
       3, 4, 12,
       new Translation2d(0.332, -0.277),
-      162.158203125,
+      168.486,
       MOVE_PID,
       FRONT_STEER_PID,
       FRONT_POSITION_STEER_PID,
       MOVE_FF_LESS,
       MOVE_FF_MORE,
+      MOVE_FF_MORE2,
+
       FRONT_STEER_FF,
       PULSES_PER_METER,
       FRONT_PULSES_PER_DEGREE,
@@ -144,12 +149,14 @@ public static final double COLLECT_OFFSET_METERS = 0.7;
   public final static SwerveModuleConstants BACK_LEFT = new SwerveModuleConstants(
       2, 1, 11,
       new Translation2d(-0.332, 0.288),
-      52.20703125,
+      50.625,
       MOVE_PID,
       BACK_STEER_PID,
       BACK_POSITION_STEER_PID,
       MOVE_FF_LESS,
       MOVE_FF_MORE,
+      MOVE_FF_MORE2,
+
       BACK_STEER_FF,
       PULSES_PER_METER,
       BACK_PULSES_PER_DEGREE,
@@ -159,12 +166,13 @@ public static final double COLLECT_OFFSET_METERS = 0.7;
   public final static SwerveModuleConstants BACK_RIGHT = new SwerveModuleConstants(
       8, 7, 14,
       new Translation2d(-0.332, -0.288),
-      95.185546875,
+      89.29,
       MOVE_PID,
       BACK_STEER_PID,
       BACK_POSITION_STEER_PID,
       MOVE_FF_LESS,
       MOVE_FF_MORE,
+      MOVE_FF_MORE2,
       BACK_STEER_FF,
       PULSES_PER_METER,
       BACK_PULSES_PER_DEGREE,
@@ -209,6 +217,8 @@ public static final double COLLECT_OFFSET_METERS = 0.7;
     public final PID_Constants steerPositionPID;
     public final FF_Constants moveFFSlow;
     public final FF_Constants moveFFFast;
+    public final FF_Constants moveFFFast2;
+
     public final FF_Constants steerFF;
     public final double pulsePerMeter;
     public final double pulsePerDegree;
@@ -216,7 +226,7 @@ public static final double COLLECT_OFFSET_METERS = 0.7;
 
     public SwerveModuleConstants(int moveMotorId, int angleMotorId, int absoluteEncoderId,
         Translation2d moduleTranslationOffset, double steerOffset,
-        PID_Constants movePID, PID_Constants steerPID, PID_Constants steerPositionPID, FF_Constants moveFFLess, FF_Constants moveFFMore, FF_Constants steerFF,
+        PID_Constants movePID, PID_Constants steerPID, PID_Constants steerPositionPID, FF_Constants moveFFLess, FF_Constants moveFFMore, FF_Constants moveFFmore2, FF_Constants steerFF,
         double pulsePerMeter, double pulsePerDegree, boolean inverted, double INTEGRAL_ZONE) {
       this.moveMotorId = moveMotorId;
       this.angleMotorId = angleMotorId;
@@ -226,6 +236,7 @@ public static final double COLLECT_OFFSET_METERS = 0.7;
       this.movePID = movePID;
       this.moveFFSlow = moveFFLess;
       this.moveFFFast = moveFFMore;
+      this.moveFFFast2 = moveFFmore2;
       this.steerFF = steerFF;
       this.steerPID = steerPID;
       this.pulsePerDegree = pulsePerDegree;

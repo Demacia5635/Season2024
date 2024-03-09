@@ -48,9 +48,9 @@ public class Utils {
      NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(pipeline);
 }
   //usful : https://github.com/NAHSRobotics-Team5667/2020-FRC/blob/master/src/main/java/frc/robot/utils/LimeLight.java
-  private static double shootDistance[] = {1.35, 1.96, 2.5, 3.05,5};
-  private static double shootAngle[] = {56, 47.5, 41, 35.5, 27.5};
-  private static double shootVelocity[] = {15, 16, 17, 17.5,22};
+  private static double shootDistance[] = {1.35, 1.96, 2.5, 3.01,5};
+  private static double shootAngle[] = {57, 47.5, 41, 37.5, 27.5};
+  private static double shootVelocity[] = {14, 16, 17, 16.5,22};
 
   public static double extrapolatre(double d1, double d2, double v1, double v2, double d) {
     return v1 + (v2-v1)*(d-d1)/(d2-d1);
@@ -60,11 +60,6 @@ public class Utils {
   }
 
   public static Pair<Double,Double> getShootingAngleVelocity(double distance) {
-    Shooter shooter = RobotContainer.robotContainer.shooter; 
-    if(shooter.getIsInCalibration()) {
-      System.out.println(" calibrate - " + shooter.getCalibrateAngle() + " " + shooter.getCalibrateVel());
-      return new Pair<Double,Double>(shooter.getCalibrateAngle(), shooter.getCalibrateVel());
-    }
     double v = 0;
     double a = 0;
     int i = 0;

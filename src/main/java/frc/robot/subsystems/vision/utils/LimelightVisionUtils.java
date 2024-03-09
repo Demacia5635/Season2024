@@ -30,32 +30,26 @@ public class LimelightVisionUtils {
         return LIMELIGHT_SHOOTER_TABLE.getEntry("tid").getDouble(0);
     }
 
-    public static double getIdAmp() {
-        return LIMELIGHT_AMP_TABLE.getEntry("tid").getDouble(0);
-    }
-
-    //first is amp second is shooter
-    public static Pair<Boolean, Boolean> isInFrontOfShooter() {
+    public static boolean isInFrontOfShooter() {
         double id = (RobotContainer.robotContainer.isRed()) ? 4 : 7;
-        return new Pair<Boolean, Boolean>(getIdAmp()== id, getIdShooter() == id);
+        return getIdShooter() == id;
+    }
+    public static boolean isInFrontOfAMP(){
+        double id = (RobotContainer.robotContainer.isRed()) ? 5 : 6;
+        return getIdShooter() == id;
+         
     }
 
-    public static boolean isSeeSpeaker(){
-        return isInFrontOfShooter().getFirst() || isInFrontOfShooter().getSecond();
-    }
-
+    
     public static Translation2d getDxDy() {
-        Pair<Boolean, Boolean> pair = isInFrontOfShooter();
+        boolean isInFront = isInFrontOfShooter();
         double dx;
         double dy;
-        if (pair.getSecond()) {
-            dx = LIMELIGHT_SHOOTER_TABLE.getEntry("targetpose_robotspace").getDoubleArray(new double[6])[0];
-            dy = LIMELIGHT_SHOOTER_TABLE.getEntry("targetpose_robotspace").getDoubleArray(new double[6])[1];
-            return new Translation2d(dx, dy); 
-        }
-        if (pair.getFirst()) {
-             dx = LIMELIGHT_AMP_TABLE.getEntry("targetpose_robotspace").getDoubleArray(new double[6])[0];
-            dy = LIMELIGHT_AMP_TABLE.getEntry("targetpose_robotspace").getDoubleArray(new double[6])[1];
+        double[] array;
+        if (isInFront) {
+            array = LIMELIGHT_SHOOTER_TABLE.getEntry("targetpose_robotspace").getDoubleArray(new double[6]);
+            dy = array[0];
+            dx = array[2];
             return new Translation2d(dx, dy); 
         }
         return null;
@@ -64,7 +58,29 @@ public class LimelightVisionUtils {
 
     public static Rotation2d getTA() {
         Translation2d xy = getDxDy();
-        return (xy ==null) ? new Rotation2d(0) : xy.getAngle();
+        return (xy==null)? new Rotation2d() : new Rotation2d(Math.atan(xy.getY()/ xy.getX()));
+        //return (xy ==null) ? new Rotation2d(0) : xy.getAngle();
+    }
+
+    public static Rotation2d getTAAmp() {
+        Translation2d xy = getDxDyAMP();
+        return (xy==null)? new Rotation2d() : new Rotation2d(Math.atan(xy.getY()/ xy.getX()));
+        //return (xy ==null) ? new Rotation2d(0) : xy.getAngle();
+    }
+
+    public static Translation2d getDxDyAMP() {
+        boolean isInFront = isInFrontOfShooter();
+        double dx;
+        double dy;
+        double[] array;
+        if (isInFront) {
+            array = LIMELIGHT_SHOOTER_TABLE.getEntry("targetpose_robotspace").getDoubleArray(new double[6]);
+            dy = array[0];
+            dx = array[2];
+            return new Translation2d(dx, dy); 
+        }
+        return null;
+        //cannot be in this distance (out of field)
     }
 
 

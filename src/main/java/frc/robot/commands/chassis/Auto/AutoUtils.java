@@ -61,7 +61,7 @@ public class AutoUtils {
     }
 
     public static  Command goTo(pathPoint point, double maxv) {
-        return new PathFollow(chassis, new pathPoint[] { dummyPoint, point }, maxv, maxAceel, 0, isRed, true);
+        return new PathFollow(chassis, new pathPoint[] { dummyPoint, point }, maxv, maxAceel, 0, isRed);
     }
 
     public static  Command turnToSpeaker() {

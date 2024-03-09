@@ -91,7 +91,7 @@ public class StartBottomPlayoffs extends Command {
     }
 
     private Command goTo(pathPoint point) {
-        return new PathFollow(chassis, new pathPoint[] { dummyPoint, point }, maxVel, maxAceel, 0, isRed, false);
+        return new PathFollow(chassis, new pathPoint[] { dummyPoint, point }, maxVel, maxAceel, 0, isRed);
     }
 
     private Command turnToSpeaker() {

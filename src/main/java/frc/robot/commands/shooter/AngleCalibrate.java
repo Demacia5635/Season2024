@@ -33,7 +33,7 @@ public class AngleCalibrate extends Command {
     /**set the anlge motor pow */
     @Override
     public void execute() {
-        shooter.angleSetPow(-0.17);
+        
     }
 
     /**stops the anlge motor and reset the dis */

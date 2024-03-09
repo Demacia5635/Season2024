@@ -35,6 +35,8 @@ public class SwerveModule implements Sendable {
 
     private FeedForward_SVA MoveFFSlow;
     private FeedForward_SVA moveFFFast;
+    private FeedForward_SVA moveFFFast2;
+
     private FeedForward_SVA steerFF;
     private Trapezoid steerTrapezoid;
 
@@ -74,6 +76,7 @@ public class SwerveModule implements Sendable {
         //     MOVE_KV2, MOVE_KVSQRT);
         MoveFFSlow = new FeedForward_SVA(constants.moveFFSlow.KS, constants.moveFFSlow.KV, constants.moveFFSlow.KA);
         moveFFFast = new FeedForward_SVA(constants.moveFFFast.KS, constants.moveFFFast.KV, constants.moveFFFast.KA);
+        moveFFFast2 = new FeedForward_SVA(constants.moveFFFast2.KS, constants.moveFFFast2.KV, constants.moveFFFast2.KA);
         steerFF = new FeedForward_SVA(constants.steerFF.KS, constants.steerFF.KV, constants.steerFF.KA);
         setMovePID(0,constants.movePID.KP, constants.movePID.KI, constants.movePID.KD);
         setSteerPID(SteerVelocitySlot,constants.steerPID.KP, constants.steerPID.KI, constants.steerPID.KD);
@@ -238,6 +241,7 @@ public class SwerveModule implements Sendable {
         double tgtV = MathUtil.clamp(v, currentVelocity-maxVelocityChange, currentVelocity+maxVelocityChange);
         double ff = Math.abs(tgtV) > 2.5 ? moveFFFast.calculate(tgtV, currentVelocity):
                         MoveFFSlow.calculate(tgtV, currentVelocity);
+        if (Math.abs(tgtV) > 3) ff = moveFFFast2.calculate(tgtV, currentVelocity);
     
         debug(" tgtV=" + tgtV + " cur V=" + currentVelocity + " ff=" + ff);
         moveMotor.set(ControlMode.Velocity, talonVelocity(tgtV), DemandType.ArbitraryFeedForward, ff);

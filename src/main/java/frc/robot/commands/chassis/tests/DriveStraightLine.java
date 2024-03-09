@@ -15,16 +15,16 @@ import frc.robot.subsystems.chassis.Chassis;
 public class DriveStraightLine extends Command {
   Chassis chassis;
   double vel;
-  public DriveStraightLine() {
-    this.chassis = RobotContainer.robotContainer.chassis;
+  public DriveStraightLine(Chassis chassis) {
+    this.chassis = chassis;
     
+    SmartDashboard.putNumber("Vel check spin", 0);
     addRequirements(chassis);
     SmartDashboard.putData(this);
   }
   @Override
   public void initSendable(SendableBuilder builder) {
-      builder.addDoubleProperty("Vel", () -> vel, (double vel) -> this.vel = vel);
-  }
+      super.initSendable(builder);  }
 
   
   @Override
@@ -35,7 +35,9 @@ public class DriveStraightLine extends Command {
  
   @Override
   public void execute() {
-    chassis.setVelocities(new ChassisSpeeds(vel, 0, 1));
+    vel = 3;
+    System.out.println("Vel check spin" + vel);
+    chassis.setVelocities(new ChassisSpeeds(vel, 0, 3));
   }
 
   // Called once the command ends or is interrupted.

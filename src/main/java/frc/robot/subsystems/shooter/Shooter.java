@@ -24,6 +24,11 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import frc.robot.RobotContainer;
 import frc.robot.Sysid.Sysid;
 import frc.robot.commands.shooter.ActivateShooter;
+import frc.robot.subsystems.shooter.ShooterConstants.AngleChanger;
+import frc.robot.subsystems.shooter.ShooterConstants.SHOOTER_MOTOR;
+import frc.robot.subsystems.shooter.ShooterConstants.ShooterID;
+import frc.robot.subsystems.shooter.ShooterConstants.ShooterVar;
+import frc.robot.subsystems.shooter.ShooterConstants.Shooting;
 
 import static frc.robot.subsystems.shooter.ShooterConstants.*;
 
@@ -47,30 +52,14 @@ public class Shooter extends SubsystemBase {
     /**the limit switch on the angle changer machanism */
     DigitalInput limitSwitch;
 
+    SHOOTER_MODE shooterMode = SHOOTER_MODE.IDLE;
+
     /**is the shooter shoot */
     private boolean isShooting  = false;
-    
-    /**is the shooter is shooting to the amp */
-    private boolean isShootingAmp = false;
-    
-    /**is the shooter is shooting from the podium */
-    private boolean isShootingPodium = false;
-    private boolean isShootingClose = false;
-
-    private boolean isUnderStage = false;
 
 
     /**is the shooter is ready to shoot */
     private boolean isShootingReady = false;
-
-    /**is the shooter is active */
-    private boolean isActive = false;
-
-    /**is Shooting from diffrent place than chassis location */
-    private boolean isShootingFrom = false;
-
-    /**is the shooter is in calibration */
-    private boolean isInCalibration = false;
     
     /**the calibration angle */
     private double calibrateAngle = 0;
@@ -78,7 +67,7 @@ public class Shooter extends SubsystemBase {
     /**the calibration velocity */
     private double calibrateVel = 0;
 
-    private double offset = 0;
+    private double angleOffset = 0;
 
     
     /**creates a new shooter and angle changer*/
@@ -219,12 +208,9 @@ public class Shooter extends SubsystemBase {
         stop();
         angleStop();
         feedingStop();
-        setIsActive(false);
         setIsShooting(false);
-        setIsShootingAmp(false);
         setIsShootingReady(false);
-        setIsShootingFrom(false);
-        setIsInCalibration(false);
+        setShooterMode(SHOOTER_MODE.IDLE);
     }
 
     /**
@@ -235,11 +221,11 @@ public class Shooter extends SubsystemBase {
         for (SHOOTER_MOTOR i : motor) {
             switch (i) {
                 case UP:
-                    motorUP.setNeutralMode(NeutralMode.Brake);
+                    motorUP.setNeutralMode(NeutralMode.Coast);
                     break;
     
                 case DOWN:
-                    motorDown.setNeutralMode(NeutralMode.Brake);
+                    motorDown.setNeutralMode(NeutralMode.Coast);
                     break;
     
                 case FEEDING:
@@ -248,9 +234,6 @@ public class Shooter extends SubsystemBase {
     
                 case ANGLE:
                     motorAngle.setNeutralMode(NeutralMode.Brake);
-                    break;
-    
-                default:
                     break;
             }
             
@@ -280,9 +263,6 @@ public class Shooter extends SubsystemBase {
                 case ANGLE:
                     motorAngle.setNeutralMode(NeutralMode.Coast);
                     break;
-    
-                default:
-                    break;
             }
             
         }
@@ -292,7 +272,7 @@ public class Shooter extends SubsystemBase {
      * reset the base dis of the angle motor also reset the encoder of the angle motor 
      */
     public void resetDis() {
-        offset = motorAngle.getSelectedSensorPosition();
+        angleOffset = motorAngle.getSelectedSensorPosition();
     }
 
     /**
@@ -310,23 +290,7 @@ public class Shooter extends SubsystemBase {
         this.isShooting = isShooting;
     }
 
-    /**
-     * set the isShootingAmp var
-     * @param isShootingAmp what isShootingAmp will be
-     */
-    public void setIsShootingAmp(boolean isShootingAmp) {
-        this.isShootingAmp = isShootingAmp;
-    }
 
-    /**
-     * set the isShootingPodium var
-     * @param isShootingPodium what isShootingPodium will be
-     */
-    public void setIsShootingPodium(boolean isShootingPodium) {
-        isShootingAmp = false;
-        isShootingClose = false;
-        this.isShootingPodium = isShootingPodium;
-    }
 
     /**
      * set isShootingReady var
@@ -334,30 +298,6 @@ public class Shooter extends SubsystemBase {
      */
     public void setIsShootingReady(boolean isShootingReady) {
         this.isShootingReady = isShootingReady;
-    }
-
-    /**
-     * set isActive var
-     * @param isActive what isActiveReady will be
-     */
-    public void setIsActive(boolean isActive) {
-        this.isActive = isActive;
-    }
-
-    /**
-     * set isShootingFrom var
-     * @param isShootingFrom what isShootingFrom will be
-     */
-    public void setIsShootingFrom(boolean isShootingFrom) {
-        this.isShootingFrom = isShootingFrom;
-    }
-
-    /**
-     * set isIncalibration var
-     * @param isInCalibration what isInCalibration will be
-     */
-    public void setIsInCalibration(boolean isInCalibration) {
-        this.isInCalibration = isInCalibration;
     }
 
     /**
@@ -376,21 +316,21 @@ public class Shooter extends SubsystemBase {
         this.calibrateVel = calibrateVel;
     }
 
+
+    public void setShooterMode(SHOOTER_MODE shooterMode) {
+        this.shooterMode = shooterMode;
+    }
+
+    public SHOOTER_MODE getShooterMode() {
+        return this.shooterMode;
+    }
+
     /**
      * get the command that will activate the shooter to shoot from the podium
      * @return a command that will shoot from the podium
      */
     public Command getActivateShooterToPodium() {
-        return new InstantCommand(()->setIsShootingPodium(true)).andThen(new ActivateShooter(this,RobotContainer.robotContainer.intake, RobotContainer.robotContainer.chassis,false));
-    }
-
-
-        /**
-     * get the command that will activate the shooter to shoot from the podium
-     * @return a command that will shoot from the podium
-     */
-    public Command getActivateShooterToUnderStage() {
-        return new InstantCommand(()->setIsUnderStage(true)).andThen(new ActivateShooter(this,RobotContainer.robotContainer.intake, RobotContainer.robotContainer.chassis,false));
+        return new InstantCommand(()->setShooterMode(SHOOTER_MODE.PODIUM));
     }
 
     /**
@@ -398,8 +338,7 @@ public class Shooter extends SubsystemBase {
      * @return acommand that set shoter to true and wait 0.5 sec
      */
     public Command getShootCommand() {
-        return new InstantCommand(()-> shoot()).andThen(new WaitCommand(2)
-            .raceWith(RobotContainer.robotContainer.intake.getActivateIntakeCommand()));
+        return new InstantCommand(()-> shoot());
     }
 
     /**
@@ -414,19 +353,17 @@ public class Shooter extends SubsystemBase {
      * activate shooter to the speaker
      * @return a command that will set isShootingToAmp false and activate the shooter to shoot at the amp
      */
-    public Command getActivateShooterToSpeaker() {
-        return (new InstantCommand((()->{setIsShootingAmp(false); setIsShootingPodium(false); setIsUnderStage(false);}))).alongWith(new ActivateShooter(this,RobotContainer.robotContainer.intake, RobotContainer.robotContainer.chassis,false));
+    public Command getActivateShooterAuto() {
+        return (new InstantCommand((()->setShooterMode(SHOOTER_MODE.AUTO))));
     }
 
     /**
      * activate the shooter to shoot to the speaker from the sub offer
      * @return a command that will make the shooter shoot from the sub offer
      */
-    public Command getActivateShooterToSpeakerFromSub() {
-        Command c = new InstantCommand(()->isShootingClose(true)).
-        alongWith(new ActivateShooter(this,RobotContainer.robotContainer.intake,
-                             RobotContainer.robotContainer.chassis,1.35,false));
-        c.setName("activate from sub");
+    public Command getActivateShooterSubwoofer() {
+        Command c = new InstantCommand(()->setShooterMode(SHOOTER_MODE.SUBWOOFER));
+        c.setName("activate sub");
         return c;
     }
 
@@ -435,7 +372,7 @@ public class Shooter extends SubsystemBase {
      * @return a command that will set isShootingToAmp true and activate the shooter to shoot at the amp
      */
     public Command getActivateShooterToAmp() {
-        return new InstantCommand(()->setIsShootingAmp(true)).andThen(new ActivateShooter(this,RobotContainer.robotContainer.intake, RobotContainer.robotContainer.chassis,false));
+        return new InstantCommand(()->setShooterMode(SHOOTER_MODE.AMP));
     }
 
     /**
@@ -446,30 +383,6 @@ public class Shooter extends SubsystemBase {
         return isShooting;
     }
 
-    /**
-     * get isShootingAmp
-     * @return isShootingAmp
-     */
-    public boolean getIsShootingAmp() {
-        return isShootingAmp;
-    }
-
-    /**
-     * get isShootingPodium
-     * @return isShootingPodium
-     */
-    public boolean getIsShootingPodium() {
-        return isShootingPodium;
-    }
-
-    public boolean isShootingClose() {
-        return isShootingClose;
-    }
-    public void isShootingClose(boolean isShootingClose) {
-        isShootingAmp = false;
-        isShootingPodium = false;
-        this.isShootingClose = isShootingClose;
-    }
     
 
     /**
@@ -478,30 +391,6 @@ public class Shooter extends SubsystemBase {
      */
     public boolean getIsShootingReady() {
         return isShootingReady;
-    }
-
-    /**
-     * get isActive
-     * @return isActive
-     */
-    public boolean getIsActive() {
-        return isActive;
-    }
-
-    /**
-     * get isShootingFrom
-     * @return isShootingFrom
-     */
-    public boolean getIsShootingFrom() {
-        return isShootingFrom;
-    }
-
-    /**
-     * get isInCalibration
-     * @return isInCalibration
-     */
-    public boolean getIsInCalibration() {
-        return isInCalibration;
     }
 
     /**
@@ -525,7 +414,8 @@ public class Shooter extends SubsystemBase {
      * @return isActive and not isShootingAmp
      */
     public boolean getIsActiveToSpeaker() {
-        return isActive && !isShootingAmp && !isShootingFrom  && !isInCalibration;
+        return (shooterMode ==SHOOTER_MODE.AUTO)
+        || (shooterMode == SHOOTER_MODE.AUTO_CONTINIOUS) || (shooterMode == SHOOTER_MODE.PODIUM);
     }
 
     /**
@@ -542,7 +432,7 @@ public class Shooter extends SubsystemBase {
 
 
     public double getSelectedSensorPosition() {
-        return motorAngle.getSelectedSensorPosition() - offset;
+        return motorAngle.getSelectedSensorPosition() - angleOffset;
     }
 
     
@@ -691,12 +581,9 @@ public class Shooter extends SubsystemBase {
 
         /*put shooter var on shuffleboard and making them able to be changeble */
         builder.addBooleanProperty("is shooting", this::getIsShooting, this::setIsShooting);
-        builder.addBooleanProperty("is shooting amp", this::getIsShootingAmp, this::setIsShootingAmp);
-        builder.addBooleanProperty("is shooting podium", this::getIsShootingPodium, this::setIsShootingPodium);
+       
         builder.addBooleanProperty("is shooting ready", this::getIsShootingReady, this::setIsShootingReady);
-        builder.addBooleanProperty("is active", this::getIsActive, this::setIsActive);
-        builder.addBooleanProperty("is shooting from", this::getIsShootingFrom, this::setIsShootingFrom);
-        builder.addBooleanProperty("Calibrate",this::getIsInCalibration, this::setIsInCalibration);
+        builder.addStringProperty("Shooter Mode", ()->getShooterMode().toString(), null);
         builder.addDoubleProperty("calibrate Angle", this::getCalibrateAngle, this::setCalibrateAngle);
         builder.addDoubleProperty("calibrate Velocity", this::getCalibrateVel, this::setCalibrateVel);
         
@@ -725,11 +612,4 @@ public class Shooter extends SubsystemBase {
         }
     }
 
-    public boolean isUnderStage() {
-        return isUnderStage;
-    }
-
-    public void setIsUnderStage(boolean is) {
-        isUnderStage = is;
-    }
 }

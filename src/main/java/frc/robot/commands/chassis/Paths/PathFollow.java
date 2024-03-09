@@ -80,11 +80,9 @@ public class PathFollow extends Command {
         0, RobotContainer.robotContainer.isRed());
   }
 
-  public PathFollow(Chassis chassis, pathPoint[] points, double maxVel, double maxAcc, double finishVel,
-      boolean isRed) {
+  public PathFollow(Chassis chassis, pathPoint[] points, double maxVel, double maxAcc, double finishVel) {
     this.points = points;
     this.finishVel = finishVel;
-    this.isRed = isRed;
 
     this.chassis = chassis;
 
@@ -102,9 +100,9 @@ public class PathFollow extends Command {
 
   }
 
-  public PathFollow(Chassis chassis, pathPoint[] points, double maxVel, double maxAcc, double finishVel, boolean isRed,
+  public PathFollow(Chassis chassis, pathPoint[] points, double maxVel, double maxAcc, double finishVel,
       boolean rotateToSpeaker) {
-    this(chassis, points, maxVel, maxAcc, finishVel, isRed);
+    this(chassis, points, maxVel, maxAcc, finishVel);
     this.rotateToSpeaker = rotateToSpeaker;
   }
 
@@ -119,6 +117,7 @@ public class PathFollow extends Command {
 
   @Override
   public void initialize() {
+    isRed = RobotContainer.robotContainer.isRed();
     // sets first point to chassis pose to prevent bugs with red and blue alliance
     points[0] = new pathPoint(chassis.getPose().getX(), chassis.getPose().getY(), points[1].getRotation(),
         points[0].getRadius(), false);
@@ -282,13 +281,14 @@ public class PathFollow extends Command {
 
   @Override
   public boolean isFinished() {
-    return totalLeft <= 0.2;
+    return totalLeft <= 0.1;
   }
 
   @Override
   public void initSendable(SendableBuilder builder) {
     // builder.addStringProperty("Current Segment", () -> currentSegmentInfo(),
     // null);
+    super.initSendable(builder);
     builder.addDoubleProperty("Distance Passed", () -> {
       return distancePassed;
     }, null);

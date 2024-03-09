@@ -56,7 +56,7 @@ public class ShooterConstants {
     
         /*the max and min dis of the angle changer */
         public static final double MAX_DIS = 225;
-        public static final double MIN_DIS = 100;
+        public static final double MIN_DIS = 115;
 
         public static final double BOUNDARY_DIS = 4;
     }
@@ -119,4 +119,12 @@ public class ShooterConstants {
         ANGLE,
     }
 
+    public enum SHOOTER_MODE {
+        IDLE, 
+        AMP, 
+        PODIUM, 
+        SUBWOOFER, 
+        AUTO, 
+        AUTO_CONTINIOUS
+    }
 }

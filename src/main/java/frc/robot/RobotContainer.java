@@ -25,6 +25,7 @@ import frc.robot.commands.shooter.ActivateShooter;
 import frc.robot.commands.shooter.AngleCalibrate;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterConstants;
+import frc.robot.subsystems.shooter.ShooterConstants.SHOOTER_MODE;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionLimelight;
 import frc.robot.utils.Utils;
@@ -33,7 +34,6 @@ import frc.robot.commands.chassis.DriveCommand;
 import frc.robot.commands.chassis.DriveToNote;
 import frc.robot.commands.chassis.GoToAngleChassis;
 import frc.robot.commands.chassis.AutoPrevious.Fowrard;
-import frc.robot.commands.chassis.AutoPrevious.MidPlayoffTEST;
 import frc.robot.commands.chassis.AutoPrevious.Shoot;
 import frc.robot.commands.chassis.AutoPrevious.StartBottom1;
 import frc.robot.commands.chassis.AutoPrevious.StartBottom2;
@@ -44,6 +44,9 @@ import frc.robot.commands.chassis.AutoPrevious.StartMiddle2;
 import frc.robot.commands.chassis.AutoPrevious.StartTOP1;
 import frc.robot.commands.chassis.AutoPrevious.StartTOP2;
 import frc.robot.commands.chassis.Auto.AutoChooser;
+import frc.robot.commands.chassis.Auto.CollectTop;
+import frc.robot.commands.chassis.Auto.CollectWing;
+import frc.robot.commands.chassis.Auto.DestroyCenter;
 import frc.robot.commands.chassis.Paths.GoToAMP1;
 import frc.robot.commands.intake.IntakeCommand;
 import frc.robot.commands.intake.IntakeToShooter;
@@ -64,19 +67,17 @@ public class RobotContainer implements Sendable {
   public Chassis chassis;
   public VisionLimelight vision;
   public LedControll led;
+
   public Command shoot; // shoot to amp or to speaker
-  public Command 
-  activateShooter; // prepare to shoot
-  public Command autonomousRight;
   public Command driveToNote;
   public Command manualIntake;
   public Command activateAmp;
   public Command disableCommand;
   public Command resetOdometry;
   public Command activatePodium;
-
-
-
+  public Command activateShooter;
+  public Command activateSubwoofer;
+  
   private SendableChooser<Command> autoChoose;
 
   public RobotContainer() {
@@ -92,6 +93,7 @@ public class RobotContainer implements Sendable {
     chassis.setDefaultCommand(new DriveCommand(chassis, commandController));
     led = new LedControll(9, 110);
   
+    shooter.setDefaultCommand(new ActivateShooter(shooter, intake, chassis));
     createCommands();
     
     SmartDashboard.putData("RobotContainer", this);
@@ -103,91 +105,29 @@ public class RobotContainer implements Sendable {
     intake.stop();
   }
   public void createCommands() {
-    SmartDashboard.putNumber("UP", 0);
-    SmartDashboard.putNumber("DOWN", 0);
-    SmartDashboard.putNumber("ANGLE SHOOTER", 0);
+    SmartDashboard.putNumber("vel calibrate", 0);
+
+    SmartDashboard.putNumber("angle calibrate", 0);
 
 
 
     driveToNote = new DriveToNote(chassis, 1.6, true).raceWith(new IntakeCommand(intake));
-    driveToNote.setName("Drive to Note");
     shoot = shooter.getShootCommand();
-    shoot.setName("Shoot");
-    activateShooter = shooter.getActivateShooterToSpeaker();
-    activateShooter.setName("activateShooter");
+    activateShooter = shooter.getActivateShooterAuto();
     manualIntake = new IntakeCommand(intake);
-    manualIntake.setName("manualIntake");
     activateAmp = shooter.getActivateShooterToAmp();
-    activateAmp.setName("Activate Amp");
     activatePodium = shooter.getActivateShooterToPodium();
-    activatePodium.setName("activate podium");
 
     resetOdometry = new InstantCommand(()-> chassis.setOdometryToForward()).ignoringDisable(true);
-    resetOdometry.setName("reset odometry");
-    disableCommand = new InstantCommand(()-> stopAll(),intake, shooter).andThen(shooter.getActivateShooterToUnderStage());
-    disableCommand.setName("disable command");
+    disableCommand = new InstantCommand(()-> stopAll(),intake);
 
-    Command startTop = (new AngleCalibrate(shooter))
-      .andThen((new ActivateShooter(shooter, intake, chassis, true))
-      .alongWith(new StartTOP1()));
-    startTop.setName("TOP");
-    Command StartMiddle = new ActivateShooter(shooter, intake, chassis, true).alongWith(new StartMiddle1());
-    StartMiddle.setName("Middle");
-    Command startBottom = new ActivateShooter(shooter, intake, chassis, true).alongWith(new StartBottom1());
-    startBottom.setName("Buttom");
-    Command autoShoot = (new AngleCalibrate(shooter))
-      .andThen(new ActivateShooter(shooter, intake, chassis, true)
-      .alongWith((new WaitUntilCommand(()->shooter.getIsShootingReady())).andThen(shooter.getShootCommand())));
-      autoShoot.setName("auto shoot");
-    Command justShootFromSubWuffer = (new AngleCalibrate(shooter))
-      .andThen(shooter.getActivateShooterToSpeakerFromSub()
-      .alongWith((new WaitUntilCommand(()->shooter.getIsShootingReady())).andThen(shooter.getShootCommand())));
-
-    Command shootFromSubAndLeave = (new AngleCalibrate(shooter)
-      .andThen(shooter.getActivateShooterToSpeakerFromSub()
-      .alongWith((new WaitUntilCommand(()->shooter.getIsShootingReady())).andThen(shooter.getShootCommand())))).raceWith(new WaitCommand(5)).andThen(
-      new RunCommand(
-        () -> chassis.setVelocities(new ChassisSpeeds((isRed) ? -1 : 1,
-         0, 0))).raceWith(new WaitCommand(5)));
-  
-    Command StartBottomEscape = new ActivateShooter(shooter, intake, chassis, true).alongWith(new StartBottomEscape());
-    StartBottomEscape.setName("start b escape");
-    // Command PlayOffs = (new AngleCalibrate(shooter)
-    //   .andThen(shooter.getActivateShooterToSpeakerFromSub()
-    //   .alongWith((new WaitUntilCommand(()->shooter.getIsShootingReady())).andThen(shooter.getShootCommand()))))
-    //   .andThen(new ActivateShooter(shooter, intake, chassis, true).alongWith(new StartBottomPlayoffs()));
-    // PlayOffs.setName("playpoff");
-
-    Command PlayOffs = new ActivateShooter(shooter, intake, chassis, true).alongWith(new StartBottomPlayoffs());
-    Command tryForDis3TOP = (new AngleCalibrate(shooter)
-      .andThen(shooter.getActivateShooterToSpeakerFromSub()
-      .alongWith((new WaitUntilCommand(()->shooter.getIsShootingReady())).andThen(shooter.getShootCommand())))).andThen(new StartTOP2().alongWith(new ActivateShooter(shooter, intake, chassis, true)));
-    Command tryForDis3MIDDLE = (new AngleCalibrate(shooter)
-      .andThen(shooter.getActivateShooterToSpeakerFromSub()
-      .alongWith((new WaitUntilCommand(()->shooter.getIsShootingReady())).andThen(shooter.getShootCommand())))).andThen(new StartMiddle2().alongWith(new ActivateShooter(shooter, intake, chassis, true)));
-    Command tryForDis3BOTTOM = (new AngleCalibrate(shooter)
-      .andThen(shooter.getActivateShooterToSpeakerFromSub()
-      .alongWith((new WaitUntilCommand(()->shooter.getIsShootingReady())).andThen(shooter.getShootCommand())))).andThen(new StartBottom2().alongWith(new ActivateShooter(shooter, intake, chassis, true)));
-
-
+    Command collectTop = new CollectTop();
+    Command collectWing = new CollectWing();
+    Command destroyCenter = new DestroyCenter();
     autoChoose = new SendableChooser<Command>();
-    autoChoose.setDefaultOption("Playoffs", PlayOffs);
-    autoChoose.addOption("Top",startTop);
-    autoChoose.addOption("Middle", StartMiddle);
-    autoChoose.addOption("Bottom", startBottom);
-    autoChoose.addOption("shoot", autoShoot);
-    autoChoose.addOption("StartBottomEscape", StartBottomEscape);
-    autoChoose.addOption("just shoot from subwuffer", justShootFromSubWuffer);
-    autoChoose.addOption("Middle try", tryForDis3MIDDLE);
-    autoChoose.addOption("Top try", tryForDis3TOP);
-    autoChoose.addOption("Bottom try", tryForDis3BOTTOM);
-    autoChoose.addOption("shot + leave", shootFromSubAndLeave);
-
-
-
-
-
-
+    autoChoose.addOption("Top",collectTop);
+    autoChoose.addOption("Wing", collectWing);
+    autoChoose.addOption("Destroy", destroyCenter);
     SmartDashboard.putData("Auto Chooser", autoChoose);
 }
 
@@ -236,7 +176,7 @@ public class RobotContainer implements Sendable {
     commandController.back().onTrue(resetOdometry);
     commandController.leftBumper().onTrue(disableCommand);
    // commandController.pov(270).onTrue(new GoToAMP1());
-    commandController.rightBumper().onTrue(shooter.getActivateShooterToSpeakerFromSub());
+    commandController.rightBumper().onTrue(shooter.getActivateShooterSubwoofer());
     overrideAuto.onTrue(chassis.getDefaultCommand());
 
     //Operator Controller
@@ -253,7 +193,7 @@ public class RobotContainer implements Sendable {
     Command driverB = new InstantCommand((()->vision.setResetOdo(true))).ignoringDisable(true);
     driverB.setName("Perlman B");
     commandController2.b().onTrue(driverB);
-    commandController2.y().onTrue(shooter.getActivateShooterToSpeakerFromSub());
+    commandController2.y().onTrue(shooter.getActivateShooterSubwoofer());
     commandController2.x().onTrue(activateShooter);
     commandController2.a().onTrue(activateAmp);
     commandController2.rightBumper().onTrue(activatePodium);
@@ -278,8 +218,8 @@ public class RobotContainer implements Sendable {
 }
 
 
-  public void calibrate() {
-    new AngleCalibrate(shooter).schedule();
+  public void calibrateSetIdle() {
+    shooter.stopAll();
   }
 
  
@@ -291,8 +231,7 @@ public class RobotContainer implements Sendable {
     System.out.println(" -------------------------------------------");
     System.out.println(" -------------------------------------------");
     System.out.println(" -------------------------------------------");
-    return cmd;
-    //return new StartTOP1().alongWith(new ActivateShooter(shooter, intake, chassis, true));
-    //return new RunCommand(()->shooter.setVel(10), shooter);
+    return cmd.alongWith(shooter.getDefaultCommand(), 
+      new InstantCommand(()->shooter.setShooterMode(SHOOTER_MODE.AUTO_CONTINIOUS)));
   }
 }

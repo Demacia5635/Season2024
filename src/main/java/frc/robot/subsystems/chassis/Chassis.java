@@ -4,6 +4,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -13,6 +14,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -20,6 +22,8 @@ import frc.robot.RobotContainer;
 import frc.robot.PathFollow.Util.pathPoint;
 import frc.robot.Sysid.Sysid;
 import frc.robot.Sysid.Sysid.Gains;
+import frc.robot.commands.chassis.Paths.PathFollow;
+import frc.robot.commands.chassis.tests.DriveStraightLine;
 import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.subsystems.vision.utils.LimelightVisionUtils;
 import frc.robot.subsystems.vision.utils.UpdatedPoseEstimatorClasses.SwerveDrivePoseEstimator;
@@ -37,7 +41,9 @@ import com.ctre.phoenix.sensors.Pigeon2;
 public class Chassis extends SubsystemBase {
   private final SwerveModule[] modules;
   private final Pigeon2 gyro;
-  private Trapezoid rotationTrapezoid = new Trapezoid(MAX_OMEGA_VELOCITY, MAX_OMEGA_ACCELERATION);
+  private Trapezoid rotationTrapezoid = new Trapezoid(Math.toRadians(720), Math.toRadians(1200));
+  private Trapezoid rotationTrapezoidSpeaker = new Trapezoid(Math.toRadians(720), Math.toRadians(720));
+
 
   public static List<pathPoint> pointsForPathTeleop = new ArrayList<pathPoint>();
   public static List<pathPoint> pointsForAuto = new ArrayList<pathPoint>();
@@ -76,6 +82,9 @@ public class Chassis extends SubsystemBase {
     SmartDashboard.putNumber("Set Gyro Angle", 0);
     SmartDashboard.putData("Change gyro angle ", new InstantCommand( () -> setGyroAngle(SmartDashboard.getNumber("Set Gyro Angle", 0))).ignoringDisable(true));
 
+
+    SmartDashboard.putData("run command", new RunCommand(()->{setModulesPower(1); setModulesAngleFromSB(0);}, this));
+
     SmartDashboard.putData("set coast",
         new InstantCommand(() -> setNeutralMode(NeutralMode.Coast)).ignoringDisable(true));
     SmartDashboard.putData("set brake",
@@ -84,7 +93,14 @@ public class Chassis extends SubsystemBase {
         SmartDashboard.putData("reset pose", new InstantCommand(() -> setOdometryToForward()).ignoringDisable(true));
 
     SmartDashboard.putData("calibrate", new InstantCommand(()->calibrate(), this).ignoringDisable(true));
+    
+    pathPoint dummyPoint = new pathPoint(0, 0, new Rotation2d(), 0, false);
+    pathPoint point = new pathPoint(2, 1, Rotation2d.fromDegrees(-20), 0, false);
 
+    Command cmdpf = new PathFollow(this, new pathPoint[] { dummyPoint, point }, 4.1, 10, 0, false);
+   
+    SmartDashboard.putData("check offset spin", new DriveStraightLine(this));
+    SmartDashboard.putData("Path Follow Check", cmdpf);
     SmartDashboard.putData("Chassis Move Sysid",
         (new Sysid(this::setModulesPower, this::getMoveVelocity, 0.2, 0.8, this)).getCommand());
     SmartDashboard.putData("Chassis Move Sysid2",
@@ -199,8 +215,9 @@ public class Chassis extends SubsystemBase {
    * @param speeds In m/s and rad/s
    */
   public void setVelocities(ChassisSpeeds speeds) {
-    double param = -0.2;
-    ChassisSpeeds relativeSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds, getAngle());
+    double param = speeds.omegaRadiansPerSecond > Math.toRadians(20) ? -0.1 : 0;
+    ChassisSpeeds relativeSpeeds = 
+    ChassisSpeeds.fromFieldRelativeSpeeds(speeds, getAngle());
     Translation2d newSpeeds = new Translation2d(relativeSpeeds.vxMetersPerSecond,
      relativeSpeeds.vyMetersPerSecond).rotateBy(Rotation2d.fromRadians(relativeSpeeds.omegaRadiansPerSecond * param));
     ChassisSpeeds newChassisSpeeds = new ChassisSpeeds(newSpeeds.getX(), newSpeeds.getY(), relativeSpeeds.omegaRadiansPerSecond);
@@ -364,18 +381,51 @@ public class Chassis extends SubsystemBase {
     return finalVector.getAngle();
   }
 
+  public void GoToAMP(){
+    double kP = 0.2;
+    Translation2d AMP = LimelightVisionUtils.getDxDyAMP();
+    if(AMP != null){
+      setVelocitiesRotateToAngle(new ChassisSpeeds(0, -AMP.getY() * kP,
+      Math.toRadians(180)), getAngle().minus(LimelightVisionUtils.getTAAmp()));
+    }
+    else {
+      setVelocities(new ChassisSpeeds(0, 0, 0));
+    }
+  }
+
   public double getRadPerSecToSpeaker() {
     Translation2d speaker = Utils.speakerPosition();
-    if(LimelightVisionUtils.isSeeSpeaker()) {
-      return getRadPerSecToAngle(getAngle().plus(LimelightVisionUtils.getTA()));
+   System.out.println("current angle= " + getAngle().getDegrees());
+    System.out.println("angle odometry" + speaker.minus(getPose().getTranslation()).getAngle().plus(Rotation2d.fromDegrees(180)));
+    if(LimelightVisionUtils.isInFrontOfShooter()) {
+      System.out.println("angle april tag" + getAngle().minus(LimelightVisionUtils.getTA()).getDegrees() + " ta= "
+       + LimelightVisionUtils.getTA().getDegrees());
+  
+      return getRadPerSecToAngle(getAngle().minus(LimelightVisionUtils.getTA()));
     }
-    return getRadPerSecToAngle(speaker.getAngle());
+
+    return getRadPerSecToAngle(speaker.minus(getPose().getTranslation()).getAngle().plus(Rotation2d.fromDegrees(180)));
+  }
+
+  public double getGyroRate() {
+    double []rot  = new double[3];
+    gyro.getRawGyro(rot);
+    return rot[2];
   }
 
   public double getRadPerSecToAngle(Rotation2d fieldRelativeAngle) {
       double rotateVel = rotationTrapezoid.calculate(
-        fieldRelativeAngle.minus(getAngle()).getRadians(), getChassisSpeeds().omegaRadiansPerSecond, 0);
-      return rotateVel;
+        fieldRelativeAngle.minus(getAngle()).getRadians(), Math.toRadians(getGyroRate()), 0);
+      return Math.abs(getAngle().minus(fieldRelativeAngle).getDegrees())>3? rotateVel : 0;
+  }
+
+
+  public double getRadPerSecToAngleAPTAG(Rotation2d fieldRelativeAngle) {
+
+      double rotateVel = rotationTrapezoidSpeaker.calculate(
+        fieldRelativeAngle.minus(getAngle()).getRadians(), Math.toRadians(getGyroRate()), 0);
+
+      return Math.abs(getAngle().minus(fieldRelativeAngle).getDegrees())>3? rotateVel : 0;
   }
   
     public static Translation2d speakerPosition() {
@@ -389,7 +439,8 @@ public class Chassis extends SubsystemBase {
   @Override
   public void periodic() {
     poseEstimator.update(getRawAngle(), getModulePositions());
-    field.setRobotPose(getPose());
+
+    field.setRobotPose(getPose().plus(new Transform2d(1.2, 0, new Rotation2d())));
     SmartDashboard.putNumber("Distance from speaker", speakerPosition().getDistance(getPose().getTranslation()));
  }
 }
