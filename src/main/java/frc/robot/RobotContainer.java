@@ -176,8 +176,7 @@ public class RobotContainer implements Sendable {
     commandController.back().onTrue(resetOdometry);
     commandController.leftBumper().onTrue(disableCommand);
    // commandController.pov(270).onTrue(new GoToAMP1());
-    //commandController.rightBumper().onTrue(shooter.getActivateShooterSubwoofer());
-    commandController.rightBumper().onTrue(shoot);
+    commandController.rightBumper().onTrue(shooter.getActivateShooterSubwoofer());
     overrideAuto.onTrue(chassis.getDefaultCommand());
 
     //Operator Controller
