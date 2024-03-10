@@ -64,12 +64,13 @@ public class ShooterConstants {
     /**vars for shooting */
     public static class Shooting {
         /*shooting feed forward */
-        public static final double KS = 0.134913294868407;
-        public static final double KV = 0.017947964948241;
-        public static final double KV2 = 0.001053738244123;
+        public static final double KS = 0.1510682394443;
+        public static final double KV = 0.016769985504258;
+        public static final double KV2 = 0.001011134688171;
 
         /*shooting pid */
-        public static final double KP = 0.079105686035457;
+        public static final double KP = 0.02;
+        public static final double KI = 0.0007;
     }
 
 

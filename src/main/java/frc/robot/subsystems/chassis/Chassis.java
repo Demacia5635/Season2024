@@ -25,6 +25,7 @@ import frc.robot.Sysid.Sysid.Gains;
 import frc.robot.commands.chassis.Paths.PathFollow;
 import frc.robot.commands.chassis.tests.DriveStraightLine;
 import frc.robot.subsystems.shooter.ShooterConstants;
+import frc.robot.subsystems.vision.VisionLimelight;
 import frc.robot.subsystems.vision.utils.LimelightVisionUtils;
 import frc.robot.subsystems.vision.utils.UpdatedPoseEstimatorClasses.SwerveDrivePoseEstimator;
 import frc.robot.utils.Trapezoid;
@@ -125,6 +126,11 @@ public class Chassis extends SubsystemBase {
    // SmartDashboard.putData("go to angle position", new RunCommand(()->modules[0].setAngleByPositionPID(Rotation2d.fromDegrees(SmartDashboard.getNumber("ANG", 0))), this));
 
    setNeutralMode(NeutralMode.Brake);
+   SmartDashboard.putData("SetAngle45", new RunCommand(() -> {
+    for (SwerveModule module : modules) {
+      module.setAngleByPositionPID(Rotation2d.fromDegrees(45));  
+    }
+   }, this));
   }
 
   public SwerveModule[] getModules() {
@@ -394,14 +400,12 @@ public class Chassis extends SubsystemBase {
   }
 
   public double getRadPerSecToSpeaker() {
-    Translation2d speaker = Utils.speakerPosition();
-   System.out.println("current angle= " + getAngle().getDegrees());
-    System.out.println("angle odometry" + speaker.minus(getPose().getTranslation()).getAngle().plus(Rotation2d.fromDegrees(180)));
-    if(LimelightVisionUtils.isInFrontOfShooter()) {
-      System.out.println("angle april tag" + getAngle().minus(LimelightVisionUtils.getTA()).getDegrees() + " ta= "
-       + LimelightVisionUtils.getTA().getDegrees());
+    Translation2d speaker = Utils.speakerTargetPosition();
   
-      return getRadPerSecToAngle(getAngle().minus(LimelightVisionUtils.getTA()));
+    Rotation2d limelightSpeakerAngle = RobotContainer.robotContainer.vision.getSpeakerAngle();
+    if(limelightSpeakerAngle != null) {
+      return getRadPerSecToAngle(limelightSpeakerAngle);
+  //    return getRadPerSecToAngle(getAngle().minus(LimelightVisionUtils.getTA()));
     }
 
     return getRadPerSecToAngle(speaker.minus(getPose().getTranslation()).getAngle().plus(Rotation2d.fromDegrees(180)));
@@ -416,19 +420,12 @@ public class Chassis extends SubsystemBase {
   public double getRadPerSecToAngle(Rotation2d fieldRelativeAngle) {
       double rotateVel = rotationTrapezoid.calculate(
         fieldRelativeAngle.minus(getAngle()).getRadians(), Math.toRadians(getGyroRate()), 0);
-      return Math.abs(getAngle().minus(fieldRelativeAngle).getDegrees())>3? rotateVel : 0;
+      return Math.abs(getAngle().minus(fieldRelativeAngle).getDegrees()) >= 3 ? rotateVel : 0;
   }
 
 
-  public double getRadPerSecToAngleAPTAG(Rotation2d fieldRelativeAngle) {
-
-      double rotateVel = rotationTrapezoidSpeaker.calculate(
-        fieldRelativeAngle.minus(getAngle()).getRadians(), Math.toRadians(getGyroRate()), 0);
-
-      return Math.abs(getAngle().minus(fieldRelativeAngle).getDegrees())>3? rotateVel : 0;
-  }
   
-    public static Translation2d speakerPosition() {
+  public static Translation2d speakerPosition() {
     return Utils.speakerPosition();
   }
 

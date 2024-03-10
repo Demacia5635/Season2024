@@ -52,9 +52,12 @@ public class Field {
     };
 
     public static final Translation2d Speaker = new Translation2d(-0.04, 5.55);
+    public static final Translation2d SpeakerTarget = new Translation2d(0.1, 5.55);
+    
     public static final double SubwooferWidth = 3*FEET + 0.125*INCH;
 
     public static Translation2d toRed(Translation2d blue) {
+        
         return new Translation2d(FiledLength-blue.getX(), blue.getY());
     }
 
@@ -74,6 +77,7 @@ public class Field {
     }
 
     public static final Translation2d RedSpeaker = toRed(Speaker);
+    public static final Translation2d RedSpeakerTarget = toRed(SpeakerTarget);
     public static final Translation2d RedAMP = toRed(AMP);
 
     public static final Translation2d RedSubShootPosition =toRed(SubShootPosition);

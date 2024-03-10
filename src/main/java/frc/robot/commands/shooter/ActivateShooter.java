@@ -7,12 +7,7 @@ package frc.robot.commands.shooter;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.Field;
-import frc.robot.RobotContainer;
 import frc.robot.subsystems.chassis.Chassis;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.shooter.Shooter;
@@ -108,9 +103,9 @@ public class ActivateShooter extends Command {
                 // velUp = ShooterConstants.AmpVar.UP;
                 // velDown = ShooterConstants.AmpVar.DOWN;
                 // angle = ShooterConstants.AmpVar.ANGLE;
-                velDown = SmartDashboard.getNumber("vel calibrate", 0);
+                velDown = shooter.getCalibrateVel();
                 velUp = velDown;
-                angle = SmartDashboard.getNumber("angle calibrate", 0);
+                angle = shooter.getCalibrateAngle();
 
                 break;
 
@@ -145,8 +140,7 @@ public class ActivateShooter extends Command {
                 break;
         
           
-        }
-       
+        }       
         /*put the anlge motor at the wanted angle */
         double angleError = shooter.getAngle() - angle;
         angleError = Math.abs(angleError) > 0.5 ? angleError: 0;
@@ -154,23 +148,16 @@ public class ActivateShooter extends Command {
 
         double power = isAtLimit ? 0:
                 MathUtil.clamp(0.07 * Math.signum(angleError) + angleError * 0.06, -0.4, 0.4);
-        if(isAtLimit) {
-            System.out.println(" shooter is at limtit " + " angle = " + angle + " angle error =" + angleError + " cur angle = " + 
-                shooter.getAngle());
-        }
         shooter.angleSetPow(power);
 
         /*start the shooting motors */
         shooter.setVel(velUp, velDown);
         double velErrorUp = shooter.getMotorVel(SHOOTER_MOTOR.UP) - velUp;
         double velErrorDown = shooter.getMotorVel(SHOOTER_MOTOR.DOWN) - velDown;
-        isReady = Math.abs(angleError) < 1 && 
-                          Math.abs(velErrorUp) < 0.5 && 
-                          Math.abs(velErrorDown) < 0.5;
+        isReady = Math.abs(angleError) < 0.75 && 
+                          Math.abs(velErrorUp) < 0.3 && 
+                          Math.abs(velErrorDown) < 0.3;
         shooter.setIsShootingReady(isReady && velDown>0);
-
-        if(isShooting)
-             System.out.println("timer value" + timer.get());
 
         /*checks if the shooter is ready and if the timer did not hit 0.4*/
         if (!isShooting && shooter.getIsShooting()) {
@@ -187,6 +174,7 @@ public class ActivateShooter extends Command {
             timer.reset();
             shooter.setIsShooting(false);
             shooter.feedingSetPow(0);
+            shooter.setPow(0);
             intake.setPower(0);
             shooter.setIsShootingReady(false);
 

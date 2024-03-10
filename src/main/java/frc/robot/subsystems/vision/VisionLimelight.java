@@ -7,6 +7,7 @@ import java.util.Comparator;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -33,6 +34,7 @@ public class VisionLimelight extends SubsystemBase {
     int lastData5;
     double lastUpdateTime5;
     double[] timestamp = {0,0};
+    double[] speakerAngleBuf = new double[5];
 
     Rotation2d blueSpeakerAngle = null;
     double blueSpeakerDistance = 0;
@@ -59,6 +61,7 @@ public class VisionLimelight extends SubsystemBase {
         this.visionFieldavg5 = new Field2d();
         SmartDashboard.putData("no Filter vision field", noFilterVisionField);
         SmartDashboard.putData("vision Avg 5 field", visionFieldavg5);
+        Arrays.fill(speakerAngleBuf,1000);
     }
 
     // #endregion
@@ -129,10 +132,13 @@ public class VisionLimelight extends SubsystemBase {
         try {
             getNewDataFromLimelights();
             updateRobotPose5();
+            pushSpeakrAngle(LimelightVisionUtils.getTA());
         } catch (Exception e) {
 
         }
     }
+
+
 
     // #region util methods
 
@@ -203,5 +209,37 @@ public class VisionLimelight extends SubsystemBase {
         return getTime() - lastUpdateTimeStamp() < 1;
     }
     // #endregion
+
+    public void pushSpeakrAngle(double speakerAngle) {
+        if(speakerAngle != 1000) {
+            System.out.println(" speaker angle " + Math.toDegrees(speakerAngle));
+        }
+        for(int i = 1; i < speakerAngleBuf.length; i++) {
+            speakerAngleBuf[i] = speakerAngleBuf[i-1];
+        }
+        speakerAngleBuf[0] = speakerAngle;
+    }
+
+    public boolean isSpeakerAngleValid() {
+        for(double a : speakerAngleBuf) {
+            if(a == 1000) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+
+    public Rotation2d getSpeakerAngle() {
+        if(isSpeakerAngleValid()) {
+            double sum = 0;
+            for(double a : speakerAngleBuf) {
+                sum += a;
+            }
+            return new Rotation2d(sum/speakerAngleBuf.length);
+        } else {
+            return null;
+        }
+    }
 
 }

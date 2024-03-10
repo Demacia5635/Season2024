@@ -12,7 +12,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
@@ -21,9 +20,7 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
-import frc.robot.RobotContainer;
 import frc.robot.Sysid.Sysid;
-import frc.robot.commands.shooter.ActivateShooter;
 import frc.robot.subsystems.shooter.ShooterConstants.AngleChanger;
 import frc.robot.subsystems.shooter.ShooterConstants.SHOOTER_MOTOR;
 import frc.robot.subsystems.shooter.ShooterConstants.ShooterID;
@@ -31,6 +28,8 @@ import frc.robot.subsystems.shooter.ShooterConstants.ShooterVar;
 import frc.robot.subsystems.shooter.ShooterConstants.Shooting;
 
 import static frc.robot.subsystems.shooter.ShooterConstants.*;
+
+import org.opencv.dnn.Model;
 
 /**subsystem shooter and angle changing */
 public class Shooter extends SubsystemBase {
@@ -78,11 +77,15 @@ public class Shooter extends SubsystemBase {
         motorUP.configFactoryDefault();
         motorUP.setInverted(true);
         motorUP.config_kP(0, Shooting.KP);
+        motorUP.config_kI(0, Shooting.KI);
+        motorUP.config_IntegralZone(0, 1 * ShooterVar.PULES_PER_REV / ShooterVar.PEREMITER_OF_WHEEL / 10);
 
         /*config motor Down */
         motorDown = new TalonFX(ShooterID.MOTOR_DOWN_ID);
         motorDown.configFactoryDefault();
         motorDown.config_kP(0, Shooting.KP);
+        motorDown.config_kI(0, Shooting.KI);
+        motorDown.config_IntegralZone(0, 1 * ShooterVar.PULES_PER_REV / ShooterVar.PEREMITER_OF_WHEEL / 10);
 
         /*config feeding motor */
         motorFeeding = new TalonSRX(ShooterID.MOTOR_FEEDING_ID);
@@ -147,7 +150,7 @@ public class Shooter extends SubsystemBase {
      * @return the needed feedforward
      */
     public double getFF(double vel) {
-        return (Shooting.KS * Math.signum(vel)+
+        return (Shooting.KS * Math.signum(vel) +
                 Shooting.KV * vel +
                 Shooting.KV2 * Math.pow(vel, 2));
     }
@@ -162,12 +165,20 @@ public class Shooter extends SubsystemBase {
         /*set vel for the up motor */
         double ffUp = getFF(velUp);
         double wantedVelUp = (velUp/ 10) / ShooterVar.PEREMITER_OF_WHEEL * ShooterVar.PULES_PER_REV;
-        motorUP.set(ControlMode.Velocity, wantedVelUp, DemandType.ArbitraryFeedForward, ffUp);
+        if(velUp == 0) {
+            motorUP.set(ControlMode.PercentOutput,0);
+        } else {
+            motorUP.set(ControlMode.Velocity, wantedVelUp, DemandType.ArbitraryFeedForward, ffUp);
+        }
         
         /*set vel for the down motor */
         double ffDown = getFF(velDown);
         double wantedVelDown = (velDown/ 10) / ShooterVar.PEREMITER_OF_WHEEL * ShooterVar.PULES_PER_REV;
-        motorDown.set(ControlMode.Velocity, wantedVelDown, DemandType.ArbitraryFeedForward, ffDown);
+        if (velDown == 0) {
+            motorDown.set(ControlMode.PercentOutput, 0);
+        } else {
+            motorDown.set(ControlMode.Velocity, wantedVelDown, DemandType.ArbitraryFeedForward, ffDown);
+        }
     }
 
     /**
@@ -221,11 +232,11 @@ public class Shooter extends SubsystemBase {
         for (SHOOTER_MOTOR i : motor) {
             switch (i) {
                 case UP:
-                    motorUP.setNeutralMode(NeutralMode.Coast);
+                    motorUP.setNeutralMode(NeutralMode.Brake);
                     break;
     
                 case DOWN:
-                    motorDown.setNeutralMode(NeutralMode.Coast);
+                    motorDown.setNeutralMode(NeutralMode.Brake);
                     break;
     
                 case FEEDING:
@@ -414,8 +425,9 @@ public class Shooter extends SubsystemBase {
      * @return isActive and not isShootingAmp
      */
     public boolean getIsActiveToSpeaker() {
-        return (shooterMode ==SHOOTER_MODE.AUTO)
-        || (shooterMode == SHOOTER_MODE.AUTO_CONTINIOUS) || (shooterMode == SHOOTER_MODE.PODIUM);
+        return (shooterMode == SHOOTER_MODE.AUTO) || 
+               (shooterMode == SHOOTER_MODE.AUTO_CONTINIOUS) || 
+               (shooterMode == SHOOTER_MODE.PODIUM);
     }
 
     /**
