@@ -42,7 +42,7 @@ import com.ctre.phoenix.sensors.Pigeon2;
 public class Chassis extends SubsystemBase {
   private final SwerveModule[] modules;
   private final Pigeon2 gyro;
-  private Trapezoid rotationTrapezoid = new Trapezoid(Math.toRadians(720), Math.toRadians(1200));
+  private Trapezoid rotationTrapezoid = new Trapezoid(Math.toRadians(560), Math.toRadians(2000));
   private Trapezoid rotationTrapezoidSpeaker = new Trapezoid(Math.toRadians(720), Math.toRadians(720));
 
 
@@ -420,7 +420,7 @@ public class Chassis extends SubsystemBase {
   public double getRadPerSecToAngle(Rotation2d fieldRelativeAngle) {
       double rotateVel = rotationTrapezoid.calculate(
         fieldRelativeAngle.minus(getAngle()).getRadians(), Math.toRadians(getGyroRate()), 0);
-      return Math.abs(getAngle().minus(fieldRelativeAngle).getDegrees()) >= 3 ? rotateVel : 0;
+      return Math.abs(getAngle().minus(fieldRelativeAngle).getDegrees()) >= 4 ? rotateVel : 0;
   }
 
 
