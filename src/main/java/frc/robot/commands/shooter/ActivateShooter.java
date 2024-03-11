@@ -100,12 +100,12 @@ public class ActivateShooter extends Command {
 
         switch (shooter.getShooterMode()) {
             case AMP:
-                // velUp = ShooterConstants.AmpVar.UP;
-                // velDown = ShooterConstants.AmpVar.DOWN;
-                // angle = ShooterConstants.AmpVar.ANGLE;
-                velDown = shooter.getCalibrateVel();
-                velUp = velDown;
-                angle = shooter.getCalibrateAngle();
+                velUp = ShooterConstants.AmpVar.UP;
+                velDown = ShooterConstants.AmpVar.DOWN;
+                angle = ShooterConstants.AmpVar.ANGLE;
+                // velDown = shooter.getCalibrateVel();
+                // velUp = velDown;
+                // angle = shooter.getCalibrateAngle();
 
                 break;
 

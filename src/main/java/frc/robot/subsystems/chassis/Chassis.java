@@ -227,6 +227,10 @@ public class Chassis extends SubsystemBase {
     Translation2d newSpeeds = new Translation2d(relativeSpeeds.vxMetersPerSecond,
      relativeSpeeds.vyMetersPerSecond).rotateBy(Rotation2d.fromRadians(relativeSpeeds.omegaRadiansPerSecond * param));
     ChassisSpeeds newChassisSpeeds = new ChassisSpeeds(newSpeeds.getX(), newSpeeds.getY(), relativeSpeeds.omegaRadiansPerSecond);
+    relativeSpeeds.omegaRadiansPerSecond = (Math.abs(relativeSpeeds.omegaRadiansPerSecond)<0.1) ? 0 : relativeSpeeds.omegaRadiansPerSecond;
+    if ((Math.abs(relativeSpeeds.omegaRadiansPerSecond)>0.1) && (Math.abs(relativeSpeeds.omegaRadiansPerSecond)<1)) {
+      relativeSpeeds.omegaRadiansPerSecond *=1.5;
+    }
     SwerveModuleState[] states = KINEMATICS.toSwerveModuleStates(newChassisSpeeds);
     
     setModuleStates(states);
@@ -414,12 +418,25 @@ public class Chassis extends SubsystemBase {
   public double getGyroRate() {
     double []rot  = new double[3];
     gyro.getRawGyro(rot);
-    return rot[2];
+    return -rot[0];
+  }
+
+  public double getGyroRateY() {
+    double []rot  = new double[3];
+    gyro.getRawGyro(rot);
+    return rot[1];
+  }
+
+  public double getGyroRateX() {
+    double []rot  = new double[3];
+    gyro.getRawGyro(rot);
+    return rot[0];
   }
 
   public double getRadPerSecToAngle(Rotation2d fieldRelativeAngle) {
       double rotateVel = rotationTrapezoid.calculate(
         fieldRelativeAngle.minus(getAngle()).getRadians(), Math.toRadians(getGyroRate()), 0);
+        System.out.println("rotation vel= " + rotateVel + " angle current= " + getAngle().getDegrees() + ", target= " + fieldRelativeAngle.getDegrees());
       return Math.abs(getAngle().minus(fieldRelativeAngle).getDegrees()) >= 4 ? rotateVel : 0;
   }
 

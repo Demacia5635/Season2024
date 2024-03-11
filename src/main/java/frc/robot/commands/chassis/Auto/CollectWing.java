@@ -16,7 +16,8 @@ public class CollectWing extends Command {
   pathPoint wingNote2 = offset(Field.WingNotes[1], 0,0, 0);
   pathPoint wingNote3 = offset(Field.WingNotes[2], 0,0, 0);
 
-  pathPoint shootPoint = offset(Field.Speaker, 0,0,0);
+  pathPoint shootPoint1 = offset(Field.Speaker, 0,0,0);
+  pathPoint shootPoint2 = offset(Field.Speaker, 0,0,0);
 
 
 
@@ -30,7 +31,7 @@ public class CollectWing extends Command {
   @Override
   public void initialize() {
 
-    addCommands(getNote(wingNote1).alongWith(shoot()), cmd);
+    /*addCommands(getNote(wingNote1).alongWith(shoot()), cmd);
     addCommands(goTo(shootPoint, 2), cmd);
     addCommands(shoot(), cmd);
     addCommands(getNote(wingNote2), cmd);
@@ -39,11 +40,8 @@ public class CollectWing extends Command {
     addCommands(getNote(wingNote3), cmd);
     addCommands(goTo(shootPoint, 2), cmd);
     addCommands(shoot(), cmd);
-
-
+*/
     cmd.schedule();
- 
-
   }
 
   // Called every time the scheduler runs while the command is scheduled.

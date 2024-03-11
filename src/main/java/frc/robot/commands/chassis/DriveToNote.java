@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.Timer;
 public class DriveToNote extends Command {
   Chassis chassis;
   double velocity;
+  double maxVelocity;
   double lastDistance;
 
   double[] llpython;
@@ -29,6 +30,8 @@ public class DriveToNote extends Command {
   ChassisSpeeds speed;
   boolean finish = false;
   boolean countTime;
+  long lastCounter;
+  double fieldRelativeAngle;
 
   PIDController rotationPidController = new PIDController(0.04, 0.00, 0.006);
 
@@ -38,7 +41,7 @@ public class DriveToNote extends Command {
 
   public DriveToNote(Chassis chassis, double vel, boolean countTime) {
     this.chassis = chassis;
-    this.velocity = vel;
+    this.maxVelocity = vel;
     this.countTime = countTime;
     addRequirements(chassis);
   }
@@ -54,7 +57,7 @@ public class DriveToNote extends Command {
     timer.start();
   }
 
-  private double calcTimeToRotate(double angle){
+  private double calcTimeToRotate(double angle) {
     angle = Math.toRadians(angle);
     return 2 * (Math.sqrt(Math.abs(angle) / MAX_OMEGA_ACCELERATION));
   }
@@ -65,22 +68,34 @@ public class DriveToNote extends Command {
       return;
     }
     llpython = llentry.getDoubleArray(new double[8]);
-    distance = llpython[0];
-    angle = llpython[1];
-    if (distance > 0) {
-      timer.reset();
-    } else {
-      return;
-    }
-   //double rotateVel = (Math.abs(angle - 3) <= 3) ? 0 : rotationPidController.calculate(-angle, 3);
-    double fieldRelativeAngle = angle + chassis.getAngle().getDegrees();
-    double distanceMeters = distance/METER_IN_CM;
-    fieldRelativeAngle = Math.toRadians(fieldRelativeAngle); 
-    velocity = Math.min((distanceMeters - COLLECT_OFFSET_METERS) / calcTimeToRotate(angle), MAX_DRIVE_VELOCITY);
-    speed = new ChassisSpeeds(velocity * Math.cos(fieldRelativeAngle), velocity * Math.sin(fieldRelativeAngle), MAX_OMEGA_VELOCITY);
+    if (llpython[2] != lastCounter) {
+      lastCounter = (long)llpython[2];
+      distance = llpython[0];
+      angle = llpython[1] - chassis.getGyroRate() * 0.05;
+      System.out.println("note distance= " + distance + ", note angle= " + angle);
+      if (distance > 0) {
+        timer.reset();
+      } else {
+        return;
+      }
+      // double rotateVel = (Math.abs(angle - 3) <= 3) ? 0 :
+      // rotationPidController.calculate(-angle, 3);
+      fieldRelativeAngle = angle + chassis.getAngle().getDegrees();
+      double distanceMeters = distance / METER_IN_CM;
 
-    lastDistance = distance;
-    lastAngle = fieldRelativeAngle;
+      fieldRelativeAngle = Math.toRadians(fieldRelativeAngle);
+      double time = calcTimeToRotate(angle);
+      if (time < 0.1) {
+        velocity = maxVelocity;
+      } else {
+        velocity = Math.min((distanceMeters - COLLECT_OFFSET_METERS) / time, maxVelocity);
+      }
+      System.out.println("drive velocity= " + velocity);
+      speed = new ChassisSpeeds(velocity * Math.cos(fieldRelativeAngle), velocity * Math.sin(fieldRelativeAngle),
+          MAX_OMEGA_VELOCITY);
+      lastDistance = distance;
+      lastAngle = fieldRelativeAngle;
+    }
     chassis.setVelocitiesRotateToAngle(speed, Rotation2d.fromRadians(fieldRelativeAngle));
 
   }
@@ -94,8 +109,7 @@ public class DriveToNote extends Command {
 
   @Override
   public boolean isFinished() {
-    return finish || (timer.get() > -(0.5*velocity) + 1.5 && countTime);
+    return finish || (timer.get() > -(0.5 * velocity) + 1.5 && countTime);
   }
 
 }
-

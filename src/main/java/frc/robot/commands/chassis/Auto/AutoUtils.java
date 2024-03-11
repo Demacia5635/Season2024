@@ -61,16 +61,12 @@ public class AutoUtils {
     }
 
     public static  Command goTo(pathPoint point, double maxv) {
-        return new PathFollow(chassis, new pathPoint[] { dummyPoint, point }, maxv, maxAceel, 0, isRed);
+        return new PathFollow(chassis, new pathPoint[] { dummyPoint, point }, maxv, maxAceel, 0, true);
     }
 
-    public static  Command turnToSpeaker() {
-        return new GoToAngleChassis(chassis, speaker);
-        
-    }
 
     public static  Command getNote(pathPoint point) {
-        return (new PathFollow(chassis, new pathPoint[] { dummyPoint, point }, maxVel, maxAceel, 1, isRed)
+        return (new PathFollow(chassis, new pathPoint[] { dummyPoint, point }, maxVel, maxAceel, 1, false)
                 .raceWith(new WaitUntilCommand(() -> Utils.seeNote())))
                 .andThen(takeNote());
     }

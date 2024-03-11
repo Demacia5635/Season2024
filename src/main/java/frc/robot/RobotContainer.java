@@ -44,6 +44,7 @@ import frc.robot.commands.chassis.AutoPrevious.StartMiddle2;
 import frc.robot.commands.chassis.AutoPrevious.StartTOP1;
 import frc.robot.commands.chassis.AutoPrevious.StartTOP2;
 import frc.robot.commands.chassis.Auto.AutoChooser;
+import frc.robot.commands.chassis.Auto.Check;
 import frc.robot.commands.chassis.Auto.CollectTop;
 import frc.robot.commands.chassis.Auto.CollectWing;
 import frc.robot.commands.chassis.Auto.DestroyCenter;
@@ -225,13 +226,14 @@ public class RobotContainer implements Sendable {
  
    
   public Command getAutonomousCommand() {
-    Command cmd = autoChoose.getSelected();
-    System.out.println(" -------------------------------------------");
-    System.out.println(" Auto command = " + cmd);
-    System.out.println(" -------------------------------------------");
-    System.out.println(" -------------------------------------------");
-    System.out.println(" -------------------------------------------");
-    return cmd.alongWith(shooter.getDefaultCommand(), 
-      new InstantCommand(()->shooter.setShooterMode(SHOOTER_MODE.AUTO_CONTINIOUS)));
+    // Command cmd = autoChoose.getSelected();
+    // System.out.println(" -------------------------------------------");
+    // System.out.println(" Auto command = " + cmd);
+    // System.out.println(" -------------------------------------------");
+    // System.out.println(" -------------------------------------------");
+    // System.out.println(" -------------------------------------------");
+    // return cmd.alongWith(shooter.getDefaultCommand(), 
+    //   new InstantCommand(()->shooter.setShooterMode(SHOOTER_MODE.AUTO_CONTINIOUS)));
+    return new Check(chassis).withTimeout(3);
   }
 }

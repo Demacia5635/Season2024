@@ -251,16 +251,6 @@ public class PathFollow extends Command {
       wantedAngle = points[segmentIndex].getRotation();
     }
 
-    /*
-     * rotationVelocity = rotationPidController.calculate(
-     * chassis.getAngle().getRadians(), wantedAngle.getRadians()) *
-     * Math.toRadians(300);
-     */
-
-//    rotationVelocity = wantedAngle.minus(chassis.getAngle()).getRadians();
-
-    // SmartDashboard.putNumber("DIFF", wantedAngle.getRadians() -
-    // chassis.getAngle().getRadians());
     if (totalLeft <= 0.1)
       velVector = new Translation2d(0, 0);
     ChassisSpeeds speed = new ChassisSpeeds(velVector.getX(), velVector.getY(), 0);
