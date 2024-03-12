@@ -20,6 +20,9 @@ public class pathPoint extends Pose2d{
     public pathPoint(Translation2d p, Rotation2d r) {
       this(p.getX(),p.getY(),r,0,false);
     }
+    public pathPoint(Translation2d p, Rotation2d r, double radius) {
+      this(p.getX(),p.getY(),r,radius,false);
+    }
     public pathPoint(Translation2d p, Rotation2d r, double radius, boolean isAprilTag) {
       this(p.getX(),p.getY(),r,radius,isAprilTag);
     }

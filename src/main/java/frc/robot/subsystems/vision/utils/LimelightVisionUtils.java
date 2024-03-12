@@ -50,10 +50,8 @@ public class LimelightVisionUtils {
         if (isInFront) {
             //array = LIMELIGHT_SHOOTER_TABLE.getEntry("targetpose_robotspace").getDoubleArray(new double[6]);
             array = LIMELIGHT_SHOOTER_TABLE.getEntry("botpose_targetspace").getDoubleArray(new double[6]);
-            dy = array[0] -0.12;
+            dy = array[0];
             dx = -array[2] - 0.10;
-            System.out.println(" dx = " + dx + " dy = " + dy);
-
             return new Translation2d(dx, dy); 
         }
         return null;

@@ -105,13 +105,13 @@ public class RobotContainer implements Sendable {
     intake.stop();
   }
   public void createCommands() {
-    SmartDashboard.putNumber("vel calibrate", 0);
+    SmartDashboard.putNumber("VEL CALIBRATE", 0);
 
-    SmartDashboard.putNumber("angle calibrate", 0);
+    SmartDashboard.putNumber("ANGLE CALIBRATE", 0);
 
 
 
-    driveToNote = new DriveToNote(chassis, 1.6, true).raceWith(new IntakeCommand(intake));
+    driveToNote = new DriveToNote(chassis, 1.6, true).raceWith(new IntakeCommand(intake)).andThen(new IntakeCommand(intake));
     shoot = shooter.getShootCommand();
     activateShooter = shooter.getActivateShooterAuto();
     manualIntake = new IntakeCommand(intake);

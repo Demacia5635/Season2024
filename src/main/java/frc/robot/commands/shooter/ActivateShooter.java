@@ -7,6 +7,7 @@ package frc.robot.commands.shooter;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.chassis.Chassis;
 import frc.robot.subsystems.intake.Intake;
@@ -103,9 +104,9 @@ public class ActivateShooter extends Command {
                 // velUp = ShooterConstants.AmpVar.UP;
                 // velDown = ShooterConstants.AmpVar.DOWN;
                 // angle = ShooterConstants.AmpVar.ANGLE;
-                velDown = shooter.getCalibrateVel();
+                velDown = SmartDashboard.getNumber("VEL CALIBRATE", 0);
                 velUp = velDown;
-                angle = shooter.getCalibrateAngle();
+                angle = SmartDashboard.getNumber("ANGLE CALIBRATE", 0);;
 
                 break;
 

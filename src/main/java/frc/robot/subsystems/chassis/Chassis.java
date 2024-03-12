@@ -24,6 +24,7 @@ import frc.robot.Sysid.Sysid;
 import frc.robot.Sysid.Sysid.Gains;
 import frc.robot.commands.chassis.Paths.PathFollow;
 import frc.robot.commands.chassis.tests.DriveStraightLine;
+import frc.robot.subsystems.chassis.utils.SwerveKinematics;
 import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.subsystems.vision.VisionLimelight;
 import frc.robot.subsystems.vision.utils.LimelightVisionUtils;
@@ -42,7 +43,7 @@ import com.ctre.phoenix.sensors.Pigeon2;
 public class Chassis extends SubsystemBase {
   private final SwerveModule[] modules;
   private final Pigeon2 gyro;
-  private Trapezoid rotationTrapezoid = new Trapezoid(Math.toRadians(560), Math.toRadians(2000));
+  private Trapezoid rotationTrapezoid = new Trapezoid(Math.toRadians(300), Math.toRadians(500));
   private Trapezoid rotationTrapezoidSpeaker = new Trapezoid(Math.toRadians(720), Math.toRadians(720));
 
 
@@ -227,8 +228,8 @@ public class Chassis extends SubsystemBase {
     Translation2d newSpeeds = new Translation2d(relativeSpeeds.vxMetersPerSecond,
      relativeSpeeds.vyMetersPerSecond).rotateBy(Rotation2d.fromRadians(relativeSpeeds.omegaRadiansPerSecond * param));
     ChassisSpeeds newChassisSpeeds = new ChassisSpeeds(newSpeeds.getX(), newSpeeds.getY(), relativeSpeeds.omegaRadiansPerSecond);
+    newChassisSpeeds.omegaRadiansPerSecond = SwerveKinematics.fixOmega(newChassisSpeeds.omegaRadiansPerSecond);
     SwerveModuleState[] states = KINEMATICS.toSwerveModuleStates(newChassisSpeeds);
-    
     setModuleStates(states);
   }
   public void setVelocitiesRotateToSpeaker(ChassisSpeeds speeds) {
@@ -403,9 +404,8 @@ public class Chassis extends SubsystemBase {
     Translation2d speaker = Utils.speakerTargetPosition();
   
     Rotation2d limelightSpeakerAngle = RobotContainer.robotContainer.vision.getSpeakerAngle();
-    if(limelightSpeakerAngle != null) {
-      return getRadPerSecToAngle(limelightSpeakerAngle);
-  //    return getRadPerSecToAngle(getAngle().minus(LimelightVisionUtils.getTA()));
+    if(limelightSpeakerAngle != null && distanceFromSpeaker() < 3) {
+      return getRadPerSecToAngleForSpeaker(limelightSpeakerAngle);
     }
 
     return getRadPerSecToAngle(speaker.minus(getPose().getTranslation()).getAngle().plus(Rotation2d.fromDegrees(180)));
@@ -423,6 +423,13 @@ public class Chassis extends SubsystemBase {
       return Math.abs(getAngle().minus(fieldRelativeAngle).getDegrees()) >= 4 ? rotateVel : 0;
   }
 
+  public double getRadPerSecToAngleForSpeaker(Rotation2d fieldRelativeAngle) {
+    double deadband = distanceFromSpeaker() > 2 ? 6 : 4;
+      double rotateVel = rotationTrapezoid.calculate(
+        fieldRelativeAngle.minus(getAngle()).getRadians(), Math.toRadians(getGyroRate()), 0);
+      return Math.abs(getAngle().minus(fieldRelativeAngle).getDegrees()) >= deadband ? rotateVel : 0;
+  }
+
 
   
   public static Translation2d speakerPosition() {
@@ -431,6 +438,11 @@ public class Chassis extends SubsystemBase {
 
   public boolean isAimingSpeaker() {
     return isAimingSpeaker;
+  }
+
+
+  public double distanceFromSpeaker() {
+    return speakerPosition().getDistance(getPose().getTranslation());
   }
 
   @Override
