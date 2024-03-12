@@ -24,6 +24,7 @@ import frc.robot.Sysid.Sysid;
 import frc.robot.Sysid.Sysid.Gains;
 import frc.robot.commands.chassis.Paths.PathFollow;
 import frc.robot.commands.chassis.tests.DriveStraightLine;
+import frc.robot.subsystems.chassis.utils.SwerveKinematics;
 import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.subsystems.vision.VisionLimelight;
 import frc.robot.subsystems.vision.utils.LimelightVisionUtils;
@@ -42,7 +43,7 @@ import com.ctre.phoenix.sensors.Pigeon2;
 public class Chassis extends SubsystemBase {
   private final SwerveModule[] modules;
   private final Pigeon2 gyro;
-  private Trapezoid rotationTrapezoid = new Trapezoid(Math.toRadians(560), Math.toRadians(2000));
+  private Trapezoid rotationTrapezoid = new Trapezoid(Math.toRadians(560), Math.toRadians(720));
   private Trapezoid rotationTrapezoidSpeaker = new Trapezoid(Math.toRadians(720), Math.toRadians(720));
 
 
@@ -228,13 +229,19 @@ public class Chassis extends SubsystemBase {
      relativeSpeeds.vyMetersPerSecond).rotateBy(Rotation2d.fromRadians(relativeSpeeds.omegaRadiansPerSecond * param));
     ChassisSpeeds newChassisSpeeds = new ChassisSpeeds(newSpeeds.getX(), newSpeeds.getY(), relativeSpeeds.omegaRadiansPerSecond);
     relativeSpeeds.omegaRadiansPerSecond = (Math.abs(relativeSpeeds.omegaRadiansPerSecond)<0.1) ? 0 : relativeSpeeds.omegaRadiansPerSecond;
-    if ((Math.abs(relativeSpeeds.omegaRadiansPerSecond)>0.1) && (Math.abs(relativeSpeeds.omegaRadiansPerSecond)<1)) {
-      relativeSpeeds.omegaRadiansPerSecond *=1.5;
-    }
+    //newChassisSpeeds.omegaRadiansPerSecond = SwerveKinematics.fixOmega(newChassisSpeeds.omegaRadiansPerSecond);
     SwerveModuleState[] states = KINEMATICS.toSwerveModuleStates(newChassisSpeeds);
     
     setModuleStates(states);
   }
+
+
+// public void setVelocities(ChassisSpeeds speeds) {
+//   ChassisSpeeds s = ChassisSpeeds.fromFieldRelativeSpeeds(speeds, getAngle());
+//   SwerveModuleState[] states = KINEMATICS_CORRECTED.toSwerveModuleStates(s);
+//   setModuleStates(states);
+// }
+
   public void setVelocitiesRotateToSpeaker(ChassisSpeeds speeds) {
     speeds.omegaRadiansPerSecond = getRadPerSecToSpeaker();
     setVelocities(speeds);

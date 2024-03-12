@@ -5,6 +5,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import frc.robot.PathFollow.Util.RectanglePos;
+import frc.robot.subsystems.chassis.utils.SwerveKinematics;
 
 public final class ChassisConstants {
 
@@ -180,6 +181,13 @@ public static final double COLLECT_OFFSET_METERS = 0.7;
       BACK_INTEGRAL_ZONE);
 
   public static final SwerveDriveKinematics KINEMATICS = new SwerveDriveKinematics(
+      FRONT_LEFT.moduleTranslationOffset,
+      FRONT_RIGHT.moduleTranslationOffset,
+      BACK_LEFT.moduleTranslationOffset,
+      BACK_RIGHT.moduleTranslationOffset);
+  
+
+  public static final SwerveKinematics KINEMATICS_CORRECTED = new SwerveKinematics(
       FRONT_LEFT.moduleTranslationOffset,
       FRONT_RIGHT.moduleTranslationOffset,
       BACK_LEFT.moduleTranslationOffset,
