@@ -168,7 +168,6 @@ public class ActivateShooter extends Command {
             timer.start();
             shooter.feedingSetPow(1);
             intake.setPower(1);
-
         } else if (isShooting && timer.get() > 1) {
             /*if the shooter is shooting and the timer hit 0.4 than stop shooting */
             isShooting = false;

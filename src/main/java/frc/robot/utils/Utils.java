@@ -31,7 +31,7 @@ public class Utils {
     }
     
   public static double deadband(double x, double threshold) {
-    return MathUtil.applyDeadband(x, threshold);
+    return Math.abs(x) < threshold ? 0 :x;
   }
 
   public static boolean seeNote() {
@@ -97,10 +97,11 @@ public class Utils {
   }
 
   public static double angelErrorInDegrees(Rotation2d r1, Rotation2d r2, double deadband) {
-    return MathUtil.applyDeadband(MathUtil.inputModulus(r1.minus(r2).getDegrees(), -180, 180),deadband);
+    
+    return deadband(MathUtil.inputModulus(r1.minus(r2).getDegrees(), -180, 180),deadband);
   }
   public static double angelErrorInRadians(Rotation2d r1, Rotation2d r2, double deadband) {
-    return MathUtil.applyDeadband(MathUtil.angleModulus(r1.minus(r2).getRadians()),deadband);
+    return deadband(MathUtil.angleModulus(r1.minus(r2).getRadians()),deadband);
   }
 
 }

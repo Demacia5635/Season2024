@@ -71,7 +71,7 @@ public class DriveToNote extends Command {
       lastCounter = (long)llpython[2];
       distance = llpython[0];
       angle = llpython[1] - chassis.getGyroRate() * 0.05;
-      System.out.println("note distance= " + distance + ", note angle= " + angle);
+      //System.out.println("note distance= " + distance + ", note angle= " + angle);
       if (distance > 0) {
         timer.reset();
       } else {
@@ -89,7 +89,7 @@ public class DriveToNote extends Command {
       } else {
         velocity = Math.min((distanceMeters - COLLECT_OFFSET_METERS) / time, maxVelocity);
       }
-      System.out.println("drive velocity= " + velocity);
+     // System.out.println("drive velocity= " + velocity);
       speed = new ChassisSpeeds(velocity * Math.cos(fieldRelativeAngle), velocity * Math.sin(fieldRelativeAngle),
           MAX_OMEGA_VELOCITY);
       lastDistance = distance;

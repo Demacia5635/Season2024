@@ -44,7 +44,7 @@ import frc.robot.commands.chassis.AutoPrevious.StartMiddle2;
 import frc.robot.commands.chassis.AutoPrevious.StartTOP1;
 import frc.robot.commands.chassis.AutoPrevious.StartTOP2;
 import frc.robot.commands.chassis.Auto.AutoChooser;
-import frc.robot.commands.chassis.Auto.Check;
+
 import frc.robot.commands.chassis.Auto.CollectTop;
 import frc.robot.commands.chassis.Auto.CollectWing;
 import frc.robot.commands.chassis.Auto.DestroyCenter;
@@ -172,12 +172,12 @@ public class RobotContainer implements Sendable {
     commandController.x().onTrue(activateShooter);
     // B - in Drive Command
     commandController.a().onTrue(manualIntake);
-    commandController.pov(0).onTrue(shoot);
+    commandController.rightBumper().onTrue(shoot);
     commandController.start().onTrue(activateAmp);
     commandController.back().onTrue(resetOdometry);
     commandController.leftBumper().onTrue(disableCommand);
    // commandController.pov(270).onTrue(new GoToAMP1());
-    commandController.rightBumper().onTrue(shooter.getActivateShooterSubwoofer());
+    commandController.pov(0).onTrue(shooter.getActivateShooterSubwoofer());
     overrideAuto.onTrue(chassis.getDefaultCommand());
 
     //Operator Controller
@@ -226,14 +226,13 @@ public class RobotContainer implements Sendable {
  
    
   public Command getAutonomousCommand() {
-    // Command cmd = autoChoose.getSelected();
-    // System.out.println(" -------------------------------------------");
-    // System.out.println(" Auto command = " + cmd);
-    // System.out.println(" -------------------------------------------");
-    // System.out.println(" -------------------------------------------");
-    // System.out.println(" -------------------------------------------");
-    // return cmd.alongWith(shooter.getDefaultCommand(), 
-    //   new InstantCommand(()->shooter.setShooterMode(SHOOTER_MODE.AUTO_CONTINIOUS)));
-    return new Check(chassis).withTimeout(3);
+    Command cmd = autoChoose.getSelected();
+    if(cmd != null) {
+      return cmd.alongWith( 
+        new InstantCommand(()->shooter.setShooterMode(SHOOTER_MODE.AUTO_CONTINIOUS))
+        .andThen(new ActivateShooter(shooter, intake, chassis)));
+    } else {
+      return null;
+    }
   }
 }

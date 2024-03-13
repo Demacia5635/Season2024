@@ -32,8 +32,10 @@ public class IntakeConstants {
   
   
         public static final double INTAKE_POWER = 1;
+        public static final double INTAKE_POWER_SECOND = 0.8;
+
         public static final double INTAKE_TRANSFER_POWER = 1;
-        public static final double NUM_FINAL_ROTATIONS = 10;
+        public static final double NUM_FINAL_ROTATIONS = 0;
         public static final double SENSOR_TO_REST_DIST = ConvertionParams.MOTOR_PULSES_PER_SPIN/ConvertionParams.MOTOR_GEAR_RATIO*NUM_FINAL_ROTATIONS;
         public static final double INTAKE_PRE_LIMIT_POWER = 1;
   

@@ -604,6 +604,7 @@ public class Shooter extends SubsystemBase {
         builder.addDoubleProperty("calibrate Velocity", this::getCalibrateVel, this::setCalibrateVel);
         
         /*put on the shuffleBoard all the commands */
+        /* 
         SmartDashboard.putData("Dis reset", new InstantCommand(this::resetDis).ignoringDisable(true));
         SmartDashboard.putData("motor up Brake", new InstantCommand(()-> brake(SHOOTER_MOTOR.UP)).ignoringDisable(true));
         SmartDashboard.putData("motor up Coast", new InstantCommand(()-> coast(SHOOTER_MOTOR.UP)).ignoringDisable(true));
@@ -613,7 +614,7 @@ public class Shooter extends SubsystemBase {
         SmartDashboard.putData("motor feeding Coast", new InstantCommand(()-> coast(SHOOTER_MOTOR.FEEDING)).ignoringDisable(true));
         SmartDashboard.putData("motor angle Brake", new InstantCommand(()-> brake(SHOOTER_MOTOR.ANGLE)).ignoringDisable(true));
         SmartDashboard.putData("motor angle Coast", new InstantCommand(()-> coast(SHOOTER_MOTOR.ANGLE)).ignoringDisable(true));
-
+  */
     }
 
     /** 

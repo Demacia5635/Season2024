@@ -59,8 +59,8 @@ public class Intake extends SubsystemBase {
         SmartDashboard.putData("Coast", new InstantCommand(
                 () -> this.setCoast(), this).ignoringDisable(true));
 
-        SmartDashboard.putData("Intake", new IntakeCommand(this));
-        SmartDashboard.putData("Dispense", new DispenseCommand(this));
+     //   SmartDashboard.putData("Intake", new IntakeCommand(this));
+     //   SmartDashboard.putData("Dispense", new DispenseCommand(this));
     }
 
     public void configDevices() {
@@ -92,6 +92,11 @@ public class Intake extends SubsystemBase {
     public void setPower(double p1) {
         motor1.set(ControlMode.PercentOutput, p1);
         motor2.set(ControlMode.PercentOutput, p1);
+    }
+
+    public void setPower(double p1, double p2) {
+        motor1.set(ControlMode.PercentOutput, p1);
+        motor2.set(ControlMode.PercentOutput, p2);
     }
 
     public void setVelocity(double velocity) {
