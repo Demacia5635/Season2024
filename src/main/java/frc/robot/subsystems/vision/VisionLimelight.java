@@ -211,9 +211,6 @@ public class VisionLimelight extends SubsystemBase {
     // #endregion
 
     public void pushSpeakrAngle(double speakerAngle) {
-        if(speakerAngle != 1000) {
-            System.out.println(" speaker angle " + Math.toDegrees(speakerAngle));
-        }
         for(int i = 1; i < speakerAngleBuf.length; i++) {
             speakerAngleBuf[i] = speakerAngleBuf[i-1];
         }

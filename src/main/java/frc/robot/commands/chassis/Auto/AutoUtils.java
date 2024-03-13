@@ -60,6 +60,9 @@ public class AutoUtils {
         return goTo(point, maxVel);
     }
 
+    public static Command goToMultiple(pathPoint[] points, double maxVel){
+        return new PathFollow(chassis, points, maxVel, maxAceel, 0, false);
+    }
     public static  Command goTo(pathPoint point, double maxv) {
         return new PathFollow(chassis, new pathPoint[] { dummyPoint, point }, maxv, maxAceel, 0, true);
     }
@@ -72,7 +75,9 @@ public class AutoUtils {
     }
 
     public static  Command takeNote() {
-        return (new DriveToNote(chassis, 1, true).raceWith(new IntakeCommand(intake))).withTimeout(2);
+        return new DriveToNote(chassis, 1, true)
+        .raceWith(new IntakeCommand(intake)).andThen(new IntakeCommand(intake)).withTimeout(3);
     }
+
     
 }

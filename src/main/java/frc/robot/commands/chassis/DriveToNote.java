@@ -1,4 +1,3 @@
-
 package frc.robot.commands.chassis;
 
 import static frc.robot.subsystems.chassis.ChassisConstants.COLLECT_OFFSET_METERS;
@@ -109,7 +108,7 @@ public class DriveToNote extends Command {
 
   @Override
   public boolean isFinished() {
-    return finish || (timer.get() > -(0.5 * velocity) + 1.5 && countTime);
+    return finish || (timer.get() > -(0.5 * velocity) + 1 && countTime);
   }
 
 }
