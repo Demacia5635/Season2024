@@ -79,6 +79,7 @@ public class Shooter extends SubsystemBase {
         motorUP.config_kP(0, Shooting.KP);
         motorUP.config_kI(0, Shooting.KI);
         motorUP.config_IntegralZone(0, 1 * ShooterVar.PULES_PER_REV / ShooterVar.PEREMITER_OF_WHEEL / 10);
+        motorUP.configClosedloopRamp(0.5);
 
         /*config motor Down */
         motorDown = new TalonFX(ShooterID.MOTOR_DOWN_ID);
@@ -86,6 +87,7 @@ public class Shooter extends SubsystemBase {
         motorDown.config_kP(0, Shooting.KP);
         motorDown.config_kI(0, Shooting.KI);
         motorDown.config_IntegralZone(0, 1 * ShooterVar.PULES_PER_REV / ShooterVar.PEREMITER_OF_WHEEL / 10);
+        motorDown.configClosedloopRamp(0.5);
 
         /*config feeding motor */
         motorFeeding = new TalonSRX(ShooterID.MOTOR_FEEDING_ID);
@@ -109,7 +111,8 @@ public class Shooter extends SubsystemBase {
         limitSwitch = new DigitalInput(ShooterID.LIMIT_SWITCH_ID);
 
         /*put all the motors at brake */
-        brake(SHOOTER_MOTOR.UP, SHOOTER_MOTOR.DOWN, SHOOTER_MOTOR.FEEDING, SHOOTER_MOTOR.ANGLE);
+        brake(SHOOTER_MOTOR.FEEDING, SHOOTER_MOTOR.ANGLE);
+        coast(SHOOTER_MOTOR.UP, SHOOTER_MOTOR.DOWN);
         
         /*put all the init sendable and useful commands into the smart dashboard */
         SmartDashboard.putNumber("wanted vel", 0);
