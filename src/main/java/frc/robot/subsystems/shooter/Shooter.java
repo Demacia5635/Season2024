@@ -298,6 +298,7 @@ public class Shooter extends SubsystemBase {
      */
     public void resetDis() {
         angleOffset = motorAngle.getSelectedSensorPosition();
+        setHasCalibrated(true);
     }
 
     /**
@@ -604,6 +605,7 @@ public class Shooter extends SubsystemBase {
         builder.addDoubleProperty("Analog get Volt", this::getAnalogVolt, null);
         builder.addBooleanProperty("is note", this::isNote, null);
         builder.addBooleanProperty("Is active to speaker", this::getIsActiveToSpeaker, null);
+        builder.addBooleanProperty("Calibreated", this::getHasCalibrated, null);
 
         /*put shooter var on shuffleboard and making them able to be changeble */
         builder.addBooleanProperty("is shooting", this::getIsShooting, this::setIsShooting);

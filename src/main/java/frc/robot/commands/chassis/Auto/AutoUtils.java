@@ -106,5 +106,10 @@ public class AutoUtils {
             .raceWith(isReadyToShoot());
     }
 
+    public static Command leave() {
+        return new RunCommand(()-> chassis.setVelocities(
+            new ChassisSpeeds(1.5, 0, 0)), chassis).withTimeout(3);
+    }
+
     
 }

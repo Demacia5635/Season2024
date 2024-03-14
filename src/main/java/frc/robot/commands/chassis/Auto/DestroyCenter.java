@@ -18,7 +18,7 @@ public class DestroyCenter extends Command {
   SequentialCommandGroup cmd;
   Timer timer = new Timer();
   pathPoint centerNote1 = offset(Field.CenterNotes[0], 0,0,0);
-  pathPoint centerNote5 = offset(Field.CenterNotes[4], 0,1,0);
+  pathPoint centerNote5 = offset(Field.CenterNotes[4], 0,0.5,0);
   pathPoint shootPoint = new pathPoint(new Translation2d(2,3.9), Rotation2d.fromDegrees(-50));
   pathPoint firstPoint = new pathPoint(new Translation2d(2,3), new Rotation2d(),1);
 

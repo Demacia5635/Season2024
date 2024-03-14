@@ -36,7 +36,7 @@ public class Utils {
 
   public static boolean seeNote() {
         double[] llpython = NetworkTableInstance.getDefault().getTable("limelight").getEntry("llpython").getDoubleArray(new double[8]);
-        return llpython!= null && llpython.length>0 && llpython[0] != 0 && llpython[0] < 200;
+        return llpython!= null && llpython.length>0 && llpython[0] != 0 && llpython[0] < 350;
         //return llpython[0] != 0 && llpython[0] < 200;
   }
 
@@ -48,9 +48,9 @@ public class Utils {
      NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(pipeline);
 }
   //usful : https://github.com/NAHSRobotics-Team5667/2020-FRC/blob/master/src/main/java/frc/robot/utils/LimeLight.java
-  private static double shootDistance[] = {1.38, 2, 2.3, 2.5, 3, 3.3, 3.5};
-  private static double shootAngle[] = {58, 51.5, 46, 42, 41, 40.5, 37.25};
-  private static double shootVelocity[] = {14, 14, 14.5, 15, 15, 14.8, 15.25};
+  private static double shootDistance[] = {1.38, 2,    2.3, 2.5,  3,    3.3,  3.5};
+  private static double shootAngle[] =    {58,   51.5, 46,  45,  37.8, 38.5, 37.25};
+  private static double shootVelocity[] = {13.5, 13.5, 14.5,14,  14.5, 14.8, 15.25};
 
   
   public static double extrapolatre(double d1, double d2, double v1, double v2, double d) {
