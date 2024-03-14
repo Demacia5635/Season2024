@@ -31,7 +31,7 @@ public class Utils {
     }
     
   public static double deadband(double x, double threshold) {
-    return MathUtil.applyDeadband(x, threshold);
+    return Math.abs(x) < threshold ? 0 :x;
   }
 
   public static boolean seeNote() {
@@ -48,10 +48,11 @@ public class Utils {
      NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(pipeline);
 }
   //usful : https://github.com/NAHSRobotics-Team5667/2020-FRC/blob/master/src/main/java/frc/robot/utils/LimeLight.java
-  private static double shootDistance[] = {1.38, 2, 2.5, 3, 3.5};
-  private static double shootAngle[] = {58, 51.5, 46, 41, 37.25};
-  private static double shootVelocity[] = {14, 14, 14.5, 15, 15.25};
+  private static double shootDistance[] = {1.38, 2, 2.3, 2.5, 3, 3.3, 3.5};
+  private static double shootAngle[] = {58, 51.5, 46, 42, 41, 40.5, 37.25};
+  private static double shootVelocity[] = {14, 14, 14.5, 15, 15, 14.8, 15.25};
 
+  
   public static double extrapolatre(double d1, double d2, double v1, double v2, double d) {
     return v1 + (v2-v1)*(d-d1)/(d2-d1);
   }
@@ -96,10 +97,11 @@ public class Utils {
   }
 
   public static double angelErrorInDegrees(Rotation2d r1, Rotation2d r2, double deadband) {
-    return MathUtil.applyDeadband(MathUtil.inputModulus(r1.minus(r2).getDegrees(), -180, 180),deadband);
+    
+    return deadband(MathUtil.inputModulus(r1.minus(r2).getDegrees(), -180, 180),deadband);
   }
   public static double angelErrorInRadians(Rotation2d r1, Rotation2d r2, double deadband) {
-    return MathUtil.applyDeadband(MathUtil.angleModulus(r1.minus(r2).getRadians()),deadband);
+    return deadband(MathUtil.angleModulus(r1.minus(r2).getRadians()),deadband);
   }
 
 }

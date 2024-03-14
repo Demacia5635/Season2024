@@ -50,26 +50,27 @@ public class LimelightVisionUtils {
         if (isInFront) {
             //array = LIMELIGHT_SHOOTER_TABLE.getEntry("targetpose_robotspace").getDoubleArray(new double[6]);
             array = LIMELIGHT_SHOOTER_TABLE.getEntry("botpose_targetspace").getDoubleArray(new double[6]);
-            dy = array[0] -0.12;
+            dy = array[0];
             dx = -array[2] - 0.10;
-            System.out.println(" dx = " + dx + " dy = " + dy);
-
+           //System.out.println("dx= " + dx +", dy=" + dy);
             return new Translation2d(dx, dy); 
         }
         return null;
         //cannot be in this distance (out of field)
     }
-
+     
     public static double getTA() {
         Translation2d xy = getDxDy();
         if(xy == null) {
             return 1000;
         }
         double rad = Math.atan(xy.getY()/ xy.getX());
+        //System.out.println("rad blue= " +  MathUtil.angleModulus(rad));
         if(RobotContainer.robotContainer.isRed()) {
+           // System.out.println("rad red= " + MathUtil.angleModulus(Math.PI + rad));
             return  MathUtil.angleModulus(Math.PI + rad);
         }
-        return rad;
+        return MathUtil.angleModulus(rad);
         //return (xy ==null) ? new Rotation2d(0) : xy.getAngle();
     }
 
@@ -127,8 +128,9 @@ public class LimelightVisionUtils {
         double distance =  (robotPose.length >= 9) ? robotPose[9]: 1;
         //double distance =  robotPose[9];
 
-       
-        if(distance > MAX_DISTANCE_FOR_LIMELIGHT || distance == 0){
+        
+        if(distance > MAX_DISTANCE_FOR_LIMELIGHT || distance == 0 || 
+            Math.abs(RobotContainer.robotContainer.chassis.getChassisSpeeds().omegaRadiansPerSecond) > 1){
             return null;
         }
 

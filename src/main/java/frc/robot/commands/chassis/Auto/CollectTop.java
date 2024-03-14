@@ -11,7 +11,7 @@ import frc.robot.Field;
 import frc.robot.PathFollow.Util.pathPoint;
 
 public class CollectTop extends Command {
-  SequentialCommandGroup cmd = new SequentialCommandGroup(initShooter());
+  SequentialCommandGroup cmd;
   pathPoint wingNote = offset(Field.WingNotes[0], 0,0, 0);
   pathPoint centerNote1 = offset(Field.CenterNotes[0], 0,0,0);
   pathPoint centerNote2 = offset(Field.CenterNotes[1], 0,0,0);
@@ -28,16 +28,15 @@ public class CollectTop extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-
-    addCommands(takeNote().alongWith(shoot()), cmd);
+    cmd = new SequentialCommandGroup(takeNote().alongWith(shoot(1)));
     addCommands(goTo(shootPoint, 2), cmd);
-    addCommands(shoot(), cmd);
+    addCommands(shoot(1), cmd);
     addCommands(getNote(centerNote1), cmd);
     addCommands(goTo(shootPoint, 2), cmd);
-    addCommands(shoot(), cmd);
+    addCommands(shoot(1), cmd);
     addCommands(getNote(centerNote2), cmd);
     addCommands(goTo(shootPoint, 2), cmd);
-    addCommands(shoot(), cmd);
+    addCommands(shoot(1), cmd);
 
 
     cmd.schedule();

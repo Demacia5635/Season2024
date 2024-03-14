@@ -59,6 +59,9 @@ public class PathFollow extends Command {
   pathPoint[] points;
   double finishVel;
 
+  boolean autoRotate = false;
+  double autoRotateVel = 2;
+
   /**
    * Creates a new path follower using the given points.
    * 
@@ -256,10 +259,19 @@ public class PathFollow extends Command {
     ChassisSpeeds speed = new ChassisSpeeds(velVector.getX(), velVector.getY(), 0);
     if (rotateToSpeaker) {
       chassis.setVelocitiesRotateToSpeaker(speed);
+    } else if(autoRotate) {
+      speed.omegaRadiansPerSecond = autoRotateVel;
+      chassis.setVelocities(speed);
     } else {
       chassis.setVelocitiesRotateToAngle(speed, wantedAngle);
     }
 
+  }
+
+  public PathFollow setAutoRotate(double rate) {
+    autoRotate = true;
+    autoRotateVel = rate;
+    return this;
   }
 
   @Override
@@ -299,8 +311,8 @@ public class PathFollow extends Command {
   }
 
   public void printSegments() {
-    // for (Segment s : segments) {
-    // System.out.println(s);
-    // }
+    for (Segment s : segments) {
+     System.out.println(s);
+    }
   }
 }

@@ -101,6 +101,11 @@ public final class ChassisConstants {
   public static final FF_Constants MOVE_FF_MORE2 = new FF_Constants(1, 0.25, 0.03251759948634);
 
 
+//left front
+  public static final PID_Constants FRONT_POSITION_STEER_PID_LEFT = new PID_Constants(0.067, 0.002, 0.098);
+  public static final FF_Constants FRONT_STEER_FF_LEFT = new FF_Constants(0.069108623637248, 0.00034365326824, 0.000702476229803);
+
+
 
   // public static final PID_Constants BACK_POSITION_STEER_PID = new PID_Constants(0.036894342949841, 0.003689434294984, 0.000368943429498);
   public static final PID_Constants FRONT_POSITION_STEER_PID = new PID_Constants(0.067, 0.002, 0.098);

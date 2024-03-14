@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
@@ -68,6 +69,8 @@ public class Shooter extends SubsystemBase {
 
     private double angleOffset = 0;
 
+    private boolean hasCalibrated = false;
+
     
     /**creates a new shooter and angle changer*/
     public Shooter() {
@@ -79,6 +82,7 @@ public class Shooter extends SubsystemBase {
         motorUP.config_kP(0, Shooting.KP);
         motorUP.config_kI(0, Shooting.KI);
         motorUP.config_IntegralZone(0, 1 * ShooterVar.PULES_PER_REV / ShooterVar.PEREMITER_OF_WHEEL / 10);
+        motorUP.configClosedloopRamp(0.5);
 
         /*config motor Down */
         motorDown = new TalonFX(ShooterID.MOTOR_DOWN_ID);
@@ -86,6 +90,7 @@ public class Shooter extends SubsystemBase {
         motorDown.config_kP(0, Shooting.KP);
         motorDown.config_kI(0, Shooting.KI);
         motorDown.config_IntegralZone(0, 1 * ShooterVar.PULES_PER_REV / ShooterVar.PEREMITER_OF_WHEEL / 10);
+        motorDown.configClosedloopRamp(0.5);
 
         /*config feeding motor */
         motorFeeding = new TalonSRX(ShooterID.MOTOR_FEEDING_ID);
@@ -109,7 +114,8 @@ public class Shooter extends SubsystemBase {
         limitSwitch = new DigitalInput(ShooterID.LIMIT_SWITCH_ID);
 
         /*put all the motors at brake */
-        brake(SHOOTER_MOTOR.UP, SHOOTER_MOTOR.DOWN, SHOOTER_MOTOR.FEEDING, SHOOTER_MOTOR.ANGLE);
+        brake(SHOOTER_MOTOR.FEEDING, SHOOTER_MOTOR.ANGLE);
+        coast(SHOOTER_MOTOR.UP, SHOOTER_MOTOR.DOWN);
         
         /*put all the init sendable and useful commands into the smart dashboard */
         SmartDashboard.putNumber("wanted vel", 0);
@@ -195,6 +201,14 @@ public class Shooter extends SubsystemBase {
     public void stop() {
         motorUP.set(ControlMode.PercentOutput, 0);
         motorDown.set(ControlMode.PercentOutput, 0);
+    }
+
+    public void setHasCalibrated(boolean hasCalibrated) {
+        this.hasCalibrated = hasCalibrated;
+    }
+
+    public boolean getHasCalibrated() {
+        return hasCalibrated;
     }
     
     /**
@@ -600,6 +614,7 @@ public class Shooter extends SubsystemBase {
         builder.addDoubleProperty("calibrate Velocity", this::getCalibrateVel, this::setCalibrateVel);
         
         /*put on the shuffleBoard all the commands */
+        /* 
         SmartDashboard.putData("Dis reset", new InstantCommand(this::resetDis).ignoringDisable(true));
         SmartDashboard.putData("motor up Brake", new InstantCommand(()-> brake(SHOOTER_MOTOR.UP)).ignoringDisable(true));
         SmartDashboard.putData("motor up Coast", new InstantCommand(()-> coast(SHOOTER_MOTOR.UP)).ignoringDisable(true));
@@ -609,7 +624,7 @@ public class Shooter extends SubsystemBase {
         SmartDashboard.putData("motor feeding Coast", new InstantCommand(()-> coast(SHOOTER_MOTOR.FEEDING)).ignoringDisable(true));
         SmartDashboard.putData("motor angle Brake", new InstantCommand(()-> brake(SHOOTER_MOTOR.ANGLE)).ignoringDisable(true));
         SmartDashboard.putData("motor angle Coast", new InstantCommand(()-> coast(SHOOTER_MOTOR.ANGLE)).ignoringDisable(true));
-
+  */
     }
 
     /** 

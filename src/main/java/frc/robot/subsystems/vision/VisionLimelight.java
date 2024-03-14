@@ -93,16 +93,10 @@ public class VisionLimelight extends SubsystemBase {
     // vision mesurements to pose estimator
     public void updateRobotPose5() {
         double time = getTime();
-        SmartDashboard.putBoolean("is valid buff", validBuf5(time));
         if (validBuf5(time)) {
             Pair<Pose2d, Double> vData5AvgPair = avg(buf5Avg);
             Pose2d pose = vData5AvgPair.getFirst();
             double timestamp = vData5AvgPair.getSecond();
-//            VisionData vDataAvg5 = new VisionData(vData5AvgPair.getFirst(), vData5AvgPair.getSecond(), poseEstimator);
-//            SmartDashboard.putBoolean("updates", vDataAvg5.getPose() != null && vDataAvg5 != null);
-//            if (vDataAvg5.getPose() != null && vDataAvg5 != null) {
-                
-                // poseEstimator.addVisionMeasurement(new Pose2d(pose.getTranslation(),chassis.getAngle()), timestamp);
                 poseEstimator.addVisionMeasurement(pose, timestamp);
                 visionFieldavg5.setRobotPose(pose);
                 lastUpdateTime5 = time;
@@ -211,13 +205,13 @@ public class VisionLimelight extends SubsystemBase {
     // #endregion
 
     public void pushSpeakrAngle(double speakerAngle) {
-        if(speakerAngle != 1000) {
-            System.out.println(" speaker angle " + Math.toDegrees(speakerAngle));
-        }
         for(int i = 1; i < speakerAngleBuf.length; i++) {
             speakerAngleBuf[i] = speakerAngleBuf[i-1];
         }
         speakerAngleBuf[0] = speakerAngle;
+        if(Math.abs(speakerAngleBuf[0]-speakerAngleBuf[1])>0.3) {
+            speakerAngleBuf[0] = 1000;
+        }
     }
 
     public boolean isSpeakerAngleValid() {

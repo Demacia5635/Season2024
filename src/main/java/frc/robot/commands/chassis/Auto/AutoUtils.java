@@ -2,8 +2,11 @@ package frc.robot.commands.chassis.Auto;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Constants.ChassisConstants;
 import frc.robot.RobotContainer;
@@ -41,15 +44,17 @@ public class AutoUtils {
         Math.abs(wantedPos.getY() - chassis.getPoseY()) <= offset;
     }
     
-
     public static pathPoint offset(Translation2d from, double x, double y, double angle) {
-        System.out.println(" Point at " + (from.getX() + x) + " / " + (from.getY()+y));
-        return new pathPoint(from.getX()+x, from.getY()+ y, Rotation2d.fromDegrees(angle),0,false);
+        return offset(from, x, y, angle,0);
+    }
+
+    public static pathPoint offset(Translation2d from, double x, double y, double angle, double radius) {
+        return new pathPoint(from.getX()+x, from.getY()+ y, Rotation2d.fromDegrees(angle),radius,false);
     }
 
 
-    public static  Command shoot() {
-        return shooter.getShootCommand();
+    public static  Command shoot(double delay) {
+        return shooter.getShootCommand().andThen(new WaitCommand(delay));
     }
 
     public static  Command initShooter() {
@@ -57,11 +62,24 @@ public class AutoUtils {
     }
 
     public static  Command goTo(pathPoint point) {
-        return goTo(point, maxVel);
+        return goTo(point, maxVel, true);
+    }
+    public static  Command goTo(pathPoint point, double maxV) {
+        return goTo(point, maxV, true);
+    }
+    public static  Command goToRotate(pathPoint point, double maxV, double rate) {
+        return new PathFollow(chassis, new pathPoint[] { dummyPoint, point }, maxV, maxAceel,
+         0, false).setAutoRotate(rate);
     }
 
-    public static  Command goTo(pathPoint point, double maxv) {
-        return new PathFollow(chassis, new pathPoint[] { dummyPoint, point }, maxv, maxAceel, 0, true);
+    public static Command goToMultiple(pathPoint[] points, double maxVel){
+        return new PathFollow(chassis, points, maxVel, maxAceel, 0, false);
+    }
+    public static  Command goTo(pathPoint point, double maxv, boolean toSpeaker) {
+        return new PathFollow(chassis, new pathPoint[] { dummyPoint, point }, maxv, maxAceel, 0, toSpeaker);
+    }
+    public static  Command goTo(pathPoint point, double maxv, boolean toSpeaker, double endV) {
+        return new PathFollow(chassis, new pathPoint[] { dummyPoint, point }, maxv, maxAceel, endV, toSpeaker);
     }
 
 
@@ -72,7 +90,21 @@ public class AutoUtils {
     }
 
     public static  Command takeNote() {
-        return (new DriveToNote(chassis, 1, true).raceWith(new IntakeCommand(intake))).withTimeout(2);
+        return new DriveToNote(chassis, 1.5, true)
+        .raceWith(new IntakeCommand(intake)).andThen(new IntakeCommand(intake)).withTimeout(2);
     }
+    public static Command isReadyToShoot(){
+        return new WaitUntilCommand(()->shooterReady());
+    }
+
+    public static boolean shooterReady() {
+        return shooter.getIsShootingReady() && Math.abs(chassis.getErrorSpeakerAngle()) < 4;
+    }
+
+    public static Command turnToSpeakerAndWaitForReady() {
+        return new RunCommand(()->chassis.setVelocitiesRotateToSpeaker(new ChassisSpeeds()), chassis)
+            .raceWith(isReadyToShoot());
+    }
+
     
 }

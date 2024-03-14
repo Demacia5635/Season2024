@@ -7,6 +7,7 @@ package frc.robot.commands.shooter;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.chassis.Chassis;
 import frc.robot.subsystems.intake.Intake;
@@ -49,7 +50,7 @@ public class ActivateShooter extends Command {
     /**the angle to the shooter */
     double angle;
 
-    boolean hasCalibrated = false;
+    boolean hasCalibrated;
 
     /**
      * activate the shooter
@@ -88,11 +89,11 @@ public class ActivateShooter extends Command {
     public void execute() {
         speaker = Utils.speakerPosition();
 
-        if(!hasCalibrated) {
+        if(!shooter.getHasCalibrated()) {
             shooter.angleSetPow(-0.3);
             if (shooter.isLimit()) {
                 shooter.angleSetPow(0);
-                hasCalibrated = true;
+                shooter.setHasCalibrated(true);;
             } else {
                 return;
             }
@@ -100,12 +101,12 @@ public class ActivateShooter extends Command {
 
         switch (shooter.getShooterMode()) {
             case AMP:
-                velUp = ShooterConstants.AmpVar.UP;
-                velDown = ShooterConstants.AmpVar.DOWN;
-                angle = ShooterConstants.AmpVar.ANGLE;
-                // velDown = shooter.getCalibrateVel();
-                // velUp = velDown;
-                // angle = shooter.getCalibrateAngle();
+                // velUp = ShooterConstants.AmpVar.UP;
+                // velDown = ShooterConstants.AmpVar.DOWN;
+                // angle = ShooterConstants.AmpVar.ANGLE;
+                velDown = SmartDashboard.getNumber("VEL CALIBRATE", 0);
+                velUp = velDown;
+                angle = SmartDashboard.getNumber("ANGLE CALIBRATE", 0);;
 
                 break;
 
@@ -167,7 +168,6 @@ public class ActivateShooter extends Command {
             timer.start();
             shooter.feedingSetPow(1);
             intake.setPower(1);
-
         } else if (isShooting && timer.get() > 1) {
             /*if the shooter is shooting and the timer hit 0.4 than stop shooting */
             isShooting = false;

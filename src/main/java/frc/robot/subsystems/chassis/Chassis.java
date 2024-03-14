@@ -43,9 +43,12 @@ import com.ctre.phoenix.sensors.Pigeon2;
 public class Chassis extends SubsystemBase {
   private final SwerveModule[] modules;
   private final Pigeon2 gyro;
-  private Trapezoid rotationTrapezoid = new Trapezoid(Math.toRadians(560), Math.toRadians(720));
+  private Trapezoid rotationTrapezoid = new Trapezoid(Math.toRadians(300), Math.toRadians(500));
   private Trapezoid rotationTrapezoidSpeaker = new Trapezoid(Math.toRadians(720), Math.toRadians(720));
 
+  private double speakerAngleError;
+  private PIDController angleSpeakerPID = new PIDController(0.05,0.0, 0.002);
+  
 
   public static List<pathPoint> pointsForPathTeleop = new ArrayList<pathPoint>();
   public static List<pathPoint> pointsForAuto = new ArrayList<pathPoint>();
@@ -228,10 +231,8 @@ public class Chassis extends SubsystemBase {
     Translation2d newSpeeds = new Translation2d(relativeSpeeds.vxMetersPerSecond,
      relativeSpeeds.vyMetersPerSecond).rotateBy(Rotation2d.fromRadians(relativeSpeeds.omegaRadiansPerSecond * param));
     ChassisSpeeds newChassisSpeeds = new ChassisSpeeds(newSpeeds.getX(), newSpeeds.getY(), relativeSpeeds.omegaRadiansPerSecond);
-    relativeSpeeds.omegaRadiansPerSecond = (Math.abs(relativeSpeeds.omegaRadiansPerSecond)<0.1) ? 0 : relativeSpeeds.omegaRadiansPerSecond;
-    //newChassisSpeeds.omegaRadiansPerSecond = SwerveKinematics.fixOmega(newChassisSpeeds.omegaRadiansPerSecond);
+    newChassisSpeeds.omegaRadiansPerSecond = SwerveKinematics.fixOmega(newChassisSpeeds.omegaRadiansPerSecond);
     SwerveModuleState[] states = KINEMATICS.toSwerveModuleStates(newChassisSpeeds);
-    
     setModuleStates(states);
   }
 
@@ -257,6 +258,11 @@ public class Chassis extends SubsystemBase {
       modules[i].configFactoryDefault();
     }
   }
+
+  public double getErrorSpeakerAngle(){
+    return speakerAngleError;
+  }
+
 
 
 
@@ -412,20 +418,24 @@ public class Chassis extends SubsystemBase {
 
   public double getRadPerSecToSpeaker() {
     Translation2d speaker = Utils.speakerTargetPosition();
-  
     Rotation2d limelightSpeakerAngle = RobotContainer.robotContainer.vision.getSpeakerAngle();
-    if(limelightSpeakerAngle != null) {
-      return getRadPerSecToAngle(limelightSpeakerAngle);
-  //    return getRadPerSecToAngle(getAngle().minus(LimelightVisionUtils.getTA()));
-    }
-
-    return getRadPerSecToAngle(speaker.minus(getPose().getTranslation()).getAngle().plus(Rotation2d.fromDegrees(180)));
+    Rotation2d odometryAngle = speaker.minus(getPose().getTranslation()).getAngle().plus(Rotation2d.fromDegrees(180));
+    double dif = (limelightSpeakerAngle!=null && odometryAngle!=null) ? Math.abs(Utils.angelErrorInDegrees(limelightSpeakerAngle, odometryAngle, 10)) : 1000;
+    Rotation2d target = limelightSpeakerAngle != null && distanceFromSpeaker() < 3 && dif == 0 ?
+      limelightSpeakerAngle : odometryAngle;
+    return getRadPerSecToAngle(target);
   }
 
+  double lastAngle = 0;
+  double currentAngle = 0;
   public double getGyroRate() {
+    return (currentAngle - lastAngle)/0.02;
+  }
+
+  public double getGyroRateZ() {
     double []rot  = new double[3];
     gyro.getRawGyro(rot);
-    return -rot[0];
+    return rot[2];
   }
 
   public double getGyroRateY() {
@@ -441,13 +451,13 @@ public class Chassis extends SubsystemBase {
   }
 
   public double getRadPerSecToAngle(Rotation2d fieldRelativeAngle) {
-      double rotateVel = rotationTrapezoid.calculate(
-        fieldRelativeAngle.minus(getAngle()).getRadians(), Math.toRadians(getGyroRate()), 0);
-        System.out.println("rotation vel= " + rotateVel + " angle current= " + getAngle().getDegrees() + ", target= " + fieldRelativeAngle.getDegrees());
-      return Math.abs(getAngle().minus(fieldRelativeAngle).getDegrees()) >= 4 ? rotateVel : 0;
+      speakerAngleError = Utils.angelErrorInDegrees(fieldRelativeAngle, getAngle(),4);
+      double rotateVel = angleSpeakerPID.calculate(-speakerAngleError,0);
+
+//        System.out.println("angle error1= " +  speakerAngleError + ", rotateVel1= " + rotateVel + 
+//           " angle = " + getAngle().getDegrees() + " rate=" + getGyroRate());
+      return rotateVel;
   }
-
-
   
   public static Translation2d speakerPosition() {
     return Utils.speakerPosition();
@@ -457,9 +467,16 @@ public class Chassis extends SubsystemBase {
     return isAimingSpeaker;
   }
 
+
+  public double distanceFromSpeaker() {
+    return speakerPosition().getDistance(getPose().getTranslation());
+  }
+
   @Override
   public void periodic() {
     poseEstimator.update(getRawAngle(), getModulePositions());
+    lastAngle = currentAngle;
+    currentAngle = getRawAngle().getDegrees();
 
     field.setRobotPose(getPose().plus(new Transform2d(1.2, 0, new Rotation2d())));
     SmartDashboard.putNumber("Distance from speaker", speakerPosition().getDistance(getPose().getTranslation()));

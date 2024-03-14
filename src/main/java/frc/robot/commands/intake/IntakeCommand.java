@@ -43,7 +43,7 @@ public class IntakeCommand extends Command {
         } else if (noteWasDetected) { // Note detected, use transfer speed
             intake.setPower(Parameters.INTAKE_TRANSFER_POWER); // Run motors at transfer speed
         } else if (!hasEntered) {
-            intake.setPower(Parameters.INTAKE_POWER); // Run motors at intake speed until note is detected
+            intake.setPower(Parameters.INTAKE_POWER, Parameters.INTAKE_POWER_SECOND); // Run motors at intake speed until note is detected
         } else {
             intake.setPower(Parameters.INTAKE_PRE_LIMIT_POWER); // Run motors at intake speed until note is detected
         }

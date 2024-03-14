@@ -108,7 +108,7 @@ public class SwerveModule implements Sendable {
 
 
         // add the sysid for the module
-        SmartDashboard.putData(name + " Steer Sysid", (new Sysid(this::setSteerPower, this::getSteerVelocity, 0.1, 0.8, chassis)).getCommand());
+//        SmartDashboard.putData(name + " Steer Sysid", (new Sysid(this::setSteerPower, this::getSteerVelocity, 0.1, 0.8, chassis)).getCommand());
     
     }
 
