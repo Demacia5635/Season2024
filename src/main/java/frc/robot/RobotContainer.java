@@ -44,7 +44,7 @@ import frc.robot.commands.chassis.AutoPrevious.StartMiddle2;
 import frc.robot.commands.chassis.AutoPrevious.StartTOP1;
 import frc.robot.commands.chassis.AutoPrevious.StartTOP2;
 import frc.robot.commands.chassis.Auto.AutoChooser;
-
+import frc.robot.commands.chassis.Auto.CollectBottom;
 import frc.robot.commands.chassis.Auto.CollectTop;
 import frc.robot.commands.chassis.Auto.CollectWing;
 import frc.robot.commands.chassis.Auto.DestroyCenter;
@@ -125,10 +125,13 @@ public class RobotContainer implements Sendable {
     Command collectTop = new CollectTop();
     Command collectWing = new CollectWing();
     Command destroyCenter = new DestroyCenter();
+    Command collectBottom = new CollectBottom();
     autoChoose = new SendableChooser<Command>();
     autoChoose.addOption("Top",collectTop);
     autoChoose.addOption("Wing", collectWing);
     autoChoose.addOption("Destroy", destroyCenter);
+    autoChoose.addOption("Bottom", collectBottom);
+
     SmartDashboard.putData("Auto Chooser", autoChoose);
 }
 
