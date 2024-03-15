@@ -48,9 +48,10 @@ public class Utils {
      NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(pipeline);
 }
   //usful : https://github.com/NAHSRobotics-Team5667/2020-FRC/blob/master/src/main/java/frc/robot/utils/LimeLight.java
+  //need to fix point of 3 meters
   private static double shootDistance[] = {1.38, 2,    2.3, 2.5,  3,    3.3,  3.5};
-  private static double shootAngle[] =    {58,   51.5, 46,  45,  37.8, 38.5, 37.25};
-  private static double shootVelocity[] = {13.5, 13.5, 14.5,14,  14.5, 14.8, 15.25};
+  private static double shootAngle[] =    {58,   51.5, 46,  45,  42, 38.5, 37.25};
+  private static double shootVelocity[] = {13.5, 13.5, 14.5,14,  14.8, 14.8, 15.25};
 
   
   public static double extrapolatre(double d1, double d2, double v1, double v2, double d) {

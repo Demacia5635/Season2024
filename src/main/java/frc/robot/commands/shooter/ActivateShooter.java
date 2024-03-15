@@ -148,17 +148,17 @@ public class ActivateShooter extends Command {
         boolean isAtLimit = shooter.isDisLimits(angleError > 0);
 
         double power = isAtLimit ? 0:
-                MathUtil.clamp(0.07 * Math.signum(angleError) + angleError * 0.06, -0.4, 0.4);
+                MathUtil.clamp(ShooterConstants.AngleChanger.KS * Math.signum(angleError) + angleError * ShooterConstants.AngleChanger.KV, -ShooterConstants.AngleChanger.MAX_ANGLE_POWER, ShooterConstants.AngleChanger.MAX_ANGLE_POWER);
         shooter.angleSetPow(power);
 
         /*start the shooting motors */
         shooter.setVel(velUp, velDown);
         double velErrorUp = shooter.getMotorVel(SHOOTER_MOTOR.UP) - velUp;
         double velErrorDown = shooter.getMotorVel(SHOOTER_MOTOR.DOWN) - velDown;
-        isReady = Math.abs(angleError) < 0.75 && 
-                          Math.abs(velErrorUp) < 0.3 && 
-                          Math.abs(velErrorDown) < 0.3;
-        shooter.setIsShootingReady(isReady && velDown>0);
+        isReady = Math.abs(angleError) < ShooterConstants.AngleChanger.ERROR && 
+                          Math.abs(velErrorUp) < ShooterConstants.Shooting.ERROR && 
+                          Math.abs(velErrorDown) < ShooterConstants.Shooting.ERROR;
+        shooter.setIsShootingReady(isReady && velDown > 0);
 
         /*checks if the shooter is ready and if the timer did not hit 0.4*/
         if (!isShooting && shooter.getIsShooting()) {

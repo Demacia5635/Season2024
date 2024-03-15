@@ -46,9 +46,9 @@ public class ShooterConstants {
         public static final double KB = 128;
         
         /*set up the feedForward var of the angle changer */
-        public static final double KS = 0.056673856189171;
+        public static final double KS = 0.07; //0.07;
         public static final double KG = 0;
-        public static final double KV = 0.000091655292302;
+        public static final double KV = 0.06;
         
         /*set up the PID of the angle motor */
         public static final double KP = 0.3;
@@ -59,6 +59,10 @@ public class ShooterConstants {
         public static final double MIN_DIS = 115;
 
         public static final double BOUNDARY_DIS = 4;
+
+        public static final double MAX_ANGLE_POWER =  0.5;
+
+        public static final double ERROR = 0.75;
     }
 
     /**vars for shooting */
@@ -71,6 +75,8 @@ public class ShooterConstants {
         /*shooting pid */
         public static final double KP = 0.02;
         public static final double KI = 0.0007;
+
+        public static final double ERROR = 0.3;
     }
 
 
