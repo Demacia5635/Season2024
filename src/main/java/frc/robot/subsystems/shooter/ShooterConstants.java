@@ -98,9 +98,9 @@ public class ShooterConstants {
 
     /**var for shooting from the podium */
     public static class PodiumVar {
-        public static final double UP = 16;
-        public static final double DOWN = 16;
-        public static final double ANGLE = 41;
+        public static final double UP = 15;
+        public static final double DOWN = 15;
+        public static final double ANGLE = 39;
         
     }
     

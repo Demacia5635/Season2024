@@ -101,13 +101,13 @@ public class ActivateShooter extends Command {
 
         switch (shooter.getShooterMode()) {
             case AMP:
-                // velUp = ShooterConstants.AmpVar.UP;
-                // velDown = ShooterConstants.AmpVar.DOWN;
-                // angle = ShooterConstants.AmpVar.ANGLE;
-                velDown = SmartDashboard.getNumber("VEL CALIBRATE", 0);
+                velUp = ShooterConstants.AmpVar.UP;
+                velDown = ShooterConstants.AmpVar.DOWN;
+                angle = ShooterConstants.AmpVar.ANGLE;
+                /*velDown = SmartDashboard.getNumber("VEL CALIBRATE", 0);
                 velUp = velDown;
                 angle = SmartDashboard.getNumber("ANGLE CALIBRATE", 0);;
-
+                */
                 break;
 
             case PODIUM:

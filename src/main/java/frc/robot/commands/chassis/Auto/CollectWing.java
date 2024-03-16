@@ -39,9 +39,10 @@ public class CollectWing extends Command {
   @Override
   public void initialize() {
     timer.restart();
-    cmd = new SequentialCommandGroup(goTo(firstShootPoint,1.6, false));
-    addCommands(turnToSpeakerAndWaitForReady(), cmd);
-    addCommands(shoot(0.5), cmd);
+    cmd = new SequentialCommandGroup(goTo(firstShootPoint,1.6, true));
+    //addCommands(turnToSpeakerAndWaitForReady(), cmd);
+    addCommands(new WaitCommand(1.5), cmd);
+    addCommands(shoot(0.6), cmd);
     addCommands(takeNote(), cmd);
     addCommands(goTo(secondShootPoint,2.2, false), cmd);
     addCommands(turnToSpeakerAndWaitForReady(), cmd);
@@ -49,11 +50,12 @@ public class CollectWing extends Command {
     addCommands(takeNote(), cmd);
     addCommands(goTo(thirdShootPoint,2.2, false), cmd);
     addCommands(turnToSpeakerAndWaitForReady(), cmd);
-    addCommands(new WaitCommand(0.2), cmd);
-    addCommands(shoot(0.3), cmd);
+    addCommands(new WaitCommand(0.5), cmd);
+    addCommands(shoot(0.5), cmd);
     addCommands(takeNote(), cmd);
     addCommands(goTo(thirdShootPoint,2.2,false), cmd);
     addCommands(turnToSpeakerAndWaitForReady(), cmd);
+    addCommands(new WaitCommand(0.3), cmd);
     addCommands(shoot(0), cmd);
     addCommands(new InstantCommand(()->System.out.println("\n\n\n finish - time = " + timer.get() + "\n\n\n")), cmd);
 
