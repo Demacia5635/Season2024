@@ -11,6 +11,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -48,10 +49,7 @@ import frc.robot.commands.chassis.Auto.CollectBottom;
 import frc.robot.commands.chassis.Auto.CollectTop;
 import frc.robot.commands.chassis.Auto.CollectWing;
 import frc.robot.commands.chassis.Auto.DestroyCenter;
-import frc.robot.commands.chassis.Auto.Leave;
-import frc.robot.commands.chassis.Paths.GoToAMP1;
 import frc.robot.commands.intake.IntakeCommand;
-import frc.robot.commands.intake.IntakeToShooter;
 import frc.robot.subsystems.amp.Amp;
 import frc.robot.subsystems.chassis.Chassis;
 import frc.robot.subsystems.intake.Intake;
@@ -80,10 +78,14 @@ public class RobotContainer implements Sendable {
   public Command activateShooter;
   public Command activateSubwoofer;
   
-  private SendableChooser<Command> autoChoose;
+  private enum AutoOptions { Top, Wing, Destroy, Buttom};
+  private SendableChooser<AutoOptions> autoChoose;
+
+  
 
   public RobotContainer() {
     robotContainer = this;
+    DataLogManager.start();
     
     chassis = new Chassis();
     vision = new VisionLimelight(chassis, chassis.getSwerveDrivePoseEstimator());
@@ -106,6 +108,7 @@ public class RobotContainer implements Sendable {
     shooter.stopAll();
     intake.stop();
   }
+
   public void createCommands() {
     SmartDashboard.putNumber("VEL CALIBRATE", 0);
 
@@ -123,17 +126,10 @@ public class RobotContainer implements Sendable {
     resetOdometry = new InstantCommand(()-> chassis.setOdometryToForward()).ignoringDisable(true);
     disableCommand = new InstantCommand(()-> stopAll(),intake);
 
-    Command collectTop = new CollectTop();
-    Command collectWing = new CollectWing();
-    Command destroyCenter = new DestroyCenter();
-    Command collectBottom = new CollectBottom();
-    autoChoose = new SendableChooser<Command>();
-    autoChoose.addOption("Top",collectTop);
-    autoChoose.addOption("Wing", collectWing);
-    autoChoose.addOption("Destroy", destroyCenter);
-    autoChoose.addOption("Bottom", collectBottom);
-
-
+    autoChoose = new SendableChooser<AutoOptions>();
+    for(AutoOptions a : AutoOptions.values()) {
+      autoChoose.addOption(a.name(), a);
+    }
     SmartDashboard.putData("Auto Chooser", autoChoose);
 }
 
@@ -231,7 +227,24 @@ public class RobotContainer implements Sendable {
  
    
   public Command getAutonomousCommand() {
-    Command cmd = autoChoose.getSelected();
+
+    AutoOptions autoOption = autoChoose.getSelected();
+    Command cmd = null;
+    switch(autoOption) {
+      case Top:
+        cmd = new CollectTop();
+        break;
+      case Wing:
+        cmd = new CollectWing();
+        break;
+      case Destroy:
+        cmd = new DestroyCenter();
+        break;
+      case Buttom:
+        cmd = new CollectBottom();
+        break;
+    }
+    
     if(cmd != null) {
       return cmd.alongWith( 
         new InstantCommand(()->shooter.setShooterMode(SHOOTER_MODE.AUTO_CONTINIOUS))
