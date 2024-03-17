@@ -6,6 +6,7 @@ package frc.robot.commands.shooter;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -158,6 +159,15 @@ public class ActivateShooter extends Command {
         isReady = Math.abs(angleError) < ShooterConstants.AngleChanger.ERROR && 
                           Math.abs(velErrorUp) < ShooterConstants.Shooting.ERROR && 
                           Math.abs(velErrorDown) < ShooterConstants.Shooting.ERROR;
+        boolean isReadyVel = Math.abs(velErrorUp) < ShooterConstants.Shooting.ERROR && 
+                          Math.abs(velErrorDown) < ShooterConstants.Shooting.ERROR;
+        boolean isReadyAngle =  Math.abs(angleError) < ShooterConstants.AngleChanger.ERROR;
+        SmartDashboard.putBoolean("isReadyAngle", isReadyAngle);
+        SmartDashboard.putBoolean("isReadyVel", isReadyVel);
+
+
+        DataLogManager.log("is ready vel= " + isReadyVel + ", is ready angle= " + isReadyAngle);
+
         shooter.setIsShootingReady(isReady && velDown > 0);
 
         /*checks if the shooter is ready and if the timer did not hit 0.4*/

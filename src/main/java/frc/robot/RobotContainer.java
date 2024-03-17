@@ -12,6 +12,8 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -31,6 +33,7 @@ import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionLimelight;
 import frc.robot.utils.Utils;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.chassis.DriveCommand;
 import frc.robot.commands.chassis.DriveToNote;
 import frc.robot.commands.chassis.GoToAngleChassis;
@@ -60,6 +63,8 @@ public class RobotContainer implements Sendable {
   private Boolean isRed = true;
   CommandXboxController commandController;
   public CommandXboxController commandController2;
+  public Joystick gitar;
+
  
   public Shooter shooter;
   public Amp amp;
@@ -86,11 +91,13 @@ public class RobotContainer implements Sendable {
   public RobotContainer() {
     robotContainer = this;
     DataLogManager.start();
-    
+    DriverStation.startDataLog(DataLogManager.getLog());
+
     chassis = new Chassis();
     vision = new VisionLimelight(chassis, chassis.getSwerveDrivePoseEstimator());
     intake = new Intake();
     // amp = new Amp();
+    gitar = new Joystick(2);
     commandController2 = new CommandXboxController(1);
     commandController = new CommandXboxController(0);
     shooter = new Shooter();
@@ -199,8 +206,8 @@ public class RobotContainer implements Sendable {
     commandController2.x().onTrue(activateShooter);
     commandController2.a().onTrue(activateAmp);
     commandController2.rightBumper().onTrue(activatePodium);
-    Command PerlmanleftBumper = (new RunCommand(()->shooter.feedingSetPow(-0.5), intake).withTimeout(0.2))
-      .andThen(new InstantCommand(()->shooter.feedingSetPow(0), intake));
+    Command PerlmanleftBumper = (new RunCommand(()->shooter.feedingSetPow(-0.5), shooter).withTimeout(0.2))
+      .andThen(new InstantCommand(()->shooter.feedingSetPow(0), shooter));
     PerlmanleftBumper.setName("Perlman l Bumber");
     commandController2.leftBumper().onTrue(PerlmanleftBumper);
     Command Ppov0 = new InstantCommand(()-> {intake.setPower(1); shooter.feedingSetPow(1); shooter.setVel(10);}, shooter, intake);
@@ -213,10 +220,24 @@ public class RobotContainer implements Sendable {
     Command Ppov90 = new InstantCommand(() -> {Utils.setPipeline(Math.min(Utils.getPipeline() + 1, 6)); }).ignoringDisable(true);
     Ppov180.setName("P Pov 90");
     commandController2.pov(90).onTrue(Ppov90);
-
-  
     commandController2.pov(270).onTrue(new InstantCommand(() -> {Utils.setPipeline(Math.max(Utils.getPipeline() - 1, 0)); }).ignoringDisable(true));
 
+    JoystickButton button1 = new JoystickButton(gitar, 1);
+    JoystickButton button2 = new JoystickButton(gitar, 2);
+    JoystickButton button3 = new JoystickButton(gitar, 3);
+    JoystickButton button4 = new JoystickButton(gitar, 4);
+    JoystickButton button5 = new JoystickButton(gitar, 5);
+    JoystickButton button7 = new JoystickButton(gitar, 7);
+    JoystickButton button8 = new JoystickButton(gitar, 8);
+
+    button5.onTrue(driverB);
+    button1.onTrue(shooter.getActivateShooterSubwoofer());
+    button2.onTrue(activateShooter);
+    button3.onTrue(activateAmp);
+    button4.onTrue(activatePodium);
+
+    button7.onTrue(Ppov90);
+    button8.onTrue(new InstantCommand(() -> {Utils.setPipeline(Math.max(Utils.getPipeline() - 1, 0)); }).ignoringDisable(true));
 }
 
 

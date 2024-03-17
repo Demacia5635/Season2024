@@ -82,7 +82,7 @@ public class Shooter extends SubsystemBase {
         motorUP.config_kP(0, Shooting.KP);
         motorUP.config_kI(0, Shooting.KI);
         motorUP.config_IntegralZone(0, 1 * ShooterVar.PULES_PER_REV / ShooterVar.PEREMITER_OF_WHEEL / 10);
-        motorUP.configClosedloopRamp(0.5);
+        motorUP.configClosedloopRamp(Shooting.RAMP);
 
         /*config motor Down */
         motorDown = new TalonFX(ShooterID.MOTOR_DOWN_ID);
@@ -90,7 +90,7 @@ public class Shooter extends SubsystemBase {
         motorDown.config_kP(0, Shooting.KP);
         motorDown.config_kI(0, Shooting.KI);
         motorDown.config_IntegralZone(0, 1 * ShooterVar.PULES_PER_REV / ShooterVar.PEREMITER_OF_WHEEL / 10);
-        motorDown.configClosedloopRamp(0.5);
+        motorDown.configClosedloopRamp(Shooting.RAMP);
 
         /*config feeding motor */
         motorFeeding = new TalonSRX(ShooterID.MOTOR_FEEDING_ID);
@@ -122,7 +122,8 @@ public class Shooter extends SubsystemBase {
         SmartDashboard.putData("set vel shooter", new RunCommand(()->setVel(SmartDashboard.getNumber("wanted vel", 0)), this));
         SmartDashboard.putData(this);
         SmartDashboard.putData("Shooter Move Sysid",
-        (new Sysid(this::setPow, ()-> getMotorVel(SHOOTER_MOTOR.UP), 0.2, 0.8, this)).getCommand());
+       // (new Sysid(this::setPow, ()-> getMotorVel(SHOOTER_MOTOR.UP), 0.2, 0.8, this)).getCommand());
+        Sysid.getSteadyCommand(this::setPow, ()-> getMotorVel(SHOOTER_MOTOR.UP), 0.25,0.9,0.02,12,20, this));
     }
 
     /**

@@ -478,7 +478,7 @@ public class Chassis extends SubsystemBase {
     lastAngle = currentAngle;
     currentAngle = getRawAngle().getDegrees();
 
-    field.setRobotPose(getPose().plus(new Transform2d(1.2, 0, new Rotation2d())));
+    field.setRobotPose(getPose().plus(new Transform2d(0, 0, new Rotation2d())));
     SmartDashboard.putNumber("Distance from speaker", speakerPosition().getDistance(getPose().getTranslation()));
  }
 }

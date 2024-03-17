@@ -73,20 +73,12 @@ public class ShooterConstants {
         public static final double KV2 = 0.001011134688171;
 
         /*shooting pid */
-        public static final double KP = 0.02;
+        public static final double KP =  0.02;
         public static final double KI = 0.0007;
 
         public static final double ERROR = 0.3;
-    }
 
-
-    /**set up the lookup table var */
-    public static class LookUpTableVar {
-        public static final double[][] lookUpTable = {
-            {1.7, 53, 16.7}, {1.96, 47.5, 17}, {2.5, 40, 17.5}, 
-            {3, 35.1, 19},  {3.7, 37, 17.5}, {4.65, 34, 18}
-              
-        };
+        public static final double RAMP = 0.5;
     }
 
     /*var for shooting to the amp */
