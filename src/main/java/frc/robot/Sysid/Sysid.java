@@ -55,6 +55,7 @@ public class Sysid {
     static double defaultDelay = 10;
     Gains[] gains;                  // the gains we are looking for
     double[] result=null;           // the result, after analyze
+    boolean steadyOnly = false;     // if we need steady only
 
     /**
      * Constructor with default values - anly required the setPower, setVelocity, min/max power and subsystems
@@ -141,6 +142,14 @@ public class Sysid {
         this.subsystems = subsystems;
         this.gains = types;
     }
+
+    public static Command getSteadyCommand(Consumer<Double> setPower, Supplier<Double> getVelocity, double minPower, double maxPower, double powerStep, double minVelocity, double maxVelocity, Subsystem...subsystems) {
+        Sysid id = new Sysid(new Gains[] {Gains.KS, Gains.KV, Gains.KV2}, setPower, getVelocity, null, null, minPower, maxPower, 2, 1, 1,subsystems);
+        id.steadyOnly = true;
+        Command cmd  = new NoAccelerationPowerCommand(setPower, minPower, maxPower, powerStep, id.dataCollector, false, minVelocity, maxVelocity, maxVelocity, subsystems);
+        return cmd.andThen(new InstantCommand(() -> id.analyze()));
+    }
+
 
     /**
      * run the command
