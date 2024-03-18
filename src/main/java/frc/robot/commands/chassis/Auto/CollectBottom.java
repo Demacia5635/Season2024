@@ -19,12 +19,14 @@ import frc.robot.utils.Utils;
 
 public class CollectBottom extends Command {
   SequentialCommandGroup cmd;
-  pathPoint escapePoint1 = offset(Field.WingNotes[2], 0,-2, 0, 0.5);
-  pathPoint escapePoint2 = offset(Field.CenterNotes[4], -2,1, -20);
-  pathPoint escapePoint3 = offset(Field.CenterNotes[3], -0.5,1, 0);
+  // pathPoint escapePoint1 = offset(Field.WingNotes[2], 0,-3.5, 0, 0.5);
+    pathPoint escapePoint1 = offset(Field.CenterNotes[3], -3,-2, 20);
 
-  pathPoint shootPointFirst = new pathPoint(new Translation2d(1.72, 3.37), Rotation2d.fromDegrees(-50));
-  pathPoint shootPoint = offset(Field.Speaker, 2,-2, -45);
+  pathPoint escapePoint2 = offset(Field.CenterNotes[4], -2,1, 0);
+ // pathPoint escapePoint3 = offset(Field.CenterNotes[3], -0.5,1, 0);
+
+  pathPoint shootPointFirst = new pathPoint(new Translation2d(3.18, 2.8), Rotation2d.fromDegrees(-40));
+  pathPoint shootPoint = offset(Field.Speaker, 3,-1.5, -30);
   pathPoint shootPointAnchor = new pathPoint(new Translation2d(3.3, 2), Rotation2d.fromDegrees(-40), 0.4);
 
   Timer timer = new Timer();
@@ -39,20 +41,25 @@ public class CollectBottom extends Command {
   public void initialize() {
     timer.restart();
     cmd = new SequentialCommandGroup(goTo(shootPointFirst, 1.5, true));
-    addCommands(turnToSpeakerAndWaitForReady(),cmd);
-    addCommands(new WaitCommand(0.7), cmd);
-    addCommands(shoot(0.5),cmd);
+    //addCommands(turnToSpeakerAndWaitForReady(),cmd);
+    // addCommands(new WaitCommand(0.7), cmd);
+    addCommands(new WaitCommand(1), cmd);
+    addCommands(shoot(1.5),cmd);
 //    addCommands(goToMultiple(
 //        new pathPoint[]{dummyPoint,escapePoint1,escapePoint2},2.5), cmd);
-    addCommands(goTo(escapePoint2,3.2), cmd);
+    addCommands(goTo(escapePoint2,1.5), cmd);
     addCommands(takeNote(), cmd);
-    addCommands(goToMultiple(new pathPoint[]{dummyPoint, shootPointAnchor, shootPoint}, 3.2), cmd);
-    addCommands(turnToSpeakerAndWaitForReady(), cmd);
-    addCommands(new WaitCommand(0.5), cmd);
+    //addCommands(goToMultiple(new pathPoint[]{dummyPoint, shootPointAnchor, shootPoint}, 3.2), cmd);
+    addCommands(goTo(shootPointFirst,1.5, true), cmd);
 
-    addCommands(shoot(0.5), cmd);
-    addCommands(goToMultiple(
-        new pathPoint[]{dummyPoint,escapePoint1,escapePoint3},2.5).raceWith(new WaitUntilCommand(()->Utils.seeNote())), cmd);
+    //addCommands(turnToSpeakerAndWaitForReady(), cmd);
+    addCommands(new WaitCommand(1), cmd);
+
+    addCommands(shoot(1), cmd);
+    addCommands(goTo(escapePoint1,1.5), cmd);
+
+    // addCommands(goToMultiple(
+    //     new pathPoint[]{dummyPoint,escapePoint1,escapePoint3},2.5), cmd);
     addCommands(takeNote(), cmd);
     addCommands(new InstantCommand(()->System.out.println("\n\n\n finish - time = " + timer.get() + "\n\n\n")), cmd);
 

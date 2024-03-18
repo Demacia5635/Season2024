@@ -22,7 +22,10 @@ public class Shoot extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    cmd = new SequentialCommandGroup(shoot(0));
+    cmd = new SequentialCommandGroup(new InstantCommand());
+     addCommands(turnToSpeakerAndWaitForReady(), cmd);
+     addCommands(new WaitCommand(0.5), cmd);
+     addCommands(shoot(0.4), cmd);
     
 
     cmd.schedule();

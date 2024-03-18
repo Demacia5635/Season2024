@@ -83,7 +83,7 @@ public class RobotContainer implements Sendable {
   public Command activateShooter;
   public Command activateSubwoofer;
   
-  private enum AutoOptions { Top, Wing, Destroy, Buttom};
+  private enum AutoOptions { Shoot, Wing, Destroy, Bottom};
   private SendableChooser<AutoOptions> autoChoose;
 
   
@@ -253,8 +253,8 @@ public class RobotContainer implements Sendable {
     AutoOptions autoOption = autoChoose.getSelected();
     Command cmd = null;
     switch(autoOption) {
-      case Top:
-        cmd = new CollectTop();
+      case Shoot:
+        cmd = new Shoot();
         break;
       case Wing:
         cmd = new CollectWing();
@@ -262,7 +262,7 @@ public class RobotContainer implements Sendable {
       case Destroy:
         cmd = new DestroyCenter();
         break;
-      case Buttom:
+      case Bottom:
         cmd = new CollectBottom();
         break;
     }

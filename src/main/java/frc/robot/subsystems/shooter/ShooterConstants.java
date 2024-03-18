@@ -55,7 +55,7 @@ public class ShooterConstants {
         public static final double KD = KP / 100;
     
         /*the max and min dis of the angle changer */
-        public static final double MAX_DIS = 225;
+        public static final double MAX_DIS = 235;
         public static final double MIN_DIS = 115;
 
         public static final double BOUNDARY_DIS = 4;
@@ -90,9 +90,9 @@ public class ShooterConstants {
 
     /**var for shooting from the podium */
     public static class PodiumVar {
-        public static final double UP = 15;
-        public static final double DOWN = 15;
-        public static final double ANGLE = 39;
+        public static final double UP = 16.5;
+        public static final double DOWN = 16.5;
+        public static final double ANGLE = 36;
         
     }
     

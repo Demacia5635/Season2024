@@ -16,6 +16,7 @@ import frc.robot.subsystems.chassis.Chassis;
 import frc.robot.subsystems.vision.utils.LimelightVisionUtils;
 import frc.robot.subsystems.vision.utils.VisionData;
 import frc.robot.subsystems.vision.utils.UpdatedPoseEstimatorClasses.SwerveDrivePoseEstimator;
+import frc.robot.utils.Utils;
 
 import static frc.robot.subsystems.vision.VisionConstants.*;
 //#endregion
@@ -144,8 +145,11 @@ public class VisionLimelight extends SubsystemBase {
 
         double averageX = 0.0;
         double averageY = 0.0;
+        double radiansDifference = 0.0;
         double averageRotation = 0.0;
         double avarageTimeStamp = 0.0;
+        Rotation2d first = visionDataArr[0].getPose().getRotation();
+
 
         for (VisionData vData : visionDataArr) {
             if (vData != null && vData.getPose() != null) {
@@ -154,12 +158,15 @@ public class VisionLimelight extends SubsystemBase {
                 averageY += pose.getTranslation().getY();
                 averageRotation += pose.getRotation().getRadians();
                 avarageTimeStamp += vData.getTimeStamp();
+                radiansDifference += Utils.angelErrorInRadians(first, pose.getRotation(), 0);
             }
         }
 
         averageX /= visionDataArr.length;
         averageY /= visionDataArr.length;
-        averageRotation /= visionDataArr.length;
+        radiansDifference/= (visionDataArr.length-1);
+        // averageRotation /= visionDataArr.length;
+        averageRotation = first.getRadians() + radiansDifference;
         avarageTimeStamp /= visionDataArr.length;
         // Create a new Pose2d with the calculated averages
         return new Pair<Pose2d, Double>((new Pose2d(averageX, averageY, new Rotation2d(averageRotation))),

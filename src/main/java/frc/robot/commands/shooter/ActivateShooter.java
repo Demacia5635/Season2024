@@ -41,6 +41,7 @@ public class ActivateShooter extends Command {
 
     /**a var to check if the shooter is ready to shoot */
     boolean isReady = false;
+    int readyCounter = 0;
 
     /**the vel to the up motor */
     double velUp;
@@ -105,10 +106,10 @@ public class ActivateShooter extends Command {
                 velUp = ShooterConstants.AmpVar.UP;
                 velDown = ShooterConstants.AmpVar.DOWN;
                 angle = ShooterConstants.AmpVar.ANGLE;
-                /*velDown = SmartDashboard.getNumber("VEL CALIBRATE", 0);
-                velUp = velDown;
-                angle = SmartDashboard.getNumber("ANGLE CALIBRATE", 0);;
-                */
+                // velDown = SmartDashboard.getNumber("VEL CALIBRATE", 0);
+                // velUp = velDown;
+                // angle = SmartDashboard.getNumber("ANGLE CALIBRATE", 0);;
+                
                 break;
 
             case PODIUM:
@@ -158,17 +159,20 @@ public class ActivateShooter extends Command {
         double velErrorDown = shooter.getMotorVel(SHOOTER_MOTOR.DOWN) - velDown;
         isReady = Math.abs(angleError) < ShooterConstants.AngleChanger.ERROR && 
                           Math.abs(velErrorUp) < ShooterConstants.Shooting.ERROR && 
-                          Math.abs(velErrorDown) < ShooterConstants.Shooting.ERROR;
+                          Math.abs(velErrorDown) < ShooterConstants.Shooting.ERROR &&
+                          velUp > 0;
         boolean isReadyVel = Math.abs(velErrorUp) < ShooterConstants.Shooting.ERROR && 
                           Math.abs(velErrorDown) < ShooterConstants.Shooting.ERROR;
         boolean isReadyAngle =  Math.abs(angleError) < ShooterConstants.AngleChanger.ERROR;
         SmartDashboard.putBoolean("isReadyAngle", isReadyAngle);
         SmartDashboard.putBoolean("isReadyVel", isReadyVel);
 
-
-        DataLogManager.log("is ready vel= " + isReadyVel + ", is ready angle= " + isReadyAngle);
-
-        shooter.setIsShootingReady(isReady && velDown > 0);
+        if(isReady) {
+            readyCounter++; 
+        } else {
+            readyCounter = 0;
+        }
+        shooter.setIsShootingReady(readyCounter > 10);
 
         /*checks if the shooter is ready and if the timer did not hit 0.4*/
         if (!isShooting && shooter.getIsShooting()) {
@@ -178,7 +182,7 @@ public class ActivateShooter extends Command {
             timer.start();
             shooter.feedingSetPow(1);
             intake.setPower(1);
-        } else if (isShooting && timer.get() > 1) {
+        } else if (isShooting && timer.get() > 2) {
             /*if the shooter is shooting and the timer hit 0.4 than stop shooting */
             isShooting = false;
             timer.reset();
@@ -186,13 +190,18 @@ public class ActivateShooter extends Command {
             shooter.feedingSetPow(0);
             shooter.setPow(0);
             intake.setPower(0);
+            readyCounter= 0;
             shooter.setIsShootingReady(false);
 
             if (shooter.getShooterMode()!=SHOOTER_MODE.AUTO_CONTINIOUS) {
                 shooter.setShooterMode(SHOOTER_MODE.IDLE);
             }
+        } else if(isShooting) {
+            intake.setPower(1);
         }
-    }
+
+        }
+    
 
     /**
      * stop the shooter and intake if the want to finish

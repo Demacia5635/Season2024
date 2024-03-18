@@ -7,13 +7,13 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.Counter;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.commands.intake.DispenseCommand;
 import frc.robot.commands.intake.IntakeCommand;
 import frc.robot.subsystems.intake.IntakeConstants.*;
 
@@ -90,16 +90,20 @@ public class Intake extends SubsystemBase {
     }
 
     public void setPower(double p1) {
+//        DataLogManager.log(" Setting power to " + p1);
         motor1.set(ControlMode.PercentOutput, p1);
         motor2.set(ControlMode.PercentOutput, p1);
     }
 
     public void setPower(double p1, double p2) {
+        //DataLogManager.log(" Setting power to " + p1 + "/" + p2);
         motor1.set(ControlMode.PercentOutput, p1);
         motor2.set(ControlMode.PercentOutput, p2);
     }
 
     public void setVelocity(double velocity) {
+//        DataLogManager.log(" Setting Velocity to " + velocity);
+
         motor1.set(ControlMode.Velocity, velocity);
         motor2.set(ControlMode.Velocity, velocity);
 
@@ -132,10 +136,10 @@ public class Intake extends SubsystemBase {
         System.out.println("coast");
         motor1.setNeutralMode(NeutralMode.Coast);
         motor2.setNeutralMode(NeutralMode.Coast);
-
     }
 
     public void stop() {
+//        DataLogManager.log(" set Intake stop");
         motor1.set(ControlMode.PercentOutput, 0);
         motor2.set(ControlMode.PercentOutput, 0);
 
@@ -187,6 +191,7 @@ public class Intake extends SubsystemBase {
         super.initSendable(builder);
         builder.addBooleanProperty("is note", this::isNote2, null);
         builder.addDoubleProperty("Limit switch voltage intake", this::getLimitVolt, null);
+        builder.addDoubleProperty("Intake Power", ()->motor1.getMotorOutputPercent(), null);
     }
 
 }

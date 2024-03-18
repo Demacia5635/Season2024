@@ -28,7 +28,6 @@ import frc.robot.Sysid.Sysid;
 import frc.robot.Sysid.Sysid.Gains;
 import frc.robot.commands.amp.AmpIntake2;
 import frc.robot.commands.amp.AmpIntakeShoot;
-import frc.robot.commands.intake.DispenseCommand;
 
 public class Amp extends SubsystemBase {
     public final TalonFX armMotor;
@@ -373,7 +372,6 @@ public class Amp extends SubsystemBase {
     public Command getReadyCommand(Intake intake) {
         return new InstantCommand(() -> goToSensor(), this).andThen(
                 new WaitUntilCommand(() -> isArmInPosition()),
-                new AmpIntake2(this).raceWith(new DispenseCommand(intake)),
                 new InstantCommand(() -> goToUpperPosition(), this),
                 new WaitUntilCommand(() -> isArmInPosition()));
     }
