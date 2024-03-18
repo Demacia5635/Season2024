@@ -227,17 +227,18 @@ public class RobotContainer implements Sendable {
     JoystickButton button3 = new JoystickButton(gitar, 3);
     JoystickButton button4 = new JoystickButton(gitar, 4);
     JoystickButton button5 = new JoystickButton(gitar, 5);
+    JoystickButton button6 = new JoystickButton(gitar, 6);
     JoystickButton button7 = new JoystickButton(gitar, 7);
     JoystickButton button8 = new JoystickButton(gitar, 8);
 
-    button5.onTrue(driverB);
     button1.onTrue(shooter.getActivateShooterSubwoofer());
     button2.onTrue(activateShooter);
     button3.onTrue(activateAmp);
     button4.onTrue(activatePodium);
-
-    button7.onTrue(Ppov90);
-    button8.onTrue(new InstantCommand(() -> {Utils.setPipeline(Math.max(Utils.getPipeline() - 1, 0)); }).ignoringDisable(true));
+    button5.onTrue(driverB);
+    button6.onTrue(PerlmanleftBumper);
+    button7.onTrue(Ppov180);
+    button8.onTrue(new InstantCommand(() -> {Utils.setPipeline(Utils.getPipeline() != 2 ? Utils.getPipeline() + 1 : 0); }).ignoringDisable(true));
 }
 
 
