@@ -122,7 +122,7 @@ public static final double COLLECT_OFFSET_METERS = 0.7;
   public final static SwerveModuleConstants FRONT_LEFT = new SwerveModuleConstants(
       5, 6, 13,
       new Translation2d(0.332, 0.277),
-      21.1816,
+      20.47,
       MOVE_PID,
       FRONT_STEER_PID,
       FRONT_POSITION_STEER_PID,
@@ -138,7 +138,7 @@ public static final double COLLECT_OFFSET_METERS = 0.7;
   public final static SwerveModuleConstants FRONT_RIGHT = new SwerveModuleConstants(
       3, 4, 12,
       new Translation2d(0.332, -0.277),
-      168.486,
+      169.01,
       MOVE_PID,
       FRONT_STEER_PID,
       FRONT_POSITION_STEER_PID,
@@ -155,7 +155,7 @@ public static final double COLLECT_OFFSET_METERS = 0.7;
   public final static SwerveModuleConstants BACK_LEFT = new SwerveModuleConstants(
       2, 1, 11,
       new Translation2d(-0.332, 0.288),
-      50.625,
+      50.97,
       MOVE_PID,
       BACK_STEER_PID,
       BACK_POSITION_STEER_PID,
@@ -172,7 +172,7 @@ public static final double COLLECT_OFFSET_METERS = 0.7;
   public final static SwerveModuleConstants BACK_RIGHT = new SwerveModuleConstants(
       8, 7, 14,
       new Translation2d(-0.332, -0.288),
-      89.29,
+      94.57,
       MOVE_PID,
       BACK_STEER_PID,
       BACK_POSITION_STEER_PID,

@@ -108,7 +108,7 @@ public class DriveToNote extends Command {
 
   @Override
   public boolean isFinished() {
-    return finish || (timer.get() > -(0.5 * velocity) + 1 && countTime);
+    return finish || (timer.get() > -(0.5 * velocity) + 1.25 && countTime);
   }
 
 }

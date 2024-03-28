@@ -114,6 +114,7 @@ public class LedControll extends SubsystemBase{
             setColor(Color.kGreen);
         } else {
             setColor(Color.kRed);
+            //rainbow();
         }
     }
 }
