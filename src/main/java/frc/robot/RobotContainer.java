@@ -34,6 +34,7 @@ import frc.robot.subsystems.vision.VisionLimelight;
 import frc.robot.utils.Utils;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import frc.robot.commands.chassis.CurveCommand;
 import frc.robot.commands.chassis.DriveCommand;
 import frc.robot.commands.chassis.DriveToNote;
 import frc.robot.commands.chassis.GoToAngleChassis;
@@ -249,30 +250,6 @@ public class RobotContainer implements Sendable {
  
    
   public Command getAutonomousCommand() {
-
-    AutoOptions autoOption = autoChoose.getSelected();
-    Command cmd = null;
-    switch(autoOption) {
-      case Shoot:
-        cmd = new Shoot();
-        break;
-      case Wing:
-        cmd = new CollectWing();
-        break;
-      case Destroy:
-        cmd = new DestroyCenter();
-        break;
-      case Bottom:
-        cmd = new CollectBottom();
-        break;
-    }
-    
-    if(cmd != null) {
-      return cmd.alongWith( 
-        new InstantCommand(()->shooter.setShooterMode(SHOOTER_MODE.AUTO_CONTINIOUS))
-        .andThen(new ActivateShooter(shooter, intake, chassis)));
-    } else {
-      return null;
-    }
+    return new CurveCommand(chassis, 1, new Translation2d(), new Translation2d(1, 1), new Translation2d(1, 3));
   }
 }

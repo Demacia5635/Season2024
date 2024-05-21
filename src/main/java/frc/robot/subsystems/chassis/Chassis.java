@@ -97,6 +97,8 @@ public class Chassis extends SubsystemBase {
     SmartDashboard.putData("reset wheels", new InstantCommand(() -> resetWheels()).ignoringDisable(true));
         SmartDashboard.putData("reset pose", new InstantCommand(() -> setOdometryToForward()).ignoringDisable(true));
 
+    SmartDashboard.putData("Reset Position", new InstantCommand(()->resetOdometry(), this).ignoringDisable(true));
+
     SmartDashboard.putData("calibrate", new InstantCommand(()->calibrate(), this).ignoringDisable(true));
     
     pathPoint dummyPoint = new pathPoint(0, 0, new Rotation2d(), 0, false);
@@ -308,6 +310,12 @@ public class Chassis extends SubsystemBase {
     poseEstimator.resetPosition(getRawAngle(), getModulePositions(),
         new Pose2d(poseEstimator.getEstimatedPosition().getTranslation(), Rotation2d.fromDegrees(0)));
   }
+
+  public void resetOdometry() {
+     poseEstimator.resetPosition(getRawAngle(), getModulePositions(),
+        new Pose2d(0, 0, Rotation2d.fromDegrees(0)));
+  }
+  
 
   /**
    * Returns the position of every module
