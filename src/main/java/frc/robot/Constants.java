@@ -46,8 +46,8 @@ public final class Constants {
       MODULE_BACK_RIGHT.moduleTranslationOffset
     );
 
-    public static final double MAX_DRIVE_VELOCITY = 4;
-    public static final double DRIVE_ACCELERATION = 12;
+    public static final double MAX_DRIVE_VELOCITY = 2; //4;
+    public static final double DRIVE_ACCELERATION = 4; //12;
     public static final double MAX_STEER_VELOCITY = 600;
     public static final double STEER_ACCELERATION = 6000;
 
@@ -141,5 +141,11 @@ public final class Constants {
  
   }
 
+
+  public static final class OpenDayAutoConstants {
+    public final static double MAX_VEL = 2;
+    public final static double MAX_ACC = 4;
+    
+  }
 
 }

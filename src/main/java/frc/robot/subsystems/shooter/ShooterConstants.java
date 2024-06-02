@@ -62,7 +62,7 @@ public class ShooterConstants {
 
         public static final double MAX_ANGLE_POWER =  0.5;
 
-        public static final double ERROR = 0.75;
+        public static final double ERROR = 1;
     }
 
     /**vars for shooting */
@@ -76,7 +76,7 @@ public class ShooterConstants {
         public static final double KP =  0.02;
         public static final double KI = 0.0007;
 
-        public static final double ERROR = 0.3;
+        public static final double ERROR = 0.5;
 
         public static final double RAMP = 0.5;
     }

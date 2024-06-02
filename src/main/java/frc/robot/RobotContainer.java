@@ -52,15 +52,17 @@ import frc.robot.commands.chassis.Auto.CollectBottom;
 import frc.robot.commands.chassis.Auto.CollectTop;
 import frc.robot.commands.chassis.Auto.CollectWing;
 import frc.robot.commands.chassis.Auto.DestroyCenter;
+import frc.robot.commands.chassis.Auto.OpenDay.MakeCode;
 import frc.robot.commands.intake.IntakeCommand;
 import frc.robot.subsystems.amp.Amp;
 import frc.robot.subsystems.chassis.Chassis;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.leds.LedControll;
+import frc.robot.commands.chassis.Auto.OpenDay.OpenDayAuto;
 
 public class RobotContainer implements Sendable {
   public static RobotContainer robotContainer;
-  private Boolean isRed = true;
+  private Boolean isRed = false;
   CommandXboxController commandController;
   public CommandXboxController commandController2;
   public Joystick gitar;
@@ -149,7 +151,7 @@ public class RobotContainer implements Sendable {
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    builder.addBooleanProperty("is Red",this::isRed, this::isRed);
+    // builder.addBooleanProperty("is Red",this::isRed, this::isRed);
   }
 
 
@@ -250,29 +252,33 @@ public class RobotContainer implements Sendable {
    
   public Command getAutonomousCommand() {
 
-    AutoOptions autoOption = autoChoose.getSelected();
-    Command cmd = null;
-    switch(autoOption) {
-      case Shoot:
-        cmd = new Shoot();
-        break;
-      case Wing:
-        cmd = new CollectWing();
-        break;
-      case Destroy:
-        cmd = new DestroyCenter();
-        break;
-      case Bottom:
-        cmd = new CollectBottom();
-        break;
-    }
+    // AutoOptions autoOption = autoChoose.getSelected();
+    // Command cmd = null;
+    // switch(autoOption) {
+    //   case Shoot:
+    //     cmd = new Shoot();
+    //     break;
+    //   case Wing:
+    //     cmd = new CollectWing();
+    //     break;
+    //   case Destroy:
+    //     cmd = new DestroyCenter();
+    //     break;
+    //   case Bottom:
+    //     cmd = new CollectBottom();
+    //     break;
+    // }
     
-    if(cmd != null) {
-      return cmd.alongWith( 
-        new InstantCommand(()->shooter.setShooterMode(SHOOTER_MODE.AUTO_CONTINIOUS))
-        .andThen(new ActivateShooter(shooter, intake, chassis)));
-    } else {
-      return null;
-    }
+    // if(cmd != null) {
+    //   return cmd.alongWith( 
+    //     new InstantCommand(()->shooter.setShooterMode(SHOOTER_MODE.AUTO_CONTINIOUS))
+    //     .andThen(new ActivateShooter(shooter, intake, chassis)));
+    // } else {
+    //   return null;
+    // }
+
+    MakeCode.WriteCode();
+    OpenDayAuto.cmd.addRequirements(chassis, shooter, intake);
+    return OpenDayAuto.cmd;
   }
 }
