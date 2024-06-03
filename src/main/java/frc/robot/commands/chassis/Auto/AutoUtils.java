@@ -113,7 +113,7 @@ public class AutoUtils {
             .raceWith(isReadyToShoot());
     }
 
-    public static Command setShooterAngleToShoot(){
+    public static Command setShooterToShoot(){
         return new InstantCommand(() -> shooter.setShooterMode(SHOOTER_MODE.AUTO));
     }
     public static Command shootWhenReady(){
