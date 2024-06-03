@@ -117,7 +117,7 @@ public class AutoUtils {
         return new InstantCommand(() -> shooter.setShooterMode(SHOOTER_MODE.AUTO));
     }
     public static Command shootWhenReady(){
-        return isReadyToShoot().andThen(shoot(1)).andThen(()->shooter.setShooterMode(SHOOTER_MODE.IDLE));
+        return isReadyToShoot().andThen(shoot(1));
     }
     
 
