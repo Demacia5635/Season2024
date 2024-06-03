@@ -59,8 +59,6 @@ public class ActivateShooter extends Command {
      * @param shooter the wanted shooter
      * @param intake the wanted intake
      * @param chassis the wanted chassis pos
-     * @param from the pos to shoot, if null will shoot from chassis pos
-     * @param isContinious if the command will not stop the motor
      */
     public ActivateShooter(Shooter shooter, Intake intake, Chassis chassis) {
         this.shooter = shooter;

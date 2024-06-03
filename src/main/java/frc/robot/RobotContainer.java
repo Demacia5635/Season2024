@@ -58,7 +58,6 @@ import frc.robot.subsystems.amp.Amp;
 import frc.robot.subsystems.chassis.Chassis;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.leds.LedControll;
-import frc.robot.commands.chassis.Auto.OpenDay.OpenDayAuto;
 
 public class RobotContainer implements Sendable {
   public static RobotContainer robotContainer;
@@ -85,7 +84,7 @@ public class RobotContainer implements Sendable {
   public Command activateShooter;
   public Command activateSubwoofer;
   
-  private enum AutoOptions { Shoot, Wing, Destroy, Bottom};
+  private enum AutoOptions { Shoot, Wing, Destroy, Bottom, OPEN_DAY};
   private SendableChooser<AutoOptions> autoChoose;
 
   
@@ -252,33 +251,43 @@ public class RobotContainer implements Sendable {
    
   public Command getAutonomousCommand() {
 
-    // AutoOptions autoOption = autoChoose.getSelected();
-    // Command cmd = null;
-    // switch(autoOption) {
-    //   case Shoot:
-    //     cmd = new Shoot();
-    //     break;
-    //   case Wing:
-    //     cmd = new CollectWing();
-    //     break;
-    //   case Destroy:
-    //     cmd = new DestroyCenter();
-    //     break;
-    //   case Bottom:
-    //     cmd = new CollectBottom();
-    //     break;
-    // }
+    AutoOptions autoOption = autoChoose.getSelected();
+    Command cmd = null;
+    switch(autoOption) {
+      case Shoot:
+        cmd = new Shoot();
+        break;
+      case Wing:
+        cmd = new CollectWing();
+        break;
+      case Destroy:
+        cmd = new DestroyCenter();
+        break;
+      case Bottom:
+        cmd = new CollectBottom();
+        break;
+      case OPEN_DAY:
+        cmd = new MakeCode();
+        break;
+    }
     
-    // if(cmd != null) {
-    //   return cmd.alongWith( 
-    //     new InstantCommand(()->shooter.setShooterMode(SHOOTER_MODE.AUTO_CONTINIOUS))
-    //     .andThen(new ActivateShooter(shooter, intake, chassis)));
-    // } else {
-    //   return null;
-    // }
+    
+    
+    if(cmd != null && autoOption != AutoOptions.OPEN_DAY) {
+      return cmd.alongWith( 
+        new InstantCommand(()->shooter.setShooterMode(SHOOTER_MODE.AUTO_CONTINIOUS))
+        .andThen(new ActivateShooter(shooter, intake, chassis)));
+    }
+    else if(cmd != null){
+      return cmd.alongWith( 
+        new InstantCommand(()->shooter.setShooterMode(SHOOTER_MODE.IDLE))
+        .andThen(new ActivateShooter(shooter, intake, chassis)));
+    }
+    
+    else {
+      return null;
+    }
 
-    MakeCode.WriteCode();
-    OpenDayAuto.cmd.addRequirements(chassis, shooter, intake);
-    return OpenDayAuto.cmd;
+
   }
 }

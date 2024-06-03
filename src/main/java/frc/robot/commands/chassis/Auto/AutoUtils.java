@@ -4,6 +4,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -13,11 +14,17 @@ import frc.robot.RobotContainer;
 import frc.robot.PathFollow.Util.pathPoint;
 import frc.robot.commands.chassis.DriveToNote;
 import frc.robot.commands.chassis.GoToAngleChassis;
+import frc.robot.commands.chassis.Auto.OpenDay.MoveBackwards;
+import frc.robot.commands.chassis.Auto.OpenDay.MoveForward;
+import frc.robot.commands.chassis.Auto.OpenDay.MoveLeft;
+import frc.robot.commands.chassis.Auto.OpenDay.MoveRight;
 import frc.robot.commands.chassis.Paths.PathFollow;
 import frc.robot.commands.intake.IntakeCommand;
+import frc.robot.commands.shooter.ActivateShooter;
 import frc.robot.subsystems.chassis.Chassis;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.shooter.ShooterConstants.SHOOTER_MODE;
 import frc.robot.utils.Utils;
 import frc.robot.subsystems.chassis.ChassisConstants.*;
 
@@ -94,10 +101,10 @@ public class AutoUtils {
         .raceWith(new IntakeCommand(intake)).andThen(new IntakeCommand(intake)).withTimeout(2);
     }
     public static Command isReadyToShoot(){
-        return new WaitUntilCommand(()->shooterReady());
+        return new WaitUntilCommand(()->isShooterReady());
     }
 
-    public static boolean shooterReady() {
+    public static boolean isShooterReady() {
         return shooter.getIsShootingReady() && Math.abs(chassis.getErrorSpeakerAngle()) < 4;
     }
 
@@ -106,10 +113,31 @@ public class AutoUtils {
             .raceWith(isReadyToShoot());
     }
 
+    public static Command setShooterAngleToShoot(){
+        return new InstantCommand(() -> shooter.setShooterMode(SHOOTER_MODE.AUTO));
+    }
+    public static Command shootWhenReady(){
+        return isReadyToShoot().andThen(shoot(1)).andThen(()->shooter.setShooterMode(SHOOTER_MODE.IDLE));
+    }
+    
+
     public static Command leave() {
         return new RunCommand(()-> chassis.setVelocities(
             new ChassisSpeeds(1.5, 0, 0)), chassis).withTimeout(3);
     }
+    public static Command MoveForward(double distance){
+        return new MoveForward(distance);
+    }
+    public static Command MoveBackwards(double distance){
+        return new MoveBackwards(distance);
+    }
+    public static Command MoveRight(double distance){
+        return new MoveRight(distance);
+    }
+    public static Command MoveLeft(double distance){
+        return new MoveLeft(distance);
+    }
+    
 
     
 }
