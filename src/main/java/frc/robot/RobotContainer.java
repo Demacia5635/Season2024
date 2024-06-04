@@ -150,7 +150,7 @@ public class RobotContainer implements Sendable {
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    // builder.addBooleanProperty("is Red",this::isRed, this::isRed);
+    builder.addBooleanProperty("is Red",this::isRed, this::isRed);
   }
 
 
