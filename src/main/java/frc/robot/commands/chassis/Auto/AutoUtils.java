@@ -126,21 +126,25 @@ public class AutoUtils {
             new ChassisSpeeds(1.5, 0, 0)), chassis).withTimeout(3);
     }
     public static Command MoveForward(double dis){
-        return new RunCommand(()-> chassis.setVelocities(new ChassisSpeeds(-1, 0, 0)), chassis).raceWith(new WaitCommand(dis));
+        return new RunCommand(()-> chassis.setVelocities(new ChassisSpeeds(-1, 0, 0)), chassis).raceWith(new WaitCommand(dis))
+        .andThen(new InstantCommand(()-> chassis.stop(), chassis));
         // return new MoveForward(distance);
     }
     public static Command MoveBackwards(double distance){
-        return new RunCommand(()-> chassis.setVelocities(new ChassisSpeeds(1, 0, 0)), chassis).raceWith(new WaitCommand(distance));
+        return new RunCommand(()-> chassis.setVelocities(new ChassisSpeeds(1, 0, 0)), chassis).raceWith(new WaitCommand(distance))
+        .andThen(new InstantCommand(()-> chassis.stop(), chassis));
 
         //return new MoveBackwards(distance);
     }
     public static Command MoveRight(double dis){
-        return new RunCommand(()-> chassis.setVelocities(new ChassisSpeeds(0, 1, 0)), chassis).raceWith(new WaitCommand(dis));
+        return new RunCommand(()-> chassis.setVelocities(new ChassisSpeeds(0, 1, 0)), chassis).raceWith(new WaitCommand(dis))
+        .andThen(new InstantCommand(()-> chassis.stop(), chassis));
 
         // return new MoveRight(distance);
     }
     public static Command MoveLeft(double dis){
-        return new RunCommand(()-> chassis.setVelocities(new ChassisSpeeds(0, -1, 0)), chassis).raceWith(new WaitCommand(dis));
+        return new RunCommand(()-> chassis.setVelocities(new ChassisSpeeds(0, -1, 0)), chassis).raceWith(new WaitCommand(dis))
+        .andThen(new InstantCommand(()-> chassis.stop(), chassis));
     }
     
 

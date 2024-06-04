@@ -27,13 +27,10 @@ public class MakeCode extends Command {
   @Override
   public void initialize() {
     cmd = new SequentialCommandGroup(
-        MoveForward(1)
-        
+        takeNote()
+
     );
-    
-    addCommands(MoveBackwards(1), cmd);
-    addCommands(MoveLeft(1), cmd);
-    addCommands(MoveRight(1), cmd);
+
 
 
     
