@@ -125,17 +125,22 @@ public class AutoUtils {
         return new RunCommand(()-> chassis.setVelocities(
             new ChassisSpeeds(1.5, 0, 0)), chassis).withTimeout(3);
     }
-    public static Command MoveForward(double distance){
-        return new MoveForward(distance);
+    public static Command MoveForward(double dis){
+        return new RunCommand(()-> chassis.setVelocities(new ChassisSpeeds(-1, 0, 0)), chassis).raceWith(new WaitCommand(dis));
+        // return new MoveForward(distance);
     }
     public static Command MoveBackwards(double distance){
-        return new MoveBackwards(distance);
+        return new RunCommand(()-> chassis.setVelocities(new ChassisSpeeds(1, 0, 0)), chassis).raceWith(new WaitCommand(distance));
+
+        //return new MoveBackwards(distance);
     }
-    public static Command MoveRight(double distance){
-        return new MoveRight(distance);
+    public static Command MoveRight(double dis){
+        return new RunCommand(()-> chassis.setVelocities(new ChassisSpeeds(0, 1, 0)), chassis).raceWith(new WaitCommand(dis));
+
+        // return new MoveRight(distance);
     }
-    public static Command MoveLeft(double distance){
-        return new MoveLeft(distance);
+    public static Command MoveLeft(double dis){
+        return new RunCommand(()-> chassis.setVelocities(new ChassisSpeeds(0, -1, 0)), chassis).raceWith(new WaitCommand(dis));
     }
     
 

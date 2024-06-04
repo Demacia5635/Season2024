@@ -26,30 +26,20 @@ public class MakeCode extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    cmd = new SequentialCommandGroup(goTo(example,1.6, true));
-    addCommands(new WaitCommand(0.5), cmd);
-    addCommands(MoveForward(1), cmd);
+    cmd = new SequentialCommandGroup(
+        MoveForward(1)
+        
+    );
+    
     addCommands(MoveBackwards(1), cmd);
     addCommands(MoveLeft(1), cmd);
     addCommands(MoveRight(1), cmd);
-    addCommands(setShooterToShoot(), cmd);
-    addCommands(shootWhenReady(), cmd);
 
 
     
     cmd.schedule();
   }
 
-  // Called every time the scheduler runs while the command is scheduled.
-  @Override
-  public void execute() {}
-
-  // Called once the command ends or is interrupted.
-  @Override
-  public void end(boolean interrupted) {
-  }
-
-  // Returns true when the command should end.
   @Override
   public boolean isFinished() {
     return cmd.isFinished();

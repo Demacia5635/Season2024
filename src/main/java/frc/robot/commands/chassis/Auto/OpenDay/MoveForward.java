@@ -13,7 +13,7 @@ import frc.robot.subsystems.chassis.Chassis;
 public class MoveForward extends Command {
   double distance;
   Chassis chassis;
-  double vel = 1;
+  double vel = -4;
   public MoveForward(double distance) {
    this.distance = distance;
    this.chassis = RobotContainer.robotContainer.chassis;
@@ -24,8 +24,10 @@ public class MoveForward extends Command {
 
   @Override
   public void execute() {
+    
     chassis.setVelocities(new ChassisSpeeds(0, vel, 0));
-    distance -= (vel * 0.02);
+    distance += (vel * 0.00002);
+    System.out.println(distance);
 
 
 

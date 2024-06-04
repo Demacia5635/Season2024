@@ -13,7 +13,7 @@ import frc.robot.subsystems.chassis.Chassis;
 public class MoveRight extends Command {
   double distance;
   Chassis chassis;
-  double vel = -1;
+  double vel = 1;
   public MoveRight(double distance) {
    this.distance = distance;
    this.chassis = RobotContainer.robotContainer.chassis;
@@ -25,7 +25,7 @@ public class MoveRight extends Command {
   @Override
   public void execute() {
     chassis.setVelocities(new ChassisSpeeds(vel, 0, 0));
-    distance += (vel * 0.02);
+    distance -= (vel * 0.02);
 
 
 
@@ -39,6 +39,6 @@ public class MoveRight extends Command {
 
   @Override
   public boolean isFinished() {
-    return distance <= 0.05;
+    return distance >= 0.05;
   }
 }
