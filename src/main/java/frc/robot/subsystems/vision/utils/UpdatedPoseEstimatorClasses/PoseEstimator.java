@@ -15,9 +15,12 @@ import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
 import edu.wpi.first.math.kinematics.Kinematics;
 import edu.wpi.first.math.kinematics.Odometry;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.WheelPositions;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import frc.robot.subsystems.chassis.utils.SwerveKinematics;
+
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
@@ -39,6 +42,7 @@ import java.util.Objects;
  */
 public class PoseEstimator<T extends WheelPositions<T>> {
   private final Kinematics<?, T> m_kinematics;
+  private final SwerveKinematics ms_Kinematics;
   private final Odometry<T> m_odometry;
   private final Matrix<N3, N1> m_q = new Matrix<>(Nat.N3(), Nat.N1());
   private final Matrix<N3, N3> m_visionK = new Matrix<>(Nat.N3(), Nat.N3());
@@ -59,13 +63,14 @@ public class PoseEstimator<T extends WheelPositions<T>> {
    *     in meters, y position in meters, and heading in radians). Increase these numbers to trust
    *     the vision pose measurement less.
    */
-  public PoseEstimator(
+  public PoseEstimator(SwerveDriveKinematics ms_Kinematics,
       Kinematics<?, T> kinematics,
       Odometry<T> odometry,
       Matrix<N3, N1> stateStdDevs,
       Matrix<N3, N1> visionMeasurementStdDevs) {
     m_kinematics = kinematics;
     m_odometry = odometry;
+    this.ms_Kinematics = ms_Kinematics;
 
     for (int i = 0; i < 3; ++i) {
       m_q.set(i, 0, stateStdDevs.get(i, 0) * stateStdDevs.get(i, 0));
@@ -306,7 +311,7 @@ public class PoseEstimator<T extends WheelPositions<T>> {
         var gyroLerp = gyroAngle.interpolate(endValue.gyroAngle, t);
 
         // Create a twist to represent the change based on the interpolated sensor inputs.
-        Twist2d twist = m_kinematics.toTwist2d(wheelPositions, wheelLerp);
+        Twist2d twist = ms_Kinematics.toTwist2d(wheelPositions, wheelLerp);
         twist.dtheta = gyroLerp.minus(gyroAngle).getRadians();
 
         return new InterpolationRecord(poseMeters.exp(twist), gyroLerp, wheelLerp);
