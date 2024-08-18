@@ -20,6 +20,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
  *   - do the reverse - if Omega is non zero - change the result vx/vy as compensated
  */
 public class SwerveKinematics extends SwerveDriveKinematics {
+    
 
     public static final double VX_VY_CHANGE_RATIO = -0.1;
     public static final double MIN_RATIO_CHANGE = Math.toRadians(20);
@@ -85,7 +86,6 @@ public class SwerveKinematics extends SwerveDriveKinematics {
         }
         
 
-
         SwerveModulePosition[] newPositions = new SwerveModulePosition[start.positions.length];
         for (int i = 0; i < start.positions.length; i++) {
             var startModule = start.positions[i];
@@ -94,7 +94,14 @@ public class SwerveKinematics extends SwerveDriveKinematics {
             new SwerveModulePosition(
                 endModule.distanceMeters - startModule.distanceMeters,
                 endModule.angle.plus(startModule.angle).div(2));
-        }
+        };
+
+
+
+        
+
         return toTwist2d(newPositions);
     }
+
+
 }
