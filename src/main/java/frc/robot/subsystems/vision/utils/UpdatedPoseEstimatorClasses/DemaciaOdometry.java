@@ -66,7 +66,7 @@ public class DemaciaOdometry {
 
         twist.dtheta = angle.minus(m_previousAngle).getRadians();
         Pose2d newPose = exp(pose, twist); //need to test
-        newPose = pose.exp(twist);
+        //newPose = pose.exp(twist);
         m_previousWheelPositions = cur;
         m_previousAngle = angle;
         pose = new Pose2d(newPose.getTranslation(), angle);
