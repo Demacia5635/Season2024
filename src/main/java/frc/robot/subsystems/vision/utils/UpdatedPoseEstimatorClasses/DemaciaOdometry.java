@@ -51,8 +51,8 @@ public class DemaciaOdometry {
     public Pose2d update(Rotation2d gyroAngle, SwerveModulePosition[] wheelPositions) {
         Rotation2d angle = gyroAngle.plus(m_gyroOffset);
         SwerveDriveWheelPositions cur = new SwerveDriveWheelPositions(wheelPositions);
-        SwerveModulePosition[] curModulesPos = cur.positions;
 
+        SwerveModulePosition[] curModulesPos = cur.positions;
         SwerveModulePosition[] estimated = calcModulesPosBasedOn2Other(gyroAngle, m_previousWheelPositions, cur);
 
         List<SwerveModulePosition> modulesPositionAfterCalc = new ArrayList<SwerveModulePosition>();
@@ -66,6 +66,7 @@ public class DemaciaOdometry {
 
         twist.dtheta = angle.minus(m_previousAngle).getRadians();
         Pose2d newPose = exp(pose, twist); //need to test
+        newPose = pose.exp(twist);
         m_previousWheelPositions = cur;
         m_previousAngle = angle;
         pose = new Pose2d(newPose.getTranslation(), angle);
