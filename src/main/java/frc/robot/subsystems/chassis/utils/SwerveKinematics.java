@@ -83,6 +83,7 @@ public class SwerveKinematics extends SwerveDriveKinematics {
         if (start.positions.length != end.positions.length) {
             throw new IllegalArgumentException("Inconsistent number of modules!");
         }
+        
 
 
         SwerveModulePosition[] newPositions = new SwerveModulePosition[start.positions.length];
