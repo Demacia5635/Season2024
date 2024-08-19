@@ -96,10 +96,6 @@ public class SwerveKinematics extends SwerveDriveKinematics {
                 endModule.angle.plus(startModule.angle).div(2));
         };
 
-
-
-        
-
         return toTwist2d(newPositions);
     }
 

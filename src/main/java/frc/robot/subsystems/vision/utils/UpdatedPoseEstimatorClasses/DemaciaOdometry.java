@@ -52,21 +52,10 @@ public class DemaciaOdometry {
         Rotation2d angle = gyroAngle.plus(m_gyroOffset);
         SwerveDriveWheelPositions cur = new SwerveDriveWheelPositions(wheelPositions);
 
-        SwerveModulePosition[] curModulesPos = cur.positions;
-        SwerveModulePosition[] estimated = calcModulesPosBasedOn2Other(gyroAngle, m_previousWheelPositions, cur);
-
-        List<SwerveModulePosition> modulesPositionAfterCalc = new ArrayList<SwerveModulePosition>();
-
-        for(int i = 0; i < curModulesPos.length; i++){
-            if(isSame(curModulesPos[i], estimated[i])) modulesPositionAfterCalc.add(curModulesPos[i]);
-            else ; //need to think of alg to get wrong modules
-        }
-
         Twist2d twist = kinematics.toTwist2d(m_previousWheelPositions, cur);
 
         twist.dtheta = angle.minus(m_previousAngle).getRadians();
-        Pose2d newPose = exp(pose, twist); //need to test
-        //newPose = pose.exp(twist);
+        Pose2d newPose = pose.exp(twist);
         m_previousWheelPositions = cur;
         m_previousAngle = angle;
         pose = new Pose2d(newPose.getTranslation(), angle);
@@ -74,12 +63,12 @@ public class DemaciaOdometry {
         return pose;
     }
 
-    private boolean isSame(SwerveModulePosition current, SwerveModulePosition estimated){
+    /*private boolean isSame(SwerveModulePosition current, SwerveModulePosition estimated){
         return Math.abs(current.distanceMeters - estimated.distanceMeters) < DISTANCE_OFFSET && Math.abs(current.angle.minus(estimated.angle).getDegrees() ) < ANGLE_OFFSET;
     }
     
 
-    private SwerveModulePosition[] calcModulesPosBasedOn2Other(Rotation2d gyroAngle, SwerveDriveWheelPositions start, SwerveDriveWheelPositions end){
+    private SwerveModulePosition[] calcModulesPosBasedOnOther(Rotation2d gyroAngle, SwerveDriveWheelPositions start, SwerveDriveWheelPositions end){
         SwerveModulePosition[] knownPositions = new SwerveModulePosition[start.positions.length / 2];
         SwerveModulePosition[] estimatedPositions = new SwerveModulePosition[knownPositions.length];
 
@@ -101,11 +90,5 @@ public class DemaciaOdometry {
             result[i] = estimatedPositions[i];
         }
         return result;
-    }
-
-    private Pose2d exp(Pose2d pose, Twist2d twist){
-        return new Pose2d(pose.getX() + twist.dx, pose.getY() + twist.dy, pose.getRotation().plus(Rotation2d.fromDegrees(twist.dtheta)));
-    }
-
-
+    }*/
 }
