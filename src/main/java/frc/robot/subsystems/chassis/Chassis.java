@@ -60,6 +60,9 @@ public class Chassis extends SubsystemBase {
 
   boolean isAimingSpeaker = false;
 
+  public static double targetVelocity = 0;
+  public static double currentVelocity = 0;
+
 
   public Chassis() {
     modules = new SwerveModule[] {
@@ -135,6 +138,13 @@ public class Chassis extends SubsystemBase {
       module.setAngleByPositionPID(Rotation2d.fromDegrees(45));  
     }
    }, this));
+  }
+
+  public static double getTargetVelocity(){
+    return targetVelocity;
+  }
+  public static double getVelocityAsDouble(){
+    return currentVelocity;
   }
 
   public SwerveModule[] getModules() {
@@ -233,6 +243,7 @@ public class Chassis extends SubsystemBase {
     ChassisSpeeds newChassisSpeeds = new ChassisSpeeds(newSpeeds.getX(), newSpeeds.getY(), relativeSpeeds.omegaRadiansPerSecond);
     newChassisSpeeds.omegaRadiansPerSecond = SwerveKinematics.fixOmega(newChassisSpeeds.omegaRadiansPerSecond);
     SwerveModuleState[] states = KINEMATICS.toSwerveModuleStates(newChassisSpeeds);
+    targetVelocity = new Translation2d(newChassisSpeeds.vxMetersPerSecond, newChassisSpeeds.vyMetersPerSecond).getNorm();
     setModuleStates(states);
   }
 
@@ -477,6 +488,8 @@ public class Chassis extends SubsystemBase {
     poseEstimator.update(getRawAngle(), getModulePositions());
     lastAngle = currentAngle;
     currentAngle = getRawAngle().getDegrees();
+
+    currentVelocity = getVelocity().getNorm();
 
     field.setRobotPose(getPose().plus(new Transform2d(0, 0, new Rotation2d())));
     SmartDashboard.putNumber("Distance from speaker", speakerPosition().getDistance(getPose().getTranslation()));
