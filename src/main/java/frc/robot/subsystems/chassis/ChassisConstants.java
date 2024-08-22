@@ -1,68 +1,16 @@
 package frc.robot.subsystems.chassis;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
+
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import frc.robot.PathFollow.Util.RectanglePos;
 import frc.robot.subsystems.chassis.utils.SwerveKinematics;
 
 public final class ChassisConstants {
 
-   /** from blue alliance, in meters */
-  public static RectanglePos rectAMP = new RectanglePos(   
-    new Translation2d(16.534, 0.502),
-    new Translation2d(13.229, 0));
-  /** from blue alliance, in meters */
-  public static RectanglePos rectSPEAKER = new RectanglePos(
-    new Translation2d(16.515, 4.076),
-    new Translation2d(14.596, 0.395));
-   
-  /** from blue alliance, in meters */
-  public static RectanglePos rectSOURCE = new RectanglePos(
 
-    new Translation2d(1.850, 8.156),
-    new Translation2d(0.027, 6.515));
-  /** from blue alliance, in meters */
-  public static RectanglePos rectSTAGE = new RectanglePos(
-    new Translation2d(13.443, 5.745),
-    new Translation2d(10.501, 2.35));
-
-  public static final Translation2d noteTop = new Translation2d(); //TODO
-  public static final Translation2d noteMid = new Translation2d();//TODO
-  public static final Translation2d noteBottom = new Translation2d(); //TODO
-  public static final Translation2d note1 = new Translation2d(); //TODO
-  public static final Translation2d note2 = new Translation2d(); //TODO
-  public static final Translation2d note3 = new Translation2d(); //TODO
-  public static final Translation2d note4 = new Translation2d(); //TODO
-  public static final Translation2d note5 = new Translation2d(); //TODO
-
-  public static final int GYRO_ID = 19;
+  public static final int GYRO_ID = 14;
 
   public static final double CYCLE_DT = 0.02;
-
-  static Pose2d aprilTag1 = new Pose2d(inchToMeter(593.68),inchToMeter(0.245), Rotation2d.fromDegrees(120));
-  static Pose2d aprilTag2 = new Pose2d(inchToMeter(637.21),inchToMeter(34.79), Rotation2d.fromDegrees(120));
-  static Pose2d aprilTag3 = new Pose2d(inchToMeter(652.73),inchToMeter(196.17), Rotation2d.fromDegrees(180));
-  static Pose2d aprilTag4 = new Pose2d(inchToMeter(652.73),inchToMeter(218.42), Rotation2d.fromDegrees(180));
-  static Pose2d aprilTag5 = new Pose2d(inchToMeter(578.77),inchToMeter(323), Rotation2d.fromDegrees(270));
-  static Pose2d aprilTag6 = new Pose2d(inchToMeter(72.5),inchToMeter(323), Rotation2d.fromDegrees(270));
-  static Pose2d aprilTag7 = new Pose2d(inchToMeter(-1.5),inchToMeter(218.42), Rotation2d.fromDegrees(0));
-  static Pose2d aprilTag8 = new Pose2d(inchToMeter(-1.5),inchToMeter(196.17), Rotation2d.fromDegrees(0));
-  static Pose2d aprilTag9 = new Pose2d(inchToMeter(14.02),inchToMeter(34.79), Rotation2d.fromDegrees(60));
-  static Pose2d aprilTag10 = new Pose2d(inchToMeter(57.54),inchToMeter(9.68), Rotation2d.fromDegrees(60));
-  static Pose2d aprilTag11 = new Pose2d(inchToMeter(468.69),inchToMeter(146.19), Rotation2d.fromDegrees(300));
-  static Pose2d aprilTag12 = new Pose2d(inchToMeter(468.69), inchToMeter(177.10) ,Rotation2d.fromDegrees(60));
-  static Pose2d aprilTag13 = new Pose2d(inchToMeter(441.74),inchToMeter(161.62), Rotation2d.fromDegrees(180));
-  static Pose2d aprilTag14 = new Pose2d(inchToMeter(209.48),inchToMeter(161.62), Rotation2d.fromDegrees(0));
-  static Pose2d aprilTag15 = new Pose2d(inchToMeter(182.73),inchToMeter(177.10), Rotation2d.fromDegrees(120));
-  static Pose2d aprilTag16 = new Pose2d(inchToMeter(182.73),inchToMeter(146.19), Rotation2d.fromDegrees(240));
-  public final static Pose2d[] aprilTagsPositions = {aprilTag1, aprilTag2, aprilTag3, aprilTag4, aprilTag5, aprilTag6, aprilTag7, aprilTag8,
-     aprilTag9, aprilTag10, aprilTag11, aprilTag12, aprilTag13, aprilTag14, aprilTag15, aprilTag16};
-
-  private static double inchToMeter(double inch){
-    return inch * 0.0254;
-  }
   
   public static final double MAX_DRIVE_VELOCITY = 4.1;
   public static final double DRIVE_ACCELERATION = 50;
@@ -120,9 +68,9 @@ public static final double COLLECT_OFFSET_METERS = 0.7;
 
 
   public final static SwerveModuleConstants FRONT_LEFT = new SwerveModuleConstants(
-      5, 6, 13,
+      4, 5, 6,
       new Translation2d(0.332, 0.277),
-      20.47,
+      (-0.354*360) - 90,
       MOVE_PID,
       FRONT_STEER_PID,
       FRONT_POSITION_STEER_PID,
@@ -136,9 +84,9 @@ public static final double COLLECT_OFFSET_METERS = 0.7;
       false,
       FRONT_INTEGRAL_ZONE);
   public final static SwerveModuleConstants FRONT_RIGHT = new SwerveModuleConstants(
-      3, 4, 12,
+      1, 2, 3,
       new Translation2d(0.332, -0.277),
-      169.01,
+      (-0.297*360) - 90,
       MOVE_PID,
       FRONT_STEER_PID,
       FRONT_POSITION_STEER_PID,
@@ -153,9 +101,9 @@ public static final double COLLECT_OFFSET_METERS = 0.7;
       FRONT_INTEGRAL_ZONE);
 
   public final static SwerveModuleConstants BACK_LEFT = new SwerveModuleConstants(
-      2, 1, 11,
+      10, 11, 12,
       new Translation2d(-0.332, 0.288),
-      50.97,
+      (-0.382*360) - 90,
       MOVE_PID,
       BACK_STEER_PID,
       BACK_POSITION_STEER_PID,
@@ -170,9 +118,9 @@ public static final double COLLECT_OFFSET_METERS = 0.7;
       BACK_INTEGRAL_ZONE);
 
   public final static SwerveModuleConstants BACK_RIGHT = new SwerveModuleConstants(
-      8, 7, 14,
+      7, 8, 9,
       new Translation2d(-0.332, -0.288),
-      94.57,
+      (-0.277*360) - 90,
       MOVE_PID,
       BACK_STEER_PID,
       BACK_POSITION_STEER_PID,

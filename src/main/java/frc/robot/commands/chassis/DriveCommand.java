@@ -29,7 +29,6 @@ public class DriveCommand extends Command {
     this.commandXboxController = commandXboxController;
     addRequirements(chassis);
     commandXboxController.b().onTrue(new InstantCommand(() -> precisionDrive = !precisionDrive));
-    // commandXboxController.y().onTrue(new InstantCommand((() -> this.wantedAngleApriltag = chassis.getClosetAngleApriltag())).andThen(() -> rotateToApriltag = true));
   }
 
   @Override
@@ -51,29 +50,14 @@ public class DriveCommand extends Command {
     double velY = Math.pow(joyY, 2) * MAX_DRIVE_VELOCITY * Math.signum(joyY);
     double velRot = Math.pow(rot, 2) * MAX_OMEGA_VELOCITY * Math.signum(rot);
 
-    /*
-    if (rotateToApriltag) {
-      if (Math.abs(
-          (wantedAngleApriltag).minus(chassis.getAngle()).getDegrees()) >= -1 &&
-          Math.abs((wantedAngleApriltag).minus(chassis.getAngle()).getDegrees()) <= 1) {
-        velRot = 0;
-        rotateToApriltag = false;
-      } else {
-        velRot = rotationPidController.calculate(chassis.getAngle().getDegrees(), wantedAngleApriltag.getDegrees())
-            * Math.toRadians(90);
-      }
-    } */
     if (precisionDrive) {
       velX /= 4;
       velY /= 4;
       velRot /= 4;
     }
     ChassisSpeeds speeds = new ChassisSpeeds(velX, velY, velRot);
-    if (rot == 0 && RobotContainer.robotContainer.shooter.getIsActiveToSpeaker()) { // rotate to speaker
-      chassis.setVelocitiesRotateToSpeaker(speeds);
-    } else {
-      chassis.setVelocities(speeds);
+    chassis.setVelocities(speeds);
     }
   }
 
-}
+
