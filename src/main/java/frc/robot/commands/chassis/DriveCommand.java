@@ -1,9 +1,14 @@
 package frc.robot.commands.chassis;
 
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Constants.ChassisConstants;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.chassis.Chassis;
 
@@ -20,21 +25,46 @@ public class DriveCommand extends Command {
   private boolean isRed;
   private boolean precisionDrive = false;
 
-  // Rotation2d wantedAngleApriltag = new Rotation2d();
-  // boolean rotateToApriltag = false;
-  // PIDController rotationPidController = new PIDController(0.03, 0, 0.0008);
+  private boolean isSeeNote = false;
+  private boolean hasNote = false;
+  private boolean hasVx = false;
+
+  private boolean autoIntake;
+
+  private double[] llpython;
+
+  NetworkTableEntry llentry;
+
+  public boolean start;
 
   public DriveCommand(Chassis chassis, CommandXboxController commandXboxController) {
     this.chassis = chassis;
+    this.autoIntake = true;
     this.commandXboxController = commandXboxController;
+   
     addRequirements(chassis);
     commandXboxController.b().onTrue(new InstantCommand(() -> precisionDrive = !precisionDrive));
-    // commandXboxController.y().onTrue(new InstantCommand((() -> this.wantedAngleApriltag = chassis.getClosetAngleApriltag())).andThen(() -> rotateToApriltag = true));
+    commandXboxController.y().onTrue(new InstantCommand(() -> { autoIntake = !autoIntake; start = autoIntake;}));
+
   }
 
   @Override
   public void initialize() {
+     llentry = NetworkTableInstance.getDefault().getTable("limelight").getEntry("llpython");
+    llpython = llentry.getDoubleArray(new double[8]);
 
+  }
+
+
+  //need to add intake
+  private boolean hasNote(){
+    return RobotContainer.robotContainer.intake.isNotePresent();
+  }
+
+  //need to add intake
+  private boolean isSeeNote(double distance){
+    
+    return distance != 0;
   }
 
   @Override
@@ -51,29 +81,40 @@ public class DriveCommand extends Command {
     double velY = Math.pow(joyY, 2) * MAX_DRIVE_VELOCITY * Math.signum(joyY);
     double velRot = Math.pow(rot, 2) * MAX_OMEGA_VELOCITY * Math.signum(rot);
 
-    /*
-    if (rotateToApriltag) {
-      if (Math.abs(
-          (wantedAngleApriltag).minus(chassis.getAngle()).getDegrees()) >= -1 &&
-          Math.abs((wantedAngleApriltag).minus(chassis.getAngle()).getDegrees()) <= 1) {
-        velRot = 0;
-        rotateToApriltag = false;
-      } else {
-        velRot = rotationPidController.calculate(chassis.getAngle().getDegrees(), wantedAngleApriltag.getDegrees())
-            * Math.toRadians(90);
-      }
-    } */
+    llpython = llentry.getDoubleArray(new double[8]);
+    hasVx = ChassisSpeeds.fromFieldRelativeSpeeds(new ChassisSpeeds(velX, velY, 0), chassis.getAngle()).vxMetersPerSecond != 0;
+    hasNote = hasNote();
+    isSeeNote = isSeeNote(llpython[0]);
+
+    System.out.println("is see note: " + isSeeNote);
+
     if (precisionDrive) {
       velX /= 4;
       velY /= 4;
       velRot /= 4;
     }
-    ChassisSpeeds speeds = new ChassisSpeeds(velX, velY, velRot);
-    if (rot == 0 && RobotContainer.robotContainer.shooter.getIsActiveToSpeaker()) { // rotate to speaker
-      chassis.setVelocitiesRotateToSpeaker(speeds);
-    } else {
+
+    if(hasVx && !hasNote && isSeeNote && autoIntake){
+      if(!RobotContainer.robotContainer.manualIntake.isScheduled()) RobotContainer.robotContainer.manualIntake.schedule();
+      
+      System.out.println("ENTERED");
+      llpython = llentry.getDoubleArray(new double[8]);
+      System.out.println("V: " + getV());
+      double angle = llpython[1];
+      double vectorAngle = angle * 2;
+      Translation2d robotToNote = new Translation2d(getV(), Rotation2d.fromDegrees(vectorAngle));
+      chassis.setVelocitiesRobotRel(new ChassisSpeeds(robotToNote.getX(), robotToNote.getY(), 0)); 
+    }
+
+    else{
+      ChassisSpeeds speeds = new ChassisSpeeds(velX, velY, velRot);
+      //updateAutoIntake();
       chassis.setVelocities(speeds);
     }
+  }
+
+  private double getV(){
+    return Math.min(Math.hypot(commandXboxController.getLeftX(), commandXboxController.getLeftY()) * ChassisConstants.MAX_DRIVE_VELOCITY, ChassisConstants.MAX_DRIVE_VELOCITY);
   }
 
 }

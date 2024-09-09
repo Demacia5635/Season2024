@@ -29,7 +29,6 @@ import frc.robot.commands.shooter.AngleCalibrate;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.subsystems.shooter.ShooterConstants.SHOOTER_MODE;
-import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionLimelight;
 import frc.robot.utils.Utils;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -176,7 +175,7 @@ public class RobotContainer implements Sendable {
 
     Trigger overrideAuto = new Trigger(() -> Utils.joystickOutOfDeadband(commandController));
 
-    commandController.y().onTrue(driveToNote);
+    //commandController.y().onTrue(driveToNote);
     commandController.x().onTrue(activateShooter);
     // B - in Drive Command
     commandController.a().onTrue(manualIntake);
@@ -186,6 +185,7 @@ public class RobotContainer implements Sendable {
     commandController.leftBumper().onTrue(disableCommand);
    // commandController.pov(270).onTrue(new GoToAMP1());
     commandController.pov(0).onTrue(shooter.getActivateShooterSubwoofer());
+    commandController.pov(180).onTrue(new InstantCommand(()-> intake.setPower(-1)));
     overrideAuto.onTrue(chassis.getDefaultCommand());
 
     //Operator Controller

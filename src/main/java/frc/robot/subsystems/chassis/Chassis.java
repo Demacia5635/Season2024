@@ -252,6 +252,11 @@ public class Chassis extends SubsystemBase {
     setVelocities(speeds);
   }
 
+  public void setVelocitiesRobotRel(ChassisSpeeds speeds){
+    
+    setModuleStates(KINEMATICS.toSwerveModuleStates(speeds));
+  }
+
 
   public void configAllFactoryDefaut() {
     for (int i=0; i<modules.length; i++) {
