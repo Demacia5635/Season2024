@@ -11,8 +11,11 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.ChassisConstants;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.chassis.Chassis;
+import edu.wpi.first.wpilibj.Timer;
 
 import static frc.robot.utils.Utils.*;
+
+import java.util.Timer;
 
 import static frc.robot.subsystems.chassis.ChassisConstants.*;
 
@@ -36,11 +39,15 @@ public class DriveCommand extends Command {
   NetworkTableEntry llentry;
 
   public boolean start;
+  private Timer timer;
+  Translation2d robotToNote;
 
   public DriveCommand(Chassis chassis, CommandXboxController commandXboxController) {
     this.chassis = chassis;
     this.autoIntake = true;
     this.commandXboxController = commandXboxController;
+    this.timer = new Timer();
+    
    
     addRequirements(chassis);
     commandXboxController.b().onTrue(new InstantCommand(() -> precisionDrive = !precisionDrive));
@@ -95,18 +102,20 @@ public class DriveCommand extends Command {
     }
 
     if(hasVx && !hasNote && isSeeNote && autoIntake){
-      if(!RobotContainer.robotContainer.manualIntake.isScheduled()) RobotContainer.robotContainer.manualIntake.schedule();
       
-      System.out.println("ENTERED");
+      if(!RobotContainer.robotContainer.manualIntake.isScheduled() && autoIntake) RobotContainer.robotContainer.manualIntake.schedule();
+      
       llpython = llentry.getDoubleArray(new double[8]);
-      System.out.println("V: " + getV());
       double angle = llpython[1];
       double vectorAngle = angle * 2;
-      Translation2d robotToNote = new Translation2d(getV(), Rotation2d.fromDegrees(vectorAngle));
+      robotToNote = new Translation2d(getV(), Rotation2d.fromDegrees(vectorAngle));
       chassis.setVelocitiesRobotRel(new ChassisSpeeds(robotToNote.getX(), robotToNote.getY(), 0)); 
     }
 
     else{
+      timer.start();
+      if(isSeeNote && timer.get() <= 0.35) chassis.setVelocitiesRobotRel(new ChassisSpeeds(robotToNote.getX(), robotToNote.getY(), 0));
+      else timer.stop();
       ChassisSpeeds speeds = new ChassisSpeeds(velX, velY, velRot);
       //updateAutoIntake();
       chassis.setVelocities(speeds);
