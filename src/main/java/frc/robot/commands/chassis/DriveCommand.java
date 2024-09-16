@@ -41,6 +41,7 @@ public class DriveCommand extends Command {
   public boolean start;
   private Timer timer;
   Translation2d robotToNote;
+  Translation2d notePos = new Translation2d();
 
   public DriveCommand(Chassis chassis, PS5Controller controller) {
     this.chassis = chassis;
@@ -72,12 +73,15 @@ public class DriveCommand extends Command {
     
     return distance != 0;
   }
+  private boolean isNearNote(Translation2d notePos){
+    return chassis.getPose().getTranslation().getDistance(notePos) <= 1;
+  }
 
   @Override
   public void execute() {
     
     if(controller.getCircleButtonPressed()) precisionDrive = !precisionDrive;
-    if(controller.getTriangleButtonPressed()) { autoIntake = !autoIntake; start = autoIntake;}
+    if(controller.getTriangleButtonPressed()) { autoIntake = !autoIntake;}
     isRed = chassis.isRed();
     direction = isRed ? 1 : -1;
     
@@ -102,22 +106,24 @@ public class DriveCommand extends Command {
       velY /= 4;
       velRot /= 4;
     }
-
-    if(hasVx && !hasNote && isSeeNote && autoIntake){
+    if(hasVx && !hasNote && (isSeeNote || isNearNote(notePos)) && autoIntake){
       
-      if(!RobotContainer.robotContainer.manualIntake.isScheduled() && autoIntake) RobotContainer.robotContainer.manualIntake.schedule();
+ //     if(!RobotContainer.robotContainer.manualIntake.isScheduled() && autoIntake) RobotContainer.robotContainer.manualIntake.schedule();
       
       llpython = llentry.getDoubleArray(new double[8]);
-      double angle = llpython[1];
+      double distanceToNote = llpython[0] / 100;
+      double angle = (isSeeNote) ? llpython[1] : chassis.getPose().getTranslation().minus(notePos).getAngle().getDegrees();
+      
+      notePos = chassis.getPose().getTranslation().plus(new Translation2d(distanceToNote, Rotation2d.fromDegrees(angle)));
+
+      
       double vectorAngle = angle * 2;
       robotToNote = new Translation2d(getV(), Rotation2d.fromDegrees(vectorAngle));
       chassis.setVelocitiesRobotRel(new ChassisSpeeds(robotToNote.getX(), robotToNote.getY(), 0)); 
     } 
 
     else{
-      timer.start();
-      if(isSeeNote && timer.get() <= 0.35) chassis.setVelocitiesRobotRel(new ChassisSpeeds(robotToNote.getX(), robotToNote.getY(), 0));
-      else timer.stop();
+      
       ChassisSpeeds speeds = new ChassisSpeeds(velX, velY, velRot);
       //updateAutoIntake();
       chassis.setVelocities(speeds);

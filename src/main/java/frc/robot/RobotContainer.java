@@ -155,7 +155,7 @@ public class RobotContainer implements Sendable {
   }
 
 
-  private void configureBindings() {
+  public void configureBindings() {
     // Buttons:
     //Driver controller
     // Y - Auto Intake
@@ -179,17 +179,18 @@ public class RobotContainer implements Sendable {
     Trigger overrideAuto = new Trigger(() -> Utils.joystickOutOfDeadband(commandController));
 
     //commandController.y().onTrue(driveToNote);
-    commandController.x().onTrue(activateShooter);
+    //commandController.x().onTrue(activateShooter);
     // B - in Drive Command
-    commandController.a().onTrue(manualIntake);
-    commandController.rightBumper().onTrue(shoot);
-    commandController.start().onTrue(activateAmp);
-    commandController.back().onTrue(resetOdometry);
-    commandController.leftBumper().onTrue(disableCommand);
+    //commandController.a().onTrue(manualIntake);
+    //commandController.rightBumper().onTrue(shoot);
+    //commandController.start().onTrue(activateAmp);
+    if(controller.getOptionsButtonPressed()) resetOdometry.schedule();
+    //if(controller.getCrossButtonPressed()) manualIntake.schedule();
+    if(controller.getL1ButtonPressed()) disableCommand.schedule();
    // commandController.pov(270).onTrue(new GoToAMP1());
-    commandController.pov(0).onTrue(shooter.getActivateShooterSubwoofer());
-    commandController.pov(180).onTrue(new InstantCommand(()-> intake.setPower(-1)));
-    overrideAuto.onTrue(chassis.getDefaultCommand());
+    //commandController.pov(0).onTrue(shooter.getActivateShooterSubwoofer());
+    //if(controller.getR3ButtonPressed()) new InstantCommand(()-> intake.setPower(-1)).schedule();
+    //overrideAuto.onTrue(chassis.getDefaultCommand());
 
     //Operator Controller
     //b -> set odometry to vision
@@ -202,7 +203,7 @@ public class RobotContainer implements Sendable {
     //pov(up) -> puke from Shooter(remove stack note)
     //pov(right) -> exposer+1
     //pov(left) -> exposer-1
-    Command driverB = new InstantCommand((()->vision.setResetOdo(true))).ignoringDisable(true);
+    /*Command driverB = new InstantCommand((()->vision.setResetOdo(true))).ignoringDisable(true);
     driverB.setName("Perlman B");
     commandController2.b().onTrue(driverB);
     commandController2.y().onTrue(shooter.getActivateShooterSubwoofer());
@@ -242,12 +243,15 @@ public class RobotContainer implements Sendable {
     button6.onTrue(PerlmanleftBumper);
     button7.onTrue(Ppov180);
     button8.onTrue(new InstantCommand(() -> {Utils.setPipeline(Utils.getPipeline() != 2 ? Utils.getPipeline() + 1 : 0); }).ignoringDisable(true));
+    */
 }
+
 
 
   public void calibrateSetIdle() {
     shooter.stopAll();
   }
+
 
  
    
