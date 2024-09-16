@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.ChassisConstants;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.chassis.Chassis;
+import edu.wpi.first.wpilibj.PS5Controller;
 import edu.wpi.first.wpilibj.Timer;
 
 import static frc.robot.utils.Utils.*;
@@ -20,7 +21,7 @@ import static frc.robot.subsystems.chassis.ChassisConstants.*;
 
 public class DriveCommand extends Command {
   private final Chassis chassis;
-  private final CommandXboxController commandXboxController;
+  private final PS5Controller controller;
 
   private double direction;
 
@@ -41,16 +42,15 @@ public class DriveCommand extends Command {
   private Timer timer;
   Translation2d robotToNote;
 
-  public DriveCommand(Chassis chassis, CommandXboxController commandXboxController) {
+  public DriveCommand(Chassis chassis, PS5Controller controller) {
     this.chassis = chassis;
     this.autoIntake = true;
-    this.commandXboxController = commandXboxController;
+    this.controller = controller;
     this.timer = new Timer();
     
    
     addRequirements(chassis);
-    commandXboxController.b().onTrue(new InstantCommand(() -> precisionDrive = !precisionDrive));
-    commandXboxController.y().onTrue(new InstantCommand(() -> { autoIntake = !autoIntake; start = autoIntake;}));
+    
 
   }
 
@@ -75,13 +75,16 @@ public class DriveCommand extends Command {
 
   @Override
   public void execute() {
+    
+    if(controller.getCircleButtonPressed()) precisionDrive = !precisionDrive;
+    if(controller.getTriangleButtonPressed()) { autoIntake = !autoIntake; start = autoIntake;}
     isRed = chassis.isRed();
     direction = isRed ? 1 : -1;
     
-    double joyX = deadband(commandXboxController.getLeftY(), 0.1) * direction;
-    double joyY = deadband(commandXboxController.getLeftX(), 0.1) * direction;
-    double rot = -(deadband(commandXboxController.getRightTriggerAxis(), 0.1)
-        - deadband(commandXboxController.getLeftTriggerAxis(), 0.1));
+    double joyX = deadband(controller.getLeftY(), 0.1) * direction;
+    double joyY = deadband(controller.getLeftX(), 0.1) * direction;
+    double rot = -(deadband((controller.getR2Axis() + 1) / 2, 0.1)
+        - deadband((controller.getL2Axis() + 1) / 2, 0.1));
 
     double velX = Math.pow(joyX, 2) * MAX_DRIVE_VELOCITY * Math.signum(joyX);
     double velY = Math.pow(joyY, 2) * MAX_DRIVE_VELOCITY * Math.signum(joyY);
@@ -122,7 +125,7 @@ public class DriveCommand extends Command {
   }
 
   private double getV(){
-    return Math.min(Math.hypot(commandXboxController.getLeftX(), commandXboxController.getLeftY()) * ChassisConstants.MAX_DRIVE_VELOCITY, ChassisConstants.MAX_DRIVE_VELOCITY);
+    return Math.min(Math.hypot(controller.getLeftX(), controller.getLeftY()) * ChassisConstants.MAX_DRIVE_VELOCITY, ChassisConstants.MAX_DRIVE_VELOCITY);
   }
 
 }

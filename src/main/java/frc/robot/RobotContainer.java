@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PS4Controller;
+import edu.wpi.first.wpilibj.PS5Controller;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -62,6 +63,7 @@ public class RobotContainer implements Sendable {
   private Boolean isRed = true;
   CommandXboxController commandController;
   public CommandXboxController commandController2;
+  PS5Controller controller;
   public Joystick gitar;
 
  
@@ -99,8 +101,9 @@ public class RobotContainer implements Sendable {
     gitar = new Joystick(2);
     commandController2 = new CommandXboxController(1);
     commandController = new CommandXboxController(0);
+    controller = new PS5Controller(2);
     shooter = new Shooter();
-    chassis.setDefaultCommand(new DriveCommand(chassis, commandController));
+    chassis.setDefaultCommand(new DriveCommand(chassis, controller));
     led = new LedControll(9, 110);
   
     shooter.setDefaultCommand(new ActivateShooter(shooter, intake, chassis));
