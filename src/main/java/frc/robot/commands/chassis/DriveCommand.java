@@ -97,8 +97,8 @@ public class DriveCommand extends Command {
     llpython = llentry.getDoubleArray(new double[8]);
     hasVx = ChassisSpeeds.fromFieldRelativeSpeeds(new ChassisSpeeds(velX, velY, 0), chassis.getAngle()).vxMetersPerSecond != 0;
     hasNote = hasNote();
-    isSeeNote = isSeeNote(llpython[0]);
-
+    //isSeeNote = isSeeNote(llpython[0]);
+    isSeeNote = false;
     System.out.println("is see note: " + isSeeNote);
 
     if (precisionDrive) {
